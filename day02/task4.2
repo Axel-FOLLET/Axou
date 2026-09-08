@@ -1,0 +1,8 @@
+#!/usr/bin/env python3
+def calc_pi_minus_3(depth):
+    result = 0
+    for k in range(2 * depth - 1, 0, -2):
+        result = k**2 / (6 + result)
+    return result
+
+print(round(3 + calc_pi_minus_3(300), 6))
