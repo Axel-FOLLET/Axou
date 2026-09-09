@@ -1,0 +1,10 @@
+#!/usr/bin/env python3
+def compte_mot(text, mot):
+    return text.count(mot) + text.count(mot[::-1])
+
+def challenge(i):
+    text = i.lower()
+    return compte_mot(text, "cat") + compte_mot(text, "garden") + compte_mot(text, "mice")
+
+print(challenge("the CataCat attaCk a Cat"))
+print(challenge("thE Cat's tactic wAS tO surpRISE thE mIce iN tHE gArdeN"))
