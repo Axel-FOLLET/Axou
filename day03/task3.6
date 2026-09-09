@@ -1,0 +1,60 @@
+#!/usr/bin/env python3
+import unicodedata
+
+langues = {
+    "Esperanto": {"e":10,"a":13,"i":11,"n":8,"o":9,"r":6,"s":6,"t":6,"l":6,"d":3,"u":3,"m":3,"p":3,"g":2,"k":2,"v":2},
+    "Spanish": {"e":13,"a":13,"i":8,"n":7,"o":9,"r":7,"s":8,"t":5,"l":5,"d":5,"u":3,"m":3,"c":4,"p":3,"g":2,"b":2},
+    "Portuguese": {"e":13,"a":15,"i":7,"n":5,"o":10,"r":7,"s":7,"t":4,"l":3,"d":5,"u":4,"m":5,"c":4,"p":3,"h":1,"g":1},
+    "Italian": {"e":12,"a":12,"i":10,"n":7,"o":10,"r":6,"s":5,"t":6,"l":6,"d":4,"u":3,"m":2,"c":4,"p":3,"h":1,"g":2},
+    "French": {"e":15,"a":8,"i":8,"n":7,"o":6,"r":7,"s":8,"t":7,"l":5,"d":4,"u":6,"m":3,"c":3,"p":2,"v":2,"f":1},
+    "English": {"e":13,"a":8,"i":7,"n":7,"o":7,"r":6,"s":6,"t":9,"l":4,"d":4,"u":3,"m":2,"c":3,"p":2,"h":6,"g":2},
+    "German": {"e":16,"a":6,"i":6,"n":10,"o":3,"r":7,"s":7,"t":6,"l":3,"d":5,"u":4,"m":2,"c":3,"h":5,"g":3,"k":1},
+    "Dutch": {"e":17,"a":7,"i":6,"n":10,"o":6,"r":6,"s":6,"t":7,"l":3,"d":6,"u":2,"m":2,"c":1,"p":1,"h":2,"g":3},
+    "Swedish": {"e":10,"a":9,"i":6,"n":9,"o":4,"r":8,"s":7,"t":8,"l":5,"d":5,"u":2,"m":3,"c":1,"p":2,"h":2,"g":3},
+    "Polish": {"e":7,"a":10,"i":8,"n":6,"o":7,"r":5,"s":5,"t":2,"l":3,"d":4,"u":2,"m":3,"c":4,"p":2,"h":1,"g":2},
+    "Turkish": {"e":10,"a":13,"i":10,"n":8,"o":3,"r":8,"s":3,"t":3,"l":6,"d":5,"u":3,"m":4,"h":1,"g":1,"k":6},
+}
+
+def enlever_accents(texte):
+    texte_decompose = unicodedata.normalize("NFD", texte)
+    resultat = ""
+    for caractere in texte_decompose:
+        if caractere.isalpha() or caractere == " ":
+            resultat = resultat + caractere
+    return resultat
+
+def comparaison(pourcentages_texte, pourcentages_langue):
+    difference_totale = 0
+    for lettre in pourcentages_texte:
+        pourcentage_texte = pourcentages_texte[lettre]
+        pourcentage_langue = pourcentages_langue.get(lettre, 0)
+        difference_totale = difference_totale + abs(pourcentage_texte - pourcentage_langue)
+    return difference_totale
+
+texte = input("Donne un texte : ")
+texte = texte.lower()
+texte = enlever_accents(texte)
+
+compteur = {}
+longueur_totale = 0
+for lettre in texte:
+    if lettre.isalpha():
+        longueur_totale = longueur_totale + 1
+        if lettre in compteur:
+            compteur[lettre] = compteur[lettre] + 1
+        else:
+            compteur[lettre] = 1
+
+pourcentages_texte = {}
+for lettre in compteur:
+    pourcentages_texte[lettre] = (compteur[lettre] / longueur_totale) * 100
+
+meilleure_langue = ""
+meilleur_score = None
+for nom_langue, pourcentages_langue in langues.items():
+    score = comparaison(pourcentages_texte, pourcentages_langue)
+    if meilleur_score is None or score < meilleur_score:
+        meilleur_score = score
+        meilleure_langue = nom_langue
+
+print("La langue est probablement : " + meilleure_langue)
