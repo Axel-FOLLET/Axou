@@ -1,0 +1,15 @@
+#!/usr/bin/env python3
+
+phrase = input("Donnez votre phrase cryptée : ")
+
+for clef in range(0, 26):
+    resultat = ""
+    for lettre in phrase.lower():
+        if lettre.isalpha():
+            resultat += chr((ord(lettre) - ord("a") - clef) % 26 + ord("a"))
+        else:
+            resultat += lettre
+    print(str(clef) + " : " + resultat)
+
+detect = input("Quelle phrase a du sens ? Donnez le nombre associé à la ligne : ")
+print("La clef utilisée était donc " + detect + " !")

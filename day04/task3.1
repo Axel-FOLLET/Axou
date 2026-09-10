@@ -1,0 +1,11 @@
+#!/usr/bin/env python3
+
+clef = int(input("Donnez votre clef de cryptage : "))
+phrase = input("Donnez votre donnée confidentielle : ")
+resultat = ""
+for lettre in phrase.lower() :
+   if lettre.isalpha() :
+      resultat += chr((ord(lettre) - ord("a") + clef) % 26 + ord("a"))
+   else :
+      resultat += lettre
+print(resultat)

@@ -1,0 +1,41 @@
+#!/usr/bin/env python3
+
+french = {"a":7.636,"b":0.901,"c":3.260,"d":3.669,"e":14.715,"f":1.066,"g":0.866,"h":0.737,"i":7.529,"j":0.613,"k":0.049,"l":5.456,"m":2.968,"n":7.095,"o":5.796,"p":2.521,"q":1.362,"r":6.693,"s":7.948,"t":7.244,"u":6.311,"v":1.838,"w":0.074,"x":0.427,"y":0.128,"z":0.326}
+
+phrase = input("Donnez votre phrase cryptée : ")
+
+meilleure_clef = 0
+meilleur_score = None
+
+for clef in range(0, 26):
+    resultat = ""
+    for lettre in phrase.lower():
+        if lettre.isalpha():
+            resultat += chr((ord(lettre) - ord("a") - clef) % 26 + ord("a"))
+        else:
+            resultat += lettre
+
+    compteur = {}
+    longueur_totale = 0
+    for lettre in resultat:
+        if lettre.isalpha():
+            longueur_totale += 1
+            if lettre in compteur:
+                compteur[lettre] += 1
+            else:
+                compteur[lettre] = 1
+
+    score = 0
+    if longueur_totale > 0:
+        for lettre in compteur:
+            pourcentage_texte = (compteur[lettre] / longueur_totale) * 100
+            pourcentage_francais = french.get(lettre, 0)
+            score += abs(pourcentage_texte - pourcentage_francais)
+
+    if meilleur_score is None or score < meilleur_score:
+        meilleur_score = score
+        meilleure_clef = clef
+        meilleur_resultat = resultat
+
+print("Clef detectee automatiquement : " + str(meilleure_clef))
+print("Message decrypte : " + meilleur_resultat)

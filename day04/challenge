@@ -1,0 +1,14 @@
+#!/usr/bin/env python3
+
+while True :
+   texte_et_nombre = input("Give me an integer and a string separated by a space: ")
+   nombre, texte = texte_et_nombre.split(" ")
+   nombre = int(nombre)
+   if nombre == 0 :
+         break
+   elif any(lettre in "aeiou" for lettre in texte) :
+         print(nombre)
+   elif nombre >= 42 :
+         print(nombre)
+   else :
+         print(texte)
