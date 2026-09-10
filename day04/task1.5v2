@@ -1,0 +1,17 @@
+#!/usr/bin/env python3
+
+texte = int(input("Please give me a number, I will give you a category: "))
+
+def categorize_numbers(texte):
+    if texte == 42:
+        print("a")
+    if texte <= 21:
+        print("b")
+    if texte % 2 == 0:
+        print("c")
+    if texte / 2 < 21:
+        print("d")
+    if texte % 2 != 0 and texte >= 45:
+        print("e")
+
+categorize_numbers(texte)

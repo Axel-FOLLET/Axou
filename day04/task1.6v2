@@ -1,0 +1,16 @@
+#!/usr/bin/env python3
+
+a = int(input("Number a: "))
+b = int(input("Number b: "))
+
+def compare_number(a, b):
+    if a == b:
+        print("a and b are the same")
+    else:
+        print("b is different from a")
+        if b < a:
+            print("b is lower than a")
+        else:
+            print("b is bigger than a")
+
+compare_number(a, b)

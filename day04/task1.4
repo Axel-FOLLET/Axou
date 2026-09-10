@@ -1,0 +1,13 @@
+#!/usr/bin/env python3
+
+texte = input("Please enter the pyramid: ")
+
+def good_password(texte):
+    if texte.lower() == "open sesame" :
+        print("access granted")
+    elif texte.lower() == "will you open, you goddamn !@&/°" :
+        print("access fucking granted")
+    else :
+        print("permission denied")
+
+good_password(texte)
