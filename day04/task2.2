@@ -1,0 +1,11 @@
+#!/usr/bin/env python3
+
+phrase = input("Donne moi une jolie phrase que je l'enlaidisse : ")
+
+def doublon(phrase):
+  result = ""
+  for caractere in phrase :
+     result += caractere*2
+  return result
+
+print(doublon(phrase))
