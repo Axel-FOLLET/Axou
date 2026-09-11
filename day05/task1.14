@@ -1,0 +1,6 @@
+#!/usr/bin/env python3
+
+phrase = input("Donnez 5 nombres séparés par une espace : ")
+liste_nombre = [int(element) for element in phrase.split(" ")]
+liste_inverse = sorted(liste_nombre, reverse=True)
+print(liste_inverse)

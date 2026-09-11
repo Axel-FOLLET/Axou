@@ -1,0 +1,8 @@
+#!/usr/bin/env python3
+
+phrase = input("Donnez 5 nombres séparés par une espace : ")
+liste_nombre = [int(element) for element in phrase.split(" ")]
+
+print("Le nombre le plus petit est " + str(min(liste_nombre)))
+print("Le nombre le plus grand est " + str(max(liste_nombre)))
+

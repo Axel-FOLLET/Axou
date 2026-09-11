@@ -1,0 +1,8 @@
+#!/usr/bin/env python3
+
+phrase = input("Donnez 5 nombres espacés par une espace : ")
+liste_nombre = [int(element) for element in phrase.split(" ")]
+total = 1
+for element in liste_nombre:
+    total = total * element
+print(total)
