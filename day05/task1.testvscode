@@ -1,0 +1,7 @@
+#!/usr/bin/env python3
+
+nombre = input("Donne moi un nombre")
+if int(nombre) % 2 == 0 :
+    print("Ton nombre est pair")
+else :
+    print("Ton nombre est impair")
