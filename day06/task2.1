@@ -1,0 +1,8 @@
+#!/usr/bin/env python3
+
+def somme(n):
+    if n <= 1:
+        return n
+    return n + somme(n - 1)
+
+print(somme(42))
