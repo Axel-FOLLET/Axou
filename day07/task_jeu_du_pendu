@@ -25,9 +25,9 @@ def afficher_mot(mot, lettres_devinees):
     guess = ""
     for letter in mot:
         if letter in lettres_devinees:
-            guess += letter.upper()
+            guess += letter.upper() + " "
         else:
-            guess += " _ "
+            guess += "_ "
     return guess
 
 penalite = 0
@@ -80,6 +80,7 @@ while True:
     print()
     print()
     print("________________________________________________________")
+    print("ATTENTION, IL VOUS RESTE " + str(120 - round((time.time() - temps_depart), 0)) + " SECONDES !")
     tentative = input("JOUEUR, TENTEZ VOTRE CHANCE ET PROPOSEZ UNE LETTRE, OU UN MOT COMPLET : ")
     tentative_nettoyee = nettoyage(tentative)
     victoire = points(tentative_nettoyee)
@@ -92,7 +93,7 @@ while True:
     if penalite >= max_penalites:
         print()
         print()
-        print("LE SORT VOUS A ÉTÉ DÉFAVORABLE, VOUS ALLEZ ÊTRE PENDU, DEFAITE")
+        print("LE SORT VOUS A ÉTÉ DÉFAVORABLE, VOUS ALLEZ ÊTRE PENDU, DEFAITE.")
         print("LE MOT À DEVINER ÉTAIT : " + mot_a_deviner.upper())
         break
     if set(mot) == lettres_devinees:
@@ -104,6 +105,18 @@ while True:
     if time.time() - temps_depart > 120:
         print()
         print()
-        print("VOUS AVEZ PRIS TROP DE TEMPS ! VOUS ALLEZ ÊTRE PENDU, DEFAITE.")
-        print("LE MOT À DEVINER ÉTAIT : " + mot_a_deviner.upper())
-        break
+        print("VOUS AVEZ PRIS TROP DE TEMPS ! DERNIERE TENTATIVE AVANT LA DEFAITE !")
+        tentative = input("JOUEUR, TENTEZ VOTRE CHANCE ET PROPOSEZ UN MOT COMPLET : ")
+        tentative_nettoyee = nettoyage(tentative)
+        if tentative_nettoyee == mot:
+            print()
+            print()
+            print("VOUS REMPORTEZ LA PARTIE ! VOUS OBTENEZ LE DROIT DE SURVIVRE.")
+            print("LE MOT À DEVINER ÉTAIT : " + mot_a_deviner.upper())
+            break
+        else:
+            print()
+            print()
+            print("LE SORT VOUS A ÉTÉ DÉFAVORABLE, VOUS ALLEZ ÊTRE PENDU, DEFAITE.")
+            print("LE MOT À DEVINER ÉTAIT : " + mot_a_deviner.upper())
+            break
