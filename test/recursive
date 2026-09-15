@@ -1,0 +1,27 @@
+#!/usr/bin/env python3
+import random
+
+def couleur_suivante(a, b):
+    if a == b:
+        return a
+    else:
+        return list({"R", "G", "B"} - {a, b})[0]
+
+def ligne_suivante(ligne):
+    nouvelle_ligne = ""
+    for i in range(len(ligne) - 1):
+        nouvelle_ligne += couleur_suivante(ligne[i], ligne[i + 1])
+    return nouvelle_ligne
+
+def couleur_finale(ligne):
+    if len(ligne) == 1:
+        return ligne
+    return couleur_finale(ligne_suivante(ligne))
+
+nombre = int(input("Combien de couleurs voulez-vous générer ? "))
+ligne_depart = ""
+for _ in range(nombre):
+    ligne_depart += random.choice(["R", "G", "B"])
+
+print("Ligne de départ : " + ligne_depart)
+print("Couleur finale : " + couleur_finale(ligne_depart))
