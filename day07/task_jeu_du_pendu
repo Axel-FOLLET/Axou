@@ -56,67 +56,31 @@ def points(tentative):
 mot = nettoyage(mot_a_deviner)
 lettres_devinees = set()
 
-print()
-print("________________________________________________________")
-print()
-print()
-print("BIENVENUE AU JEU DU PENDU, TROUVEZ LE MOT SECRET POUR SURVIVRE !")
-print()
-print("ATTENTION !")
-print("SEULES " + str(max_penalites) + " ERREURS VOUS SERONT PERMISES.")
-print("UNE MAUVAISE LETTRE VOUS COÛTERA 1 PENALITE, MAIS UN MOT COMPLET ERRONÉ VOUS EN COÛTERA 5 !")
-print("LE MOT A DEVINER A " + str(len(mot)) + " LETTRE(S).")
-print("VOUS DISPOSEZ DE 2 MINUTES MAXIMUM POUR TROUVER LE MOT !")
-print()
-print("PUISSE LE SORT VOUS ÊTRE FAVORABLE.")
-print()
+print("\n________________________________________________________ \n \n \nBIENVENUE AU JEU DU PENDU, TROUVEZ LE MOT SECRET POUR SURVIVRE !\n \nATTENTION !\nSEULES " + str(max_penalites) + " ERREURS VOUS SERONT PERMISES. \nUNE MAUVAISE LETTRE VOUS COÛTERA 1 PENALITE, MAIS UN MOT COMPLET ERRONÉ VOUS EN COÛTERA 5 ! \nLE MOT A DEVINER A " + str(len(mot)) + " LETTRE(S). \nVOUS DISPOSEZ DE 2 MINUTES MAXIMUM POUR TROUVER LE MOT \nPUISSE LE SORT VOUS ÊTRE FAVORABLE. \n")
 
 temps_depart = time.time()
 
 while True:
-    print(afficher_mot(mot, lettres_devinees))
-    print()
-    print("VOS PÉNALITÉS SONT AU NOMBRE DE : " + str(penalite) + "/" + str(max_penalites) + " ; ATTENTION, IL VOUS RESTE " + str(max_penalites - penalite) + " CHANCES !")
-    print()
-    print()
-    print("________________________________________________________")
-    print("ATTENTION, IL VOUS RESTE " + str(120 - round((time.time() - temps_depart), 0)) + " SECONDES !")
+    print("\n" + afficher_mot(mot, lettres_devinees) + "\n VOS PÉNALITÉS SONT AU NOMBRE DE : " + str(penalite) + "/" + str(max_penalites) + " ; ATTENTION, IL VOUS RESTE " + str(max_penalites - penalite) + " CHANCES !" "\n \n________________________________________________________ \nATTENTION, IL VOUS RESTE " + str(120 - int(time.time() - temps_depart)) + " SECONDES !")
     tentative = input("JOUEUR, TENTEZ VOTRE CHANCE ET PROPOSEZ UNE LETTRE, OU UN MOT COMPLET : ")
     tentative_nettoyee = nettoyage(tentative)
     victoire = points(tentative_nettoyee)
     if victoire:
-        print()
-        print()
-        print("VOUS REMPORTEZ LA PARTIE ! VOUS OBTENEZ LE DROIT DE SURVIVRE.")
-        print("LE MOT À DEVINER ÉTAIT : " + mot_a_deviner.upper())
+        print("\n \nVOUS REMPORTEZ LA PARTIE ! VOUS OBTENEZ LE DROIT DE SURVIVRE. \nLE MOT À DEVINER ÉTAIT : " + mot_a_deviner.upper())
         break
     if penalite >= max_penalites:
-        print()
-        print()
-        print("LE SORT VOUS A ÉTÉ DÉFAVORABLE, VOUS ALLEZ ÊTRE PENDU, DEFAITE.")
-        print("LE MOT À DEVINER ÉTAIT : " + mot_a_deviner.upper())
+        print("\n \nLE SORT VOUS A ÉTÉ DÉFAVORABLE, VOUS ALLEZ ÊTRE PENDU, DEFAITE. \nLE MOT À DEVINER ÉTAIT : " + mot_a_deviner.upper())
         break
     if set(mot) == lettres_devinees:
-        print()
-        print()
-        print("VOUS REMPORTEZ LA PARTIE ! VOUS OBTENEZ LE DROIT DE SURVIVRE.")
-        print("LE MOT À DEVINER ÉTAIT : " + mot_a_deviner.upper())
+        print("\n \nVOUS REMPORTEZ LA PARTIE ! VOUS OBTENEZ LE DROIT DE SURVIVRE. \nLE MOT À DEVINER ÉTAIT : " + mot_a_deviner.upper())
         break
     if time.time() - temps_depart > 120:
-        print()
-        print()
-        print("VOUS AVEZ PRIS TROP DE TEMPS ! DERNIERE TENTATIVE AVANT LA DEFAITE !")
+        print("\n \nVOUS AVEZ PRIS TROP DE TEMPS ! DERNIERE TENTATIVE AVANT LA DEFAITE !")
         tentative = input("JOUEUR, TENTEZ VOTRE CHANCE ET PROPOSEZ UN MOT COMPLET : ")
         tentative_nettoyee = nettoyage(tentative)
         if tentative_nettoyee == mot:
-            print()
-            print()
-            print("VOUS REMPORTEZ LA PARTIE ! VOUS OBTENEZ LE DROIT DE SURVIVRE.")
-            print("LE MOT À DEVINER ÉTAIT : " + mot_a_deviner.upper())
+            print("\n \nVOUS REMPORTEZ LA PARTIE ! VOUS OBTENEZ LE DROIT DE SURVIVRE. \nLE MOT À DEVINER ÉTAIT : " + mot_a_deviner.upper())
             break
         else:
-            print()
-            print()
-            print("LE SORT VOUS A ÉTÉ DÉFAVORABLE, VOUS ALLEZ ÊTRE PENDU, DEFAITE.")
-            print("LE MOT À DEVINER ÉTAIT : " + mot_a_deviner.upper())
+            print("\n \nLE SORT VOUS A ÉTÉ DÉFAVORABLE, VOUS ALLEZ ÊTRE PENDU, DEFAITE. \nLE MOT À DEVINER ÉTAIT : " + mot_a_deviner.upper())
             break
