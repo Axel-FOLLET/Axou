@@ -1,0 +1,16 @@
+#!/usr/bin/env python3
+
+import turtle
+turtle.shape("turtle")
+turtle.color("pink")
+
+nombre_tours = int(input("Donnez un nombre de spirales : "))
+
+def draw_spiral(nombre_tours):
+    for i in range(nombre_tours):
+        turtle.circle(-i, 20)  
+        # dessine 20° des 360° du cercle, puis reboucle avec i qui grandit de valeur
+        # le comportement de base fait une spirale vers la gauche, -i pour la droite
+
+draw_spiral(nombre_tours)
+turtle.done()
