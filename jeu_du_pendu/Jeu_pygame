@@ -341,7 +341,7 @@ while jeu_actif:
 
             elif etat == "jeu":
                 #On gère la saisie de l'utilisateur.
-
+                
                 if event.key == pygame.K_RETURN:
                     tentative_nettoyee = nettoyage(saisie)
                     resultat = traiter_tentative(tentative_nettoyee)
