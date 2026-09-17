@@ -1,21 +1,27 @@
 #!/usr/bin/env python3
 
+import random
 import pygame
 import time
 import unicodedata
 import getpass
 import sys
+import datetime
 
+
+
+# on initie notre fenêtre à afficher ainsi que le mot pour notre jeu
 pygame.init()
 fenetre = pygame.display.set_mode((600, 800))
 police = pygame.font.SysFont(None, 30)  # créée une seule fois, ici vu qu'elle va êtreréutilisée
 
-if len(sys.argv) > 1:
-    max_penalites = int(sys.argv[1])
-else:
-    max_penalites = 12
+from base_mots import choisir_mot
 
-mot_a_deviner = getpass.getpass("MAÎTRE DU JEU, DONNEZ VOTRE MOT À DEVINER : ")
+mot_a_deviner = choisir_mot()
+
+
+
+# on définit nos fonctions utiles pour le jeu
 
 def nettoyage(mot_a_deviner):
     mot = ""
@@ -45,6 +51,8 @@ def entree_valide(tentative):
     # accepte uniquement du texte non vide, composé exclusivement de lettres
     return len(tentative) > 0 and tentative.isalpha()
 
+max_penalites = 12
+
 def traiter_lettre(tentative):
     # gère le cas d'une lettre unique : déjà tentée, trouvée dans le mot, ou pénalité si absente
     global penalite
@@ -65,11 +73,16 @@ def traiter_mot_complet(tentative):
     penalite += 5
     return False
 
+nombre_tentatives = 0
+
 def points(tentative):
+    global nombre_tentatives
     # aiguille la tentative vers le bon traitement, selon sa validité et sa longueur
     if not entree_valide(tentative):
         print("ENTRÉE INVALIDE, VEUILLEZ PROPOSER UNE LETTRE OU UN MOT.")
         return False
+    #si l'entrée est valide, on compte la tentative pour le score et on l'envoie vers le bon traitement
+    nombre_tentatives += 1
     if len(tentative) == 1:
         traiter_lettre(tentative)
         return False
@@ -136,6 +149,43 @@ def rafraichir_ecran(fenetre, penalite, lettres_tentees, mot):
 mot = nettoyage(mot_a_deviner)
 lettres_devinees = set()
 
+def lire_meilleur_score():
+    # tente de lire le fichier de score existant, renvoie None si aucune partie n'a encore été gagnée
+    try:
+        with open("meilleur_score.txt") as fichier:
+            contenu = fichier.readline()
+    except FileNotFoundError:
+        contenu = None
+    return contenu
+
+def meilleur_score_battu(contenu, nombre_tentatives):
+    # un score inexistant est toujours battu ; sinon, compare le nombre de tentatives (plus petit = meilleur)
+    if contenu is None:
+        return True
+    # une erreur s'est glissée dans le fichier de score, on considère que le score est battu pour ne pas bloquer le jeu
+    try:
+        ancien_score = int(contenu.split()[0])
+    except (ValueError, IndexError):
+        return True
+    return nombre_tentatives < ancien_score
+
+def afficher_meilleur_score(nombre_tentatives):
+    # compare avec le record existant et affiche le message adapté (nouveau record ou score non battu)
+    contenu = lire_meilleur_score()
+    if meilleur_score_battu(contenu, nombre_tentatives):
+        print("FÉLICITATIONS ! VOUS AVEZ BATTU LE MEILLEUR SCORE !")
+    else:
+        ancien_score = int(contenu.split()[0])
+        ancienne_date = contenu.split()[1]
+        print(f"LE MEILLEUR SCORE EST DE {ancien_score} TENTATIVES LE {ancienne_date}. VOUS N'AVEZ PAS BATU CE SCORE.")
+
+def enregistrer_score(nombre_tentatives):
+    date_aujourdhui = datetime.date.today()
+    with open("meilleur_score.txt", "w") as fichier:
+        fichier.write(str(nombre_tentatives) + " " + str(date_aujourdhui))
+
+
+
 # rafraîchit l'écran pour la première fois, avant que le joueur ne commence à jouer, affin de ne pas afficher un écran vide
 rafraichir_ecran(fenetre, penalite, lettres_tentees, mot)
 
@@ -148,14 +198,15 @@ while True:
     victoire = points(tentative_nettoyee)
     # après chaque tentative, on redessine tout l'écran pour refléter le nouvel état (pénalités, lettres échouées)
     rafraichir_ecran(fenetre, penalite, lettres_tentees, mot)
-    if victoire:
+    if victoire or set(mot) == lettres_devinees:
+        afficher_meilleur_score(nombre_tentatives)
+        if meilleur_score_battu(lire_meilleur_score(), nombre_tentatives):
+            enregistrer_score(nombre_tentatives)    
         print("\n \nVOUS REMPORTEZ LA PARTIE ! VOUS OBTENEZ LE DROIT DE SURVIVRE. \nLE MOT À DEVINER ÉTAIT : " + mot_a_deviner.upper())
         break
     if penalite >= max_penalites:
+        afficher_meilleur_score(nombre_tentatives)
         print("\n \nLE SORT VOUS A ÉTÉ DÉFAVORABLE, VOUS ALLEZ ÊTRE PENDU, DEFAITE. \nLE MOT À DEVINER ÉTAIT : " + mot_a_deviner.upper())
-        break
-    if set(mot) == lettres_devinees:
-        print("\n \nVOUS REMPORTEZ LA PARTIE ! VOUS OBTENEZ LE DROIT DE SURVIVRE. \nLE MOT À DEVINER ÉTAIT : " + mot_a_deviner.upper())
         break
 
     # vérifie si l'utilisateur a cliqué sur la croix pour fermer la fenêtre pygame
