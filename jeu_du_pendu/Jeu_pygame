@@ -4,6 +4,7 @@ import datetime
 import sys
 import unicodedata
 import pygame
+import os
 
 from base_mots import choisir_mot
 
@@ -218,10 +219,12 @@ def rafraichir_ecran(saisie="", message=""):
 
 # -------------------- SCORE --------------------
 
+CHEMIN_SCORE = os.path.join(os.path.dirname(__file__), "meilleur_score.txt")
+
 def lire_meilleur_score():
     #Lit le meilleur score enregistré dans le fichier, évite les erreurs si le fichier n'existe pas.
     try:
-        with open("meilleur_score.txt") as fichier:
+        with open(CHEMIN_SCORE) as fichier:
             return fichier.readline().strip()
     except FileNotFoundError:
         return None
@@ -242,7 +245,7 @@ def meilleur_score_battu(contenu):
 def enregistrer_score():
     #Enregistre le nouveau meilleur score (w nous permet d'écraser le fichier existant).
     date_aujourdhui = datetime.date.today()
-    with open("meilleur_score.txt", "w") as fichier:
+    with open(CHEMIN_SCORE, "w") as fichier:
         fichier.write(str(nombre_tentatives) + " " + str(date_aujourdhui))
 
 

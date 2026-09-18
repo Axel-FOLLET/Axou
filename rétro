@@ -1,0 +1,18 @@
+points de progression :
+- environnement informatique
+- les boucles et les conditions
+- rendre son code lisible, clair et logique
+
+points de difficulté :
+- la recursive
+- import sys
+- la fatigue
+
+Entreprise :
+- utiliser le même langage de programmation que les autres membres de l'équipe
+- pull commit push réguliers
+- respecter les conventions de nommage et de style du code
+- utiliser des fonctions courtes quitte à en faire un plus grand nombre pour favoriser la réutilisation du travail déjà fait 
+- mettre des commentaires dans le code pour expliquer les parties complexes
+- mettre en place de la gestion de projet pour suivre des deadlines des tâches
+
