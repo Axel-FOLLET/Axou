@@ -147,8 +147,8 @@ def dessiner_homme(fenetre):
         pygame.draw.circle(fenetre, ROUGE, (300, 200), 50, 5)
     segments = [
         (8, (300, 250), (300, 400)),
-        (9, (300, 250), (250, 300)),
-        (10, (300, 250), (350, 300)),
+        (9, (300, 260), (250, 310)),
+        (10, (300, 260), (350, 310)),
         (11, (300, 400), (250, 450)),
         (12, (300, 400), (350, 450)),
     ]
@@ -187,7 +187,8 @@ def afficher_lettres_trouvees():
 def afficher_penalites():
     #Affiche le nombre de pénalités subies, puis restantes.
     afficher_texte(f"Pénalités : {penalite}/{max_penalites}", (850, 50))
-    afficher_texte(f"Chances restantes : {max_penalites - penalite}", (850, 85))
+    afficher_texte(f"Chances restantes : {max_penalites - penalite}", (850, 85), police, ROUGE)
+    afficher_texte(f"Tentatives : {nombre_tentatives}", (850, 120), police, GRIS)
 
 
 def afficher_saisie(saisie):

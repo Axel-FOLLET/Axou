@@ -16,3 +16,4 @@ Entreprise :
 - mettre des commentaires dans le code pour expliquer les parties complexes
 - mettre en place de la gestion de projet pour suivre des deadlines des tâches
 
+bash parce
