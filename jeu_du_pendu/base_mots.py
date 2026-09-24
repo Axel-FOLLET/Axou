@@ -3,7 +3,7 @@ import random
 
 def choisir_mot():
     # ouvre le dictionnaire français et lit tous les mots, un par ligne
-    chemin_fichier = "day09/mots_simples.txt"
+    chemin_fichier = "mots_simples.txt"
     with open(chemin_fichier) as fichier:
         mots = fichier.readlines()
     if len(mots) == 0:
