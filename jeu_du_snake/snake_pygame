@@ -1,0 +1,98 @@
+#!/usr/bin/env python3
+
+import sys
+import pygame
+
+from fonctions.constantes import DROITE, HAUTEUR_FENETRE, LARGEUR_FENETRE
+from fonctions.affichage import afficher_accueil, afficher_fin, afficher_jeu
+from fonctions.feux_artifice import animer_feux_artifice, creer_explosion
+from fonctions.partie import faire_avancer_partie, nouvelle_partie, pas_ecoule
+from fonctions.score import lire_meilleur_score, mettre_a_jour_meilleur_score
+from fonctions.serpent import choisir_direction, direction_de_la_touche
+
+
+# -------------------- INITIALISATION --------------------
+
+#On n'initialise que l'affichage et les polices : le jeu n'a pas de son, ce qui évite les erreurs ALSA.
+pygame.display.init()
+pygame.font.init()
+
+fenetre = pygame.display.set_mode((LARGEUR_FENETRE, HAUTEUR_FENETRE))
+pygame.display.set_caption("Jeu du snake")
+horloge = pygame.time.Clock()
+
+police = pygame.font.SysFont(None, 30)
+grande_police = pygame.font.SysFont(None, 50)
+petite_police = pygame.font.SysFont(None, 24)
+police_regles = pygame.font.SysFont(None, 24)
+polices_fin = (grande_police, police, petite_police)
+particules = []
+
+serpent, direction, pomme, score = nouvelle_partie()
+direction_demandee = DROITE
+meilleur_score = lire_meilleur_score()
+record_battu = False
+victoire = False
+dernier_pas = 0
+etat = "accueil"
+jeu_actif = True
+
+
+# -------------------- PROGRAMME PRINCIPAL --------------------
+
+while jeu_actif:
+    #On parcourt tous les événements de la file d'attente.
+    for event in pygame.event.get():
+
+        #On gère la fermeture de la fenêtre.
+        if event.type == pygame.QUIT:
+            jeu_actif = False
+
+        #On gère les touches pressées.
+        elif event.type == pygame.KEYDOWN:
+
+            if event.key == pygame.K_ESCAPE:
+                jeu_actif = False
+
+            elif etat in ("accueil", "fin") and event.key == pygame.K_RETURN:
+                #Entrée lance (ou relance) une partie toute neuve.
+                serpent, direction, pomme, score = nouvelle_partie()
+                direction_demandee = direction
+                particules = []
+                dernier_pas = pygame.time.get_ticks()
+                etat = "jeu"
+
+            elif etat == "jeu" and direction_de_la_touche(event.key):
+                #Le demi-tour est comparé à la dernière direction réellement suivie.
+                direction_demandee = choisir_direction(direction, direction_de_la_touche(event.key))
+
+    if etat == "accueil":
+        afficher_accueil(fenetre, grande_police, police, police_regles, petite_police)
+
+    elif etat == "jeu":
+        maintenant = pygame.time.get_ticks()
+        if pas_ecoule(dernier_pas, maintenant, score):
+            dernier_pas = maintenant
+            direction = direction_demandee
+            serpent, pomme, score, fini = faire_avancer_partie(serpent, direction, pomme, score)
+            if fini:
+                victoire = pomme is None
+                record_battu = mettre_a_jour_meilleur_score(score)
+                meilleur_score = lire_meilleur_score()
+                etat = "fin"
+                #Un record battu déclenche une première explosion tout de suite.
+                if record_battu:
+                    particules = creer_explosion(300, 200)
+        afficher_jeu(fenetre, serpent, direction, pomme, score, meilleur_score, police)
+
+    elif etat == "fin":
+        #Les feux d'artifice ne s'animent que si le record vient d'être battu.
+        if record_battu:
+            particules = animer_feux_artifice(particules)
+        afficher_fin(fenetre, victoire, score, meilleur_score, record_battu, particules, polices_fin)
+
+    horloge.tick(60)
+
+
+pygame.quit()
+sys.exit()

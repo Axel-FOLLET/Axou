@@ -1,3 +1,10 @@
-web_day01/
-web_day03/
-web_day2/
+# Seuls jeu_du_pendu/ et jeu_du_snake/ sont versionnés dans ce dépôt.
+# Tout le reste à la racine est ignoré.
+/*
+!/.gitignore
+!/jeu_du_pendu/
+!/jeu_du_snake/
+
+# Fichiers générés
+__pycache__/
+*.pyc

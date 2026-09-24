@@ -1,2 +1,0 @@
-vim is an adveced text editor
-
