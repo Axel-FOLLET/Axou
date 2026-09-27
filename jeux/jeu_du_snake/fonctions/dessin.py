@@ -5,8 +5,8 @@ import math
 import pygame
 
 from fonctions.constantes import (
-    BLANC, BORDEAUX_PASTEL, CONTOUR_SERPENT, HAUTEUR_BANDEAU, JAUNE_ETOILE, MARRON, NOIR,
-    NOMBRE_CASES, ROSE_PASTEL, ROUGE_LANGUE, ROUGE_POMME, TAILLE_CASE, VERT_SERPENT, VERT_TETE,
+    BLANC, CONTOUR_SERPENT, HAUTEUR_BANDEAU, JAUNE_ETOILE, MARRON, NOIR,
+    NOMBRE_CASES, ROUGE_LANGUE, ROUGE_POMME, TAILLE_CASE, VERT_CLAIR, VERT_FORET, VERT_SERPENT, VERT_TETE,
 )
 
 
@@ -36,10 +36,10 @@ def point_decale(centre, direction, distance):
 # -------------------- GRILLE --------------------
 
 def couleur_case(colonne, ligne):
-    #Alterne rose pastel et rouge bordeaux pastel comme un damier.
+    #Alterne vert clair et vert forêt comme un damier.
     if (colonne + ligne) % 2 == 0:
-        return ROSE_PASTEL
-    return BORDEAUX_PASTEL
+        return VERT_CLAIR
+    return VERT_FORET
 
 
 def dessiner_grille(fenetre):
