@@ -1,0 +1,91 @@
+/*
+ * Pied de page : navigation secondaire, crédits et mentions.
+ * BEM : bloc__element désigne une partie du bloc ; bloc--modificateur désigne une variante.
+ */
+/* -------------------- PIED DE PAGE -------------------- */
+
+.footer {
+    /*
+     * Espacement intérieur : 2 valeurs = vertical/horizontal ; 3 = haut/horizontal/bas.
+     */
+    padding: 50px 8% 40px;
+
+    background-color: #E1001A;
+    color: white;
+}
+
+
+.footer__row {
+    /*
+     * Définit le mode de disposition ; flex aligne les enfants sur un axe, grid sur une grille.
+     */
+    display: flex;
+    /*
+     * Répartit les enfants sur l'axe principal du conteneur flex.
+     */
+    justify-content: space-between;
+    flex-wrap: wrap;
+
+    /*
+     * Ajoute de l'espace entre les enfants sans marge extérieure.
+     */
+    gap: 30px;
+}
+
+
+.footer__title {
+    /*
+     * Espacement extérieur ; auto peut absorber l'espace disponible selon la disposition.
+     */
+    margin: 0 0 12px;
+
+    /*
+     * rem se rapporte à la taille de police de l'élément html.
+     */
+    font-size: 1.1rem;
+}
+
+
+.footer__list {
+    margin: 0;
+    padding: 0;
+
+    list-style: none;
+}
+
+
+.footer__list li {
+    margin-bottom: 6px;
+}
+
+
+.footer__list a {
+    color: white;
+    text-decoration: none;
+}
+
+
+.footer__list a:hover,
+.footer__list a:focus-visible {
+    text-decoration: underline;
+}
+
+
+.footer__credits {
+    max-width: 620px;
+
+    margin: 0;
+
+    font-size: 0.9rem;
+    /*
+     * Une valeur sans unité multiplie la taille de police pour fixer l'interligne.
+     */
+    line-height: 1.5;
+}
+
+
+.footer__copyright {
+    margin: 30px 0 0;
+
+    font-size: 0.85rem;
+}

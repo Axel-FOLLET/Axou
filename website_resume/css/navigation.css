@@ -1,0 +1,186 @@
+/*
+ * En-tête et navigation. Le bouton de menu est masqué ici puis affiché par responsive.css.
+ * BEM : bloc__element désigne une partie du bloc ; bloc--modificateur désigne une variante.
+ */
+/* -------------------- NAVIGATION -------------------- */
+
+.site-header {
+    width: 100%;
+
+    /*
+     * Le positionnement définit le repère utilisé par top/right/bottom/left ; les valeurs sont précisées ici.
+     */
+    position: sticky;
+    top: 0;
+
+    /*
+     * Règle l'ordre de superposition à l'intérieur du contexte d'empilement.
+     */
+    z-index: 1000;
+
+    background-color: #0D0A9B;
+}
+
+
+.navigation {
+    /*
+     * Définit le mode de disposition ; flex aligne les enfants sur un axe, grid sur une grille.
+     */
+    display: flex;
+    /*
+     * Répartit les enfants sur l'axe principal du conteneur flex.
+     */
+    justify-content: space-between;
+    /*
+     * Aligne les enfants sur l'axe transversal du conteneur.
+     */
+    align-items: center;
+
+    /*
+     * Espacement intérieur : 2 valeurs = vertical/horizontal ; 3 = haut/horizontal/bas.
+     */
+    padding: 24px 48px;
+}
+
+
+.navigation__toggle {
+    display: none;
+
+    width: 44px;
+    height: 44px;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    background: transparent;
+    color: white;
+
+    cursor: pointer;
+}
+
+
+.navigation__toggle-icon {
+    display: flex;
+    /*
+     * column empile les enfants verticalement ; row les dispose horizontalement.
+     */
+    flex-direction: column;
+    /*
+     * Ajoute de l'espace entre les enfants sans marge extérieure.
+     */
+    gap: 5px;
+}
+
+
+.navigation__toggle-icon span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: currentColor;
+    /*
+     * Anime un changement de propriété, par exemple lors d'un survol ou d'un changement de classe.
+     */
+    transition: transform 0.2s ease;
+}
+
+
+.navigation__toggle:hover,
+.navigation__toggle:focus-visible {
+    border-color: #E1001A;
+    outline: 2px solid #E1001A;
+    /*
+     * Écarte l'indicateur de focus du bord sans modifier la taille de l'élément.
+     */
+    outline-offset: 3px;
+}
+
+
+.navigation a {
+    color: white;
+    text-decoration: none;
+
+    transition: 0.3s;
+}
+
+
+.navigation a:hover {
+    color: #E1001A;
+}
+
+
+/* -------------------- PHOTO + AF -------------------- */
+
+.navigation__identity {
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+}
+
+
+.navigation__identity img {
+    width: 40px;
+    height: 40px;
+
+    /*
+     * contain conserve toute l'image ; cover remplit le cadre en recadrant si nécessaire.
+     */
+    object-fit: cover;
+
+    border-radius: 50%;
+}
+
+
+.navigation__identity a {
+    /*
+     * rem se rapporte à la taille de police de l'élément html.
+     */
+    font-size: 1.5rem;
+    font-weight: bold;
+    letter-spacing: 0.15rem;
+}
+
+
+.navigation__identity a:hover {
+    color: white;
+}
+
+
+/* -------------------- CHOIX DE LA LANGUE -------------------- */
+
+.language-switch {
+    display: flex;
+    align-items: center;
+}
+
+
+.language-switch__select {
+    padding: 6px 8px;
+
+    border: 1px solid rgba(255, 255, 255, 0.4);
+
+    background-color: #0D0A9B;
+    color: white;
+
+    font-family: inherit;
+    font-size: 0.85rem;
+
+    cursor: pointer;
+
+    outline: none;
+}
+
+/* La bordure devient rouge au survol ou lorsque le menu est sélectionné */
+.language-switch__select:hover,
+.language-switch__select:focus {
+    border-color: #E1001A;
+}
+
+
+/* -------------------- LIENS DE NAVIGATION -------------------- */
+
+.navigation__links {
+    display: flex;
+
+    gap: 32px;
+}

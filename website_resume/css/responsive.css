@@ -1,0 +1,782 @@
+/*
+ * Surcharges selon la largeur : les règles à 1024 px restent actives sous 767 px.
+ * À spécificité égale, la règle située plus bas ou chargée plus tard l'emporte.
+ * BEM : bloc__element désigne une partie du bloc ; bloc--modificateur désigne une variante.
+ */
+/* -------------------- TABLETTE -------------------- */
+
+/*
+ * Cette condition se base sur la largeur de la fenêtre en pixels CSS, pas sur le type d'appareil.
+ */
+@media (max-width: 1024px) {
+
+    /* -------------------- NAVIGATION -------------------- */
+
+    .navigation {
+        /*
+         * Le positionnement définit le repère utilisé par top/right/bottom/left ; les valeurs sont précisées ici.
+         */
+        position: relative;
+        /*
+         * Espacement intérieur : 2 valeurs = vertical/horizontal ; 3 = haut/horizontal/bas.
+         */
+        padding: 20px 32px;
+        /*
+         * Ajoute de l'espace entre les enfants sans marge extérieure.
+         */
+        gap: 20px;
+    }
+
+
+    .navigation__toggle {
+        /*
+         * Définit le mode de disposition ; flex aligne les enfants sur un axe, grid sur une grille.
+         */
+        display: inline-flex;
+        /*
+         * Définit croissance, réduction et taille de base de cet enfant flex.
+         */
+        flex: 0 0 44px;
+    }
+
+
+    .navigation__links {
+        display: none;
+
+        position: absolute;
+        top: 100%;
+        right: 0;
+        left: 0;
+        /*
+         * Règle l'ordre de superposition à l'intérieur du contexte d'empilement.
+         */
+        z-index: 1001;
+
+        /*
+         * column empile les enfants verticalement ; row les dispose horizontalement.
+         */
+        flex-direction: column;
+        gap: 0;
+        padding: 10px 32px 20px;
+
+        background-color: #0D0A9B;
+        box-shadow: 0 12px 18px rgba(0, 0, 0, 0.2);
+    }
+
+
+    .navigation--open .navigation__links {
+        display: flex;
+    }
+
+
+    .navigation__links a {
+        padding: 13px 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+
+    /* -------------------- CHOIX DE LA LANGUE TABLETTE -------------------- */
+
+    .language-switch__select {
+        padding: 5px 7px;
+
+        /*
+         * rem se rapporte à la taille de police de l'élément html.
+         */
+        font-size: 0.8rem;
+    }
+
+
+    /* -------------------- ACCUEIL -------------------- */
+
+    .home {
+        flex-direction: column;
+        /*
+         * Aligne les enfants sur l'axe transversal du conteneur.
+         */
+        align-items: flex-start;
+
+        padding: 50px 6% 100px;
+    }
+
+
+    .home__text,
+    .home__cubes {
+        width: 100%;
+    }
+
+
+    .home h1 {
+        font-size: 5rem;
+    }
+
+
+    .home__cubes {
+        height: 360px;
+
+        margin-top: 40px;
+    }
+
+
+    .home__cube--main {
+        top: 50%;
+        left: 50%;
+    }
+
+
+    .home__cube--satellite-1 {
+        top: 12%;
+        left: 20%;
+    }
+
+
+    .home__cube--satellite-2 {
+        top: 15%;
+        right: 20%;
+    }
+
+
+    .home__cube--satellite-3 {
+        bottom: 12%;
+        left: 24%;
+    }
+
+
+    .home__cube--satellite-4 {
+        right: 24%;
+        bottom: 10%;
+    }
+
+
+    /* -------------------- PETITS CUBES DES SECTIONS -------------------- */
+
+    /*
+        Sur tablette, les cubes quittent leur position
+        absolue pour éviter de recouvrir le texte.
+    */
+    .cube--section {
+        position: relative;
+
+        top: auto;
+        right: auto;
+        left: auto;
+
+        display: block;
+
+        /*
+         * Espacement extérieur ; auto peut absorber l'espace disponible selon la disposition.
+         */
+        margin: 0 0 28px auto;
+    }
+
+
+    /* -------------------- EXPÉRIENCES -------------------- */
+
+    .experience {
+        padding-left: 6%;
+        padding-right: 6%;
+
+        overflow-x: hidden;
+    }
+
+
+    .experience__skills {
+        display: none;
+    }
+
+
+    .experience__layout {
+        display: block;
+    }
+
+
+    .experience__list {
+        width: 100%;
+    }
+
+
+    /* -------------------- FLASH CARDS -------------------- */
+
+    .experience-card {
+        width: 100%;
+        max-width: 100%;
+
+        border-left: none;
+
+        background-color: transparent;
+
+        /*
+         * Donne de la profondeur aux transformations 3D des descendants.
+         */
+        perspective: 1000px;
+    }
+
+
+    .experience-card__inner {
+        display: grid;
+
+        width: 100%;
+        max-width: 100%;
+
+        /*
+         * Anime un changement de propriété, par exemple lors d'un survol ou d'un changement de classe.
+         */
+        transition: transform 0.8s ease;
+
+        /*
+         * preserve-3d conserve les faces dans l'espace 3D au lieu de les aplatir.
+         */
+        transform-style: preserve-3d;
+        -webkit-transform-style: preserve-3d;
+    }
+
+
+    .experience-card__front,
+    .experience-card__back {
+        /*
+         * Placer les deux faces dans la même cellule les superpose.
+         */
+        grid-area: 1 / 1;
+
+        width: 100%;
+        max-width: 100%;
+
+        padding: 30px 35px;
+
+        /*
+         * hidden masque la face arrière lors du retournement.
+         */
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+    }
+
+
+    .experience-card__front {
+        background-color: rgba(255, 255, 255, 0.05);
+
+        color: white;
+    }
+
+
+    .experience-card__back {
+        display: block;
+
+        background-color: rgba(255, 255, 255, 0.9);
+        color: #0D0A9B;
+
+        /*
+         * Transforme le rendu sans déplacer les voisins dans le flux normal.
+         */
+        transform: rotateY(180deg);
+    }
+
+
+    .experience-card.experience-card--flipped .experience-card__inner {
+        transform: rotateY(180deg);
+    }
+
+
+    .experience-card:hover {
+        border-left: none;
+
+        background-color: transparent;
+
+        transform: none;
+    }
+
+
+    .experience-card__back h3 {
+        color: #0D0A9B;
+
+        font-size: 1.4rem;
+        font-weight: bold;
+    }
+
+
+    .experience-card__back ul {
+        margin: 0;
+        padding-left: 22px;
+
+        /*
+         * Une valeur sans unité multiplie la taille de police pour fixer l'interligne.
+         */
+        line-height: 1.8;
+    }
+
+
+    /* -------------------- RECONVERSION -------------------- */
+
+    .career__skills h3 {
+        padding-right: 0;
+    }
+
+
+    .career__cube {
+        position: relative;
+
+        top: auto;
+        right: auto;
+
+        display: block;
+
+        margin: 0 0 30px auto;
+    }
+
+
+    /* -------------------- PROJETS -------------------- */
+
+    .projects__list {
+        flex-direction: column;
+    }
+
+
+    .project-card {
+        width: 100%;
+    }
+
+
+    .project-card__image {
+        height: 280px;
+    }
+
+
+    /* -------------------- CONTACT -------------------- */
+
+    .contact {
+        padding: 100px 6%;
+    }
+
+
+    .contact__layout {
+        flex-direction: column;
+
+        gap: 50px;
+    }
+
+
+    .contact__main {
+        width: 100%;
+        max-width: none;
+    }
+
+
+    .contact-form__name-row {
+        flex-direction: column;
+
+        gap: 0;
+    }
+
+
+    .contact__cubes {
+        width: 100%;
+
+        /*
+         * Fixe une hauteur minimale sans empêcher le contenu de grandir ; vh dépend de la hauteur de la fenêtre.
+         */
+        min-height: 360px;
+    }
+
+
+    .contact__cube--main {
+        top: 50%;
+        left: 50%;
+    }
+
+
+    .contact__cube--satellite-1 {
+        top: 12%;
+        left: 22%;
+    }
+
+
+    .contact__cube--satellite-2 {
+        top: 15%;
+        right: 22%;
+    }
+
+
+    .contact__cube--satellite-3 {
+        right: 25%;
+        bottom: 8%;
+    }
+
+
+    .contact__bars span:nth-child(3) {
+        width: 80%;
+    }
+
+
+    .contact__bars span:nth-child(2) {
+        width: 60%;
+    }
+
+
+    .contact__bars span:nth-child(1) {
+        width: 40%;
+    }
+
+
+    /* Cube de transition un peu plus proche du bord */
+    .cube--transition {
+        left: 24px;
+        bottom: 18px;
+    }
+
+
+    /* -------------------- PIED DE PAGE -------------------- */
+
+    .footer {
+        padding: 45px 6% 35px;
+    }
+
+}
+
+
+/* -------------------- TÉLÉPHONE -------------------- */
+
+/*
+ * Cette condition se base sur la largeur de la fenêtre en pixels CSS, pas sur le type d'appareil.
+ */
+@media (max-width: 767px) {
+
+    /* -------------------- NAVIGATION -------------------- */
+
+    .navigation {
+        padding: 20px 24px;
+    }
+
+
+    .navigation__links {
+        display: none;
+    }
+
+
+    /* -------------------- CHOIX DE LA LANGUE TÉLÉPHONE -------------------- */
+
+    /*
+        On rapproche légèrement la photo,
+        les initiales et le choix de langue.
+    */
+    .navigation__identity {
+        gap: 8px;
+    }
+
+
+    .language-switch__select {
+        padding: 5px 6px;
+
+        font-size: 0.75rem;
+    }
+
+    
+    /* -------------------- ACCUEIL -------------------- */
+
+    .home {
+        padding: 40px 24px 90px;
+    }
+
+
+    .home h1 {
+        font-size: 4rem;
+    }
+
+
+    .home h2 {
+        font-size: 1.2rem;
+    }
+
+
+    .home__cubes {
+        width: 100%;
+        height: 300px;
+
+        margin-top: 30px;
+    }
+
+
+    /* -------------------- TAILLES CUBES MOBILE -------------------- */
+
+    .cube--large {
+        --cube-size: 120px;
+        --cube-half: 60px;
+    }
+
+
+    .cube--medium {
+        --cube-size: 65px;
+        --cube-half: 32.5px;
+    }
+
+
+    .cube--small {
+        --cube-size: 48px;
+        --cube-half: 24px;
+    }
+
+
+    .cube--tiny {
+        --cube-size: 38px;
+        --cube-half: 19px;
+    }
+
+
+    /* -------------------- POSITION CUBES ACCUEIL -------------------- */
+
+    .home__cube--main {
+        top: 50%;
+        left: 50%;
+    }
+
+
+    .home__cube--satellite-1 {
+        top: 10%;
+        left: 12%;
+    }
+
+
+    .home__cube--satellite-2 {
+        top: 12%;
+        right: 12%;
+    }
+
+
+    .home__cube--satellite-3 {
+        bottom: 8%;
+        left: 18%;
+    }
+
+
+    .home__cube--satellite-4 {
+        right: 18%;
+        bottom: 7%;
+    }
+
+
+    /* -------------------- FORMATION -------------------- */
+
+    .education {
+        padding: 80px 20px 90px;
+    }
+
+
+    .education__content {
+        padding: 35px 24px;
+    }
+
+
+    .education__content h2 {
+        font-size: 2.2rem;
+    }
+
+
+    /* -------------------- EXPÉRIENCES -------------------- */
+
+    .experience {
+        padding: 80px 20px 90px;
+
+        overflow-x: hidden;
+    }
+
+
+    .experience-card__front,
+    .experience-card__back {
+        padding: 24px 20px;
+    }
+
+
+    .experience-card h2 {
+        font-size: 1.7rem;
+    }
+
+
+    .experience-card h3 {
+        font-size: 1.1rem;
+    }
+
+
+    .experience-card__back {
+        background-color: rgba(255, 255, 255, 0.9);
+
+        color: #0D0A9B;
+    }
+
+
+    /* -------------------- RECONVERSION -------------------- */
+
+    .career {
+        padding: 80px 12px 90px;
+    }
+
+
+    .career__banner {
+        padding: 45px 20px;
+    }
+
+
+    .career__intro {
+        padding: 32px 22px;
+    }
+
+
+    .career__intro h2 {
+        font-size: 2rem;
+        line-height: 1.15;
+    }
+
+
+    .career__cube {
+        margin-bottom: 28px;
+    }
+
+
+    /* -------------------- PROJETS -------------------- */
+
+    .projects {
+        padding: 80px 20px 90px;
+    }
+
+
+    .project-card {
+        padding: 20px;
+    }
+
+
+    .project-card__image {
+        height: 190px;
+    }
+
+
+    .projects > h2 {
+        font-size: 2.2rem;
+    }
+
+
+    /* -------------------- CONTACT -------------------- */
+
+    .contact {
+        padding: 80px 20px 90px;
+    }
+
+
+    .contact h2 {
+        font-size: 2.2rem;
+    }
+
+
+    .contact__bars {
+        margin: 35px 0;
+    }
+
+
+    .contact__bars span {
+        height: 10px;
+    }
+
+
+    .contact__bars span:nth-child(3) {
+        width: 90%;
+    }
+
+
+    .contact__bars span:nth-child(2) {
+        width: 68%;
+    }
+
+
+    .contact__bars span:nth-child(1) {
+        width: 45%;
+    }
+
+
+    .contact-form__field {
+        margin-bottom: 20px;
+    }
+
+
+    .contact__cubes {
+        min-height: 290px;
+    }
+
+
+    .contact__cube--main {
+        top: 50%;
+        left: 50%;
+    }
+
+
+    .contact__cube--satellite-1 {
+        top: 10%;
+        left: 12%;
+    }
+
+
+    .contact__cube--satellite-2 {
+        top: 12%;
+        right: 12%;
+    }
+
+
+    .contact__cube--satellite-3 {
+        right: 17%;
+        bottom: 7%;
+    }
+
+
+    .linkedin-link {
+        width: 100%;
+
+        /*
+         * Répartit les enfants sur l'axe principal du conteneur flex.
+         */
+        justify-content: center;
+    }
+
+
+    .linkedin-link img {
+        width: 28px;
+        height: 28px;
+    }
+
+
+    .contact__links {
+        width: 100%;
+    }
+
+
+    .cube--icon {
+        margin: 5px;
+    }
+
+
+    /* -------------------- CUBES DE TRANSITION -------------------- */
+
+    .cube--transition {
+        left: 18px;
+        bottom: 16px;
+    }
+
+
+    /* -------------------- PIED DE PAGE -------------------- */
+
+    .footer {
+        padding: 40px 20px 30px;
+    }
+
+
+    .footer__row {
+        flex-direction: column;
+
+        gap: 28px;
+    }
+
+
+    .footer__credits {
+        max-width: none;
+    }
+
+
+    .footer__copyright {
+        margin-top: 25px;
+    }
+
+}

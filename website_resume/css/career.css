@@ -1,0 +1,179 @@
+/*
+ * Bandeau de reconversion et présentation des compétences sélectionnables.
+ * BEM : bloc__element désigne une partie du bloc ; bloc--modificateur désigne une variante.
+ */
+/* -------------------- RECONVERSION IT -------------------- */
+
+.career {
+    /*
+     * Espacement intérieur : 2 valeurs = vertical/horizontal ; 3 = haut/horizontal/bas.
+     */
+    padding: 120px 2% 110px;
+}
+
+
+.career__banner {
+    padding: 60px 6%;
+
+    background-color: #E1001A;
+}
+
+
+.career__number {
+    margin-bottom: 25px;
+
+    /*
+     * rem se rapporte à la taille de police de l'élément html.
+     */
+    font-size: 0.9rem;
+    letter-spacing: 0.1rem;
+}
+
+
+.career__line {
+    width: 100%;
+    height: 3px;
+
+    margin-bottom: 30px;
+
+    background-color: white;
+}
+
+
+/* -------------------- INTRODUCTION -------------------- */
+
+.career__intro {
+    width: 100%;
+
+    padding: 45px 40px;
+
+    background-color: rgba(255, 255, 255, 0.13);
+}
+
+
+.career__intro h2 {
+    /*
+     * Espacement extérieur ; auto peut absorber l'espace disponible selon la disposition.
+     */
+    margin: 0 0 30px;
+
+    font-size: 3rem;
+    /*
+     * Une valeur sans unité multiplie la taille de police pour fixer l'interligne.
+     */
+    line-height: 1.1;
+}
+
+
+.career__intro p {
+    max-width: 850px;
+
+    margin: 16px 0;
+
+    line-height: 1.7;
+}
+
+
+.career__goal {
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+
+/* -------------------- COMPÉTENCES -------------------- */
+
+.career__skills {
+    /*
+     * Le positionnement définit le repère utilisé par top/right/bottom/left ; les valeurs sont précisées ici.
+     */
+    position: relative;
+
+    margin-top: 60px;
+}
+
+
+.career__skills h3 {
+    margin-bottom: 30px;
+    padding-right: 120px;
+
+    font-size: 1.5rem;
+    font-weight: normal;
+}
+
+
+/* Cube bleu */
+.career__cube {
+    position: absolute;
+
+    top: 0;
+    right: 2%;
+}
+
+
+.skills__list {
+    /*
+     * Définit le mode de disposition ; flex aligne les enfants sur un axe, grid sur une grille.
+     */
+    display: flex;
+    flex-wrap: wrap;
+
+    /*
+     * Ajoute de l'espace entre les enfants sans marge extérieure.
+     */
+    gap: 15px;
+}
+
+
+/* -------------------- BOUTONS COMPÉTENCES -------------------- */
+
+.skills__button {
+    padding: 12px 20px;
+
+    border: 1px solid rgba(255, 255, 255, 0.7);
+
+    background-color: transparent;
+    color: white;
+
+    font-family: inherit;
+    font-size: 1rem;
+
+    cursor: pointer;
+
+    /*
+     * Anime un changement de propriété, par exemple lors d'un survol ou d'un changement de classe.
+     */
+    transition:
+        background-color 0.3s ease,
+        color 0.3s ease,
+        transform 0.3s ease;
+}
+
+
+.skills__button:hover {
+    background-color: white;
+    color: #E1001A;
+
+    /*
+     * Transforme le rendu sans déplacer les voisins dans le flux normal.
+     */
+    transform: translateY(-4px);
+}
+
+
+/* -------------------- BULLE D'EXPLICATION -------------------- */
+
+.skills__description {
+    /*
+     * Fixe une hauteur minimale sans empêcher le contenu de grandir ; vh dépend de la hauteur de la fenêtre.
+     */
+    min-height: 140px;
+
+    margin-top: 30px;
+    padding: 30px 35px;
+
+    border: 1px solid rgba(255, 255, 255, 0.4);
+
+    background-color: rgba(255, 255, 255, 0.13);
+
+    line-height: 1.7;
+}

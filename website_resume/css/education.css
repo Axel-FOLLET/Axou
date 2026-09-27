@@ -1,0 +1,77 @@
+/*
+ * Présentation des formations et espacement entre leurs panneaux.
+ * BEM : bloc__element désigne une partie du bloc ; bloc--modificateur désigne une variante.
+ */
+/* -------------------- FORMATION -------------------- */
+
+.education {
+    /*
+     * Fixe une hauteur minimale sans empêcher le contenu de grandir ; vh dépend de la hauteur de la fenêtre.
+     */
+    min-height: 100vh;
+
+    /*
+     * Espacement intérieur : 2 valeurs = vertical/horizontal ; 3 = haut/horizontal/bas.
+     */
+    padding: 120px 8% 110px;
+}
+
+
+.education__content {
+    max-width: 950px;
+
+    padding: 50px 40px;
+
+    border-left: 3px solid #E1001A;
+
+    background-color: rgba(255, 255, 255, 0.03);
+}
+
+
+.education__content + .education__content {
+    margin-top: 40px;
+}
+
+
+.education__content h2 {
+    /*
+     * Espacement extérieur ; auto peut absorber l'espace disponible selon la disposition.
+     */
+    margin: 0 0 10px;
+
+    /*
+     * rem se rapporte à la taille de police de l'élément html.
+     */
+    font-size: 2.8rem;
+    letter-spacing: -0.05rem;
+}
+
+
+.education__content h3 {
+    margin: 0 0 24px;
+
+    font-size: 1.4rem;
+    font-weight: normal;
+
+    color: white;
+}
+
+
+.education__content p {
+    max-width: 760px;
+
+    margin: 14px 0;
+
+    /*
+     * Une valeur sans unité multiplie la taille de police pour fixer l'interligne.
+     */
+    line-height: 1.6;
+}
+
+
+.education__content p:first-child {
+    margin-bottom: 30px;
+
+    font-size: 0.9rem;
+    letter-spacing: 0.1rem;
+}

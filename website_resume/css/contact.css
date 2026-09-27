@@ -1,0 +1,386 @@
+/*
+ * Formulaire, liens et décor de la section contact. Les champs restent des éléments HTML natifs.
+ * BEM : bloc__element désigne une partie du bloc ; bloc--modificateur désigne une variante.
+ */
+/* -------------------- CONTACT -------------------- */
+
+.contact {
+    /*
+     * Fixe une hauteur minimale sans empêcher le contenu de grandir ; vh dépend de la hauteur de la fenêtre.
+     */
+    min-height: 100vh;
+
+    /*
+     * Espacement intérieur : 2 valeurs = vertical/horizontal ; 3 = haut/horizontal/bas.
+     */
+    padding: 120px 8% 110px;
+}
+
+
+.contact > p:first-child {
+    margin-bottom: 10px;
+
+    /*
+     * rem se rapporte à la taille de police de l'élément html.
+     */
+    font-size: 0.9rem;
+    letter-spacing: 0.1rem;
+}
+
+
+.contact h2 {
+    margin-bottom: 20px;
+
+    font-size: 3rem;
+}
+
+
+.contact__intro {
+    max-width: 700px;
+
+    margin-bottom: 30px;
+
+    /*
+     * Une valeur sans unité multiplie la taille de police pour fixer l'interligne.
+     */
+    line-height: 1.7;
+}
+
+
+/* -------------------- BANDES ROUGES -------------------- */
+
+.contact__bars {
+    /*
+     * Définit le mode de disposition ; flex aligne les enfants sur un axe, grid sur une grille.
+     */
+    display: flex;
+    /*
+     * column empile les enfants verticalement ; row les dispose horizontalement.
+     */
+    flex-direction: column;
+
+    /*
+     * Ajoute de l'espace entre les enfants sans marge extérieure.
+     */
+    gap: 9px;
+
+    /*
+     * Espacement extérieur ; auto peut absorber l'espace disponible selon la disposition.
+     */
+    margin: 50px 0 45px;
+}
+
+
+.contact__bars span {
+    display: block;
+
+    height: 12px;
+
+    background-color: #E1001A;
+}
+
+
+.contact__bars span:nth-child(3) {
+    width: 72%;
+}
+
+
+.contact__bars span:nth-child(2) {
+    width: 52%;
+}
+
+
+.contact__bars span:nth-child(1) {
+    width: 32%;
+}
+
+
+/* -------------------- MISE EN PAGE CONTACT -------------------- */
+
+.contact__layout {
+    display: flex;
+    /*
+     * Aligne les enfants sur l'axe transversal du conteneur.
+     */
+    align-items: flex-start;
+
+    gap: 80px;
+}
+
+
+.contact__main {
+    width: 60%;
+    max-width: 750px;
+}
+
+
+/* -------------------- NOM + PRÉNOM -------------------- */
+
+.contact-form__name-row {
+    display: flex;
+
+    gap: 20px;
+}
+
+
+.contact-form__name-row .contact-form__field {
+    /*
+     * Définit croissance, réduction et taille de base de cet enfant flex.
+     */
+    flex: 1;
+}
+
+
+/* -------------------- FORMULAIRE -------------------- */
+
+.contact-form {
+    width: 100%;
+}
+
+
+.contact-form__field {
+    display: flex;
+    flex-direction: column;
+
+    margin-bottom: 25px;
+}
+
+
+.contact-form__field label {
+    margin-bottom: 10px;
+
+    font-size: 0.9rem;
+    letter-spacing: 0.05rem;
+}
+
+
+.contact-form__field input,
+.contact-form__field textarea {
+    width: 100%;
+
+    padding: 15px 16px;
+
+    border: 1px solid rgba(255, 255, 255, 0.3);
+
+    background-color: rgba(255, 255, 255, 0.04);
+
+    color: white;
+
+    font-family: inherit;
+    font-size: 1rem;
+
+    outline: none;
+
+    /*
+     * Anime un changement de propriété, par exemple lors d'un survol ou d'un changement de classe.
+     */
+    transition:
+        border-color 0.3s ease,
+        background-color 0.3s ease;
+}
+
+
+.contact-form__field input:focus,
+.contact-form__field textarea:focus {
+    border-color: #E1001A;
+
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+
+.contact-form__field textarea {
+    /*
+     * Limite les directions dans lesquelles le visiteur peut redimensionner le champ.
+     */
+    resize: vertical;
+}
+
+
+/* -------------------- BOUTON ENVOYER -------------------- */
+
+.contact-form__submit {
+    padding: 14px 26px;
+
+    border: 1px solid white;
+
+    background-color: transparent;
+    color: white;
+
+    font-family: inherit;
+    font-size: 1rem;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.3s ease,
+        color 0.3s ease,
+        transform 0.3s ease;
+}
+
+
+.contact-form__submit:hover {
+    background-color: white;
+    color: #0D0A9B;
+
+    /*
+     * Transforme le rendu sans déplacer les voisins dans le flux normal.
+     */
+    transform: translateY(-3px);
+}
+
+
+/* -------------------- LINKEDIN -------------------- */
+
+.contact__links {
+    display: flex;
+    flex-direction: column;
+    /* Les deux liens prennent la largeur du plus large */
+    align-items: stretch;
+    width: fit-content;
+
+    gap: 14px;
+
+    margin: 35px 0 50px;
+}
+
+
+/*
+    Petit cube blanc qui remplace le logo dans le lien portfolio.
+    Le cube fait 18px, la marge le centre dans un carré de 30px
+    comme le logo LinkedIn.
+*/
+.cube--icon {
+    --cube-size: 18px;
+    --cube-half: 9px;
+
+    flex-shrink: 0;
+
+    margin: 6px;
+
+    /*
+     * Donne de la profondeur aux transformations 3D des descendants.
+     */
+    perspective: 300px;
+}
+
+
+.cube--white {
+    --cube-border: white;
+
+    --cube-fill: rgba(255, 255, 255, 0.06);
+    --cube-hover: rgba(255, 255, 255, 0.2);
+
+    --cube-glow: rgba(255, 255, 255, 0.25);
+}
+
+
+.cube--icon .cube__face {
+    border-width: 1.5px;
+
+    box-shadow: 0 0 6px var(--cube-glow);
+}
+
+
+.portfolio-link:hover .cube__face {
+    background-color: var(--cube-hover);
+}
+
+
+.linkedin-link {
+    display: inline-flex;
+    align-items: center;
+
+    gap: 14px;
+
+    padding: 12px 18px;
+
+    border: 1px solid rgba(255, 255, 255, 0.35);
+
+    background-color: rgba(255, 255, 255, 0.04);
+
+    color: white;
+    text-decoration: none;
+
+    transition:
+        background-color 0.3s ease,
+        border-color 0.3s ease,
+        transform 0.3s ease;
+}
+
+
+/*
+    Le logo officiel est noir avec le fond et le « in » transparents.
+    Sur le fond bleu, on le passe en blanc (version inversée autorisée) :
+    le « in » transparent laisse voir le bleu de la page.
+*/
+.linkedin-link img {
+    width: 30px;
+    height: 30px;
+
+    /*
+     * contain conserve toute l'image ; cover remplit le cadre en recadrant si nécessaire.
+     */
+    object-fit: contain;
+
+    /*
+     * Applique un effet visuel sans modifier le fichier image.
+     */
+    filter: brightness(0) invert(1);
+}
+
+
+.linkedin-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+
+    border-color: #E1001A;
+
+    transform: translateX(5px);
+}
+
+
+/* -------------------- CUBES CONTACT -------------------- */
+
+.contact__cubes {
+    flex: 1;
+
+    min-height: 520px;
+
+    /*
+     * Le positionnement définit le repère utilisé par top/right/bottom/left ; les valeurs sont précisées ici.
+     */
+    position: relative;
+}
+
+
+.contact__cube--main {
+    position: absolute;
+
+    top: 45%;
+    left: 50%;
+
+    transform: translate(-50%, -50%);
+}
+
+
+.contact__cube--satellite-1 {
+    position: absolute;
+
+    top: 10%;
+    left: 12%;
+}
+
+
+.contact__cube--satellite-2 {
+    position: absolute;
+
+    top: 18%;
+    right: 8%;
+}
+
+
+.contact__cube--satellite-3 {
+    position: absolute;
+
+    right: 18%;
+    bottom: 10%;
+}

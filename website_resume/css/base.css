@@ -1,0 +1,32 @@
+/*
+ * Base commune : modèle de boîte, police et fond. Les sections complètent ces règles.
+ * BEM : bloc__element désigne une partie du bloc ; bloc--modificateur désigne une variante.
+ */
+/* -------------------- BASE -------------------- */
+
+* {
+    /*
+     * border-box inclut padding et bordures dans les dimensions annoncées.
+     */
+    box-sizing: border-box;
+}
+
+
+html {
+    scroll-behavior: smooth;
+}
+
+
+body {
+    /*
+     * Espacement extérieur ; auto peut absorber l'espace disponible selon la disposition.
+     */
+    margin: 0;
+
+    background-color: #0D0A9B;
+    color: white;
+
+    font-family: Avenir, "Avenir Next", sans-serif;
+
+    overflow-x: hidden;
+}

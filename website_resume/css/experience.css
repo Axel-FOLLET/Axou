@@ -1,0 +1,187 @@
+/*
+ * Disposition des expériences sur grand écran ; responsive.css adapte les cartes aux petits écrans.
+ * BEM : bloc__element désigne une partie du bloc ; bloc--modificateur désigne une variante.
+ */
+/* -------------------- EXPÉRIENCES -------------------- */
+
+.experience {
+    /*
+     * Fixe une hauteur minimale sans empêcher le contenu de grandir ; vh dépend de la hauteur de la fenêtre.
+     */
+    min-height: 100vh;
+
+    /*
+     * Espacement intérieur : 2 valeurs = vertical/horizontal ; 3 = haut/horizontal/bas.
+     */
+    padding: 120px 8% 110px;
+}
+
+
+.experience > p:first-of-type {
+    margin-bottom: 10px;
+
+    /*
+     * rem se rapporte à la taille de police de l'élément html.
+     */
+    font-size: 0.9rem;
+    letter-spacing: 0.1rem;
+}
+
+
+.experience > p:nth-of-type(2) {
+    margin-bottom: 40px;
+
+    color: rgba(255, 255, 255, 0.7);
+}
+
+
+/* -------------------- PETITS CUBES DES SECTIONS -------------------- */
+
+.cube--section {
+    /*
+     * Le positionnement définit le repère utilisé par top/right/bottom/left ; les valeurs sont précisées ici.
+     */
+    position: absolute;
+
+    /*
+     * Règle l'ordre de superposition à l'intérieur du contexte d'empilement.
+     */
+    z-index: 2;
+}
+
+
+.education__cube {
+    top: 150px;
+    right: 8%;
+}
+
+
+.experience__cube {
+    top: 115px;
+    right: 7%;
+}
+
+
+.projects__cube {
+    top: 105px;
+    right: 8%;
+}
+
+
+/* -------------------- DISPOSITION DES EXPÉRIENCES -------------------- */
+
+.experience__layout {
+    /*
+     * Définit le mode de disposition ; flex aligne les enfants sur un axe, grid sur une grille.
+     */
+    display: flex;
+    /*
+     * Aligne les enfants sur l'axe transversal du conteneur.
+     */
+    align-items: flex-start;
+
+    /*
+     * Ajoute de l'espace entre les enfants sans marge extérieure.
+     */
+    gap: 60px;
+}
+
+
+.experience__list {
+    width: 65%;
+}
+
+
+/* -------------------- CARTES EXPÉRIENCES -------------------- */
+
+.experience-card {
+    width: 100%;
+    max-width: 850px;
+
+    margin-bottom: 25px;
+
+    border-left: 3px solid transparent;
+
+    background-color: rgba(255, 255, 255, 0.03);
+
+    cursor: pointer;
+
+    /*
+     * Anime un changement de propriété, par exemple lors d'un survol ou d'un changement de classe.
+     */
+    transition:
+        transform 0.3s ease,
+        background-color 0.3s ease,
+        border-left-color 0.3s ease;
+}
+
+
+.experience-card__front {
+    padding: 30px 35px;
+}
+
+
+.experience-card__back {
+    display: none;
+}
+
+
+.experience-card:hover {
+    border-left-color: #E1001A;
+
+    background-color: rgba(255, 255, 255, 0.07);
+
+    /*
+     * Transforme le rendu sans déplacer les voisins dans le flux normal.
+     */
+    transform: translateX(8px);
+}
+
+
+.experience-card h2 {
+    /*
+     * Espacement extérieur ; auto peut absorber l'espace disponible selon la disposition.
+     */
+    margin: 0 0 8px;
+
+    font-size: 2rem;
+}
+
+
+.experience-card h3 {
+    margin: 0 0 20px;
+
+    font-size: 1.2rem;
+    font-weight: normal;
+}
+
+
+.experience-card p {
+    max-width: 700px;
+
+    /*
+     * Une valeur sans unité multiplie la taille de police pour fixer l'interligne.
+     */
+    line-height: 1.6;
+}
+
+
+/* -------------------- BULLE COMPÉTENCES DESKTOP -------------------- */
+
+.experience__skills {
+    width: 35%;
+    max-width: 850px;
+
+    position: sticky;
+    top: 120px;
+
+    padding: 25px 30px;
+
+    border: 1px solid rgba(255, 255, 255, 0.25);
+
+    background-color: rgba(255, 255, 255, 0.06);
+
+    line-height: 1.8;
+
+    transition: 0.3s;
+}

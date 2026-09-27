@@ -1,0 +1,1195 @@
+<!doctype html>
+<html lang="en">
+
+<head>    <!-- Repères : les id servent aux ancres et à ARIA ; les classes BEM servent au style. Les attributs data-* transmettent des paramètres aux modules JavaScript. -->
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Ordre de la cascade : base, composants, adaptations responsive, puis fenêtre des jeux. -->
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/navigation.css">
+    <link rel="stylesheet" href="css/home.css">
+    <link rel="stylesheet" href="css/cubes.css">
+    <link rel="stylesheet" href="css/education.css">
+    <link rel="stylesheet" href="css/experience.css">
+    <link rel="stylesheet" href="css/career.css">
+    <link rel="stylesheet" href="css/projects.css">
+    <link rel="stylesheet" href="css/contact.css">
+    <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/game-modal.css">
+    <!-- type=module active import/export et attend l'analyse du HTML ; main.js initialise les interactions des deux langues. -->
+    <script type="module" src="js/main.js"></script>
+
+    <title>Axel FOLLET | Resume</title>
+</head>
+
+<body class="page">
+
+    <!-- -------------------- NAVIGATION -------------------- -->
+
+    <header class="site-header">
+
+        <!-- Le bouton met à jour aria-expanded ; aria-controls désigne le conteneur des liens. navigation--open commande leur visibilité. -->
+        <nav class="navigation">
+
+            <button
+                class="navigation__toggle"
+                type="button"
+                aria-label="Open navigation menu"
+                aria-expanded="false"
+                aria-controls="navigation-links"
+            >
+                <span class="navigation__toggle-icon" aria-hidden="true">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </span>
+            </button>
+
+            <!-- Identity: picture + initials + language selection -->
+            <div class="navigation__identity">
+
+                <img
+                    src="assets/images/profile.jpg"
+                    alt="Profile photo of Axel FOLLET"
+                >
+
+                <a href="#home">AF</a>
+
+                <div class="language-switch">
+
+                    <select
+                        id="language-select"
+                        aria-label="Choose language"
+                     class="language-switch__select">
+
+                        <option value="index.html">
+                            FR
+                        </option>
+
+                        <option value="index-en.html" selected>
+                            EN
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <!-- Links to the different sections -->
+            <div class="navigation__links" id="navigation-links">
+
+                <a href="#formation">Education</a>
+                <a href="#experience">Experience</a>
+                <a href="#reconversion">IT Career Change</a>
+                <a href="#projects">Projects</a>
+                <a href="#contact">Contact</a>
+
+            </div>
+
+        </nav>
+
+    </header>
+
+
+    <!-- -------------------- MAIN CONTENT -------------------- -->
+
+    <main>
+
+
+        <!-- -------------------- HOME -------------------- -->
+
+        <section id="home" class="home">
+
+            <!-- Main text section -->
+            <div class="home__text">
+
+                <p>RESUME / 2026</p>
+
+                <h1>
+                    Axel<br>
+                    FOLLET
+                </h1>
+
+                <h2>
+                    IT Project Manager at QUANTEAM
+                </h2>
+
+                <p>
+                    This website was created entirely by me using HTML, CSS and JavaScript.
+                    Feel free to explore it!
+                </p>
+
+                <a href="#reconversion">
+                    Discover my journey
+                </a>
+
+            </div>
+
+
+            <!-- -------------------- 3D FIGURE HOME -------------------- -->
+
+            <!-- Les cubes combinent un bloc réutilisable, ses variantes de taille/couleur et son placement. data-speed fixe la vitesse et data-phase l'orientation initiale ; JavaScript crée les six faces. -->
+            <div class="home__cubes">
+
+                <!-- Main cube -->
+                <button
+                    class="cube cube--large cube--red home__cube--main home__cube"
+                    type="button"
+                    aria-label="Spin the main cube"
+                    data-speed="16"
+                    data-phase="0"
+                ></button>
+
+
+                <!-- Smaller cubes around the main cube -->
+                <button
+                    class="cube cube--small cube--red home__cube--satellite-1 home__cube"
+                    type="button"
+                    aria-label="Spin the cube"
+                    data-speed="21"
+                    data-phase="70"
+                ></button>
+
+                <button
+                    class="cube cube--small cube--red home__cube--satellite-2 home__cube"
+                    type="button"
+                    aria-label="Spin the cube"
+                    data-speed="18"
+                    data-phase="150"
+                ></button>
+
+                <button
+                    class="cube cube--tiny cube--red home__cube--satellite-3 home__cube"
+                    type="button"
+                    aria-label="Spin the cube"
+                    data-speed="23"
+                    data-phase="220"
+                ></button>
+
+                <button
+                    class="cube cube--tiny cube--red home__cube--satellite-4 home__cube"
+                    type="button"
+                    aria-label="Spin the cube"
+                    data-speed="19"
+                    data-phase="290"
+                ></button>
+
+            </div>
+
+
+            <!-- Cube placed at the bottom of the section -->
+            <button
+                class="cube cube--tiny cube--red cube--transition"
+                type="button"
+                aria-label="Spin the cube"
+                data-speed="13"
+                data-phase="40"
+            ></button>
+
+        </section>
+
+
+        <!-- -------------------- EDUCATION -------------------- -->
+
+        <section id="formation" class="education">
+
+            <!-- Small decorative cube -->
+            <button
+                class="cube cube--tiny cube--red cube--section education__cube"
+                type="button"
+                aria-label="Spin the cube"
+                data-speed="17"
+                data-phase="120"
+            ></button>
+
+
+            <!-- Current education -->
+            <div class="education__content">
+
+                <p>01 / EDUCATION</p>
+
+                <h2>
+                    Epitech
+                </h2>
+
+                <h3>
+                    Information Systems Architect
+                </h3>
+
+                <p>
+                    IT program focused on software development,
+                    systems and IT project management.
+                </p>
+
+                <p>
+                    This program enables me to develop skills
+                    in software development, information systems architecture
+                    and technology project management.
+                </p>
+
+                <p>
+                    Project-based learning also strengthens my independence,
+                    my ability to solve complex problems
+                    and my teamwork skills.
+                </p>
+
+                <p>
+                    2026 - 2029
+                </p>
+
+            </div>
+
+
+            <!-- Previous education -->
+            <div class="education__content">
+
+                <h2>
+                    Sup des RH & EDC Paris
+                </h2>
+
+                <h3>
+                    Dual Master's Degree - Human Resources Development Management
+                    & Change Management
+                </h3>
+
+                <p>
+                    Program focused on Human Resources management,
+                    project management, change management
+                    and organizational development.
+                </p>
+
+                <p>
+                    2022 - 2024
+                </p>
+
+            </div>
+
+
+            <!-- Cube placed at the bottom of the section -->
+            <button
+                class="cube cube--tiny cube--red cube--transition"
+                type="button"
+                aria-label="Spin the cube"
+                data-speed="14"
+                data-phase="180"
+            ></button>
+
+        </section>
+
+
+        <!-- -------------------- EXPERIENCE -------------------- -->
+
+        <section id="experience" class="experience">
+
+            <!-- Small decorative cube -->
+            <button
+                class="cube cube--tiny cube--red cube--section experience__cube"
+                type="button"
+                aria-label="Spin the cube"
+                data-speed="18"
+                data-phase="250"
+            ></button>
+
+
+            <p>02 / EXPERIENCE</p>
+
+            <p>
+                Select an experience to discover
+                the associated tools and skills.
+            </p>
+
+
+            <!-- -------------------- MAIN CONTAINER -------------------- -->
+
+            <div class="experience__layout">
+
+
+                <!-- -------------------- EXPERIENCE LIST -------------------- -->
+
+                <div class="experience__list">
+
+
+                    <!-- -------------------- SFR -------------------- -->
+
+                    <div class="experience-card" id="experience-sfr">
+
+                        <div class="experience-card__inner">
+
+                            <!-- Front -->
+                            <div class="experience-card__front">
+
+                                <h2>SFR Distribution</h2>
+
+                                <h3>
+                                    HR Project Manager & Change Management
+                                </h3>
+
+                                <p>
+                                    Management and support of HR projects,
+                                    change management and coordination of projects
+                                    involving up to 3,000 employees.
+                                </p>
+
+                                <p>
+                                    Communication, training design,
+                                    performance indicator monitoring,
+                                    reporting and social data analysis.
+                                </p>
+
+                                <p>
+                                    September 2022 - October 2024
+                                </p>
+
+                            </div>
+
+
+                            <!-- Back -->
+                            <div class="experience-card__back">
+
+                                <h3>Skills & tools</h3>
+
+                                <ul>
+                                    <li>Project management</li>
+                                    <li>Change management</li>
+                                    <li>Communication and diplomacy</li>
+                                    <li>Training design</li>
+                                    <li>CapCut</li>
+                                    <li>Caption</li>
+                                    <li>edit2Emotions</li>
+                                    <li>Performance indicator monitoring</li>
+                                    <li>Reporting</li>
+                                    <li>Social data analysis</li>
+                                </ul>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- -------------------- BPCE IT -------------------- -->
+
+                    <div class="experience-card" id="experience-bpce">
+
+                        <div class="experience-card__inner">
+
+                            <!-- Front -->
+                            <div class="experience-card__front">
+
+                                <h2>BPCE Infogérance et Technologies</h2>
+
+                                <h3>
+                                    Recruitment Officer
+                                </h3>
+
+                                <p>
+                                    Management of the apprenticeship recruitment campaign
+                                    and recruitment of 52 apprentices for IT roles.
+                                </p>
+
+                                <p>
+                                    Coordination with educational institutions,
+                                    dashboard monitoring, reporting
+                                    and communication around the recruitment campaign.
+                                </p>
+
+                                <p>
+                                    March 2022 - July 2022
+                                </p>
+
+                            </div>
+
+
+                            <!-- Back -->
+                            <div class="experience-card__back">
+
+                                <h3>Skills & tools</h3>
+
+                                <ul>
+                                    <li>Apprenticeship recruitment campaign management</li>
+                                    <li>IT recruitment</li>
+                                    <li>Independent working</li>
+                                    <li>LinkedIn communication</li>
+                                    <li>Dashboards</li>
+                                    <li>Reporting</li>
+                                    <li>Coordination with educational institutions</li>
+                                    <li>Administrative management</li>
+                                    <li>Recruitment fairs</li>
+                                </ul>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- -------------------- OCP -------------------- -->
+
+                    <div class="experience-card" id="experience-ocp">
+
+                        <div class="experience-card__inner">
+
+                            <!-- Front -->
+                            <div class="experience-card__front">
+
+                                <h2>OCP Répartition</h2>
+
+                                <h3>
+                                    Recruitment Officer
+                                </h3>
+
+                                <p>
+                                    Candidate sourcing, telephone screening,
+                                    interviews and recruitment follow-up.
+                                </p>
+
+                                <p>
+                                    Contribution to the development of a recruitment
+                                    preparation and tracking tool
+                                    using SmartRecruiters.
+                                </p>
+
+                                <p>
+                                    September 2021 - February 2022
+                                </p>
+
+                            </div>
+
+
+                            <!-- Back -->
+                            <div class="experience-card__back">
+
+                                <h3>Skills & tools</h3>
+
+                                <ul>
+                                    <li>Candidate sourcing</li>
+                                    <li>SmartRecruiters</li>
+                                    <li>APEC</li>
+                                    <li>Pôle Emploi</li>
+                                    <li>Telephone interviews</li>
+                                    <li>Microsoft Teams interviews</li>
+                                    <li>Recruitment follow-up</li>
+                                    <li>Administrative management</li>
+                                    <li>Manager training</li>
+                                </ul>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- -------------------- NATIXIS -------------------- -->
+
+                    <div class="experience-card" id="experience-natixis">
+
+                        <div class="experience-card__inner">
+
+                            <!-- Front -->
+                            <div class="experience-card__front">
+
+                                <h2>Natixis</h2>
+
+                                <h3>
+                                    HRIS Officer - Internship
+                                </h3>
+
+                                <p>
+                                    November 2020 - December 2020
+                                </p>
+
+                            </div>
+
+
+                            <!-- Back -->
+                            <div class="experience-card__back">
+
+                                <h3>Skills & tools</h3>
+
+                                <ul>
+                                    <li>First independently managed project</li>
+                                    <li>Understanding the testing phase involved in developing a tool</li>
+                                    <li>Coordination between the HR and HRIS teams</li>
+                                </ul>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- -------------------- ENEDIS -------------------- -->
+
+                    <div class="experience-card" id="experience-enedis">
+
+                        <div class="experience-card__inner">
+
+                            <!-- Front -->
+                            <div class="experience-card__front">
+
+                                <h2>Enedis</h2>
+
+                                <h3>
+                                    HR Assistant - Internship
+                                </h3>
+
+                                <p>
+                                    December 2019
+                                </p>
+
+                            </div>
+
+
+                            <!-- Back -->
+                            <div class="experience-card__back">
+
+                                <h3>Skills & tools</h3>
+
+                                <ul>
+                                    <li>First professional experience</li>
+                                    <li>Introduction to the Human Resources field</li>
+                                </ul>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- -------------------- DESKTOP SKILLS PANEL -------------------- -->
+
+                <div id="skills-bubble" class="experience__skills">
+                    Select an experience
+                </div>
+
+            </div>
+
+
+            <!-- Cube placed at the bottom of the section -->
+            <button
+                class="cube cube--tiny cube--red cube--transition"
+                type="button"
+                aria-label="Spin the cube"
+                data-speed="13"
+                data-phase="310"
+            ></button>
+
+        </section>
+
+
+        <!-- -------------------- IT CAREER CHANGE -------------------- -->
+
+        <section id="reconversion" class="career">
+
+            <div class="career__banner">
+
+                <p class="career__number">
+                    03 / IT CAREER CHANGE
+                </p>
+
+
+                <div class="career__line"></div>
+
+
+                <!-- -------------------- INTRODUCTION -------------------- -->
+
+                <div class="career__intro">
+
+                    <h2>
+                        From HR project management
+                        to the world of IT!
+                    </h2>
+
+                    <p>
+                        After several years of experience in Human Resources
+                        and change management, I decided to open a new chapter
+                        in my professional journey and transition into
+                        the IT industry.
+                    </p>
+
+                    <p class="career__goal">
+                        The objective was clear: to adapt to the changes shaping our society,
+                        where technology is playing an increasingly important role,
+                        and to move into a field that has always interested me.
+                    </p>
+
+                    <p>
+                        My studies at Epitech now allow me to progressively develop
+                        my technical skills while continuing to draw on
+                        the experience I have already gained in project management,
+                        communication and independent working.
+                    </p>
+
+                </div>
+
+
+                <!-- -------------------- TECHNICAL SKILLS -------------------- -->
+
+                <div class="career__skills skills">
+
+                    <!-- Blue cube -->
+                    <button
+                        class="cube cube--medium cube--blue career__cube"
+                        type="button"
+                        aria-label="Spin the cube"
+                        data-speed="16"
+                        data-phase="90"
+                    ></button>
+
+
+                    <h3>
+                        Skills currently being developed
+                    </h3>
+
+
+                    <div class="skills__list">
+
+                        <button class="skills__button" data-skill="python" type="button">
+                            Python
+                        </button>
+
+                        <button class="skills__button" data-skill="html" type="button">
+                            HTML
+                        </button>
+
+                        <button class="skills__button" data-skill="css" type="button">
+                            CSS
+                        </button>
+
+                        <button class="skills__button" data-skill="javascript" type="button">
+                            JavaScript
+                        </button>
+
+                        <button class="skills__button" data-skill="git" type="button">
+                            Git
+                        </button>
+
+                    </div>
+
+
+                    <div id="skill-description" class="skills__description">
+                        Select a skill to learn more.
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Cube placed at the bottom of the section -->
+            <button
+                class="cube cube--tiny cube--red cube--transition"
+                type="button"
+                aria-label="Spin the cube"
+                data-speed="14"
+                data-phase="200"
+            ></button>
+
+        </section>
+
+
+        <!-- -------------------- PROJECTS -------------------- -->
+
+        <section id="projects" class="projects">
+
+            <p>04 / PROJECTS</p>
+
+            <h2>
+                My technical projects
+            </h2>
+
+
+            <!-- Small decorative cube -->
+            <button
+                class="cube cube--tiny cube--red cube--section projects__cube"
+                type="button"
+                aria-label="Spin the cube"
+                data-speed="18"
+                data-phase="140"
+            ></button>
+
+
+            <!-- -------------------- PROJECTS CONTAINER -------------------- -->
+
+            <div class="projects__list">
+
+
+                <!-- -------------------- PYTHON -------------------- -->
+
+                <div class="project-card">
+
+                    <img
+                        src="assets/images/dessin_python.png"
+                        alt="Illustration representing my Python and web development skills and projects"
+                        class="project-card__image"
+                    >
+
+                    <h3>Python & Web</h3>
+
+                    <p>
+                        Development of Python projects and web interfaces
+                        using HTML, CSS and JavaScript, with a focus on logic,
+                        responsive design and interactivity.
+                    </p>
+
+                    <p>
+                        Skills developed: algorithms, functions and data structures,
+                        DOM manipulation, animations, debugging and code organization.
+                    </p>
+
+                    <div class="project-card__actions">
+
+                        <a
+                            href="https://axel-follet.github.io/portfolio/index-en.html"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            View my portfolio
+                        </a>
+
+                        <!-- Invisible : donne au bouton la même largeur que ceux de Snake et Pendu -->
+                        <span class="project-card__sizer" aria-hidden="true">
+                            Try the game now?
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- -------------------- SNAKE -------------------- -->
+
+                <div class="project-card">
+
+                    <img
+                        src="assets/images/dessin_snake.png"
+                        alt="Illustration of the Snake game developed in Python"
+                        class="project-card__image"
+                    >
+
+                    <h3>Snake</h3>
+
+                    <p>
+                        Snake game developed in Python and Pygame.
+                    </p>
+
+                    <p>
+                        This project allowed me to work on movement handling,
+                        collision detection, scoring, keyboard events
+                        and graphical rendering.
+                    </p>
+
+                    <div class="project-card__actions">
+
+                        <a
+                            href="https://github.com/Axel-FOLLET/Axou/tree/5f52f135fe0bb45800351c035b74ff3e00f64e5e/jeu_du_snake"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            View project on GitHub
+                        </a>
+
+                        <!-- Available on desktop only -->
+                        <button
+                            class="project-card__play"
+                            type="button"
+                            data-game="snake"
+                            data-game-title="Snake"
+                        >
+                            Try the game now?
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- -------------------- HANGMAN -------------------- -->
+
+                <div class="project-card">
+
+                    <img
+                        src="assets/images/dessin_pendu.png"
+                        alt="Illustration of the Hangman game developed in Python"
+                        class="project-card__image"
+                    >
+
+                    <h3>Hangman</h3>
+
+                    <p>
+                        Hangman game developed in Python and Pygame.
+                    </p>
+
+                    <p>
+                        This project allowed me to work with conditions, loops,
+                        functions, user input handling
+                        and the overall organization of a program.
+                    </p>
+
+                    <div class="project-card__actions">
+
+                        <a
+                            href="https://github.com/Axel-FOLLET/Axou/tree/5f52f135fe0bb45800351c035b74ff3e00f64e5e/jeu_du_pendu"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            View project on GitHub
+                        </a>
+
+                        <!-- Available on desktop only -->
+                        <button
+                            class="project-card__play"
+                            type="button"
+                            data-game="pendu"
+                            data-game-title="Hangman"
+                        >
+                            Try the game now?
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Cube placed at the bottom of the section -->
+            <button
+                class="cube cube--tiny cube--red cube--transition"
+                type="button"
+                aria-label="Spin the cube"
+                data-speed="13"
+                data-phase="260"
+            ></button>
+
+        </section>
+
+
+        <!-- -------------------- CONTACT -------------------- -->
+
+        <section id="contact" class="contact">
+
+            <p>05 / CONTACT</p>
+
+            <h2>Get in touch</h2>
+
+            <p class="contact__intro">
+                Would you like to discuss an opportunity, a project,
+                or simply learn more about my background?
+                Feel free to get in touch!
+            </p>
+
+
+            <!-- -------------------- LINKEDIN -------------------- -->
+
+            <div class="contact__links">
+
+                <a
+                    href="https://www.linkedin.com/in/axel-follet/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="linkedin-link"
+                >
+
+                    <img
+                        src="assets/images/linkedin-logo.png"
+                        alt="Logo LinkedIn"
+                    >
+
+                    Would you like to view my LinkedIn profile?
+
+                </a>
+
+                <a
+                    href="https://axel-follet.github.io/portfolio/index-en.html"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="linkedin-link portfolio-link"
+                >
+
+                    <!-- Petit cube blanc animé à la place d'un logo -->
+                    <span
+                        class="cube cube--icon cube--white"
+                        aria-hidden="true"
+                        data-speed="40"
+                        data-phase="60"
+                    ></span>
+
+                    Would you like to explore my portfolio?
+
+                </a>
+
+            </div>
+
+
+            <!-- Accent bars -->
+            <div class="contact__bars">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+
+
+            <!-- -------------------- CONTACT CONTENT -------------------- -->
+
+            <div class="contact__layout">
+
+
+                <!-- Left section -->
+                <div class="contact__main">
+
+                    <!-- -------------------- FORM -------------------- -->
+
+                    <form
+                        class="contact-form"
+                        action="https://formspree.io/f/xaenbdqw"
+                        method="POST"
+                    >
+
+                        <div class="contact-form__name-row">
+
+                            <!-- Last name -->
+                            <div class="contact-form__field">
+
+                                <label for="surname">
+                                    LAST NAME
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="surname"
+                                    name="surname"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <!-- First name -->
+                            <div class="contact-form__field">
+
+                                <label for="name">
+                                    First name
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="name"
+                                    name="name"
+                                    required
+                                >
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Email -->
+                        <div class="contact-form__field">
+
+                            <label for="email">
+                                Email
+                            </label>
+
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- Subject -->
+                        <div class="contact-form__field">
+
+                            <label for="subject">
+                                Subject
+                            </label>
+
+                            <input
+                                type="text"
+                                id="subject"
+                                name="subject"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- Message -->
+                        <div class="contact-form__field">
+
+                            <label for="message">
+                                Message
+                            </label>
+
+                            <textarea
+                                id="message"
+                                name="message"
+                                rows="6"
+                                required
+                            ></textarea>
+
+                        </div>
+
+
+                        <button type="submit" class="contact-form__submit">
+                            Send
+                        </button>
+
+                    </form>
+
+                </div>
+
+
+                <!-- -------------------- CONTACT 3D FIGURE -------------------- -->
+
+                <div class="contact__cubes">
+
+                    <button
+                        class="cube cube--large cube--red contact__cube--main contact__cube"
+                        type="button"
+                        aria-label="Spin the main cube"
+                        data-speed="15"
+                        data-phase="30"
+                    ></button>
+
+                    <button
+                        class="cube cube--small cube--red contact__cube--satellite-1 contact__cube"
+                        type="button"
+                        aria-label="Spin the cube"
+                        data-speed="20"
+                        data-phase="110"
+                    ></button>
+
+                    <button
+                        class="cube cube--small cube--red contact__cube--satellite-2 contact__cube"
+                        type="button"
+                        aria-label="Spin the cube"
+                        data-speed="18"
+                        data-phase="210"
+                    ></button>
+
+                    <button
+                        class="cube cube--tiny cube--red contact__cube--satellite-3 contact__cube"
+                        type="button"
+                        aria-label="Spin the cube"
+                        data-speed="21"
+                        data-phase="300"
+                    ></button>
+
+                </div>
+
+            </div>
+
+
+            <!-- Final cube -->
+            <button
+                class="cube cube--tiny cube--red cube--transition"
+                type="button"
+                aria-label="Spin the cube"
+                data-speed="13"
+                data-phase="330"
+            ></button>
+
+        </section>
+
+    </main>
+
+
+    <!-- -------------------- FOOTER -------------------- -->
+
+    <footer class="footer">
+
+        <div class="footer__row">
+
+            <div>
+                <h2 class="footer__title">Navigation</h2>
+                <ul class="footer__list">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#formation">Education</a></li>
+                    <li><a href="#experience">Experience</a></li>
+                    <li><a href="#reconversion">IT Career Change</a></li>
+                    <li><a href="#projects">Projects</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h2 class="footer__title">Resources and credits</h2>
+                <p class="footer__credits">
+                    Photo, drawings and texts: original work by Axel FOLLET. The 3D cubes and icons are made with HTML, CSS and JavaScript. LinkedIn® and the [in]® logo are trademarks of LinkedIn Corporation and its affiliates. This personal website is neither affiliated with nor endorsed by LinkedIn. No third-party font or theme is used: the font is the system one (Avenir when available).
+                </p>
+            </div>
+
+        </div>
+
+        <p class="footer__copyright">
+            &copy; 2026 Axel FOLLET
+        </p>
+
+    </footer>
+
+
+    <!-- -------------------- DESKTOP GAME WINDOW -------------------- -->
+
+    <div
+        id="game-modal"
+        class="game-modal"
+        aria-hidden="true"
+    >
+        <button
+            class="game-modal__backdrop"
+            type="button"
+            data-game-close
+            aria-label="Close the game"
+        ></button>
+
+        <div
+            class="game-modal__dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="game-modal-title"
+        >
+            <div class="game-modal__header">
+                <h2 id="game-modal-title">Game</h2>
+
+                <button
+                    id="game-modal-close"
+                    class="game-modal__close"
+                    type="button"
+                    data-game-close
+                    aria-label="Close the game"
+                >
+                    ×
+                </button>
+            </div>
+
+            <!-- L'iframe héberge son propre document et ses commandes clavier. Son adresse est choisie au clic ; about:blank décharge le jeu à la fermeture. -->
+            <div class="game-modal__content">
+                <iframe
+                    id="game-frame"
+                    title="Playable game"
+                    src="about:blank"
+                 class="game-modal__frame"></iframe>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

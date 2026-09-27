@@ -1,0 +1,216 @@
+/*
+ * Cartes de projets. Flexbox aligne leur contenu et place les actions en bas.
+ * BEM : bloc__element désigne une partie du bloc ; bloc--modificateur désigne une variante.
+ */
+/* -------------------- PROJETS -------------------- */
+
+.projects {
+    /*
+     * Fixe une hauteur minimale sans empêcher le contenu de grandir ; vh dépend de la hauteur de la fenêtre.
+     */
+    min-height: 100vh;
+
+    /*
+     * Espacement intérieur : 2 valeurs = vertical/horizontal ; 3 = haut/horizontal/bas.
+     */
+    padding: 120px 8% 110px;
+}
+
+
+.projects > p:first-child {
+    margin-bottom: 10px;
+
+    /*
+     * rem se rapporte à la taille de police de l'élément html.
+     */
+    font-size: 0.9rem;
+    letter-spacing: 0.1rem;
+}
+
+
+.projects > h2 {
+    margin-bottom: 50px;
+
+    font-size: 3rem;
+}
+
+
+/* -------------------- LISTE DES PROJETS -------------------- */
+
+.projects__list {
+    /*
+     * Définit le mode de disposition ; flex aligne les enfants sur un axe, grid sur une grille.
+     */
+    display: flex;
+    /*
+     * Aligne les enfants sur l'axe transversal du conteneur.
+     */
+    align-items: stretch;
+
+    /*
+     * Ajoute de l'espace entre les enfants sans marge extérieure.
+     */
+    gap: 25px;
+}
+
+
+/* -------------------- CARTE PROJET -------------------- */
+
+.project-card {
+    /*
+     * Définit croissance, réduction et taille de base de cet enfant flex.
+     */
+    flex: 1;
+
+    display: flex;
+    /*
+     * column empile les enfants verticalement ; row les dispose horizontalement.
+     */
+    flex-direction: column;
+
+    padding: 30px;
+
+    border: 1px solid rgba(255, 255, 255, 0.2);
+
+    background-color: rgba(255, 255, 255, 0.04);
+
+    /*
+     * Contrôle ce qui dépasse de la boîte ; hidden le masque.
+     */
+    overflow: hidden;
+
+    /*
+     * Anime un changement de propriété, par exemple lors d'un survol ou d'un changement de classe.
+     */
+    transition:
+        transform 0.3s ease,
+        background-color 0.3s ease,
+        border-color 0.3s ease;
+}
+
+
+.project-card:hover {
+    /*
+     * Transforme le rendu sans déplacer les voisins dans le flux normal.
+     */
+    transform: translateY(-8px);
+
+    background-color: rgba(255, 255, 255, 0.08);
+
+    border-color: #E1001A;
+}
+
+
+/* -------------------- IMAGES DES PROJETS -------------------- */
+
+.project-card__image {
+    width: 100%;
+    height: 220px;
+
+    /*
+     * contain conserve toute l'image ; cover remplit le cadre en recadrant si nécessaire.
+     */
+    object-fit: contain;
+
+    margin-bottom: 25px;
+
+    background-color: transparent;
+}
+
+
+/* -------------------- TITRES ET TEXTES -------------------- */
+
+.project-card h3 {
+    /*
+     * Espacement extérieur ; auto peut absorber l'espace disponible selon la disposition.
+     */
+    margin: 0 0 20px;
+
+    font-size: 2rem;
+}
+
+
+.project-card p {
+    /*
+     * Une valeur sans unité multiplie la taille de police pour fixer l'interligne.
+     */
+    line-height: 1.6;
+}
+
+
+/* -------------------- LIEN PROJET -------------------- */
+
+/*
+    Les deux boutons (GitHub + test du jeu) sont empilés dans un conteneur
+    qui prend la largeur du plus large : ils ont ainsi la même taille.
+*/
+.project-card__actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    align-self: flex-start;
+
+    max-width: 100%;
+    margin-top: auto;
+}
+
+
+.project-card a {
+    display: block;
+    /*
+     * border-box inclut padding et bordures dans les dimensions annoncées.
+     */
+    box-sizing: border-box;
+
+    padding: 12px 18px;
+
+    border: 1px solid white;
+
+    color: white;
+    text-align: center;
+    text-decoration: none;
+
+    transition: 0.3s;
+}
+
+
+.project-card a:hover {
+    background-color: white;
+    color: #0D0A9B;
+}
+
+
+/*
+    Copie invisible du bouton "Tester le jeu" : elle ne prend aucune hauteur
+    mais impose la même largeur au bouton portfolio de la carte Python.
+*/
+.project-card__sizer {
+    display: block;
+    height: 0;
+    overflow: hidden;
+
+    margin-top: -10px;
+    padding: 0 18px;
+
+    border-left: 1px solid transparent;
+    border-right: 1px solid transparent;
+
+    /*
+     * hidden masque l'élément tout en conservant sa place, contrairement à display: none.
+     */
+    visibility: hidden;
+}
+
+
+/* Le bouton de test des jeux est masqué sur mobile : la copie aussi */
+/*
+ * Cette condition se base sur la largeur de la fenêtre en pixels CSS, pas sur le type d'appareil.
+ */
+@media (max-width: 1024px) {
+
+    .project-card__sizer {
+        display: none;
+    }
+
+}

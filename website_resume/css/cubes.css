@@ -1,0 +1,273 @@
+/*
+ * Apparence et placement des cubes. Le JavaScript anime l'objet ; le CSS construit ses faces.
+ * BEM : bloc__element désigne une partie du bloc ; bloc--modificateur désigne une variante.
+ */
+/* -------------------- CUBES 3D -------------------- */
+
+/*
+    Tous les cubes utilisent le même système.
+    JavaScript gère directement leur rotation.
+*/
+.cube {
+    width: var(--cube-size);
+    height: var(--cube-size);
+
+    /*
+     * Espacement intérieur : 2 valeurs = vertical/horizontal ; 3 = haut/horizontal/bas.
+     */
+    padding: 0;
+
+    border: none;
+
+    appearance: none;
+    -webkit-appearance: none;
+
+    background-color: transparent;
+
+    cursor: pointer;
+
+    /*
+     * Donne de la profondeur aux transformations 3D des descendants.
+     */
+    perspective: 900px;
+
+    -webkit-tap-highlight-color: transparent;
+}
+
+
+.cube:focus-visible {
+    outline: 2px solid white;
+    /*
+     * Écarte l'indicateur de focus du bord sans modifier la taille de l'élément.
+     */
+    outline-offset: 8px;
+}
+
+
+/* Objet qui contient les six faces */
+.cube__object {
+    /*
+     * Définit le mode de disposition ; flex aligne les enfants sur un axe, grid sur une grille.
+     */
+    display: block;
+
+    /*
+     * Le positionnement définit le repère utilisé par top/right/bottom/left ; les valeurs sont précisées ici.
+     */
+    position: relative;
+
+    width: 100%;
+    height: 100%;
+
+    transform-origin: center center;
+
+    /*
+     * preserve-3d conserve les faces dans l'espace 3D au lieu de les aplatir.
+     */
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+
+    will-change: transform;
+}
+
+
+/* -------------------- FACES DES CUBES -------------------- */
+
+.cube__face {
+    position: absolute;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+
+    border: 2px solid var(--cube-border);
+
+    background-color: var(--cube-fill);
+
+    box-shadow:
+        0 0 18px var(--cube-glow);
+
+    /*
+     * Anime un changement de propriété, par exemple lors d'un survol ou d'un changement de classe.
+     */
+    transition:
+        background-color 0.3s ease,
+        box-shadow 0.3s ease;
+}
+
+
+.cube:hover .cube__face {
+    background-color: var(--cube-hover);
+
+    box-shadow:
+        0 0 28px var(--cube-glow);
+}
+
+
+/* -------------------- POSITION DES 6 FACES -------------------- */
+
+.cube__face--front {
+    /*
+     * Transforme le rendu sans déplacer les voisins dans le flux normal.
+     */
+    transform: translateZ(var(--cube-half));
+}
+
+
+.cube__face--back {
+    transform:
+        rotateY(180deg)
+        translateZ(var(--cube-half));
+}
+
+
+.cube__face--right {
+    transform:
+        rotateY(90deg)
+        translateZ(var(--cube-half));
+}
+
+
+.cube__face--left {
+    transform:
+        rotateY(-90deg)
+        translateZ(var(--cube-half));
+}
+
+
+.cube__face--top {
+    transform:
+        rotateX(90deg)
+        translateZ(var(--cube-half));
+}
+
+
+.cube__face--bottom {
+    transform:
+        rotateX(-90deg)
+        translateZ(var(--cube-half));
+}
+
+
+/* -------------------- TAILLES DES CUBES -------------------- */
+
+.cube--large {
+    --cube-size: 180px;
+    --cube-half: 90px;
+}
+
+
+.cube--medium {
+    --cube-size: 90px;
+    --cube-half: 45px;
+}
+
+
+.cube--small {
+    --cube-size: 65px;
+    --cube-half: 32.5px;
+}
+
+
+.cube--tiny {
+    --cube-size: 45px;
+    --cube-half: 22.5px;
+}
+
+
+/* -------------------- COULEURS DES CUBES -------------------- */
+
+.cube--red {
+    --cube-border: #E1001A;
+
+    --cube-fill: rgba(225, 0, 26, 0.04);
+    --cube-hover: rgba(225, 0, 26, 0.11);
+
+    --cube-glow: rgba(225, 0, 26, 0.35);
+}
+
+
+/* Cube bleu utilisé dans la Reconversion */
+.cube--blue {
+    --cube-border: #0D0A9B;
+
+    --cube-fill: rgba(13, 10, 155, 0.08);
+    --cube-hover: rgba(13, 10, 155, 0.18);
+
+    --cube-glow: rgba(13, 10, 155, 0.45);
+}
+
+
+/* -------------------- CUBES ACCUEIL -------------------- */
+
+.home__cubes {
+    width: 42%;
+    height: 430px;
+
+    position: relative;
+}
+
+
+/* Cube principal */
+.home__cube--main {
+    position: absolute;
+
+    top: 50%;
+    left: 50%;
+
+    transform: translate(-50%, -50%);
+}
+
+
+/* Cubes satellites */
+.home__cube--satellite-1 {
+    position: absolute;
+
+    top: 10%;
+    left: 10%;
+}
+
+
+.home__cube--satellite-2 {
+    position: absolute;
+
+    top: 13%;
+    right: 8%;
+}
+
+
+.home__cube--satellite-3 {
+    position: absolute;
+
+    bottom: 14%;
+    left: 16%;
+}
+
+
+.home__cube--satellite-4 {
+    position: absolute;
+
+    right: 12%;
+    bottom: 9%;
+}
+
+
+/* -------------------- CUBE DE TRANSITION -------------------- */
+
+/*
+    Petit cube présent en bas à gauche
+    de chaque section.
+*/
+.cube--transition {
+    position: absolute;
+
+    left: 3%;
+    bottom: 20px;
+
+    /*
+     * Règle l'ordre de superposition à l'intérieur du contexte d'empilement.
+     */
+    z-index: 5;
+}
