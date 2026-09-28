@@ -1,14 +1,14 @@
-/* Composants BEM puis responsive. */
-@import url("css/base.css");
-@import url("css/navigation.css");
-@import url("css/sections.css");
-@import url("css/buttons.css");
-@import url("css/home.css");
-@import url("css/cubes.css");
-@import url("css/projects.css");
-@import url("css/career.css");
-@import url("css/skills.css");
-@import url("css/contact.css");
-@import url("css/footer.css");
-@import url("css/responsive.css");
-@import url("css/game-modal.css");
+/* Entree compatible ; les pages chargent les composants directement. */
+@import url("css/base.css?v=bdd23bb243c5");
+@import url("css/navigation.css?v=9d13cb8ce12b");
+@import url("css/sections.css?v=ea926b91c353");
+@import url("css/buttons.css?v=1593f2c03eaa");
+@import url("css/home.css?v=c021f02a53e2");
+@import url("css/cubes.css?v=033848879066");
+@import url("css/projects.css?v=c47ba1267b7b");
+@import url("css/career.css?v=50745a92c328");
+@import url("css/skills.css?v=8f9382e73ecf");
+@import url("css/contact.css?v=6b3911577037");
+@import url("css/footer.css?v=8d7b4ac03775");
+@import url("css/responsive.css?v=d1aced2f255f");
+@import url("css/game-modal.css?v=ffaf17ebdbcf");
