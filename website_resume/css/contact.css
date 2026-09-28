@@ -384,3 +384,8 @@
     right: 18%;
     bottom: 10%;
 }
+
+/* Cadres des liens de profil : largeur et hauteur communes. */
+.contact__links { width: 100%; max-width: 750px; }
+.linkedin-link { box-sizing: border-box; min-height: 76px; width: 100%; }
+.linkedin-link img { flex-shrink: 0; }

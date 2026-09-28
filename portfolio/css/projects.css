@@ -22,7 +22,7 @@
 }
 
 
-.project-card:hover, .project-card:focus-within {
+.project-card:not(.project-card--placeholder):hover, .project-card:not(.project-card--placeholder):focus-within {
     transform: translateY(-6px);
 
     /* Neutral base prevents red from tinting the translucent blue. */
@@ -112,6 +112,7 @@
 
 /* Carte d'un futur projet */
 .project-card--placeholder {
+    transition: none;
     border-style: dashed;
 
     background-color: var(--veil);
