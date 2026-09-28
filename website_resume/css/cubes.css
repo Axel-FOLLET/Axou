@@ -271,3 +271,5 @@
      */
     z-index: 5;
 }
+
+.cube--white { --cube-border: #fff; --cube-fill: rgba(255,255,255,.06); --cube-hover: rgba(255,255,255,.18); --cube-glow: rgba(255,255,255,.25); }

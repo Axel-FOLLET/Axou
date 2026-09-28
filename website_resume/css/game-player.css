@@ -12,3 +12,11 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #0D0A9B; }
     display: block; width: auto; height: auto; max-width: 100%;
     max-height: calc(100vh - 32px); margin: 0 auto; background-color: #0D0A9B; outline: none;
 }
+
+/* Voile blanc autour du jeu : le canvas conserve ses couleurs et ses dimensions. */
+.game-player { background: rgba(255, 255, 255, .13); }
+.game-player__canvas {
+    outline: 1px solid rgba(255, 255, 255, .5);
+    outline-offset: 0;
+    box-shadow: 0 0 0 8px rgba(255, 255, 255, .1);
+}

@@ -214,3 +214,7 @@
     }
 
 }
+
+/* Le cadre garde les hauteurs responsive des illustrations. */
+.project-card__visual { display:flex; align-items:center; justify-content:center; flex-shrink:0; min-width:0; container-type:inline-size; }
+.project-card__cube { --cube-size:min(100px,50cqw); --cube-half:calc(var(--cube-size) / 2); flex-shrink:0; }
