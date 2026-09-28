@@ -18,7 +18,8 @@
 .section__title {
     margin: 0 0 30px;
 
-    font-size: 3rem;
+    /* Taille progressive entre 2.2rem (téléphone) et 3rem (ordinateur) */
+    font-size: clamp(2.2rem, 5vw, 3rem);
 }
 
 

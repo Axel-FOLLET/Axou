@@ -31,7 +31,8 @@
 .contact h2 {
     margin-bottom: 20px;
 
-    font-size: 3rem;
+    /* Taille progressive : 2.2rem sur téléphone, 3rem sur ordinateur */
+    font-size: clamp(2.2rem, 5vw, 3rem);
 }
 
 
@@ -196,6 +197,26 @@
 }
 
 
+/*
+ * Champ en erreur : bordure gauche épaisse, repérable sans dépendre de la couleur.
+ * Le padding compense les 5 px ajoutés pour que le texte ne bouge pas.
+ */
+.contact-form__field [aria-invalid="true"] {
+    border-left: 6px solid #E1001A;
+
+    padding-left: 11px;
+}
+
+
+/* Message créé par contact-form.js sous le champ concerné */
+.contact-form__error {
+    margin: 8px 0 0;
+
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+
 /* -------------------- BOUTON ENVOYER -------------------- */
 
 .contact-form__submit {
@@ -214,7 +235,8 @@
     transition:
         background-color 0.3s ease,
         color 0.3s ease,
-        transform 0.3s ease;
+        transform 0.3s ease,
+        scale 0.1s ease-out;
 }
 
 
@@ -226,6 +248,46 @@
      * Transforme le rendu sans déplacer les voisins dans le flux normal.
      */
     transform: translateY(-3px);
+}
+
+
+.contact-form__submit:active {
+    scale: 0.97;
+}
+
+
+/* Bouton désactivé pendant l'envoi : évite un double envoi */
+.contact-form__submit:disabled {
+    cursor: wait;
+    opacity: 0.6;
+}
+
+
+/* -------------------- ÉTAT DE L'ENVOI -------------------- */
+
+/*
+ * role="status" fait lire le message par les lecteurs d'écran sans déplacer le focus.
+ * La couleur est portée par la bordure : du rouge sur ce bleu serait peu lisible en texte.
+ */
+.contact-form__status {
+    min-height: 1.6em;
+
+    margin: 18px 0 0;
+    padding-left: 12px;
+
+    border-left: 3px solid transparent;
+
+    line-height: 1.6;
+}
+
+
+.contact-form__status--success {
+    border-left-color: white;
+}
+
+
+.contact-form__status--error {
+    border-left-color: #E1001A;
 }
 
 
@@ -304,7 +366,8 @@
     transition:
         background-color 0.3s ease,
         border-color 0.3s ease,
-        transform 0.3s ease;
+        transform 0.3s ease,
+        scale 0.1s ease-out;
 }
 
 
@@ -335,6 +398,11 @@
     border-color: #E1001A;
 
     transform: translateX(5px);
+}
+
+
+.linkedin-link:active {
+    scale: 0.97;
 }
 
 
@@ -389,3 +457,11 @@
 .contact__links { width: 100%; max-width: 750px; }
 .linkedin-link { box-sizing: border-box; min-height: 76px; width: 100%; }
 .linkedin-link img { flex-shrink: 0; }
+
+
+/* Champ piège anti-robots : placé hors de l'écran, jamais vu par les visiteurs */
+.contact-form__trap {
+    position: absolute;
+
+    left: -9999px;
+}

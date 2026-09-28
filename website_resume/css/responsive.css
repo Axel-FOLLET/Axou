@@ -41,7 +41,20 @@
 
 
     .navigation__links {
-        display: none;
+        /*
+         * Le menu reste en place mais caché : visibility le retire du clavier.
+         * clip-path le découvre depuis le haut et le recouvre par le même chemin.
+         * Fermeture : courbe inverse de l'ouverture ; visibility attend la fin (délai 0.2s).
+         */
+        display: flex;
+        visibility: hidden;
+        opacity: 0;
+        clip-path: inset(0 0 100% 0);
+
+        transition:
+            clip-path 0.2s cubic-bezier(0.8, 0, 0.8, 0.2),
+            opacity 0.2s ease,
+            visibility 0s linear 0.2s;
 
         position: absolute;
         top: 100%;
@@ -65,7 +78,17 @@
 
 
     .navigation--open .navigation__links {
-        display: flex;
+        visibility: visible;
+        opacity: 1;
+        /*
+         * Marge négative en bas : l'ombre portée du menu reste visible.
+         */
+        clip-path: inset(0 0 -40px 0);
+
+        transition:
+            clip-path 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
+            opacity 0.2s ease,
+            visibility 0s;
     }
 
 
@@ -103,11 +126,6 @@
     .home__text,
     .home__cubes {
         width: 100%;
-    }
-
-
-    .home h1 {
-        font-size: 5rem;
     }
 
 
@@ -221,7 +239,7 @@
         /*
          * Anime un changement de propriété, par exemple lors d'un survol ou d'un changement de classe.
          */
-        transition: transform 0.8s ease;
+        transition: transform 0.4s ease;
 
         /*
          * preserve-3d conserve les faces dans l'espace 3D au lieu de les aplatir.
@@ -285,7 +303,7 @@
     }
 
 
-    .experience-card__back h3 {
+    .experience-card__back h4 {
         color: #0D0A9B;
 
         font-size: 1.4rem;
@@ -446,11 +464,6 @@
     }
 
 
-    .navigation__links {
-        display: none;
-    }
-
-
     /* -------------------- CHOIX DE LA LANGUE TÉLÉPHONE -------------------- */
 
     /*
@@ -473,11 +486,6 @@
 
     .home {
         padding: 40px 24px 90px;
-    }
-
-
-    .home h1 {
-        font-size: 4rem;
     }
 
 
@@ -564,11 +572,6 @@
     }
 
 
-    .education__content h2 {
-        font-size: 2.2rem;
-    }
-
-
     /* -------------------- EXPÉRIENCES -------------------- */
 
     .experience {
@@ -584,12 +587,12 @@
     }
 
 
-    .experience-card h2 {
+    .experience-card h3 {
         font-size: 1.7rem;
     }
 
 
-    .experience-card h3 {
+    .experience-card h4 {
         font-size: 1.1rem;
     }
 
@@ -619,7 +622,6 @@
 
 
     .career__intro h2 {
-        font-size: 2rem;
         line-height: 1.15;
     }
 
@@ -646,20 +648,10 @@
     }
 
 
-    .projects > h2 {
-        font-size: 2.2rem;
-    }
-
-
     /* -------------------- CONTACT -------------------- */
 
     .contact {
         padding: 80px 20px 90px;
-    }
-
-
-    .contact h2 {
-        font-size: 2.2rem;
     }
 
 

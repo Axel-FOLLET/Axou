@@ -73,6 +73,26 @@
 }
 
 
+/*
+    Champ en erreur : bordure gauche épaisse, repérable sans dépendre de la couleur.
+    Le padding compense les 5 px ajoutés pour que le texte ne bouge pas.
+*/
+.form__input[aria-invalid="true"] {
+    border-left-width: 6px;
+
+    padding-left: 11px;
+}
+
+
+/* Message créé par contact.js sous le champ concerné */
+.form__error {
+    margin: 8px 0 0;
+
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+
 .form__input--area {
     resize: vertical;
 }
@@ -127,7 +147,13 @@
 
     transition:
         background-color 0.3s ease,
-        transform 0.3s ease;
+        transform 0.3s ease,
+        scale 0.1s ease-out;
+}
+
+
+.link-card:active {
+    scale: 0.99;
 }
 
 

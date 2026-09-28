@@ -40,9 +40,9 @@
     margin: 0 0 10px;
 
     /*
-     * rem se rapporte à la taille de police de l'élément html.
+     * Taille progressive : 2.2rem sur téléphone, 2.8rem sur ordinateur.
      */
-    font-size: 2.8rem;
+    font-size: clamp(2.2rem, 4.7vw, 2.8rem);
     letter-spacing: -0.05rem;
 }
 

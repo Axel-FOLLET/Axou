@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Projects | Axel FOLLET — Portfolio</title>
+    <meta name="description" content="Axel FOLLET’s academic and personal projects: context, technologies, code and demos.">
+    <meta name="author" content="Axel FOLLET">
+
+    <!-- Référencement : page canonique et version dans l'autre langue -->
+    <link rel="canonical" href="https://axel-follet.github.io/portfolio/projects-en.html">
+    <link rel="alternate" hreflang="fr" href="https://axel-follet.github.io/portfolio/projects.html">
+    <link rel="alternate" hreflang="en" href="https://axel-follet.github.io/portfolio/projects-en.html">
+
+    <!-- Aperçu lors du partage du lien -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Projects | Axel FOLLET — Portfolio">
+    <meta property="og:description" content="Axel FOLLET’s academic and personal projects: context, technologies, code and demos.">
+    <meta property="og:url" content="https://axel-follet.github.io/portfolio/projects-en.html">
+    <meta property="og:image" content="https://axel-follet.github.io/portfolio/assets/images/profile.jpg">
+
+    <!-- Versions CSS : recharge les styles modifies apres publication. -->
+    <link rel="stylesheet" href="css/base.css?v=5215fe61580e">
+    <link rel="stylesheet" href="css/navigation.css?v=fa1be1713683">
+    <link rel="stylesheet" href="css/sections.css?v=5f1431c8fd16">
+    <link rel="stylesheet" href="css/buttons.css?v=664203a79bb7">
+    <link rel="stylesheet" href="css/home.css?v=d6b6a0d974f9">
+    <link rel="stylesheet" href="css/cubes.css?v=94dd18a8abb4">
+    <link rel="stylesheet" href="css/projects.css?v=aecc90e120f0">
+    <link rel="stylesheet" href="css/career.css?v=54eb30ba776f">
+    <link rel="stylesheet" href="css/skills.css?v=8161dba47ce7">
+    <link rel="stylesheet" href="css/contact.css?v=71f97b5e39cc">
+    <link rel="stylesheet" href="css/footer.css?v=8d7b4ac03775">
+    <link rel="stylesheet" href="css/responsive.css?v=7c411a24e76b">
+    <link rel="stylesheet" href="css/game-modal.css?v=8321015a760b">
+    <link rel="stylesheet" href="css/folder-tabs.css?v=e8f0e0068781">
+    <script type="module" src="script.js"></script>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Axel FOLLET",
+        "jobTitle": "IT project manager",
+        "url": "https://axel-follet.github.io/portfolio/",
+        "sameAs": ["https://www.linkedin.com/in/axel-follet/", "https://github.com/Axel-FOLLET"]
+    }
+    </script>
+</head>
+
+<body class="page">
+
+    <!-- Lien pour aller directement au contenu (clavier) -->
+    <a class="skip-link" href="#main">Skip to content</a>
+
+
+    <!-- -------------------- NAVIGATION -------------------- -->
+
+    <header class="header">
+
+        <nav class="header__nav" aria-label="Main navigation">
+
+            <button
+                class="header__toggle"
+                id="menu-toggle"
+                type="button"
+                aria-label="Open navigation menu"
+                aria-expanded="false"
+                aria-controls="menu-links"
+            >
+                <span class="header__toggle-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+            </button>
+
+            <!-- Identité : photo + initiales + choix langue -->
+            <div class="header__identity">
+
+                <span class="header__avatar">
+                    <img
+                    class="header__photo"
+                    src="assets/images/profile.jpg"
+                    alt="Profile picture of Axel FOLLET" width="679" height="1236"
+                >
+                </span>
+
+                <a class="header__logo" href="index-en.html">AF</a>
+
+                <!-- Chaque page renvoie vers sa page équivalente dans l'autre langue -->
+                <select
+                    class="language-select"
+
+                    aria-label="Choose the language"
+                >
+                    <option value="projects.html">FR</option>
+                    <option value="projects-en.html" selected>EN</option>
+                </select>
+
+            </div>
+
+
+            <!-- Liens vers les différentes pages -->
+            <span class="header__current">Projects</span>
+            <ul class="header__links" id="menu-links">
+                <li>
+                    <a class="header__link" href="index-en.html">Home</a>
+                </li>
+                <li>
+                    <a class="header__link" href="projects-en.html" aria-current="page">Projects</a>
+                </li>
+                <li>
+                    <a class="header__link" href="skills-en.html">Skills</a>
+                </li>
+                <li>
+                    <a class="header__link" href="contact-en.html">Contact</a>
+                </li>
+            </ul>
+
+        </nav>
+
+    </header>
+
+
+    <!-- -------------------- CONTENU PRINCIPAL -------------------- -->
+
+    <main id="main"><div id="projects">
+
+
+        <!-- -------------------- PROJETS -------------------- -->
+
+        <section class="section" aria-labelledby="projects-title">
+
+            <p class="section__eyebrow">01 / PROJECTS</p>
+
+            <h1 class="section__title" id="projects-title">My technical projects</h1>
+
+            <p class="section__intro">
+                Each project states its context, its goal, the skills involved and the useful links (source code, live demo).
+            </p>
+
+            <button
+                class="cube cube--tiny cube--blue cube--corner"
+                type="button"
+                aria-label="Spin the cube"
+                data-speed="18"
+                data-phase="140"
+            ></button>
+
+            <div class="bars" aria-hidden="true">
+                <span class="bars__bar"></span>
+                <span class="bars__bar"></span>
+                <span class="bars__bar"></span>
+            </div>
+
+
+            <div class="project-list">
+
+                <!--
+                    POUR AJOUTER UN PROJET :
+                    copier un bloc <article class="project-card"> ci-dessous,
+                    puis changer le titre, l'image, le contexte, l'objectif,
+                    les technologies et les liens.
+                -->
+
+                <article class="project-card">
+
+                    <div class="project-card__media">
+                        <button
+                            class="cube cube--medium cube--blue "
+                            type="button"
+                            aria-label="Spin the cube"
+                            data-speed="16"
+                            data-phase="90"
+                        ></button>
+                    </div>
+
+                    <div class="project-card__body">
+
+                        <h3 class="project-card__title">My resume website</h3>
+
+                        <dl class="project-card__details">
+
+                            <dt class="project-card__label">Context</dt>
+                            <dd class="project-card__text">Epitech project (Web day 04): build a personal website with HTML, CSS and JavaScript, in French and English.</dd>
+
+                            <dt class="project-card__label">Goal</dt>
+                            <dd class="project-card__text">Present my path from HR project management to IT with a polished, animated and responsive interface.</dd>
+
+                            <dt class="project-card__label">Skills and technologies</dt>
+                            <dd class="project-card__text">
+                                <ul class="project-card__tags">
+                                <li class="tag">HTML</li>
+                                <li class="tag">CSS</li>
+                                <li class="tag">JavaScript</li>
+                                <li class="tag">Responsive</li>
+                                <li class="tag">CSS 3D animations</li>
+                                <li class="tag">Formspree</li>
+                                <li class="tag">GitHub Pages</li>
+                                </ul>
+                            </dd>
+
+                        </dl>
+
+                        <div class="project-card__actions">
+                            <a class="button" href="https://axel-follet.github.io/website_resume/" target="_blank" rel="noopener noreferrer">See the live website</a>
+                            <a class="button" href="https://github.com/Axel-FOLLET/website_resume" target="_blank" rel="noopener noreferrer">Source code on GitHub</a>
+                        </div>
+
+                    </div>
+
+                </article>
+
+                <article class="project-card">
+
+                    <div class="project-card__media">
+                        <img class="project-card__image" src="assets/images/dessin_snake_blue.png" alt="Illustration of the Snake game developed in Python" width="1448" height="1086" loading="lazy" decoding="async">
+                    </div>
+
+                    <div class="project-card__body">
+
+                        <h3 class="project-card__title">Snake game</h3>
+
+                        <dl class="project-card__details">
+
+                            <dt class="project-card__label">Context</dt>
+                            <dd class="project-card__text">Personal project extending the Hangman game with animation and real-time interaction.</dd>
+
+                            <dt class="project-card__label">Goal</dt>
+                            <dd class="project-card__text">Develop a playable Snake: movement, collisions, apples, score and visual effects.</dd>
+
+                            <dt class="project-card__label">Skills and technologies</dt>
+                            <dd class="project-card__text">
+                                <ul class="project-card__tags">
+                                <li class="tag">Python</li>
+                                <li class="tag">Pygame</li>
+                                <li class="tag">Keyboard events</li>
+                                <li class="tag">Collisions</li>
+                                <li class="tag">Code split into modules</li>
+                                </ul>
+                            </dd>
+
+                        </dl>
+
+                        <div class="project-card__actions">
+                            <a class="button" href="https://github.com/Axel-FOLLET/Axou/tree/5f52f135fe0bb45800351c035b74ff3e00f64e5e/jeu_du_snake" target="_blank" rel="noopener noreferrer">Source code on GitHub</a>
+                            <button class="button project-card__play" type="button" data-game="snake" data-game-title="Snake">Play</button>
+                        </div>
+
+                    </div>
+
+                </article>
+
+                <article class="project-card">
+
+                    <div class="project-card__media">
+                        <img class="project-card__image" src="assets/images/dessin_pendu_blue.png" alt="Illustration of the Hangman game developed in Python" width="1448" height="1086" loading="lazy" decoding="async">
+                    </div>
+
+                    <div class="project-card__body">
+
+                        <h3 class="project-card__title">Hangman game</h3>
+
+                        <dl class="project-card__details">
+
+                            <dt class="project-card__label">Context</dt>
+                            <dd class="project-card__text">Personal project built to consolidate my Python fundamentals.</dd>
+
+                            <dt class="project-card__label">Goal</dt>
+                            <dd class="project-card__text">Build a complete Hangman game: word choice, letter input, mistake handling and best-score saving.</dd>
+
+                            <dt class="project-card__label">Skills and technologies</dt>
+                            <dd class="project-card__text">
+                                <ul class="project-card__tags">
+                                <li class="tag">Python</li>
+                                <li class="tag">Pygame</li>
+                                <li class="tag">Conditions and loops</li>
+                                <li class="tag">Functions</li>
+                                <li class="tag">File reading</li>
+                                </ul>
+                            </dd>
+
+                        </dl>
+
+                        <div class="project-card__actions">
+                            <a class="button" href="https://github.com/Axel-FOLLET/Axou/tree/5f52f135fe0bb45800351c035b74ff3e00f64e5e/jeu_du_pendu" target="_blank" rel="noopener noreferrer">Source code on GitHub</a>
+                            <button class="button project-card__play" type="button" data-game="pendu" data-game-title="Hangman">Play</button>
+                        </div>
+
+                    </div>
+
+                </article>
+
+                <!-- -------------------- FUTURS PROJETS -------------------- -->
+
+                <article class="project-card project-card--placeholder">
+
+                    <div class="project-card__media">
+                        <button
+                    class="cube cube--small cube--white "
+                    type="button"
+                    aria-label="Spin the cube"
+                    data-speed="20"
+                    data-phase="40"
+                ></button>
+                    </div>
+
+                    <div class="project-card__body">
+                        <h3 class="project-card__title">Upcoming projects</h3>
+                        <p class="project-card__text">
+                            This portfolio grows with my studies: new Epitech projects and personal projects will be added here.
+                        </p>
+                    </div>
+
+                </article>
+
+            </div>
+
+        </section>
+
+
+        </div>
+
+        </main>
+
+
+    <!-- -------------------- PIED DE PAGE -------------------- -->
+
+    <footer class="footer">
+
+        <div class="footer__row">
+
+            <div>
+                <h2 class="footer__title">Navigation</h2>
+                <ul class="footer__list">
+                    <li><a href="index-en.html">Home</a></li>
+                    <li><a href="projects-en.html">Projects</a></li>
+                    <li><a href="skills-en.html">Skills</a></li>
+                    <li><a href="contact-en.html">Contact</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h2 class="footer__title">Resources and credits</h2>
+                <p class="footer__credits">
+                    Photo, drawings and texts: original work by Axel FOLLET. The 3D cubes are made with HTML, CSS and JavaScript. The folder and web symbols are Unicode emojis rendered by the system. LinkedIn® and the [in]® logo are trademarks of LinkedIn Corporation and its affiliates. This personal website is neither affiliated with nor endorsed by LinkedIn. No third-party font or theme is used: the font is the system one (Avenir when available).
+                </p>
+            </div>
+
+        </div>
+
+        <p class="footer__copyright">
+            &copy; 2026 Axel FOLLET
+        </p>
+
+    </footer>
+
+    <div
+        id="game-modal"
+        class="game-modal"
+        aria-hidden="true"
+    >
+        <button
+            class="game-modal__backdrop"
+            type="button"
+            data-game-close
+            aria-label="Close game"
+        ></button>
+
+        <div
+            class="game-modal__dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="game-modal-title"
+        >
+            <div class="game-modal__header">
+                <h2 id="game-modal-title">Game</h2>
+
+                <button
+                    id="game-modal-close"
+                    class="game-modal__close"
+                    type="button"
+                    data-game-close
+                    aria-label="Close game"
+                >
+                    ×
+                </button>
+            </div>
+
+            <!-- L'iframe héberge son propre document et ses commandes clavier. Son adresse est choisie au clic ; about:blank décharge le jeu à la fermeture. -->
+            <div class="game-modal__content">
+                <iframe
+                    id="game-frame"
+                    title="Playable game"
+                    src="about:blank"
+                 class="game-modal__frame"></iframe>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

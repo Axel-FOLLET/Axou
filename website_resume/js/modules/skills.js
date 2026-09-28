@@ -9,13 +9,21 @@
 export function initSkills(descriptions) {
     const panel = document.querySelector(".skills__description");
     if (!panel) return;
-    for (const button of document.querySelectorAll("[data-skill]")) {
+    const buttons = document.querySelectorAll("[data-skill]");
+    for (const button of buttons) {
         button.addEventListener("click", () => {
             /*
              * data-skill dans le HTML devient dataset.skill ; sa valeur sert de clé de recherche.
              */
             const description = descriptions[button.dataset.skill];
-            if (description) panel.textContent = description;
+            if (!description) return;
+            panel.textContent = description;
+            /*
+             * aria-pressed indique le bouton affiché : "true" pour lui, "false" pour les autres.
+             */
+            for (const other of buttons) {
+                other.setAttribute("aria-pressed", String(other === button));
+            }
         });
     }
 }

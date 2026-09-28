@@ -24,14 +24,19 @@
 
 .project-card:not(.project-card--placeholder):hover, .project-card:not(.project-card--placeholder):focus-within {
     transform: translateY(-6px);
+}
 
+
+/* Surbrillance bleue limitée au texte : le cube et les dessins gardent le voile blanc. */
+.project-card:not(.project-card--placeholder):hover .project-card__body,
+.project-card:not(.project-card--placeholder):focus-within .project-card__body {
     /* Neutral base prevents red from tinting the translucent blue. */
     background-color: #141422;
     background-image: linear-gradient(rgba(13,10,155,.72),rgba(13,10,155,.72));
 }
 
 
-/* Zone claire pour que les dessins restent lisibles */
+/* Zone transparente : le voile blanc de la carte apparaît derrière les dessins bleus */
 .project-card__media {
     display: flex;
     align-items: center;
@@ -42,12 +47,17 @@
     margin: 0;
     padding: 20px;
 
-    background-color: var(--white);
+    background-color: transparent;
 }
 
 
+/*
+    Les attributs width/height du HTML réservent la place avant le chargement.
+    height: auto garde les proportions du dessin au lieu de sa hauteur d'origine.
+*/
 .project-card__image {
     width: 100%;
+    height: auto;
     max-height: 260px;
 
     object-fit: contain;

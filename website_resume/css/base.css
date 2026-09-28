@@ -30,3 +30,49 @@ body {
 
     overflow-x: hidden;
 }
+
+
+/* -------------------- LIEN D'ÉVITEMENT -------------------- */
+
+/*
+ * Caché au-dessus de l'écran, il descend au premier appui sur Tab.
+ * Il permet d'aller au contenu sans parcourir toute la navigation.
+ */
+.skip-link {
+    position: absolute;
+
+    top: -60px;
+    left: 16px;
+
+    z-index: 2000;
+
+    padding: 10px 16px;
+
+    background-color: white;
+    color: #0D0A9B;
+
+    transition: top 0.2s ease;
+}
+
+
+.skip-link:focus {
+    top: 12px;
+}
+
+
+/* -------------------- TEXTE POUR LECTEURS D'ÉCRAN -------------------- */
+
+/*
+ * Masqué à l'écran mais lu par les lecteurs d'écran : display: none le cacherait aussi pour eux.
+ */
+.visually-hidden {
+    position: absolute;
+
+    width: 1px;
+    height: 1px;
+
+    overflow: hidden;
+
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}

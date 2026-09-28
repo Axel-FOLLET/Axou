@@ -31,7 +31,8 @@
 .projects > h2 {
     margin-bottom: 50px;
 
-    font-size: 3rem;
+    /* Taille progressive : 2.2rem sur téléphone, 3rem sur ordinateur */
+    font-size: clamp(2.2rem, 5vw, 3rem);
 }
 
 
@@ -171,13 +172,21 @@
     text-align: center;
     text-decoration: none;
 
-    transition: 0.3s;
+    transition:
+        background-color 0.3s ease,
+        color 0.3s ease,
+        scale 0.1s ease-out;
 }
 
 
 .project-card a:hover {
     background-color: white;
     color: #0D0A9B;
+}
+
+
+.project-card a:active {
+    scale: 0.97;
 }
 
 

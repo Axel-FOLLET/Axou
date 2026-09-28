@@ -24,6 +24,13 @@ export function createCube(trigger, index) {
         object,
         rotationX: -18 + phase * 0.05, rotationY: phase, rotationZ: phase * 0.12,
         baseSpeed: Number(trigger.dataset.speed) || 16,
-        clickTimeRemaining: 0
+        clickTimeRemaining: 0,
+        /*
+         * État du glisser et élan après un lancer, en degrés par seconde.
+         */
+        isDragging: false,
+        wasDragged: false,
+        velocityX: 0,
+        velocityY: 0
     };
 }

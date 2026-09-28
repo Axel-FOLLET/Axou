@@ -112,7 +112,35 @@
     transition:
         transform 0.3s ease,
         background-color 0.3s ease,
-        border-left-color 0.3s ease;
+        border-left-color 0.3s ease,
+        scale 0.1s ease-out;
+}
+
+
+/* La carte reçoit le focus clavier (tabindex) : l'indicateur doit rester visible. */
+.experience-card:focus-visible {
+    outline: 2px solid #E1001A;
+    outline-offset: 4px;
+}
+
+
+.experience-card:active {
+    scale: 0.99;
+}
+
+
+/*
+ * Carte dont les compétences sont affichées dans la bulle (aria-current posé par experience.js).
+ * Grand écran seulement : sur téléphone, la carte retournée suffit à le montrer.
+ */
+@media (min-width: 1025px) {
+
+    .experience-card[aria-current="true"] {
+        border-left-color: #E1001A;
+
+        background-color: rgba(255, 255, 255, 0.07);
+    }
+
 }
 
 
@@ -138,7 +166,7 @@
 }
 
 
-.experience-card h2 {
+.experience-card h3 {
     /*
      * Espacement extérieur ; auto peut absorber l'espace disponible selon la disposition.
      */
@@ -148,7 +176,7 @@
 }
 
 
-.experience-card h3 {
+.experience-card h4 {
     margin: 0 0 20px;
 
     font-size: 1.2rem;

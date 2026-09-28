@@ -63,15 +63,19 @@
     margin: 10px 0;
 
     /*
-     * rem se rapporte à la taille de police de l'élément html.
+     * clamp(minimum, idéal, maximum) : la taille suit la largeur de la fenêtre (8vw)
+     * sans descendre sous 4rem ni dépasser 6rem. Remplace les paliers fixes du responsive.
      */
-    font-size: 6rem;
+    font-size: clamp(4rem, 8vw, 6rem);
     /*
      * Une valeur sans unité multiplie la taille de police pour fixer l'interligne.
      */
     line-height: 0.9;
 
-    letter-spacing: -0.2rem;
+    /*
+     * em se rapporte à la taille de ce texte : le resserrement reste proportionnel au titre.
+     */
+    letter-spacing: -0.035em;
 
     text-transform: uppercase;
 }
@@ -106,13 +110,22 @@
     text-decoration: none;
 
     /*
-     * Anime un changement de propriété, par exemple lors d'un survol ou d'un changement de classe.
+     * Nommer les propriétés évite d'animer par accident une autre modification.
      */
-    transition: 0.3s;
+    transition:
+        background-color 0.3s ease,
+        color 0.3s ease,
+        scale 0.1s ease-out;
 }
 
 
 .home a:hover {
     background-color: white;
     color: #0D0A9B;
+}
+
+
+/* Retour immédiat à l'appui, utile sur écran tactile où le survol n'existe pas */
+.home a:active {
+    scale: 0.97;
 }

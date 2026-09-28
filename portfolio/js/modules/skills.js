@@ -81,6 +81,15 @@ skills.forEach(function(skill) {
             skillDescription.dataset.labelProjects + " : " + skill.dataset.projects;
         skillDescription.appendChild(detailProjects);
 
+        /*
+            Fondu court du nouveau texte : le changement se remarque sans rien déplacer.
+            animate() n'ajoute pas de classe : un nouveau clic relance simplement le fondu.
+        */
+        skillDescription.animate(
+            [{ opacity: 0 }, { opacity: 1 }],
+            { duration: 200, easing: "ease-out" }
+        );
+
     });
 
 });

@@ -28,7 +28,8 @@
 .banner__title {
     margin: 0 0 24px;
 
-    font-size: 2.6rem;
+    /* Taille progressive entre 1.9rem (téléphone) et 2.6rem (ordinateur) */
+    font-size: clamp(1.9rem, 4.5vw, 2.6rem);
 }
 
 

@@ -57,7 +57,8 @@
      */
     margin: 0 0 30px;
 
-    font-size: 3rem;
+    /* Taille progressive : 2rem sur téléphone, 3rem sur ordinateur */
+    font-size: clamp(2rem, 5vw, 3rem);
     /*
      * Une valeur sans unité multiplie la taille de police pour fixer l'interligne.
      */
@@ -145,7 +146,8 @@
     transition:
         background-color 0.3s ease,
         color 0.3s ease,
-        transform 0.3s ease;
+        transform 0.3s ease,
+        scale 0.1s ease-out;
 }
 
 
@@ -157,6 +159,19 @@
      * Transforme le rendu sans déplacer les voisins dans le flux normal.
      */
     transform: translateY(-4px);
+}
+
+
+/* Compétence affichée dans la bulle : même aspect que le survol, sans le déplacement */
+.skills__button[aria-pressed="true"] {
+    background-color: white;
+    color: #E1001A;
+}
+
+
+/* scale se combine à transform : le bouton reste soulevé et s'enfonce légèrement */
+.skills__button:active {
+    scale: 0.97;
 }
 
 

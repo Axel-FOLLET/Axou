@@ -29,17 +29,46 @@ export function showExperience(card, panel, skills) {
     panel.replaceChildren(list);
 }
 /*
- * Relie chaque entreprise aux compétences de la langue choisie.
+ * Relie chaque carte aux compétences écrites dans son verso (HTML).
+ * Une seule source pour les deux langues : la page contient déjà le texte traduit.
  * Les écouteurs sont installés une fois ; les listes sont créées seulement au clic.
  */
-export function initExperience(translations) {
+/*
+ * Marque la carte affichée dans la bulle et retire la marque des autres.
+ * aria-current indique aux lecteurs d'écran l'élément en cours ; le CSS lui donne un style.
+ */
+function selectCard(selected, cards) {
+    for (const card of cards) {
+        if (card === selected) card.setAttribute("aria-current", "true");
+        else card.removeAttribute("aria-current");
+    }
+}
+export function initExperience() {
     const panel = document.querySelector(".experience__skills");
     if (!panel) return;
-    /*
-     * Object.entries fournit les paires clé/valeur ; la déstructuration leur donne deux noms.
-     */
-    for (const [company, skills] of Object.entries(translations)) {
-        const card = document.getElementById("experience-" + company);
-        if (card) card.addEventListener("click", () => showExperience(card, panel, skills));
+    const cards = document.querySelectorAll(".experience-card");
+    for (const card of cards) {
+        /*
+         * Le spread convertit la NodeList en tableau ; map garde seulement le texte de chaque élément.
+         */
+        const skills = [...card.querySelectorAll(".experience-card__back li")].map(item => item.textContent.trim());
+        /*
+         * Même action pour le clic et le clavier : afficher les compétences et marquer la carte.
+         */
+        const activate = () => {
+            showExperience(card, panel, skills);
+            selectCard(card, cards);
+        };
+        card.addEventListener("click", activate);
+        /*
+         * Au clavier, Entrée et Espace activent la carte comme un bouton.
+         * preventDefault empêche Espace de faire défiler la page.
+         */
+        card.addEventListener("keydown", event => {
+            if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                activate();
+            }
+        });
     }
 }

@@ -23,11 +23,6 @@
     }
 
 
-    .hero__title {
-        font-size: 5rem;
-    }
-
-
     .hero__visual {
         height: 460px;
 
@@ -143,12 +138,6 @@
 
     /* -------------------- ACCUEIL -------------------- */
 
-    .hero__title {
-        font-size: 3.4rem;
-        letter-spacing: -0.1rem;
-    }
-
-
     .hero__catchphrase {
         font-size: 1.3rem;
     }
@@ -171,11 +160,6 @@
 
     /* -------------------- SECTIONS -------------------- */
 
-    .section__title {
-        font-size: 2.2rem;
-    }
-
-
     .project-card__body {
         padding: 24px 20px;
     }
@@ -184,11 +168,6 @@
     .banner__intro,
     .logic {
         padding: 26px 20px;
-    }
-
-
-    .banner__title {
-        font-size: 1.9rem;
     }
 
 
@@ -210,7 +189,10 @@
 
 /*
     Si le visiteur a demandé moins d'animations dans son système,
-    les transitions sont supprimées (JavaScript arrête aussi les cubes).
+    les déplacements sont supprimés (JavaScript arrête aussi les cubes).
+    Moins de mouvement ne veut pas dire aucun retour :
+    les changements de couleur restent pour confirmer le survol et le clic.
+    La fenêtre des jeux est traitée dans game-modal.css, chargé après ce fichier.
 */
 @media (prefers-reduced-motion: reduce) {
 
@@ -219,8 +201,19 @@
     }
 
 
-    * {
-        transition: none !important;
+    .button:hover,
+    .button:focus-visible,
+    .teaser:hover,
+    .teaser:focus-within,
+    .skill:hover,
+    .skill[aria-pressed="true"],
+    .challenge:hover,
+    .challenge:focus-within,
+    .link-card:hover,
+    .link-card:focus-within,
+    .project-card:not(.project-card--placeholder):hover,
+    .project-card:not(.project-card--placeholder):focus-within {
+        transform: none;
     }
 
 }
@@ -240,8 +233,20 @@
 @media (max-width: 1024px) {
     .header__nav { position: relative; padding: 20px 32px; gap: 20px; flex-wrap: nowrap; }
     .header__toggle { display: inline-flex; flex: 0 0 44px; }
+    /*
+     * Le menu reste en place mais caché : visibility le retire du clavier.
+     * clip-path le découvre depuis le haut (sous le bouton) et le recouvre par le même chemin.
+     * Fermeture : courbe inverse de l'ouverture ; visibility attend la fin (délai 0.2s).
+     */
     .header__links {
-        display: none;
+        display: flex;
+        visibility: hidden;
+        opacity: 0;
+        clip-path: inset(0 0 100% 0);
+        transition:
+            clip-path 0.2s cubic-bezier(0.8, 0, 0.8, 0.2),
+            opacity 0.2s ease,
+            visibility 0s linear 0.2s;
         position: absolute;
         top: 100%; left: 0; right: 0;
         z-index: 1001;
@@ -253,11 +258,24 @@
         max-height: calc(100dvh - 84px);
         overflow-y: auto;
     }
-    .header__nav--open .header__links { display: flex; }
+    .header__nav--open .header__links {
+        visibility: visible;
+        opacity: 1;
+        clip-path: inset(0 0 -40px 0); /* marge négative : l'ombre portée reste visible */
+        transition:
+            clip-path 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
+            opacity 0.2s ease,
+            visibility 0s;
+    }
     .header__link { display: block; padding: 13px 0; border-top: 1px solid rgba(255,255,255,.2); }
 }
 @media (max-width: 767px) {
     .header__nav { padding: 16px 20px; gap: 12px; }
     .header__identity { gap: 8px; }
     .header__links { padding: 10px 20px 20px; }
+}
+/* Mouvement réduit : le menu apparaît par simple fondu, sans se déplier. */
+@media (max-width: 1024px) and (prefers-reduced-motion: reduce) {
+    .header__links,
+    .header__nav--open .header__links { clip-path: none; }
 }

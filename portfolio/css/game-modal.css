@@ -18,13 +18,7 @@
     /*
      * Définit le mode de disposition ; flex aligne les enfants sur un axe, grid sur une grille.
      */
-    /*
-     * Définit le mode de disposition ; flex aligne les enfants sur un axe, grid sur une grille.
-     */
     display: block;
-    /*
-     * border-box inclut padding et bordures dans les dimensions annoncées.
-     */
     /*
      * border-box inclut padding et bordures dans les dimensions annoncées.
      */
@@ -33,13 +27,7 @@
     /*
      * Espacement extérieur ; auto peut absorber l'espace disponible selon la disposition.
      */
-    /*
-     * Espacement extérieur ; auto peut absorber l'espace disponible selon la disposition.
-     */
     margin: 0;
-    /*
-     * Espacement intérieur : 2 valeurs = vertical/horizontal ; 3 = haut/horizontal/bas.
-     */
     /*
      * Espacement intérieur : 2 valeurs = vertical/horizontal ; 3 = haut/horizontal/bas.
      */
@@ -54,13 +42,7 @@
     /*
      * rem se rapporte à la taille de police de l'élément html.
      */
-    /*
-     * rem se rapporte à la taille de police de l'élément html.
-     */
     font-size: inherit;
-    /*
-     * Une valeur sans unité multiplie la taille de police pour fixer l'interligne.
-     */
     /*
      * Une valeur sans unité multiplie la taille de police pour fixer l'interligne.
      */
@@ -72,10 +54,10 @@
     /*
      * Anime un changement de propriété, par exemple lors d'un survol ou d'un changement de classe.
      */
-    /*
-     * Anime un changement de propriété, par exemple lors d'un survol ou d'un changement de classe.
-     */
-    transition: 0.3s;
+    transition:
+        background-color 0.3s ease,
+        color 0.3s ease,
+        scale 0.1s ease-out;
 }
 
 
@@ -86,11 +68,13 @@
 }
 
 
+.project-card__play:active {
+    scale: 0.97;
+}
+
+
 .project-card__play:focus-visible {
     outline: 2px solid #0D0A9B;
-    /*
-     * Écarte l'indicateur de focus du bord sans modifier la taille de l'élément.
-     */
     /*
      * Écarte l'indicateur de focus du bord sans modifier la taille de l'élément.
      */
@@ -104,17 +88,11 @@ body.page--game-open {
     /*
      * Contrôle ce qui dépasse de la boîte ; hidden le masque.
      */
-    /*
-     * Contrôle ce qui dépasse de la boîte ; hidden le masque.
-     */
     overflow: hidden;
 }
 
 
 .game-modal {
-    /*
-     * Le positionnement définit le repère utilisé par top/right/bottom/left ; les valeurs sont précisées ici.
-     */
     /*
      * Le positionnement définit le repère utilisé par top/right/bottom/left ; les valeurs sont précisées ici.
      */
@@ -124,22 +102,24 @@ body.page--game-open {
     /*
      * Règle l'ordre de superposition à l'intérieur du contexte d'empilement.
      */
-    /*
-     * Règle l'ordre de superposition à l'intérieur du contexte d'empilement.
-     */
     z-index: 5000;
 
-    display: none;
     /*
-     * Aligne les enfants sur l'axe transversal du conteneur.
+     * La fenêtre reste dans la mise en page pour pouvoir être animée.
+     * visibility: hidden la cache aussi du clavier et des lecteurs d'écran.
+     * À la fermeture, visibility attend la fin du fondu (délai de 0.25s).
      */
+    display: flex;
+    visibility: hidden;
+    opacity: 0;
+
+    transition:
+        opacity 0.25s ease,
+        visibility 0s linear 0.25s;
     /*
      * Aligne les enfants sur l'axe transversal du conteneur.
      */
     align-items: center;
-    /*
-     * Répartit les enfants sur l'axe principal du conteneur flex.
-     */
     /*
      * Répartit les enfants sur l'axe principal du conteneur flex.
      */
@@ -149,8 +129,14 @@ body.page--game-open {
 }
 
 
+/* À l'ouverture, visibility change tout de suite pour que le focus puisse entrer. */
 .game-modal.game-modal--open {
-    display: flex;
+    visibility: visible;
+    opacity: 1;
+
+    transition:
+        opacity 0.25s ease,
+        visibility 0s;
 }
 
 
@@ -182,9 +168,6 @@ body.page--game-open {
     /*
      * column empile les enfants verticalement ; row les dispose horizontalement.
      */
-    /*
-     * column empile les enfants verticalement ; row les dispose horizontalement.
-     */
     flex-direction: column;
 
     border: 1px solid rgba(255, 255, 255, 0.35);
@@ -192,6 +175,34 @@ body.page--game-open {
     background-color: #E1001A;
 
     box-shadow: 0 30px 90px rgba(0, 0, 0, 0.45);
+
+    /*
+     * game-modal.js place transform-origin sur le bouton « Jouer » :
+     * la fenêtre grandit depuis ce bouton et y retourne à la fermeture.
+     * Fermeture : courbe inverse de celle de l'ouverture, pour un aller-retour symétrique.
+     */
+    transform: scale(0.4);
+
+    transition: transform 0.25s cubic-bezier(0.8, 0, 0.8, 0.2);
+}
+
+
+/* Ouverture : départ rapide puis ralentissement à l'arrivée */
+.game-modal--open .game-modal__dialog {
+    transform: none;
+
+    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+
+/* Mouvement réduit : simple fondu, sans agrandissement */
+@media (prefers-reduced-motion: reduce) {
+
+    .game-modal__dialog,
+    .game-modal--open .game-modal__dialog {
+        transform: none;
+    }
+
 }
 
 
@@ -200,9 +211,6 @@ body.page--game-open {
     align-items: center;
     justify-content: space-between;
 
-    /*
-     * Fixe une hauteur minimale sans empêcher le contenu de grandir ; vh dépend de la hauteur de la fenêtre.
-     */
     /*
      * Fixe une hauteur minimale sans empêcher le contenu de grandir ; vh dépend de la hauteur de la fenêtre.
      */
@@ -238,7 +246,10 @@ body.page--game-open {
 
     cursor: pointer;
 
-    transition: 0.3s;
+    transition:
+        background-color 0.3s ease,
+        border-color 0.3s ease,
+        scale 0.1s ease-out;
 }
 
 
@@ -249,6 +260,11 @@ body.page--game-open {
 }
 
 
+.game-modal__close:active {
+    scale: 0.94;
+}
+
+
 .game-modal__close:focus-visible {
     outline: 2px solid white;
     outline-offset: 4px;
@@ -256,9 +272,6 @@ body.page--game-open {
 
 
 .game-modal__content {
-    /*
-     * Définit croissance, réduction et taille de base de cet enfant flex.
-     */
     /*
      * Définit croissance, réduction et taille de base de cet enfant flex.
      */
@@ -288,9 +301,6 @@ body.page--game-open {
     Le jeu navigateur est volontairement réservé à la version ordinateur.
     Les cartes, leurs descriptions et les liens GitHub restent inchangés.
 */
-/*
- * Cette condition se base sur la largeur de la fenêtre en pixels CSS, pas sur le type d'appareil.
- */
 /*
  * Cette condition se base sur la largeur de la fenêtre en pixels CSS, pas sur le type d'appareil.
  */

@@ -19,9 +19,14 @@
 .hero__title {
     margin: 10px 0;
 
-    font-size: 6rem;
+    /*
+     * clamp(minimum, idéal, maximum) : la taille suit la largeur de la fenêtre (8vw)
+     * sans descendre sous 3.4rem ni dépasser 6rem. Remplace les paliers fixes du responsive.
+     */
+    font-size: clamp(3.4rem, 8vw, 6rem);
     line-height: 0.9;
-    letter-spacing: -0.2rem;
+    /* em suit la taille du titre : le resserrement reste proportionnel */
+    letter-spacing: -0.035em;
 
     text-transform: uppercase;
 }
@@ -78,7 +83,13 @@
 
     transition:
         transform 0.3s ease,
-        background-color 0.3s ease;
+        background-color 0.3s ease,
+        scale 0.1s ease-out;
+}
+
+
+.teaser:active {
+    scale: 0.99;
 }
 
 

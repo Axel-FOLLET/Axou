@@ -32,6 +32,40 @@
     perspective: 900px;
 
     -webkit-tap-highlight-color: transparent;
+
+    /*
+     * scale est indépendant de transform : il ne remplace pas le placement translate() des cubes.
+     */
+    transition: scale 0.1s ease-out;
+}
+
+
+/* Retour immédiat à l'appui, avant même le relâchement */
+.cube:active {
+    scale: 0.92;
+}
+
+
+/*
+ * Le cube s'attrape et se lance (drag-cube.js).
+ * pan-y : sur écran tactile, glisser verticalement fait toujours défiler la page ;
+ * glisser horizontalement fait tourner le cube.
+ */
+.cube {
+    touch-action: pan-y;
+
+    cursor: grab;
+}
+
+
+.cube:active {
+    cursor: grabbing;
+}
+
+
+/* Cube décoratif placé dans un lien : il garde le curseur du lien. */
+a .cube {
+    cursor: inherit;
 }
 
 

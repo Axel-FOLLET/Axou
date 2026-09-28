@@ -8,7 +8,35 @@
 
     z-index: 1000;
 
-    background-color: var(--red);
+    /*
+     * Rouge semi-transparent : le contenu défile dessous, flouté par backdrop-filter.
+     * Le préfixe -webkit- couvre Safari.
+     */
+    background-color: rgba(225, 0, 26, 0.78);
+
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    backdrop-filter: blur(20px) saturate(160%);
+}
+
+
+/*
+ * Fond plein si le navigateur ne sait pas flouter,
+ * ou si le visiteur demande moins de transparence ou plus de contraste.
+ */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .header {
+        background-color: var(--red);
+    }
+}
+
+
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+    .header {
+        background-color: var(--red);
+
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+    }
 }
 
 
@@ -112,7 +140,9 @@
     background: transparent;
     color: var(--white);
     cursor: pointer;
+    transition: scale 0.1s ease-out;
 }
+.header__toggle:active { scale: 0.94; }
 .header__toggle-icon { display: flex; flex-direction: column; gap: 5px; }
 .header__toggle-icon span { display: block; width: 22px; height: 2px; background: currentColor; }
 .header__toggle:hover, .header__toggle:focus-visible { border-color: var(--blue); outline: 2px solid var(--blue); outline-offset: 3px; }

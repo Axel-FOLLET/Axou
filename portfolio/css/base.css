@@ -35,6 +35,22 @@ html {
 }
 
 
+/*
+    Changement de page (onglets, langue) : fondu enchaîné au lieu d'un rechargement sec.
+    Les navigateurs qui ne connaissent pas cette règle changent simplement de page.
+    Un fondu reste acceptable en mouvement réduit : rien ne se déplace.
+*/
+@view-transition {
+    navigation: auto;
+}
+
+
+/* L'en-tête porte un nom : il reste en place pendant que le contenu change. */
+.header {
+    view-transition-name: site-header;
+}
+
+
 body {
     margin: 0;
 

@@ -1,14 +1,15 @@
-/* Entree compatible ; les pages chargent les composants directement. */
-@import url("css/base.css?v=bdd23bb243c5");
-@import url("css/navigation.css?v=9d13cb8ce12b");
-@import url("css/sections.css?v=ea926b91c353");
-@import url("css/buttons.css?v=1593f2c03eaa");
-@import url("css/home.css?v=c021f02a53e2");
-@import url("css/cubes.css?v=033848879066");
-@import url("css/projects.css?v=c47ba1267b7b");
-@import url("css/career.css?v=50745a92c328");
-@import url("css/skills.css?v=8f9382e73ecf");
-@import url("css/contact.css?v=6b3911577037");
+/* Composants partagés et onglets de navigation. */
+@import url("css/base.css?v=5215fe61580e");
+@import url("css/navigation.css?v=fa1be1713683");
+@import url("css/sections.css?v=5f1431c8fd16");
+@import url("css/buttons.css?v=664203a79bb7");
+@import url("css/home.css?v=d6b6a0d974f9");
+@import url("css/cubes.css?v=94dd18a8abb4");
+@import url("css/projects.css?v=aecc90e120f0");
+@import url("css/career.css?v=54eb30ba776f");
+@import url("css/skills.css?v=8161dba47ce7");
+@import url("css/contact.css?v=71f97b5e39cc");
 @import url("css/footer.css?v=8d7b4ac03775");
-@import url("css/responsive.css?v=d1aced2f255f");
-@import url("css/game-modal.css?v=ffaf17ebdbcf");
+@import url("css/responsive.css?v=7c411a24e76b");
+@import url("css/game-modal.css?v=8321015a760b");
+@import url("css/folder-tabs.css?v=e8f0e0068781");

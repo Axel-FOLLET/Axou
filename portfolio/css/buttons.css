@@ -20,7 +20,21 @@
     transition:
         background-color 0.3s ease,
         color 0.3s ease,
-        transform 0.3s ease;
+        transform 0.3s ease,
+        scale 0.1s ease-out;
+}
+
+
+/* Retour immédiat à l'appui, utile sur écran tactile où le survol n'existe pas */
+.button:active {
+    scale: 0.97;
+}
+
+
+/* Bouton désactivé pendant l'envoi du formulaire */
+.button:disabled {
+    cursor: wait;
+    opacity: 0.6;
 }
 
 

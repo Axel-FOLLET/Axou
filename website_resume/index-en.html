@@ -6,7 +6,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- Ordre de la cascade : base, composants, adaptations responsive, puis fenêtre des jeux. -->
+    <!-- Référencement : description, page canonique et version dans l'autre langue -->
+    <meta name="description" content="Axel FOLLET’s resume: from HR project management to IT, experience, skills, projects and contact.">
+    <meta name="author" content="Axel FOLLET">
+    <link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml">
+    <link rel="canonical" href="https://axel-follet.github.io/website_resume/index-en.html">
+    <link rel="alternate" hreflang="fr" href="https://axel-follet.github.io/website_resume/index.html">
+    <link rel="alternate" hreflang="en" href="https://axel-follet.github.io/website_resume/index-en.html">
+
+    <!-- Aperçu lors du partage du lien (Open Graph) -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Axel FOLLET | Resume">
+    <meta property="og:description" content="Axel FOLLET’s resume: from HR project management to IT, experience, skills, projects and contact.">
+    <meta property="og:url" content="https://axel-follet.github.io/website_resume/index-en.html">
+    <meta property="og:image" content="https://axel-follet.github.io/website_resume/assets/images/profile.jpg">
+
+    <!-- Ordre de la cascade : base, composants, adaptations responsive, fenêtre des jeux, puis préférences d'accessibilité. -->
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/navigation.css">
     <link rel="stylesheet" href="css/home.css">
@@ -19,6 +34,7 @@
     <link rel="stylesheet" href="css/footer.css">
     <link rel="stylesheet" href="css/responsive.css">
     <link rel="stylesheet" href="css/game-modal.css">
+    <link rel="stylesheet" href="css/preferences.css">
     <!-- type=module active import/export et attend l'analyse du HTML ; main.js initialise les interactions des deux langues. -->
     <script type="module" src="js/main.js"></script>
 
@@ -26,6 +42,9 @@
 </head>
 
 <body class="page">
+
+    <!-- Lien caché qui apparaît au premier appui sur Tab : saute la navigation -->
+    <a class="skip-link" href="#main">Skip to content</a>
 
     <!-- -------------------- NAVIGATION -------------------- -->
 
@@ -53,7 +72,7 @@
 
                 <img
                     src="assets/images/profile.jpg"
-                    alt="Profile photo of Axel FOLLET"
+                    alt="Profile photo of Axel FOLLET" width="679" height="1236"
                 >
 
                 <a href="#home">AF</a>
@@ -98,7 +117,7 @@
 
     <!-- -------------------- MAIN CONTENT -------------------- -->
 
-    <main>
+    <main id="main">
 
 
         <!-- -------------------- HOME -------------------- -->
@@ -298,6 +317,9 @@
 
             <p>02 / EXPERIENCE</p>
 
+            <!-- Titre de section lu par les lecteurs d'écran, invisible à l'écran (le repère ci-dessus reste décoratif) -->
+            <h2 class="visually-hidden">Professional experience</h2>
+
             <p>
                 Select an experience to discover
                 the associated tools and skills.
@@ -311,23 +333,24 @@
 
                 <!-- -------------------- EXPERIENCE LIST -------------------- -->
 
+                <!-- tabindex="0" rend chaque carte atteignable avec Tab ; Entrée ou Espace l'active (experience.js). -->
                 <div class="experience__list">
 
 
                     <!-- -------------------- SFR -------------------- -->
 
-                    <div class="experience-card" id="experience-sfr">
+                    <div class="experience-card" id="experience-sfr" tabindex="0">
 
                         <div class="experience-card__inner">
 
                             <!-- Front -->
                             <div class="experience-card__front">
 
-                                <h2>SFR Distribution</h2>
+                                <h3>SFR Distribution</h3>
 
-                                <h3>
+                                <h4>
                                     HR Project Manager & Change Management
-                                </h3>
+                                </h4>
 
                                 <p>
                                     Management and support of HR projects,
@@ -351,7 +374,7 @@
                             <!-- Back -->
                             <div class="experience-card__back">
 
-                                <h3>Skills & tools</h3>
+                                <h4>Skills & tools</h4>
 
                                 <ul>
                                     <li>Project management</li>
@@ -375,18 +398,18 @@
 
                     <!-- -------------------- BPCE IT -------------------- -->
 
-                    <div class="experience-card" id="experience-bpce">
+                    <div class="experience-card" id="experience-bpce" tabindex="0">
 
                         <div class="experience-card__inner">
 
                             <!-- Front -->
                             <div class="experience-card__front">
 
-                                <h2>BPCE Infogérance et Technologies</h2>
+                                <h3>BPCE Infogérance et Technologies</h3>
 
-                                <h3>
+                                <h4>
                                     Recruitment Officer
-                                </h3>
+                                </h4>
 
                                 <p>
                                     Management of the apprenticeship recruitment campaign
@@ -409,7 +432,7 @@
                             <!-- Back -->
                             <div class="experience-card__back">
 
-                                <h3>Skills & tools</h3>
+                                <h4>Skills & tools</h4>
 
                                 <ul>
                                     <li>Apprenticeship recruitment campaign management</li>
@@ -432,18 +455,18 @@
 
                     <!-- -------------------- OCP -------------------- -->
 
-                    <div class="experience-card" id="experience-ocp">
+                    <div class="experience-card" id="experience-ocp" tabindex="0">
 
                         <div class="experience-card__inner">
 
                             <!-- Front -->
                             <div class="experience-card__front">
 
-                                <h2>OCP Répartition</h2>
+                                <h3>OCP Répartition</h3>
 
-                                <h3>
+                                <h4>
                                     Recruitment Officer
-                                </h3>
+                                </h4>
 
                                 <p>
                                     Candidate sourcing, telephone screening,
@@ -466,7 +489,7 @@
                             <!-- Back -->
                             <div class="experience-card__back">
 
-                                <h3>Skills & tools</h3>
+                                <h4>Skills & tools</h4>
 
                                 <ul>
                                     <li>Candidate sourcing</li>
@@ -489,18 +512,18 @@
 
                     <!-- -------------------- NATIXIS -------------------- -->
 
-                    <div class="experience-card" id="experience-natixis">
+                    <div class="experience-card" id="experience-natixis" tabindex="0">
 
                         <div class="experience-card__inner">
 
                             <!-- Front -->
                             <div class="experience-card__front">
 
-                                <h2>Natixis</h2>
+                                <h3>Natixis</h3>
 
-                                <h3>
+                                <h4>
                                     HRIS Officer - Internship
-                                </h3>
+                                </h4>
 
                                 <p>
                                     November 2020 - December 2020
@@ -512,7 +535,7 @@
                             <!-- Back -->
                             <div class="experience-card__back">
 
-                                <h3>Skills & tools</h3>
+                                <h4>Skills & tools</h4>
 
                                 <ul>
                                     <li>First independently managed project</li>
@@ -529,18 +552,18 @@
 
                     <!-- -------------------- ENEDIS -------------------- -->
 
-                    <div class="experience-card" id="experience-enedis">
+                    <div class="experience-card" id="experience-enedis" tabindex="0">
 
                         <div class="experience-card__inner">
 
                             <!-- Front -->
                             <div class="experience-card__front">
 
-                                <h2>Enedis</h2>
+                                <h3>Enedis</h3>
 
-                                <h3>
+                                <h4>
                                     HR Assistant - Internship
-                                </h3>
+                                </h4>
 
                                 <p>
                                     December 2019
@@ -552,7 +575,7 @@
                             <!-- Back -->
                             <div class="experience-card__back">
 
-                                <h3>Skills & tools</h3>
+                                <h4>Skills & tools</h4>
 
                                 <ul>
                                     <li>First professional experience</li>
@@ -570,7 +593,7 @@
 
                 <!-- -------------------- DESKTOP SKILLS PANEL -------------------- -->
 
-                <div id="skills-bubble" class="experience__skills">
+                <div id="skills-bubble" class="experience__skills" aria-live="polite">
                     Select an experience
                 </div>
 
@@ -656,30 +679,30 @@
 
                     <div class="skills__list">
 
-                        <button class="skills__button" data-skill="python" type="button">
+                        <button class="skills__button" data-skill="python" type="button" aria-pressed="false">
                             Python
                         </button>
 
-                        <button class="skills__button" data-skill="html" type="button">
+                        <button class="skills__button" data-skill="html" type="button" aria-pressed="false">
                             HTML
                         </button>
 
-                        <button class="skills__button" data-skill="css" type="button">
+                        <button class="skills__button" data-skill="css" type="button" aria-pressed="false">
                             CSS
                         </button>
 
-                        <button class="skills__button" data-skill="javascript" type="button">
+                        <button class="skills__button" data-skill="javascript" type="button" aria-pressed="false">
                             JavaScript
                         </button>
 
-                        <button class="skills__button" data-skill="git" type="button">
+                        <button class="skills__button" data-skill="git" type="button" aria-pressed="false">
                             Git
                         </button>
 
                     </div>
 
 
-                    <div id="skill-description" class="skills__description">
+                    <div id="skill-description" class="skills__description" aria-live="polite">
                         Select a skill to learn more.
                     </div>
 
@@ -772,7 +795,7 @@
                     <img
                         src="assets/images/dessin_snake.png"
                         alt="Illustration of the Snake game developed in Python"
-                        class="project-card__image"
+                        class="project-card__image" width="1448" height="1086" loading="lazy" decoding="async"
                     >
 
                     <h3>Snake</h3>
@@ -819,7 +842,7 @@
                     <img
                         src="assets/images/dessin_pendu.png"
                         alt="Illustration of the Hangman game developed in Python"
-                        class="project-card__image"
+                        class="project-card__image" width="1448" height="1086" loading="lazy" decoding="async"
                     >
 
                     <h3>Hangman</h3>
@@ -901,7 +924,7 @@
 
                     <img
                         src="assets/images/linkedin-logo.png"
-                        alt="Logo LinkedIn"
+                        alt="Logo LinkedIn" width="840" height="779" loading="lazy" decoding="async"
                     >
 
                     Would you like to view my LinkedIn profile?
@@ -1043,9 +1066,17 @@
                         </div>
 
 
+                        <!-- Champ piège contre les robots : invisible pour les visiteurs, Formspree rejette l'envoi s'il est rempli -->
+                        <input class="contact-form__trap" type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+
                         <button type="submit" class="contact-form__submit">
                             Send
                         </button>
+
+
+                        <!-- Message d'état rempli par contact-form.js : envoi, réussite ou erreur. -->
+                        <p class="contact-form__status" role="status"></p>
 
                     </form>
 
