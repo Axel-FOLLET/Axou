@@ -115,8 +115,9 @@
 }
 
 
+/* Blanc atténué : le bleu sur le rouge manque de contraste (2,75 pour 3 minimum) */
 .header__link:hover {
-    border-bottom-color: var(--blue);
+    border-bottom-color: rgba(255, 255, 255, 0.5);
 }
 
 
@@ -136,20 +137,44 @@
     padding: 0;
     align-items: center;
     justify-content: center;
-    border: 1px solid rgba(255, 255, 255, .4);
+    border: 1px solid rgba(255, 255, 255, 0.4);
     background: transparent;
     color: var(--white);
     cursor: pointer;
     transition: scale 0.1s ease-out;
 }
-.header__toggle:active { scale: 0.94; }
-.header__toggle-icon { display: flex; flex-direction: column; gap: 5px; }
-.header__toggle-icon span { display: block; width: 22px; height: 2px; background: currentColor; }
-.header__toggle:hover, .header__toggle:focus-visible { border-color: var(--blue); outline: 2px solid var(--blue); outline-offset: 3px; }
+
+
+.header__toggle:active {
+    scale: 0.94;
+}
+
+
+.header__toggle-icon {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+
+.header__toggle-icon span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: currentColor;
+}
+
+
+/* Contour blanc, comme tous les autres focus du site : visible sur le rouge */
+.header__toggle:hover,
+.header__toggle:focus-visible {
+    border-color: var(--white);
+    outline: 2px solid var(--white);
+    outline-offset: 3px;
+}
 
 
 /* -------------------- CHOIX DE LA LANGUE -------------------- */
-
 .language-select {
     padding: 6px 8px;
 
@@ -166,7 +191,7 @@
 
 
 .language-select:hover {
-    border-color: var(--blue);
+    background-color: var(--veil-strong);
 }
 
 

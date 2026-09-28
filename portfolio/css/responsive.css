@@ -8,7 +8,6 @@
 
 
 /* -------------------- ACCUEIL -------------------- */
-
     .hero {
         flex-direction: column;
         align-items: flex-start;
@@ -36,7 +35,6 @@
 
 
     /* -------------------- SECTIONS -------------------- */
-
     .section {
         padding: 80px 6%;
     }
@@ -59,14 +57,12 @@
 
 
     /* -------------------- PROJETS -------------------- */
-
     .project-card {
         grid-template-columns: 1fr;
     }
 
 
     /* -------------------- PARCOURS -------------------- */
-
     .banner {
         margin: 0;
         padding: 50px 5%;
@@ -79,7 +75,6 @@
 
 
     /* -------------------- CONTACT -------------------- */
-
     .contact {
         flex-direction: column;
 
@@ -118,11 +113,9 @@
 
 
 /* -------------------- TÉLÉPHONE -------------------- */
-
 @media (max-width: 767px) {
 
     /* -------------------- NAVIGATION -------------------- */
-
     .header__nav {
         flex-wrap: nowrap;
 
@@ -130,14 +123,7 @@
     }
 
 
-/* Le menu est caché tant que le visiteur n'a pas appuyé sur le bouton */
-.header__links--open {
-        display: flex;
-    }
-
-
     /* -------------------- ACCUEIL -------------------- */
-
     .hero__catchphrase {
         font-size: 1.3rem;
     }
@@ -159,7 +145,6 @@
 
 
     /* -------------------- SECTIONS -------------------- */
-
     .project-card__body {
         padding: 24px 20px;
     }
@@ -219,20 +204,20 @@
 }
 
 
-/* -------------------- ANCRES -------------------- */
-
-/* Le menu reste collé en haut : on garde de la place pour lui au défilement */
-#home,
-#projects,
-#skills,
-#contact {
-    scroll-margin-top: 80px;
-}
-
 /* Burger adapte du CV : panneau sous la barre, sans deplacer le contenu. */
 @media (max-width: 1024px) {
-    .header__nav { position: relative; padding: 20px 32px; gap: 20px; flex-wrap: nowrap; }
-    .header__toggle { display: inline-flex; flex: 0 0 44px; }
+    .header__nav {
+        position: relative;
+        padding: 20px 32px;
+        gap: 20px;
+        flex-wrap: nowrap;
+    }
+
+    .header__toggle {
+        display: inline-flex;
+        flex: 0 0 44px;
+    }
+
     /*
      * Le menu reste en place mais caché : visibility le retire du clavier.
      * clip-path le découvre depuis le haut (sous le bouton) et le recouvre par le même chemin.
@@ -254,7 +239,7 @@
         gap: 0;
         padding: 10px 32px 20px;
         background-color: var(--red);
-        box-shadow: 0 12px 18px rgba(0, 0, 0, .2);
+        box-shadow: 0 12px 18px rgba(0, 0, 0, 0.2);
         max-height: calc(100dvh - 84px);
         overflow-y: auto;
     }
@@ -267,15 +252,38 @@
             opacity 0.2s ease,
             visibility 0s;
     }
-    .header__link { display: block; padding: 13px 0; border-top: 1px solid rgba(255,255,255,.2); }
+
+    .header__link {
+        display: block;
+        padding: 13px 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
 }
+
+
 @media (max-width: 767px) {
-    .header__nav { padding: 16px 20px; gap: 12px; }
-    .header__identity { gap: 8px; }
-    .header__links { padding: 10px 20px 20px; }
+    .header__nav {
+        padding: 16px 20px;
+        gap: 12px;
+    }
+
+    .header__identity {
+        gap: 8px;
+    }
+
+    .header__links {
+        padding: 10px 20px 20px;
+    }
 }
+
+
 /* Mouvement réduit : le menu apparaît par simple fondu, sans se déplier. */
 @media (max-width: 1024px) and (prefers-reduced-motion: reduce) {
     .header__links,
-    .header__nav--open .header__links { clip-path: none; }
+
+    .header__nav--open .header__links {
+        clip-path: none;
+    }
 }
+
+

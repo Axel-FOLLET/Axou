@@ -164,7 +164,7 @@
 
     /* Neutral base prevents red from tinting the translucent blue. */
     background-color: #141422;
-    background-image: linear-gradient(rgba(13,10,155,.72),rgba(13,10,155,.72));
+    background-image: linear-gradient(rgba(13, 10, 155, 0.72),rgba(13, 10, 155, 0.72));
 }
 
 

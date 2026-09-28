@@ -40,7 +40,7 @@
 
 .button:hover, .button:focus-visible {
     background-color: #141422;
-    background-image: linear-gradient(rgba(13,10,155,.72),rgba(13,10,155,.72));
+    background-image: linear-gradient(rgba(13, 10, 155, 0.72),rgba(13, 10, 155, 0.72));
     color: var(--white);
 
     transform: translateY(-3px);
@@ -71,10 +71,23 @@
 }
 
 
-
 /* Actions d'accueil de dimensions identiques, y compris sur telephone. */
-.button-group > .button { min-width: 0; width: 100%; min-height: 56px; height: 100%; overflow-wrap: anywhere; display: inline-flex; align-items: center; justify-content: center; }
+.button-group > .button {
+    min-width: 0;
+    width: 100%;
+    min-height: 56px;
+    height: 100%;
+    overflow-wrap: anywhere;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
 
 @media (max-width: 767px) {
-    .button-group { grid-template-columns: minmax(0, 1fr); }
+    .button-group {
+        grid-template-columns: minmax(0, 1fr);
+    }
 }
+
+

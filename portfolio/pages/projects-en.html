@@ -6,37 +6,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Projects | Axel FOLLET — Portfolio</title>
-    <meta name="description" content="Axel FOLLET’s academic and personal projects: context, technologies, code and demos.">
+    <meta name="description" content="Axel FOLLET's projects: bilingual resume website and Snake and Hangman games in Python, with context, technologies, takeaways, source code and playable demos.">
     <meta name="author" content="Axel FOLLET">
+    <link rel="icon" href="../assets/images/favicon.svg" type="image/svg+xml">
 
     <!-- Référencement : page canonique et version dans l'autre langue -->
-    <link rel="canonical" href="https://axel-follet.github.io/portfolio/projects-en.html">
-    <link rel="alternate" hreflang="fr" href="https://axel-follet.github.io/portfolio/projects.html">
-    <link rel="alternate" hreflang="en" href="https://axel-follet.github.io/portfolio/projects-en.html">
+    <link rel="canonical" href="https://axel-follet.github.io/portfolio/pages/projects-en.html">
+    <link rel="alternate" hreflang="fr" href="https://axel-follet.github.io/portfolio/pages/projects.html">
+    <link rel="alternate" hreflang="en" href="https://axel-follet.github.io/portfolio/pages/projects-en.html">
 
     <!-- Aperçu lors du partage du lien -->
     <meta property="og:type" content="website">
     <meta property="og:title" content="Projects | Axel FOLLET — Portfolio">
-    <meta property="og:description" content="Axel FOLLET’s academic and personal projects: context, technologies, code and demos.">
-    <meta property="og:url" content="https://axel-follet.github.io/portfolio/projects-en.html">
+    <meta property="og:description" content="Axel FOLLET's projects: bilingual resume website and Snake and Hangman games in Python, with context, technologies, takeaways, source code and playable demos.">
+    <meta property="og:url" content="https://axel-follet.github.io/portfolio/pages/projects-en.html">
     <meta property="og:image" content="https://axel-follet.github.io/portfolio/assets/images/profile.jpg">
 
     <!-- Versions CSS : recharge les styles modifies apres publication. -->
-    <link rel="stylesheet" href="css/base.css?v=5215fe61580e">
-    <link rel="stylesheet" href="css/navigation.css?v=fa1be1713683">
-    <link rel="stylesheet" href="css/sections.css?v=5f1431c8fd16">
-    <link rel="stylesheet" href="css/buttons.css?v=664203a79bb7">
-    <link rel="stylesheet" href="css/home.css?v=d6b6a0d974f9">
-    <link rel="stylesheet" href="css/cubes.css?v=94dd18a8abb4">
-    <link rel="stylesheet" href="css/projects.css?v=aecc90e120f0">
-    <link rel="stylesheet" href="css/career.css?v=54eb30ba776f">
-    <link rel="stylesheet" href="css/skills.css?v=8161dba47ce7">
-    <link rel="stylesheet" href="css/contact.css?v=71f97b5e39cc">
-    <link rel="stylesheet" href="css/footer.css?v=8d7b4ac03775">
-    <link rel="stylesheet" href="css/responsive.css?v=7c411a24e76b">
-    <link rel="stylesheet" href="css/game-modal.css?v=8321015a760b">
-    <link rel="stylesheet" href="css/folder-tabs.css?v=e8f0e0068781">
-    <script type="module" src="script.js"></script>
+    <link rel="stylesheet" href="../css/base.css?v=6f050952e6b7">
+    <link rel="stylesheet" href="../css/navigation.css?v=4a3d2ca7cf75">
+    <link rel="stylesheet" href="../css/sections.css?v=5f1431c8fd16">
+    <link rel="stylesheet" href="../css/buttons.css?v=599c22311f6c">
+    <link rel="stylesheet" href="../css/home.css?v=1e14d1951d96">
+    <link rel="stylesheet" href="../css/cubes.css?v=94dd18a8abb4">
+    <link rel="stylesheet" href="../css/projects.css?v=9b522b099d6c">
+    <link rel="stylesheet" href="../css/career.css?v=54eb30ba776f">
+    <link rel="stylesheet" href="../css/skills.css?v=35c3209e8b26">
+    <link rel="stylesheet" href="../css/contact.css?v=394b5c5ceee5">
+    <link rel="stylesheet" href="../css/footer.css?v=8d7b4ac03775">
+    <link rel="stylesheet" href="../css/responsive.css?v=0cabce87c1fa">
+    <link rel="stylesheet" href="../css/game-modal.css?v=8321015a760b">
+    <link rel="stylesheet" href="../css/folder-tabs.css?v=043a3ac3284d">
+    <!-- blocking="render" : la page ne s'affiche qu'une fois le script exécuté, cubes compris.
+         Le fondu entre pages part ainsi d'une page complète au lieu de la voir se construire. -->
+    <script type="module" src="../js/main.js" blocking="render"></script>
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
@@ -78,12 +81,12 @@
                 <span class="header__avatar">
                     <img
                     class="header__photo"
-                    src="assets/images/profile.jpg"
+                    src="../assets/images/profile.jpg"
                     alt="Profile picture of Axel FOLLET" width="679" height="1236"
                 >
                 </span>
 
-                <a class="header__logo" href="index-en.html">AF</a>
+                <a class="header__logo" href="../index-en.html">AF</a>
 
                 <!-- Chaque page renvoie vers sa page équivalente dans l'autre langue -->
                 <select
@@ -102,7 +105,7 @@
             <span class="header__current">Projects</span>
             <ul class="header__links" id="menu-links">
                 <li>
-                    <a class="header__link" href="index-en.html">Home</a>
+                    <a class="header__link" href="../index-en.html">Home</a>
                 </li>
                 <li>
                     <a class="header__link" href="projects-en.html" aria-current="page">Projects</a>
@@ -122,7 +125,7 @@
 
     <!-- -------------------- CONTENU PRINCIPAL -------------------- -->
 
-    <main id="main"><div id="projects">
+    <main id="main">
 
 
         <!-- -------------------- PROJETS -------------------- -->
@@ -134,7 +137,7 @@
             <h1 class="section__title" id="projects-title">My technical projects</h1>
 
             <p class="section__intro">
-                Each project states its context, its goal, the skills involved and the useful links (source code, live demo).
+                Three projects, three milestones: the Python games laid the foundations of programming, the resume website those of the web. For each one: the context, the goal, the key takeaway, the technologies, and the links to check for yourself.
             </p>
 
             <button
@@ -180,10 +183,13 @@
                         <dl class="project-card__details">
 
                             <dt class="project-card__label">Context</dt>
-                            <dd class="project-card__text">Epitech project (Web day 04): build a personal website with HTML, CSS and JavaScript, in French and English.</dd>
+                            <dd class="project-card__text">Epitech project (Web Day 04-05): design a resume website with HTML, CSS and JavaScript, without any framework, in French and English.</dd>
 
                             <dt class="project-card__label">Goal</dt>
-                            <dd class="project-card__text">Present my path from HR project management to IT with a polished, animated and responsive interface.</dd>
+                            <dd class="project-card__text">Present my move from HR project management to IT on a responsive, interactive and bilingual website, with a working contact form.</dd>
+
+                            <dt class="project-card__label">Key takeaway</dt>
+                            <dd class="project-card__text">A maintainable site is built from small modules: one file per responsibility (menu, cubes, form, games) keeps every fix local. The latest iterations focused on accessibility: keyboard navigation, reduced motion, form validation.</dd>
 
                             <dt class="project-card__label">Skills and technologies</dt>
                             <dd class="project-card__text">
@@ -212,7 +218,7 @@
                 <article class="project-card">
 
                     <div class="project-card__media">
-                        <img class="project-card__image" src="assets/images/dessin_snake_blue.png" alt="Illustration of the Snake game developed in Python" width="1448" height="1086" loading="lazy" decoding="async">
+                        <img class="project-card__image" src="../assets/images/dessin_snake_blue.png" alt="Illustration of the Snake game developed in Python" width="1448" height="1086" loading="lazy" decoding="async">
                     </div>
 
                     <div class="project-card__body">
@@ -222,10 +228,13 @@
                         <dl class="project-card__details">
 
                             <dt class="project-card__label">Context</dt>
-                            <dd class="project-card__text">Personal project extending the Hangman game with animation and real-time interaction.</dd>
+                            <dd class="project-card__text">Personal project, built after Hangman to move from a turn-based game to a real-time one.</dd>
 
                             <dt class="project-card__label">Goal</dt>
-                            <dd class="project-card__text">Develop a playable Snake: movement, collisions, apples, score and visual effects.</dd>
+                            <dd class="project-card__text">Develop a complete Snake: keyboard movement, collisions, apples, score and visual effects. The playable version here is adapted to JavaScript.</dd>
+
+                            <dt class="project-card__label">Key takeaway</dt>
+                            <dd class="project-card__text">Real time forces a clear split between the game loop, the display and the rules. The code is divided into modules (snake, apple, collisions, score): a rule can be fixed without touching the rest.</dd>
 
                             <dt class="project-card__label">Skills and technologies</dt>
                             <dd class="project-card__text">
@@ -252,7 +261,7 @@
                 <article class="project-card">
 
                     <div class="project-card__media">
-                        <img class="project-card__image" src="assets/images/dessin_pendu_blue.png" alt="Illustration of the Hangman game developed in Python" width="1448" height="1086" loading="lazy" decoding="async">
+                        <img class="project-card__image" src="../assets/images/dessin_pendu_blue.png" alt="Illustration of the Hangman game developed in Python" width="1448" height="1086" loading="lazy" decoding="async">
                     </div>
 
                     <div class="project-card__body">
@@ -262,10 +271,13 @@
                         <dl class="project-card__details">
 
                             <dt class="project-card__label">Context</dt>
-                            <dd class="project-card__text">Personal project built to consolidate my Python fundamentals.</dd>
+                            <dd class="project-card__text">My first personal project, built to apply Python fundamentals to a complete program.</dd>
 
                             <dt class="project-card__label">Goal</dt>
-                            <dd class="project-card__text">Build a complete Hangman game: word choice, letter input, mistake handling and best-score saving.</dd>
+                            <dd class="project-card__text">Build a Hangman game that works end to end: random word, letter input, mistake handling and best-score saving.</dd>
+
+                            <dt class="project-card__label">Key takeaway</dt>
+                            <dd class="project-card__text">Moving from isolated exercises to a complete program: reading a word list from a file, keeping a score between games and anticipating invalid input.</dd>
 
                             <dt class="project-card__label">Skills and technologies</dt>
                             <dd class="project-card__text">
@@ -306,7 +318,7 @@
                     <div class="project-card__body">
                         <h3 class="project-card__title">Upcoming projects</h3>
                         <p class="project-card__text">
-                            This portfolio grows with my studies: new Epitech projects and personal projects will be added here.
+                            Epitech projects from the coming months will be added here as I explore the different fields of IT.
                         </p>
                     </div>
 
@@ -316,10 +328,43 @@
 
         </section>
 
+        <!-- -------------------- DÉPÔTS GITHUB -------------------- -->
 
-        </div>
+        <section class="section" aria-labelledby="repos-title">
 
-        </main>
+            <p class="section__eyebrow">GITHUB</p>
+
+            <h2 class="section__title" id="repos-title">My GitHub repositories</h2>
+
+            <p class="section__intro">
+                Each repository's last update and languages are read live from GitHub on every visit: they reflect the actual state of my work.
+            </p>
+
+            <!-- Date de mise à jour et langages ajoutés par repos.js depuis l'API GitHub ; sans elle, les liens restent utilisables. -->
+            <ul class="repo-list" data-locale="en-GB" data-label-updated="Updated on" data-label-languages="Languages:">
+                <li class="repo-card" data-repo="Axel-FOLLET/portfolio">
+                    <h3 class="repo-card__title">
+                        <a class="repo-card__link" href="https://github.com/Axel-FOLLET/portfolio" target="_blank" rel="noopener noreferrer">portfolio</a>
+                    </h3>
+                    <p class="repo-card__text">The code of this site: four bilingual pages, tab navigation, built-in games and automatic publishing.</p>
+                </li>
+                <li class="repo-card" data-repo="Axel-FOLLET/website_resume">
+                    <h3 class="repo-card__title">
+                        <a class="repo-card__link" href="https://github.com/Axel-FOLLET/website_resume" target="_blank" rel="noopener noreferrer">website_resume</a>
+                    </h3>
+                    <p class="repo-card__text">The resume website shown above, bilingual and published with GitHub Pages.</p>
+                </li>
+                <li class="repo-card" data-repo="Axel-FOLLET/Axou">
+                    <h3 class="repo-card__title">
+                        <a class="repo-card__link" href="https://github.com/Axel-FOLLET/Axou" target="_blank" rel="noopener noreferrer">Axou</a>
+                    </h3>
+                    <p class="repo-card__text">My working repository: the Python games (Snake, Hangman) and the sources of both my websites.</p>
+                </li>
+            </ul>
+
+        </section>
+
+    </main>
 
 
     <!-- -------------------- PIED DE PAGE -------------------- -->
@@ -331,7 +376,7 @@
             <div>
                 <h2 class="footer__title">Navigation</h2>
                 <ul class="footer__list">
-                    <li><a href="index-en.html">Home</a></li>
+                    <li><a href="../index-en.html">Home</a></li>
                     <li><a href="projects-en.html">Projects</a></li>
                     <li><a href="skills-en.html">Skills</a></li>
                     <li><a href="contact-en.html">Contact</a></li>
@@ -341,7 +386,7 @@
             <div>
                 <h2 class="footer__title">Resources and credits</h2>
                 <p class="footer__credits">
-                    Photo, drawings and texts: original work by Axel FOLLET. The 3D cubes are made with HTML, CSS and JavaScript. The folder and web symbols are Unicode emojis rendered by the system. LinkedIn® and the [in]® logo are trademarks of LinkedIn Corporation and its affiliates. This personal website is neither affiliated with nor endorsed by LinkedIn. No third-party font or theme is used: the font is the system one (Avenir when available).
+                    Photo, drawings and texts: original work by Axel FOLLET. 3D cubes built with HTML, CSS and JavaScript; folder and globe symbols: system Unicode emojis; system font (Avenir when available). No third-party theme, font or image. LinkedIn® and the [in]® logo are trademarks of LinkedIn Corporation and its affiliates; this site is neither affiliated with nor endorsed by LinkedIn.
                 </p>
             </div>
 

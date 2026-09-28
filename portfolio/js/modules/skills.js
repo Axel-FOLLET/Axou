@@ -1,99 +1,87 @@
-export function initSkills() {
-// -------------------- COMPÉTENCES (SECTION COMPÉTENCES) --------------------
+/*
+ * Compétences : un clic sur un bouton affiche son détail dans la zone de description.
+ * Le contenu est écrit dans le HTML (attributs data-*) : un seul script pour FR et EN.
+ */
 
-// On récupère tous les boutons qui possèdent la classe "skill".
-const skills = document.querySelectorAll(".skill");
 
 /*
-    On récupère la zone qui affichera
-    l'explication de la compétence sélectionnée.
-    Elle n'existe que dans la section Compétences.
-*/
-const skillDescription = document.getElementById("skill-description");
+ * Crée un élément avec sa classe BEM et son texte.
+ * textContent insère du texte, sans l'interpréter comme du HTML.
+ */
+function createElement(tag, className, text) {
+    const element = document.createElement(tag);
+    if (className) element.className = className;
+    element.textContent = text;
+    return element;
+}
 
-skills.forEach(function(skill) {
 
-    // Pour chaque bouton, on écoute le clic.
-    skill.addEventListener("click", function() {
+/*
+ * Construit la liste de ce qui est mis en œuvre (éléments séparés par "|" dans le HTML).
+ */
+function createList(items) {
+    const list = document.createElement("ul");
+    list.className = "skill-detail__list";
+    for (const item of items.split("|")) {
+        list.append(createElement("li", "", item));
+    }
+    return list;
+}
 
-        // Tous les boutons repassent à "non sélectionné".
-        skills.forEach(function(otherSkill) {
 
-            otherSkill.setAttribute("aria-pressed", "false");
+/*
+ * Remplace le contenu de la zone par le détail de la compétence choisie.
+ * Les libellés communs (liste, projets) sont lus sur la zone elle-même.
+ */
+function showSkill(skill, panel) {
+    const parts = [
+        createElement("h4", "skill-detail__title", skill.textContent),
+        createElement("p", "skill-detail__text", skill.dataset.description)
+    ];
+    /*
+     * La mise en avant (ex. : le plus gros projet géré) est facultative.
+     */
+    if (skill.dataset.highlight) {
+        parts.push(createElement("p", "skill-detail__highlight", skill.dataset.highlight));
+    }
+    parts.push(
+        createElement("p", "skill-detail__label", panel.dataset.labelList),
+        createList(skill.dataset.list),
+        createElement("p", "skill-detail__projects", panel.dataset.labelProjects + " : " + skill.dataset.projects)
+    );
+    /*
+     * replaceChildren remplace l'ancien contenu en une seule opération.
+     */
+    panel.replaceChildren(...parts);
+    /*
+     * Fondu court du nouveau texte : le changement se remarque sans rien déplacer.
+     * animate() n'ajoute pas de classe : un nouveau clic relance simplement le fondu.
+     */
+    panel.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 200, easing: "ease-out" });
+}
 
+
+/*
+ * aria-pressed indique le bouton affiché : "true" pour lui, "false" pour les autres.
+ */
+function selectSkill(selected, skills) {
+    for (const skill of skills) {
+        skill.setAttribute("aria-pressed", String(skill === selected));
+    }
+}
+
+
+/*
+ * La zone de description n'existe que sur la page Compétences : ailleurs, la fonction s'arrête.
+ */
+export function initSkills() {
+    const skills = document.querySelectorAll(".skill");
+    const panel = document.getElementById("skill-description");
+    if (!panel) return;
+    for (const skill of skills) {
+        skill.addEventListener("click", () => {
+            selectSkill(skill, skills);
+            showSkill(skill, panel);
         });
-
-        // Seul le bouton cliqué est sélectionné.
-        skill.setAttribute("aria-pressed", "true");
-
-        /*
-            Le contenu de chaque compétence est écrit dans le HTML
-            (attributs data-...) : le même script sert donc
-            pour la version française et la version anglaise.
-        */
-        skillDescription.textContent = "";
-
-        // Titre de la compétence
-        const detailTitle = document.createElement("h4");
-        detailTitle.classList.add("skill-detail__title");
-        detailTitle.textContent = skill.textContent;
-        skillDescription.appendChild(detailTitle);
-
-        // Description générale
-        const detailText = document.createElement("p");
-        detailText.classList.add("skill-detail__text");
-        detailText.textContent = skill.dataset.description;
-        skillDescription.appendChild(detailText);
-
-        // Mise en avant éventuelle (ex. : le plus gros projet géré)
-        if (skill.dataset.highlight) {
-
-            const detailHighlight = document.createElement("p");
-            detailHighlight.classList.add("skill-detail__highlight");
-            detailHighlight.textContent = skill.dataset.highlight;
-            skillDescription.appendChild(detailHighlight);
-
-        }
-
-        // Liste de ce qui est mis en œuvre (séparée par "|" dans le HTML)
-        const detailListLabel = document.createElement("p");
-        detailListLabel.classList.add("skill-detail__label");
-        detailListLabel.textContent = skillDescription.dataset.labelList;
-        skillDescription.appendChild(detailListLabel);
-
-        const detailList = document.createElement("ul");
-        detailList.classList.add("skill-detail__list");
-
-        skill.dataset.list.split("|").forEach(function(item) {
-
-            const listItem = document.createElement("li");
-            listItem.textContent = item;
-            detailList.appendChild(listItem);
-
-        });
-
-        skillDescription.appendChild(detailList);
-
-        // Projets où la compétence est utilisée
-        const detailProjects = document.createElement("p");
-        detailProjects.classList.add("skill-detail__projects");
-        detailProjects.textContent =
-            skillDescription.dataset.labelProjects + " : " + skill.dataset.projects;
-        skillDescription.appendChild(detailProjects);
-
-        /*
-            Fondu court du nouveau texte : le changement se remarque sans rien déplacer.
-            animate() n'ajoute pas de classe : un nouveau clic relance simplement le fondu.
-        */
-        skillDescription.animate(
-            [{ opacity: 0 }, { opacity: 1 }],
-            { duration: 200, easing: "ease-out" }
-        );
-
-    });
-
-});
-
-
-
+    }
 }

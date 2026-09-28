@@ -32,7 +32,7 @@
 .project-card:not(.project-card--placeholder):focus-within .project-card__body {
     /* Neutral base prevents red from tinting the translucent blue. */
     background-color: #141422;
-    background-image: linear-gradient(rgba(13,10,155,.72),rgba(13,10,155,.72));
+    background-image: linear-gradient(rgba(13, 10, 155, 0.72),rgba(13, 10, 155, 0.72));
 }
 
 
@@ -144,3 +144,87 @@
 }
 
 
+
+
+/* -------------------- DÉPÔTS GITHUB -------------------- */
+
+/* Trois cartes côte à côte sur ordinateur, empilées sur tablette et téléphone */
+.repo-list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+
+    gap: 25px;
+
+    margin: 0;
+    padding: 0;
+
+    list-style: none;
+}
+
+
+.repo-card {
+    display: flex;
+    flex-direction: column;
+
+    /* Repère du lien étendu (::after) */
+    position: relative;
+
+    padding: 28px 30px;
+
+    border: 1px solid var(--white);
+
+    background-color: var(--veil-strong);
+}
+
+
+.repo-card__title {
+    margin: 0 0 12px;
+
+    font-size: 1.4rem;
+
+    overflow-wrap: anywhere;
+}
+
+
+/* Le lien couvre toute la carte grâce à ::after : un clic n'importe où ouvre le dépôt */
+.repo-card__link::after {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+}
+
+
+.repo-card:hover,
+.repo-card:focus-within {
+    background-color: #141422;
+    background-image: linear-gradient(rgba(13, 10, 155, 0.72), rgba(13, 10, 155, 0.72));
+}
+
+
+/* flex-grow pousse la ligne de mise à jour en bas : elle s'aligne d'une carte à l'autre */
+.repo-card__text {
+    flex-grow: 1;
+
+    margin: 0 0 18px;
+}
+
+
+/* Ligne ajoutée par repos.js */
+.repo-card__meta {
+    margin: 0;
+    padding-top: 14px;
+
+    border-top: 1px solid rgba(255, 255, 255, 0.4);
+
+    font-size: 0.9rem;
+}
+
+
+@media (max-width: 1024px) {
+
+    .repo-list {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+}

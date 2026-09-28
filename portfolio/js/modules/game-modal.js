@@ -56,7 +56,11 @@ export function initGameModal(language) {
         trigger = button;
         setOriginFrom(button);
         title.textContent = button.dataset.gameTitle || (language === "en" ? "Game" : "Jeu");
-        frame.src = "games/" + game + ".html?lang=" + language;
+        /*
+         * import.meta.url est l'adresse de ce fichier : le chemin vers games/ reste juste
+         * quelle que soit la page (racine ou dossier pages/).
+         */
+        frame.src = new URL("../../games/" + game + ".html?lang=" + language, import.meta.url).href;
         modal.classList.add("game-modal--open");
         modal.setAttribute("aria-hidden", "false");
         document.body.classList.add("page--game-open");

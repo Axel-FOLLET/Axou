@@ -1,9 +1,28 @@
 /* Navigation entre de vraies pages : onglets de classeur. */
-.header { border-bottom: 1px solid rgba(255,255,255,.5); }
-.header__current { display: none; }
+
+
+.header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+
+.header__current {
+    display: none;
+}
+
+
 @media (min-width: 1025px) {
-    .header__nav { align-items: flex-end; padding-bottom: 0; gap: 24px; }
-    .header__identity { align-self: center; padding-bottom: 20px; }
+    .header__nav {
+        align-items: flex-end;
+        padding-bottom: 0;
+        gap: 24px;
+    }
+
+    .header__identity {
+        align-self: center;
+        padding-bottom: 20px;
+    }
+
     /* Intercalaires jointifs de largeur égale, avec séparateurs inclinés discrets. */
     .header__links {
         display: grid;
@@ -13,7 +32,10 @@
         padding-right: 10px;
         isolation: isolate;
     }
-    .header__links > li { min-width: 0; }
+
+    .header__links > li {
+        min-width: 0;
+    }
 
     .header__link {
         position: relative;
@@ -26,6 +48,7 @@
         border-radius: 0;
         background: transparent;
     }
+
     /* La silhouette seule est inclinée : les libellés restent droits. */
     .header__link::before {
         content: '';
@@ -35,15 +58,29 @@
         transform: skewX(-12deg);
         transform-origin: bottom left;
         border: 0;
-        border-left: 1px solid rgba(255,255,255,.2);
+        border-left: 1px solid rgba(255, 255, 255, 0.2);
         border-radius: 7px 7px 0 0;
-        background: rgba(255,255,255,.025);
+        background: rgba(255, 255, 255, 0.025);
         transition: background-color .2s ease;
     }
-    .header__link:hover { background: transparent; }
-    .header__links > li:first-child .header__link::before { border-left: 0; }
-    .header__link:hover::before { background: rgba(255,255,255,.08); }
+
+    .header__link:hover {
+        background: transparent;
+    }
+
+    .header__links > li:first-child .header__link::before {
+        border-left: 0;
+    }
+
+    .header__link:hover::before {
+        background: rgba(255, 255, 255, 0.08);
+    }
+    /*
+        Le même nom sur l'onglet actif de chaque page : pendant le changement de page,
+        le navigateur fait glisser l'onglet de son ancienne place vers la nouvelle.
+    */
     .header__link[aria-current="page"] {
+        view-transition-name: active-tab;
         z-index: 2;
         padding-top: 13px;
         background: transparent;
@@ -51,18 +88,36 @@
     .header__link[aria-current="page"]::before {
         background: var(--red);
         border-left-color: transparent;
-        box-shadow: 0 -7px 18px rgba(0,0,0,.2), 5px 0 10px rgba(0,0,0,.12);
+        box-shadow: 0 -7px 18px rgba(0, 0, 0, 0.2), 5px 0 10px rgba(0, 0, 0, 0.12);
     }
-    .header__link:focus-visible { z-index: 3; }
+
+    .header__link:focus-visible {
+        z-index: 3;
+    }
 }
+
+
 @media (max-width: 1024px) {
-    .header__nav { flex-wrap: wrap; }
-    .header__current { display: block; flex-basis: 100%; margin: 0; font-size: .9rem; }
+    .header__nav {
+        flex-wrap: wrap;
+    }
+
+    .header__current {
+        display: block;
+        flex-basis: 100%;
+        margin: 0;
+        font-size: .9rem;
+    }
     .header__link[aria-current="page"] {
         padding-left: 14px;
-        background: rgba(255,255,255,.13);
+        background: rgba(255, 255, 255, 0.13);
         border-left: 3px solid white;
-        box-shadow: inset 4px 0 8px rgba(0,0,0,.12);
+        box-shadow: inset 4px 0 8px rgba(0, 0, 0, 0.12);
     }
-    .header__links { max-height: calc(100dvh - 130px); }
+
+    .header__links {
+        max-height: calc(100dvh - 130px);
+    }
 }
+
+

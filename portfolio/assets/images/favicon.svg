@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Icône d'onglet : initiales AF en blanc sur le rouge du portfolio, liseré bleu -->
+  <rect width="64" height="64" rx="12" fill="#E1001A"/>
+  <rect x="4" y="4" width="56" height="56" rx="9" fill="none" stroke="#0D0A9B" stroke-width="3"/>
+  <text x="32" y="43" text-anchor="middle" font-family="Avenir, 'Avenir Next', Arial, sans-serif" font-size="28" font-weight="bold" fill="#FFFFFF" letter-spacing="1">AF</text>
+</svg>

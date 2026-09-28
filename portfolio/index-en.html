@@ -6,8 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Home | Axel FOLLET — Portfolio</title>
-    <meta name="description" content="Axel FOLLET’s portfolio: development projects, background and skills.">
+    <meta name="description" content="Axel FOLLET's portfolio: web and Python projects, skills tied to real work and learning path, from HR project management to IT.">
     <meta name="author" content="Axel FOLLET">
+    <link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml">
 
     <!-- Référencement : page canonique et version dans l'autre langue -->
     <link rel="canonical" href="https://axel-follet.github.io/portfolio/index-en.html">
@@ -17,26 +18,28 @@
     <!-- Aperçu lors du partage du lien -->
     <meta property="og:type" content="website">
     <meta property="og:title" content="Home | Axel FOLLET — Portfolio">
-    <meta property="og:description" content="Axel FOLLET’s portfolio: development projects, background and skills.">
+    <meta property="og:description" content="Axel FOLLET's portfolio: web and Python projects, skills tied to real work and learning path, from HR project management to IT.">
     <meta property="og:url" content="https://axel-follet.github.io/portfolio/index-en.html">
     <meta property="og:image" content="https://axel-follet.github.io/portfolio/assets/images/profile.jpg">
 
     <!-- Versions CSS : recharge les styles modifies apres publication. -->
-    <link rel="stylesheet" href="css/base.css?v=5215fe61580e">
-    <link rel="stylesheet" href="css/navigation.css?v=fa1be1713683">
+    <link rel="stylesheet" href="css/base.css?v=6f050952e6b7">
+    <link rel="stylesheet" href="css/navigation.css?v=4a3d2ca7cf75">
     <link rel="stylesheet" href="css/sections.css?v=5f1431c8fd16">
-    <link rel="stylesheet" href="css/buttons.css?v=664203a79bb7">
-    <link rel="stylesheet" href="css/home.css?v=d6b6a0d974f9">
+    <link rel="stylesheet" href="css/buttons.css?v=599c22311f6c">
+    <link rel="stylesheet" href="css/home.css?v=1e14d1951d96">
     <link rel="stylesheet" href="css/cubes.css?v=94dd18a8abb4">
-    <link rel="stylesheet" href="css/projects.css?v=aecc90e120f0">
+    <link rel="stylesheet" href="css/projects.css?v=9b522b099d6c">
     <link rel="stylesheet" href="css/career.css?v=54eb30ba776f">
-    <link rel="stylesheet" href="css/skills.css?v=8161dba47ce7">
-    <link rel="stylesheet" href="css/contact.css?v=71f97b5e39cc">
+    <link rel="stylesheet" href="css/skills.css?v=35c3209e8b26">
+    <link rel="stylesheet" href="css/contact.css?v=394b5c5ceee5">
     <link rel="stylesheet" href="css/footer.css?v=8d7b4ac03775">
-    <link rel="stylesheet" href="css/responsive.css?v=7c411a24e76b">
+    <link rel="stylesheet" href="css/responsive.css?v=0cabce87c1fa">
     <link rel="stylesheet" href="css/game-modal.css?v=8321015a760b">
-    <link rel="stylesheet" href="css/folder-tabs.css?v=e8f0e0068781">
-    <script type="module" src="script.js"></script>
+    <link rel="stylesheet" href="css/folder-tabs.css?v=043a3ac3284d">
+    <!-- blocking="render" : la page ne s'affiche qu'une fois le script exécuté, cubes compris.
+         Le fondu entre pages part ainsi d'une page complète au lieu de la voir se construire. -->
+    <script type="module" src="js/main.js" blocking="render"></script>
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
@@ -105,13 +108,13 @@
                     <a class="header__link" href="index-en.html" aria-current="page">Home</a>
                 </li>
                 <li>
-                    <a class="header__link" href="projects-en.html">Projects</a>
+                    <a class="header__link" href="pages/projects-en.html">Projects</a>
                 </li>
                 <li>
-                    <a class="header__link" href="skills-en.html">Skills</a>
+                    <a class="header__link" href="pages/skills-en.html">Skills</a>
                 </li>
                 <li>
-                    <a class="header__link" href="contact-en.html">Contact</a>
+                    <a class="header__link" href="pages/contact-en.html">Contact</a>
                 </li>
             </ul>
 
@@ -144,7 +147,7 @@
                 </p>
 
                 <div class="button-group">
-                    <a class="button" href="projects-en.html">See my projects</a>
+                    <a class="button" href="pages/projects-en.html">See my projects</a>
                     <a class="button" href="assets/CV_Axel_FOLLET_EN.pdf" download="CV_Axel_FOLLET_EN.pdf">Download my resume (PDF)</a>
                 </div>
 
@@ -209,32 +212,32 @@
             <h2 class="section__title" id="teaser-title">What you will find</h2>
 
             <p class="section__intro">
-                    Information systems architecture student at Epitech and IT project manager at QUANTEAM. This portfolio presents my technical projects, the skills they involve and the challenges I have overcome.
-                </p>
+                IT project manager at QUANTEAM and Epitech student (Information Systems Architect, 2026-2029), I am spending my first months of training exploring the different fields of IT. This portfolio records that journey: what I built, how, and what each project taught me.
+            </p>
 
             <ul class="teaser-list">
 
                 <li>
-                    <a class="teaser" href="projects-en.html">
+                    <a class="teaser" href="pages/projects-en.html">
                         <p class="teaser__number">01</p>
                         <h3 class="teaser__title">Projects</h3>
-                        <p class="teaser__text">Context, goals, technologies and links of my work.</p>
+                        <p class="teaser__text">Each piece of work with its context, goal, technologies, source code and, where possible, a playable demo.</p>
                     </a>
                 </li>
 
                 <li>
-                    <a class="teaser" href="skills-en.html">
+                    <a class="teaser" href="pages/skills-en.html">
                         <p class="teaser__number">02</p>
                         <h3 class="teaser__title">Skills</h3>
-                        <p class="teaser__text">Skills developed, progress and challenges overcome.</p>
+                        <p class="teaser__text">Skills tied to the projects that prove them, and the milestones reached since I started.</p>
                     </a>
                 </li>
 
                 <li>
-                    <a class="teaser" href="contact-en.html">
+                    <a class="teaser" href="pages/contact-en.html">
                         <p class="teaser__number">03</p>
                         <h3 class="teaser__title">Contact</h3>
-                        <p class="teaser__text">A form, my resume, LinkedIn and my website.</p>
+                        <p class="teaser__text">A form to reach me, my resume as a PDF, LinkedIn, GitHub and my resume website.</p>
                     </a>
                 </li>
 
@@ -257,17 +260,17 @@
 
                     <li class="logic__item">
                         <strong>Concrete achievements</strong> :
-                        each project is presented with its context, objectives, technologies and links (source code, live demo).
+                        every project links to its source code, and the games can be played right in the browser.
                     </li>
 
                     <li class="logic__item">
                         <strong>Demonstrated skills</strong> :
-                        each skill is linked to the projects that illustrate it.
+                        every skill states which projects it was used in.
                     </li>
 
                     <li class="logic__item">
                         <strong>An evolving selection</strong> :
-                        the most recent and accomplished projects enrich the portfolio throughout my studies.
+                        new Epitech and personal projects gradually replace older ones, so the portfolio reflects my current level.
                     </li>
 
                 </ol>
@@ -290,16 +293,16 @@
                 <h2 class="footer__title">Navigation</h2>
                 <ul class="footer__list">
                     <li><a href="index-en.html">Home</a></li>
-                    <li><a href="projects-en.html">Projects</a></li>
-                    <li><a href="skills-en.html">Skills</a></li>
-                    <li><a href="contact-en.html">Contact</a></li>
+                    <li><a href="pages/projects-en.html">Projects</a></li>
+                    <li><a href="pages/skills-en.html">Skills</a></li>
+                    <li><a href="pages/contact-en.html">Contact</a></li>
                 </ul>
             </div>
 
             <div>
                 <h2 class="footer__title">Resources and credits</h2>
                 <p class="footer__credits">
-                    Photo, drawings and texts: original work by Axel FOLLET. The 3D cubes are made with HTML, CSS and JavaScript. The folder and web symbols are Unicode emojis rendered by the system. LinkedIn® and the [in]® logo are trademarks of LinkedIn Corporation and its affiliates. This personal website is neither affiliated with nor endorsed by LinkedIn. No third-party font or theme is used: the font is the system one (Avenir when available).
+                    Photo, drawings and texts: original work by Axel FOLLET. 3D cubes built with HTML, CSS and JavaScript; folder and globe symbols: system Unicode emojis; system font (Avenir when available). No third-party theme, font or image. LinkedIn® and the [in]® logo are trademarks of LinkedIn Corporation and its affiliates; this site is neither affiliated with nor endorsed by LinkedIn.
                 </p>
             </div>
 
