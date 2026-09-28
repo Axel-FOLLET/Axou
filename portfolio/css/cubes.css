@@ -1,0 +1,228 @@
+/* -------------------- CUBES 3D -------------------- */
+
+/*
+    Tous les cubes utilisent le même système.
+    JavaScript gère directement leur rotation.
+*/
+.cube {
+    width: var(--cube-size);
+    height: var(--cube-size);
+
+    padding: 0;
+
+    border: none;
+
+    appearance: none;
+    -webkit-appearance: none;
+
+    background-color: transparent;
+
+    cursor: pointer;
+
+    perspective: 900px;
+
+    -webkit-tap-highlight-color: transparent;
+}
+
+
+/* Tailles des cubes */
+.cube--huge {
+    --cube-size: 240px;
+}
+
+
+.cube--large {
+    --cube-size: 170px;
+}
+
+
+.cube--medium {
+    --cube-size: 90px;
+}
+
+
+.cube--small {
+    --cube-size: 65px;
+}
+
+
+.cube--tiny {
+    --cube-size: 45px;
+}
+
+
+/* Cube bleu : bien visible sur le fond rouge */
+.cube--blue {
+    --cube-border: var(--blue);
+
+    --cube-fill: rgba(13, 10, 155, 0.35);
+    --cube-hover: rgba(13, 10, 155, 0.6);
+
+    --cube-glow: rgba(13, 10, 155, 0.25);
+}
+
+
+/* Cube blanc : plus discret */
+.cube--white {
+    --cube-border: var(--white);
+
+    --cube-fill: rgba(255, 255, 255, 0.05);
+    --cube-hover: rgba(255, 255, 255, 0.18);
+
+    --cube-glow: rgba(255, 255, 255, 0.35);
+}
+
+
+/* Objet qui contient les six faces */
+.cube__object {
+    display: block;
+
+    position: relative;
+
+    width: 100%;
+    height: 100%;
+
+    transform-origin: center center;
+
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+
+    will-change: transform;
+}
+
+
+.cube__face {
+    position: absolute;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+
+    border: 2px solid var(--cube-border);
+
+    background-color: var(--cube-fill);
+
+    box-shadow: 0 0 18px var(--cube-glow);
+
+    transition:
+        background-color 0.3s ease,
+        box-shadow 0.3s ease;
+}
+
+
+.cube:hover .cube__face {
+    background-color: var(--cube-hover);
+
+    box-shadow: 0 0 28px var(--cube-glow);
+}
+
+
+/* Position des six faces : la moitié de la taille du cube */
+.cube__face--front {
+    transform: translateZ(calc(var(--cube-size) / 2));
+}
+
+
+.cube__face--back {
+    transform:
+        rotateY(180deg)
+        translateZ(calc(var(--cube-size) / 2));
+}
+
+
+.cube__face--right {
+    transform:
+        rotateY(90deg)
+        translateZ(calc(var(--cube-size) / 2));
+}
+
+
+.cube__face--left {
+    transform:
+        rotateY(-90deg)
+        translateZ(calc(var(--cube-size) / 2));
+}
+
+
+.cube__face--top {
+    transform:
+        rotateX(90deg)
+        translateZ(calc(var(--cube-size) / 2));
+}
+
+
+.cube__face--bottom {
+    transform:
+        rotateX(-90deg)
+        translateZ(calc(var(--cube-size) / 2));
+}
+
+
+/* -------------------- POSITION DES CUBES -------------------- */
+
+/* Cubes placés autour de la photo (accueil) et du formulaire (contact) */
+.cube--pos-1 {
+    position: absolute;
+
+    top: 4%;
+    left: 6%;
+}
+
+
+.cube--pos-2 {
+    position: absolute;
+
+    top: 8%;
+    right: 4%;
+}
+
+
+.cube--pos-3 {
+    position: absolute;
+
+    bottom: 8%;
+    left: 10%;
+}
+
+
+.cube--pos-4 {
+    position: absolute;
+
+    right: 8%;
+    bottom: 4%;
+}
+
+
+/* Cube principal, au centre de la zone (page Contact) */
+.cube--pos-main {
+    position: absolute;
+
+    top: 40%;
+    left: 50%;
+
+    transform: translate(-50%, -50%);
+}
+
+
+/* Gros cube au centre de l'accueil */
+.cube--hero {
+    position: absolute;
+
+    top: 50%;
+    left: 50%;
+
+    transform: translate(-50%, -50%);
+}
+
+
+/* Petit cube décoratif en haut à droite d'une section */
+.cube--corner {
+    position: absolute;
+
+    top: 100px;
+    right: 8%;
+}
+
+

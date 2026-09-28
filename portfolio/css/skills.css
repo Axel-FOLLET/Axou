@@ -1,0 +1,176 @@
+/* -------------------- COMPÉTENCES -------------------- */
+
+.skills {
+    margin-top: 60px;
+}
+
+
+.skills__title {
+    margin: 0 0 24px;
+
+    font-size: 1.5rem;
+    font-weight: normal;
+}
+
+
+.skills__list {
+    display: flex;
+    flex-wrap: wrap;
+
+    gap: 15px;
+
+    margin: 0;
+    padding: 0;
+
+    list-style: none;
+}
+
+
+.skill {
+    padding: 12px 20px;
+
+    border: 1px solid var(--white);
+
+    background-color: transparent;
+    color: var(--white);
+
+    font-family: inherit;
+    font-size: 1rem;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.3s ease,
+        color 0.3s ease,
+        transform 0.3s ease;
+}
+
+
+.skill:hover,
+.skill[aria-pressed="true"] {
+    background-color: var(--white);
+    color: var(--blue);
+
+    transform: translateY(-4px);
+}
+
+
+.skills__description {
+    min-height: 130px;
+
+    margin-top: 30px;
+    padding: 28px 32px;
+
+    border: 1px solid var(--white);
+
+    background-color: var(--veil-strong);
+}
+
+
+/* Contenu détaillé d'une compétence */
+.skill-detail__title {
+    margin: 0 0 10px;
+
+    font-size: 1.6rem;
+}
+
+
+.skill-detail__text {
+    max-width: 800px;
+
+    margin: 0 0 16px;
+}
+
+
+/* Encadré blanc pour le plus gros projet géré */
+.skill-detail__highlight {
+    max-width: 800px;
+
+    margin: 0 0 20px;
+    padding: 14px 18px;
+
+    background-color: var(--white);
+    color: var(--blue);
+
+    font-weight: bold;
+}
+
+
+.skill-detail__label {
+    margin: 0 0 8px;
+
+    font-size: 0.85rem;
+    font-weight: bold;
+    letter-spacing: 0.1rem;
+
+    text-transform: uppercase;
+}
+
+
+.skill-detail__list {
+    max-width: 800px;
+
+    margin: 0 0 18px;
+    padding-left: 22px;
+}
+
+
+.skill-detail__projects {
+    margin: 0;
+
+    font-weight: bold;
+}
+
+
+/* Défis relevés */
+.challenge-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 25px;
+
+    margin: 0;
+    padding: 0;
+
+    list-style: none;
+}
+
+
+.challenge {
+    height: 100%;
+
+    padding: 30px 32px;
+
+    border: 1px solid var(--white);
+
+    background-color: var(--veil-strong);
+
+    transition:
+        transform 0.3s ease,
+        background-color 0.3s ease;
+}
+
+
+/* Même effet de survol que les cartes de projets */
+.challenge:hover, .challenge:focus-within {
+    transform: translateY(-8px);
+
+
+    /* Neutral base prevents red from tinting the translucent blue. */
+    background-color: #141422;
+    background-image: linear-gradient(rgba(13,10,155,.72),rgba(13,10,155,.72));
+}
+
+
+.challenge__title {
+    margin: 0 0 12px;
+
+    font-size: 1.4rem;
+}
+
+
+.challenge__text {
+    margin: 0;
+}
+
+

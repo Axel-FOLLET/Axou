@@ -1,0 +1,58 @@
+/* -------------------- BOUTONS -------------------- */
+
+.button {
+    display: inline-block;
+
+    padding: 14px 24px;
+
+    border: 1px solid var(--white);
+
+    background-color: var(--veil-strong);
+    color: var(--white);
+
+    font-family: inherit;
+    font-size: 1rem;
+    text-align: center;
+    text-decoration: none;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.3s ease,
+        color 0.3s ease,
+        transform 0.3s ease;
+}
+
+
+.button:hover, .button:focus-visible {
+    background-color: #141422;
+    background-image: linear-gradient(rgba(13,10,155,.72),rgba(13,10,155,.72));
+    color: var(--white);
+
+    transform: translateY(-3px);
+}
+
+
+/* Bouton principal : rempli en bleu */
+.button--primary {
+    border-color: var(--blue);
+
+    background-color: var(--veil-strong);
+}
+
+
+.button--primary:hover {
+    border-color: var(--white);
+}
+
+
+.button-group {
+    display: flex;
+    flex-wrap: wrap;
+
+    gap: 15px;
+
+    margin-top: 30px;
+}
+
+

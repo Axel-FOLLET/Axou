@@ -1,0 +1,263 @@
+/* -------------------- TABLETTE -------------------- */
+
+@media (max-width: 1024px) {
+
+    .header__nav {
+        padding: 20px 32px;
+    }
+
+
+/* -------------------- ACCUEIL -------------------- */
+
+    .hero {
+        flex-direction: column;
+        align-items: flex-start;
+
+        padding: 50px 6% 80px;
+    }
+
+
+    .hero__text,
+    .hero__visual {
+        width: 100%;
+    }
+
+
+    .hero__title {
+        font-size: 5rem;
+    }
+
+
+    .hero__visual {
+        height: 460px;
+
+        margin-top: 40px;
+    }
+
+
+    .teaser-list {
+        grid-template-columns: 1fr;
+    }
+
+
+    /* -------------------- SECTIONS -------------------- */
+
+    .section {
+        padding: 80px 6%;
+    }
+
+
+    /*
+        Sur tablette, les cubes de coin quittent leur position
+        absolue pour éviter de recouvrir le texte.
+    */
+    .cube--corner {
+        position: relative;
+
+        top: auto;
+        right: auto;
+
+        display: block;
+
+        margin: 0 0 28px auto;
+    }
+
+
+    /* -------------------- PROJETS -------------------- */
+
+    .project-card {
+        grid-template-columns: 1fr;
+    }
+
+
+    /* -------------------- PARCOURS -------------------- */
+
+    .banner {
+        margin: 0;
+        padding: 50px 5%;
+    }
+
+
+    .challenge-list {
+        grid-template-columns: 1fr;
+    }
+
+
+    /* -------------------- CONTACT -------------------- */
+
+    .contact {
+        flex-direction: column;
+
+        gap: 50px;
+    }
+
+
+    .contact__main {
+        width: 100%;
+        max-width: none;
+    }
+
+
+    .contact__side {
+        width: 100%;
+
+        min-height: 360px;
+    }
+
+
+    .bars__bar:nth-child(1) {
+        width: 40%;
+    }
+
+
+    .bars__bar:nth-child(2) {
+        width: 60%;
+    }
+
+
+    .bars__bar:nth-child(3) {
+        width: 80%;
+    }
+
+}
+
+
+/* -------------------- TÉLÉPHONE -------------------- */
+
+@media (max-width: 767px) {
+
+    /* -------------------- NAVIGATION -------------------- */
+
+    .header__nav {
+        flex-wrap: nowrap;
+
+        padding: 16px 20px;
+    }
+
+
+/* Le menu est caché tant que le visiteur n'a pas appuyé sur le bouton */
+.header__links--open {
+        display: flex;
+    }
+
+
+    /* -------------------- ACCUEIL -------------------- */
+
+    .hero__title {
+        font-size: 3.4rem;
+        letter-spacing: -0.1rem;
+    }
+
+
+    .hero__catchphrase {
+        font-size: 1.3rem;
+    }
+
+
+    .hero__visual {
+        height: 420px;
+    }
+
+
+    .cube--huge {
+        --cube-size: 170px;
+    }
+
+
+    .cube--large {
+        --cube-size: 120px;
+    }
+
+
+    /* -------------------- SECTIONS -------------------- */
+
+    .section__title {
+        font-size: 2.2rem;
+    }
+
+
+    .project-card__body {
+        padding: 24px 20px;
+    }
+
+
+    .banner__intro,
+    .logic {
+        padding: 26px 20px;
+    }
+
+
+    .banner__title {
+        font-size: 1.9rem;
+    }
+
+
+    .timeline__step {
+        grid-template-columns: 50px 1fr;
+    }
+
+
+    .form__row {
+        flex-direction: column;
+
+        gap: 0;
+    }
+
+}
+
+
+/* -------------------- MOUVEMENT RÉDUIT -------------------- */
+
+/*
+    Si le visiteur a demandé moins d'animations dans son système,
+    les transitions sont supprimées (JavaScript arrête aussi les cubes).
+*/
+@media (prefers-reduced-motion: reduce) {
+
+    html {
+        scroll-behavior: auto;
+    }
+
+
+    * {
+        transition: none !important;
+    }
+
+}
+
+
+/* -------------------- ANCRES -------------------- */
+
+/* Le menu reste collé en haut : on garde de la place pour lui au défilement */
+#home,
+#projects,
+#skills,
+#contact {
+    scroll-margin-top: 80px;
+}
+
+/* Burger adapte du CV : panneau sous la barre, sans deplacer le contenu. */
+@media (max-width: 1024px) {
+    .header__nav { position: relative; padding: 20px 32px; gap: 20px; flex-wrap: nowrap; }
+    .header__toggle { display: inline-flex; flex: 0 0 44px; }
+    .header__links {
+        display: none;
+        position: absolute;
+        top: 100%; left: 0; right: 0;
+        z-index: 1001;
+        flex-direction: column;
+        gap: 0;
+        padding: 10px 32px 20px;
+        background-color: var(--red);
+        box-shadow: 0 12px 18px rgba(0, 0, 0, .2);
+        max-height: calc(100dvh - 84px);
+        overflow-y: auto;
+    }
+    .header__nav--open .header__links { display: flex; }
+    .header__link { display: block; padding: 13px 0; border-top: 1px solid rgba(255,255,255,.2); }
+}
+@media (max-width: 767px) {
+    .header__nav { padding: 16px 20px; gap: 12px; }
+    .header__identity { gap: 8px; }
+    .header__links { padding: 10px 20px 20px; }
+}

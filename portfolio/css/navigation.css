@@ -1,0 +1,142 @@
+/* -------------------- NAVIGATION -------------------- */
+
+.header {
+    width: 100%;
+
+    position: sticky;
+    top: 0;
+
+    z-index: 1000;
+
+    background-color: var(--red);
+}
+
+
+.header__nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 24px 48px;
+}
+
+
+.header__identity {
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+}
+
+
+.header__avatar {
+    display: block;
+
+    width: 40px;
+    height: 40px;
+
+    overflow: hidden;
+
+    border-radius: 50%;
+}
+
+
+/* Le visage est agrandi et recadré dans le rond */
+.header__photo {
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+    object-position: 50% 30%;
+
+    transform: scale(1.25);
+}
+
+
+.header__logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    letter-spacing: 0.15rem;
+
+    text-decoration: none;
+}
+
+
+.header__links {
+    display: flex;
+
+    gap: 32px;
+
+    margin: 0;
+    padding: 0;
+
+    list-style: none;
+}
+
+
+.header__link {
+    padding-bottom: 4px;
+
+    border-bottom: 3px solid transparent;
+
+    text-decoration: none;
+
+    transition: border-color 0.3s;
+}
+
+
+.header__link:hover {
+    border-bottom-color: var(--blue);
+}
+
+
+/* Page en cours : le visiteur sait toujours où il se trouve */
+.header__link[aria-current="page"] {
+    border-bottom-color: var(--white);
+
+    font-weight: bold;
+}
+
+
+/* Bouton menu, visible uniquement sur téléphone */
+.header__toggle {
+    display: none;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255, 255, 255, .4);
+    background: transparent;
+    color: var(--white);
+    cursor: pointer;
+}
+.header__toggle-icon { display: flex; flex-direction: column; gap: 5px; }
+.header__toggle-icon span { display: block; width: 22px; height: 2px; background: currentColor; }
+.header__toggle:hover, .header__toggle:focus-visible { border-color: var(--blue); outline: 2px solid var(--blue); outline-offset: 3px; }
+
+
+/* -------------------- CHOIX DE LA LANGUE -------------------- */
+
+.language-select {
+    padding: 6px 8px;
+
+    border: 1px solid var(--white);
+
+    background-color: var(--red);
+    color: var(--white);
+
+    font-family: inherit;
+    font-size: 0.85rem;
+
+    cursor: pointer;
+}
+
+
+.language-select:hover {
+    border-color: var(--blue);
+}
+
+

@@ -1,0 +1,153 @@
+/* -------------------- CONTACT -------------------- */
+
+.contact {
+    display: flex;
+    align-items: flex-start;
+
+    gap: 80px;
+}
+
+
+.contact__main {
+    width: 60%;
+    max-width: 750px;
+}
+
+
+.contact__side {
+    flex: 1;
+
+    position: relative;
+
+    min-height: 520px;
+}
+
+
+.form__row {
+    display: flex;
+
+    gap: 20px;
+}
+
+
+.form__row .form__field {
+    flex: 1;
+}
+
+
+.form__field {
+    display: flex;
+    flex-direction: column;
+
+    margin-bottom: 25px;
+}
+
+
+.form__label {
+    margin-bottom: 10px;
+
+    font-size: 0.9rem;
+    letter-spacing: 0.05rem;
+}
+
+
+.form__input {
+    width: 100%;
+
+    padding: 15px 16px;
+
+    border: 1px solid var(--white);
+
+    background-color: var(--veil);
+    color: var(--white);
+
+    font-family: inherit;
+    font-size: 1rem;
+
+    transition: background-color 0.3s ease;
+}
+
+
+.form__input:focus {
+    background-color: var(--veil-strong);
+}
+
+
+.form__input--area {
+    resize: vertical;
+}
+
+
+/* Champ anti-spam : invisible pour les humains */
+.form__trap {
+    position: absolute;
+
+    left: -9999px;
+}
+
+
+.form__status {
+    min-height: 1.6em;
+
+    margin: 20px 0 0;
+
+    font-weight: bold;
+}
+
+
+/* Liens (CV, site web, LinkedIn, GitHub) */
+.link-list {
+    display: flex;
+    flex-direction: column;
+
+    gap: 14px;
+
+    max-width: 750px;
+    margin: 0;
+    padding: 0;
+
+    list-style: none;
+}
+
+
+.link-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 14px;
+
+    padding: 16px 20px;
+
+    border: 1px solid var(--white);
+
+    background-color: var(--veil-strong);
+
+    text-decoration: none;
+
+    transition:
+        background-color 0.3s ease,
+        transform 0.3s ease;
+}
+
+
+.link-card:hover, .link-card:focus-within {
+
+    transform: translateX(5px);
+
+    /* Neutral base prevents red from tinting the translucent blue. */
+    background-color: #141422;
+    background-image: linear-gradient(rgba(13,10,155,.72),rgba(13,10,155,.72));
+}
+
+
+.link-card__label {
+    font-weight: bold;
+}
+
+
+.link-card__hint {
+    font-size: 0.9rem;
+}
+
+

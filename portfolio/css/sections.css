@@ -1,0 +1,66 @@
+/* -------------------- SECTIONS -------------------- */
+
+.section {
+    position: relative;
+
+    padding: 100px 8%;
+}
+
+
+.section__eyebrow {
+    margin: 0 0 10px;
+
+    font-size: 0.9rem;
+    letter-spacing: 0.1rem;
+}
+
+
+.section__title {
+    margin: 0 0 30px;
+
+    font-size: 3rem;
+}
+
+
+.section__intro {
+    max-width: 760px;
+
+    margin: 0 0 40px;
+}
+
+
+/* Les trois barres bleues d'accent, comme les barres rouges du CV */
+.bars {
+    display: flex;
+    flex-direction: column;
+
+    gap: 9px;
+
+    margin: 40px 0 45px;
+}
+
+
+.bars__bar {
+    display: block;
+
+    height: 12px;
+
+    background-color: var(--blue);
+}
+
+
+.bars__bar:nth-child(1) {
+    width: 32%;
+}
+
+
+.bars__bar:nth-child(2) {
+    width: 52%;
+}
+
+
+.bars__bar:nth-child(3) {
+    width: 72%;
+}
+
+

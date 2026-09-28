@@ -1,0 +1,12 @@
+import { initNavigation } from './modules/navigation.js';
+import { initSkills } from './modules/skills.js';
+import { initContact } from './modules/contact.js';
+import { initLanguage } from './modules/language.js';
+import { initCubes } from './modules/cubes/init-cubes.js';
+import { initGameModal } from './modules/game-modal.js';
+initNavigation();
+initSkills();
+initContact();
+initLanguage();
+initCubes();
+initGameModal(document.documentElement.lang === 'en' ? 'en' : 'fr');

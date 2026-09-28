@@ -1,0 +1,90 @@
+/* -------------------- PAGE PARCOURS : BANDEAU BLEU -------------------- */
+
+.banner {
+    margin: 0 2%;
+    padding: 60px 6%;
+
+    background-color: var(--blue);
+}
+
+
+.banner__line {
+    width: 100%;
+    height: 3px;
+
+    margin-bottom: 30px;
+
+    background-color: var(--white);
+}
+
+
+.banner__intro {
+    padding: 40px;
+
+    background-color: var(--veil-strong);
+}
+
+
+.banner__title {
+    margin: 0 0 24px;
+
+    font-size: 2.6rem;
+}
+
+
+.banner__text {
+    max-width: 850px;
+
+    margin: 16px 0;
+}
+
+
+.banner__highlight {
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+
+/* -------------------- FRISE DE PROGRESSION -------------------- */
+
+.timeline {
+    margin: 50px 0 0;
+    padding: 0;
+
+    list-style: none;
+}
+
+
+.timeline__step {
+    display: grid;
+    grid-template-columns: 70px 1fr;
+
+    gap: 20px;
+
+    padding: 22px 0;
+
+    border-top: 1px solid var(--white);
+}
+
+
+.timeline__number {
+    font-size: 2.4rem;
+    font-weight: bold;
+    line-height: 1;
+}
+
+
+.timeline__title {
+    margin: 0 0 6px;
+
+    font-size: 1.4rem;
+}
+
+
+.timeline__text {
+    max-width: 800px;
+
+    margin: 0;
+}
+
+

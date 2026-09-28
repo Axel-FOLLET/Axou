@@ -1,0 +1,49 @@
+/* -------------------- PIED DE PAGE -------------------- */
+
+.footer {
+    padding: 50px 8% 40px;
+
+    background-color: var(--blue);
+}
+
+
+.footer__row {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+
+    gap: 30px;
+}
+
+
+.footer__title {
+    margin: 0 0 12px;
+
+    font-size: 1.1rem;
+}
+
+
+.footer__list {
+    margin: 0;
+    padding: 0;
+
+    list-style: none;
+}
+
+
+.footer__credits {
+    max-width: 620px;
+
+    margin: 0;
+
+    font-size: 0.9rem;
+}
+
+
+.footer__copyright {
+    margin: 30px 0 0;
+
+    font-size: 0.85rem;
+}
+
+

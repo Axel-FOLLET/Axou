@@ -1,0 +1,892 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Axel FOLLET | Portfolio</title>
+    <meta name="description" content="Portfolio d'Axel FOLLET : étudiant Epitech et chargé de projets IT. Projets, progression, compétences et contact.">
+    <meta name="author" content="Axel FOLLET">
+
+    <!-- Référencement : page canonique et version dans l'autre langue -->
+    <link rel="canonical" href="https://axel-follet.github.io/portfolio/index.html">
+    <link rel="alternate" hreflang="fr" href="https://axel-follet.github.io/portfolio/index.html">
+    <link rel="alternate" hreflang="en" href="https://axel-follet.github.io/portfolio/index-en.html">
+
+    <!-- Aperçu lors du partage du lien -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Axel FOLLET | Portfolio">
+    <meta property="og:description" content="Portfolio d'Axel FOLLET : étudiant Epitech et chargé de projets IT. Projets, progression, compétences et contact.">
+    <meta property="og:url" content="https://axel-follet.github.io/portfolio/index.html">
+    <meta property="og:image" content="https://axel-follet.github.io/portfolio/assets/images/profile.jpg">
+
+    <link rel="stylesheet" href="style.css">
+    <script type="module" src="script.js"></script>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Axel FOLLET",
+        "jobTitle": "Chargé de projets IT",
+        "url": "https://axel-follet.github.io/portfolio/",
+        "sameAs": ["https://www.linkedin.com/in/axel-follet/", "https://github.com/Axel-FOLLET"]
+    }
+    </script>
+</head>
+
+<body class="page">
+
+    <!-- Lien pour aller directement au contenu (clavier) -->
+    <a class="skip-link" href="#main">Aller au contenu</a>
+
+
+    <!-- -------------------- NAVIGATION -------------------- -->
+
+    <header class="header">
+
+        <nav class="header__nav" aria-label="Navigation principale">
+
+            <button
+                class="header__toggle"
+                id="menu-toggle"
+                type="button"
+                aria-label="Ouvrir le menu de navigation"
+                aria-expanded="false"
+                aria-controls="menu-links"
+            >
+                <span class="header__toggle-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+            </button>
+
+            <!-- Identité : photo + initiales + choix langue -->
+            <div class="header__identity">
+
+                <span class="header__avatar">
+                    <img
+                    class="header__photo"
+                    src="assets/images/profile.jpg"
+                    alt="Photo de profil d'Axel FOLLET"
+                >
+                </span>
+
+                <a class="header__logo" href="#home">AF</a>
+
+                <!-- Chaque page renvoie vers sa page équivalente dans l'autre langue -->
+                <select
+                    class="language-select"
+
+                    aria-label="Choisir la langue"
+                >
+                    <option value="index.html" selected>FR</option>
+                    <option value="index-en.html">EN</option>
+                </select>
+
+            </div>
+
+
+            <!-- Liens vers les différentes pages -->
+            <ul class="header__links" id="menu-links">
+                <li>
+                    <a class="header__link" href="#home">Accueil</a>
+                </li>
+                <li>
+                    <a class="header__link" href="#projects">Projets</a>
+                </li>
+                <li>
+                    <a class="header__link" href="#skills">Compétences</a>
+                </li>
+                <li>
+                    <a class="header__link" href="#contact">Contact</a>
+                </li>
+            </ul>
+
+        </nav>
+
+    </header>
+
+
+    <!-- -------------------- CONTENU PRINCIPAL -------------------- -->
+
+    <main id="main">
+
+        <!-- -------------------- ACCUEIL -------------------- -->
+
+        <section class="hero" id="home">
+
+            <!-- Partie texte principale -->
+            <div class="hero__text">
+
+                <p class="section__eyebrow">PORTFOLIO / 2026</p>
+
+                <h1 class="hero__title">
+                    Axel<br>
+                    FOLLET
+                </h1>
+
+                <!-- Phrase d'accroche -->
+                <p class="hero__catchphrase">
+                    Du pilotage de projets RH à la conception de solutions numériques.
+                </p>
+
+                <p class="hero__intro">
+                    Étudiant en architecture des systèmes d'information à Epitech et chargé de projets IT chez QUANTEAM. Ce portfolio présente mes réalisations techniques, les compétences qu'elles mobilisent et les défis relevés.
+                </p>
+
+                <div class="button-group">
+                    <a class="button button--primary" href="#projects">Voir mes projets</a>
+                    <a class="button" href="assets/CV_Axel_FOLLET_FR.pdf" download>Télécharger mon CV (PDF)</a>
+                </div>
+
+            </div>
+
+
+            <!-- -------------------- PHOTO ET CUBES -------------------- -->
+
+            <div class="hero__visual">
+
+                <button
+            class="cube cube--huge cube--blue cube--hero"
+            type="button"
+            aria-label="Faire tourner le cube principal"
+            data-speed="14"
+            data-phase="60"
+        ></button>
+
+                <button
+                    class="cube cube--small cube--blue cube--pos-1"
+                    type="button"
+                    aria-label="Faire tourner le cube"
+                    data-speed="21"
+                    data-phase="70"
+                ></button>
+
+                <button
+                    class="cube cube--small cube--white cube--pos-2"
+                    type="button"
+                    aria-label="Faire tourner le cube"
+                    data-speed="18"
+                    data-phase="150"
+                ></button>
+
+                <button
+                    class="cube cube--tiny cube--white cube--pos-3"
+                    type="button"
+                    aria-label="Faire tourner le cube"
+                    data-speed="23"
+                    data-phase="220"
+                ></button>
+
+                <button
+                    class="cube cube--medium cube--blue cube--pos-4"
+                    type="button"
+                    aria-label="Faire tourner le cube"
+                    data-speed="19"
+                    data-phase="290"
+                ></button>
+
+            </div>
+
+        </section>
+
+
+        <!-- -------------------- CE QUE CONTIENT LE PORTFOLIO -------------------- -->
+
+        <section class="section" aria-labelledby="teaser-title">
+
+            <p class="section__eyebrow">EXPLORER</p>
+
+            <h2 class="section__title" id="teaser-title">Ce que vous allez trouver</h2>
+
+            <ul class="teaser-list">
+
+                <li>
+                    <a class="teaser" href="#projects">
+                        <p class="teaser__number">01</p>
+                        <h3 class="teaser__title">Projets</h3>
+                        <p class="teaser__text">Contexte, objectifs, technologies et liens de mes réalisations.</p>
+                    </a>
+                </li>
+
+                <li>
+                    <a class="teaser" href="#skills">
+                        <p class="teaser__number">02</p>
+                        <h3 class="teaser__title">Compétences</h3>
+                        <p class="teaser__text">Compétences développées, progression et défis relevés.</p>
+                    </a>
+                </li>
+
+                <li>
+                    <a class="teaser" href="#contact">
+                        <p class="teaser__number">03</p>
+                        <h3 class="teaser__title">Contact</h3>
+                        <p class="teaser__text">Un formulaire, mon CV, LinkedIn et mon site web.</p>
+                    </a>
+                </li>
+
+            </ul>
+
+        </section>
+
+
+        <!-- -------------------- LOGIQUE DU PORTFOLIO -------------------- -->
+
+        <section class="section" aria-labelledby="logic-title">
+
+            <p class="section__eyebrow">APPROCHE</p>
+
+            <h2 class="section__title" id="logic-title">Organisation du portfolio</h2>
+
+            <div class="logic">
+
+                <ol class="logic__list">
+
+                    <li class="logic__item">
+                        <strong>Des réalisations concrètes</strong> :
+                        chaque projet est présenté avec son contexte, ses objectifs, ses technologies et ses liens (code source, démonstration en ligne).
+                    </li>
+
+                    <li class="logic__item">
+                        <strong>Des compétences démontrées</strong> :
+                        chaque compétence est rattachée aux projets qui l'illustrent.
+                    </li>
+
+                    <li class="logic__item">
+                        <strong>Une sélection évolutive</strong> :
+                        les projets les plus récents et les plus aboutis enrichissent le portfolio au fil de ma formation.
+                    </li>
+
+                </ol>
+
+            </div>
+
+        </section>
+
+
+        <div id="projects">
+
+
+        <!-- -------------------- PROJETS -------------------- -->
+
+        <section class="section" aria-labelledby="projects-title">
+
+            <p class="section__eyebrow">01 / PROJETS</p>
+
+            <h2 class="section__title" id="projects-title">Mes projets techniques</h2>
+
+            <p class="section__intro">
+                Chaque projet précise son contexte, son objectif, les compétences travaillées et les liens utiles (code source, démonstration en ligne).
+            </p>
+
+            <button
+                class="cube cube--tiny cube--blue cube--corner"
+                type="button"
+                aria-label="Faire tourner le cube"
+                data-speed="18"
+                data-phase="140"
+            ></button>
+
+            <div class="bars" aria-hidden="true">
+                <span class="bars__bar"></span>
+                <span class="bars__bar"></span>
+                <span class="bars__bar"></span>
+            </div>
+
+
+            <div class="project-list">
+
+                <!--
+                    POUR AJOUTER UN PROJET :
+                    copier un bloc <article class="project-card"> ci-dessous,
+                    puis changer le titre, l'image, le contexte, l'objectif,
+                    les technologies et les liens.
+                -->
+
+                <article class="project-card">
+
+                    <div class="project-card__media">
+                        <button
+                            class="cube cube--medium cube--blue "
+                            type="button"
+                            aria-label="Faire tourner le cube"
+                            data-speed="16"
+                            data-phase="90"
+                        ></button>
+                    </div>
+
+                    <div class="project-card__body">
+
+                        <h2 class="project-card__title">Site web de mon CV</h2>
+
+                        <dl class="project-card__details">
+
+                            <dt class="project-card__label">Contexte</dt>
+                            <dd class="project-card__text">Projet Epitech (Web day 04) : construire un site personnel en HTML, CSS et JavaScript, en français et en anglais.</dd>
+
+                            <dt class="project-card__label">Objectif</dt>
+                            <dd class="project-card__text">Présenter mon parcours de la gestion de projets RH vers l'informatique avec une interface soignée, animée et responsive.</dd>
+
+                            <dt class="project-card__label">Compétences et technologies</dt>
+                            <dd class="project-card__text">
+                                <ul class="project-card__tags">
+                                <li class="tag">HTML</li>
+                                <li class="tag">CSS</li>
+                                <li class="tag">JavaScript</li>
+                                <li class="tag">Responsive</li>
+                                <li class="tag">Animations 3D en CSS</li>
+                                <li class="tag">Formspree</li>
+                                <li class="tag">GitHub Pages</li>
+                                </ul>
+                            </dd>
+
+                        </dl>
+
+                        <div class="project-card__actions">
+                            <a class="button" href="https://axel-follet.github.io/website_resume/" target="_blank" rel="noopener noreferrer">Voir le site en ligne</a>
+                            <a class="button" href="https://github.com/Axel-FOLLET/website_resume" target="_blank" rel="noopener noreferrer">Code source sur GitHub</a>
+                        </div>
+
+                    </div>
+
+                </article>
+
+                <article class="project-card">
+
+                    <div class="project-card__media">
+                        <img class="project-card__image" src="assets/images/dessin_snake.png" alt="Illustration du jeu Snake développé en Python">
+                    </div>
+
+                    <div class="project-card__body">
+
+                        <h2 class="project-card__title">Jeu du Snake</h2>
+
+                        <dl class="project-card__details">
+
+                            <dt class="project-card__label">Contexte</dt>
+                            <dd class="project-card__text">Projet personnel prolongeant le Pendu, avec de l'animation et de l'interaction en temps réel.</dd>
+
+                            <dt class="project-card__label">Objectif</dt>
+                            <dd class="project-card__text">Développer un Snake jouable : déplacements, collisions, pommes, score et effets visuels.</dd>
+
+                            <dt class="project-card__label">Compétences et technologies</dt>
+                            <dd class="project-card__text">
+                                <ul class="project-card__tags">
+                                <li class="tag">Python</li>
+                                <li class="tag">Pygame</li>
+                                <li class="tag">Événements clavier</li>
+                                <li class="tag">Collisions</li>
+                                <li class="tag">Organisation en modules</li>
+                                </ul>
+                            </dd>
+
+                        </dl>
+
+                        <div class="project-card__actions">
+                            <a class="button" href="https://github.com/Axel-FOLLET/Axou/tree/5f52f135fe0bb45800351c035b74ff3e00f64e5e/jeu_du_snake" target="_blank" rel="noopener noreferrer">Code source sur GitHub</a>
+                            <button class="button project-card__play" type="button" data-game="snake" data-game-title="Snake">Jouer</button>
+                        </div>
+
+                    </div>
+
+                </article>
+
+                <article class="project-card">
+
+                    <div class="project-card__media">
+                        <img class="project-card__image" src="assets/images/dessin_pendu.png" alt="Illustration du jeu du Pendu développé en Python">
+                    </div>
+
+                    <div class="project-card__body">
+
+                        <h2 class="project-card__title">Jeu du Pendu</h2>
+
+                        <dl class="project-card__details">
+
+                            <dt class="project-card__label">Contexte</dt>
+                            <dd class="project-card__text">Projet personnel réalisé pour consolider mes bases en Python.</dd>
+
+                            <dt class="project-card__label">Objectif</dt>
+                            <dd class="project-card__text">Créer un jeu du Pendu complet : choix d'un mot, saisie des lettres, gestion des erreurs et sauvegarde du meilleur score.</dd>
+
+                            <dt class="project-card__label">Compétences et technologies</dt>
+                            <dd class="project-card__text">
+                                <ul class="project-card__tags">
+                                <li class="tag">Python</li>
+                                <li class="tag">Pygame</li>
+                                <li class="tag">Conditions et boucles</li>
+                                <li class="tag">Fonctions</li>
+                                <li class="tag">Lecture de fichiers</li>
+                                </ul>
+                            </dd>
+
+                        </dl>
+
+                        <div class="project-card__actions">
+                            <a class="button" href="https://github.com/Axel-FOLLET/Axou/tree/5f52f135fe0bb45800351c035b74ff3e00f64e5e/jeu_du_pendu" target="_blank" rel="noopener noreferrer">Code source sur GitHub</a>
+                            <button class="button project-card__play" type="button" data-game="pendu" data-game-title="Pendu">Jouer</button>
+                        </div>
+
+                    </div>
+
+                </article>
+
+                <!-- -------------------- FUTURS PROJETS -------------------- -->
+
+                <article class="project-card project-card--placeholder">
+
+                    <div class="project-card__media">
+                        <button
+                    class="cube cube--small cube--white "
+                    type="button"
+                    aria-label="Faire tourner le cube"
+                    data-speed="20"
+                    data-phase="40"
+                ></button>
+                    </div>
+
+                    <div class="project-card__body">
+                        <h2 class="project-card__title">Prochains projets</h2>
+                        <p class="project-card__text">
+                            Ce portfolio évolue avec ma formation : les nouveaux projets Epitech et mes projets personnels viendront s'ajouter ici.
+                        </p>
+                    </div>
+
+                </article>
+
+            </div>
+
+        </section>
+
+
+        </div>
+
+        <div id="skills">
+
+
+        <!-- -------------------- PROGRESSION -------------------- -->
+
+        <section class="section" aria-labelledby="skills-title">
+
+            <p class="section__eyebrow">02 / COMPÉTENCES</p>
+
+            <h2 class="section__title" id="skills-title">Compétences et progression</h2>
+
+            <p class="section__intro">
+                Les compétences développées au fil de mes projets, de la prise en main de Python à la réalisation d'un site complet mis en ligne.
+            </p>
+
+            <button
+                class="cube cube--tiny cube--blue cube--corner"
+                type="button"
+                aria-label="Faire tourner le cube"
+                data-speed="18"
+                data-phase="140"
+            ></button>
+
+        </section>
+
+
+        <section class="banner" aria-labelledby="progress-title">
+
+            <p class="section__eyebrow">PROGRESSION</p>
+
+            <div class="banner__line"></div>
+
+            <div class="banner__intro">
+
+                <h2 class="banner__title" id="progress-title">
+                    De la gestion de projet au développement
+                </h2>
+
+                <p class="banner__text">
+                    Issu de la gestion de projets RH, j'ai orienté ma formation vers le développement et l'architecture des systèmes d'information.
+                </p>
+
+                <p class="banner__text banner__highlight">
+                    Mon objectif : associer rigueur méthodologique et maîtrise technique.
+                </p>
+
+            </div>
+
+            <ol class="timeline">
+                    <li class="timeline__step">
+                        <span class="timeline__number" aria-hidden="true">01</span>
+                        <div>
+                            <h3 class="timeline__title">Les bases en Python</h3>
+                            <p class="timeline__text">Prise en main de la programmation : variables, boucles, fonctions et structuration du code, mises en pratique dans les jeux du Pendu et du Snake.</p>
+                        </div>
+                    </li>
+                    <li class="timeline__step">
+                        <span class="timeline__number" aria-hidden="true">02</span>
+                        <div>
+                            <h3 class="timeline__title">Le web : HTML et CSS</h3>
+                            <p class="timeline__text">Structuration et mise en forme de pages web, avec une attention particulière portée à la mise en page responsive.</p>
+                        </div>
+                    </li>
+                    <li class="timeline__step">
+                        <span class="timeline__number" aria-hidden="true">03</span>
+                        <div>
+                            <h3 class="timeline__title">JavaScript et interactions</h3>
+                            <p class="timeline__text">Ajout d'interactions dynamiques sur le site de mon CV : animations 3D, cartes animées, formulaire de contact et version bilingue.</p>
+                        </div>
+                    </li>
+                    <li class="timeline__step">
+                        <span class="timeline__number" aria-hidden="true">04</span>
+                        <div>
+                            <h3 class="timeline__title">Un site complet et en ligne</h3>
+                            <p class="timeline__text">Réalisation d'un site complet, accessible et optimisé pour le référencement, publié en ligne.</p>
+                        </div>
+                    </li>
+            </ol>
+
+
+            <!-- -------------------- COMPÉTENCES -------------------- -->
+
+            <div class="skills">
+
+                <h3 class="skills__title">Mes compétences (cliquez pour en savoir plus)</h3>
+
+                <ul class="skills__list">
+                <li>
+                    <button
+                        class="skill"
+                        type="button"
+                        aria-pressed="false"
+                        data-description="Langage de mes premiers programmes, utilisé pour développer deux jeux complets avec Pygame."
+                        data-list="Conditions, boucles et fonctions|Organisation du code en modules (Snake : affichage, collisions, score, serpent, pomme)|Lecture et écriture de fichiers (liste de mots du Pendu, meilleur score)|Gestion des événements clavier et de l'affichage graphique"
+                        data-projects="Jeu du Pendu, Jeu du Snake"
+                    >Python</button>
+                </li>
+                <li>
+                    <button
+                        class="skill"
+                        type="button"
+                        aria-pressed="false"
+                        data-description="Structure le contenu des pages web de façon sémantique et accessible."
+                        data-list="Balises sémantiques (header, nav, main, section, footer) et hiérarchie des titres|Formulaires avec libellés associés et champs obligatoires|Textes alternatifs des images et navigation complète au clavier|Balises de référencement (title, description, canonical, hreflang)"
+                        data-projects="Site web de mon CV, ce portfolio"
+                    >HTML</button>
+                </li>
+                <li>
+                    <button
+                        class="skill"
+                        type="button"
+                        aria-pressed="false"
+                        data-description="Met en forme les pages, gère la mise en page et crée les animations."
+                        data-list="Mise en page responsive (Flexbox, Grid, media queries)|Animations et transformations 3D (cubes interactifs)|Variables CSS et convention de nommage BEM|Couleurs et contrastes conformes aux règles d'accessibilité"
+                        data-projects="Site web de mon CV, ce portfolio"
+                    >CSS</button>
+                </li>
+                <li>
+                    <button
+                        class="skill"
+                        type="button"
+                        aria-pressed="false"
+                        data-description="Ajoute de l'interactivité dans le navigateur, sans framework."
+                        data-list="Manipulation du DOM et gestion des événements|Animation fluide avec requestAnimationFrame (rotation des cubes 3D)|Envoi du formulaire de contact sans rechargement de la page (fetch)|Menu mobile et repérage de la section affichée"
+                        data-projects="Site web de mon CV, ce portfolio"
+                    >JavaScript</button>
+                </li>
+                <li>
+                    <button
+                        class="skill"
+                        type="button"
+                        aria-pressed="false"
+                        data-description="Versionne le code et le publie en ligne."
+                        data-list="Commits, historique et dépôts distants GitHub|Connexion sécurisée à GitHub par clé SSH|Publication d'un site avec GitHub Pages"
+                        data-projects="Tous mes projets"
+                    >Git</button>
+                </li>
+                <li>
+                    <button
+                        class="skill"
+                        type="button"
+                        aria-pressed="false"
+                        data-description="Compétence issue de mon parcours en RH, mobilisée pour planifier, prioriser et communiquer sur mes projets techniques."
+                        data-list="Planification, priorisation et suivi d'indicateurs|Communication et accompagnement des équipes|Conception de formations|Reporting auprès des parties prenantes"
+                        data-projects="Tous mes projets"
+                            data-highlight="Plus important projet géré : un projet de conduite du changement ayant impacté 3 000 collaborateurs."
+                    >Gestion de projet et conduite du changement</button>
+                </li>
+                </ul>
+
+                <div class="skills__description" id="skill-description" aria-live="polite" data-label-list="Ce que je mets en œuvre" data-label-projects="Projets associés">
+                    Sélectionnez une compétence pour découvrir son usage et les projets associés.
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- -------------------- DÉFIS RELEVÉS -------------------- -->
+
+        <section class="section" aria-labelledby="challenge-title">
+
+            <p class="section__eyebrow">DÉFIS RELEVÉS</p>
+
+            <h2 class="section__title" id="challenge-title">Des défis relevés</h2>
+
+            <ul class="challenge-list">
+                <li class="challenge">
+                    <h3 class="challenge__title">Un affichage 3D adapté à tous les écrans</h3>
+                    <p class="challenge__text">Adapter les cubes 3D à toutes les tailles d'écran sans masquer le contenu a demandé de repositionner les éléments selon les écrans. Le résultat est un rendu cohérent sur ordinateur, tablette et mobile.</p>
+                </li>
+
+                <li class="challenge">
+                    <h3 class="challenge__title">Un code lisible et structuré</h3>
+                    <p class="challenge__text">Pour garder un code facile à relire, j'ai adopté la convention BEM, séparé le HTML, le CSS et le JavaScript et commenté chaque fichier.</p>
+                </li>
+
+                <li class="challenge">
+                    <h3 class="challenge__title">Accessibilité et référencement</h3>
+                    <p class="challenge__text">Contrastes conformes, navigation complète au clavier, textes alternatifs et balises de référencement ont été intégrés dès la conception.</p>
+                </li>
+
+                <li class="challenge">
+                    <h3 class="challenge__title">Une montée en compétences rapide</h3>
+                    <p class="challenge__text">En reconversion, j'ai construit des bases solides en Python puis en développement web grâce à des projets concrets, en m'appuyant sur ma rigueur en gestion de projet.</p>
+                </li>
+            </ul>
+
+        </section>
+
+
+        </div>
+
+        <div id="contact">
+
+
+        <!-- -------------------- CONTACT -------------------- -->
+
+        <section class="section" aria-labelledby="contact-title">
+
+            <p class="section__eyebrow">03 / CONTACT</p>
+
+            <h2 class="section__title" id="contact-title">Me contacter</h2>
+
+            <p class="section__intro">
+                Vous souhaitez échanger à propos d'une opportunité, d'un projet ou simplement en savoir plus sur mon parcours ? N'hésitez pas à m'écrire !
+            </p>
+
+            <!-- -------------------- LIENS -------------------- -->
+
+            <ul class="link-list">
+
+                <li>
+                    <a class="link-card" href="assets/CV_Axel_FOLLET_FR.pdf" download>
+                        <span class="link-card__label">Télécharger mon CV</span>
+                        <span class="link-card__hint">PDF</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a class="link-card" href="https://axel-follet.github.io/website_resume/" target="_blank" rel="noopener noreferrer">
+                        <span class="link-card__label">Mon site web de CV</span>
+                        <span class="link-card__hint">axel-follet.github.io/website_resume</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a class="link-card" href="https://www.linkedin.com/in/axel-follet/" target="_blank" rel="noopener noreferrer">
+                        <span class="link-card__label">LinkedIn</span>
+                        <span class="link-card__hint">axel-follet</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a class="link-card" href="https://github.com/Axel-FOLLET" target="_blank" rel="noopener noreferrer">
+                        <span class="link-card__label">GitHub</span>
+                        <span class="link-card__hint">Axel-FOLLET</span>
+                    </a>
+                </li>
+
+            </ul>
+
+            <div class="bars" aria-hidden="true">
+                <span class="bars__bar"></span>
+                <span class="bars__bar"></span>
+                <span class="bars__bar"></span>
+            </div>
+
+
+            <div class="contact">
+
+                <!-- Partie gauche : formulaire et liens -->
+                <div class="contact__main">
+
+                    <!-- -------------------- FORMULAIRE -------------------- -->
+
+                    <form
+                        class="form"
+                        id="contact-form"
+                        action="https://formspree.io/f/xaenbdqw"
+                        method="POST"
+                        data-sending="Envoi en cours..."
+                        data-success="Merci ! Votre message a bien été envoyé."
+                        data-error="Une erreur est survenue, merci de réessayer plus tard."
+                    >
+
+                        <div class="form__row">
+                            <div class="form__field">
+                                <label class="form__label" for="surname">NOM</label>
+                                <input class="form__input" type="text" id="surname" name="surname" autocomplete="family-name" required>
+                            </div>
+                            <div class="form__field">
+                                <label class="form__label" for="name">Prénom</label>
+                                <input class="form__input" type="text" id="name" name="name" autocomplete="given-name" required>
+                            </div>
+                        </div>
+
+                        <div class="form__field">
+                            <label class="form__label" for="email">Email</label>
+                            <input class="form__input" type="email" id="email" name="email" autocomplete="email" required>
+                        </div>
+
+                        <div class="form__field">
+                            <label class="form__label" for="subject">Sujet</label>
+                            <input class="form__input" type="text" id="subject" name="subject" required>
+                        </div>
+
+                        <div class="form__field">
+                            <label class="form__label" for="message">Message</label>
+                            <textarea class="form__input form__input--area" id="message" name="message" rows="6" required></textarea>
+                        </div>
+
+                        <!-- Champ piège contre les robots : ne pas remplir -->
+                        <input class="form__trap" type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+                        <button class="button button--primary" type="submit">Envoyer</button>
+
+                        <!-- Message de confirmation ou d'erreur, lu par les lecteurs d'écran -->
+                        <p class="form__status" id="form-status" role="status" aria-live="polite"></p>
+
+                    </form>
+
+
+                </div>
+
+
+                <!-- -------------------- FIGURE 3D -------------------- -->
+
+                <div class="contact__side">
+
+                    <button
+                        class="cube cube--large cube--blue cube--pos-main"
+                        type="button"
+                        aria-label="Faire tourner le cube principal"
+                        data-speed="15"
+                        data-phase="30"
+                    ></button>
+
+                    <button
+                        class="cube cube--small cube--white cube--pos-1"
+                        type="button"
+                        aria-label="Faire tourner le cube"
+                        data-speed="20"
+                        data-phase="110"
+                    ></button>
+
+                    <button
+                        class="cube cube--small cube--white cube--pos-2"
+                        type="button"
+                        aria-label="Faire tourner le cube"
+                        data-speed="18"
+                        data-phase="210"
+                    ></button>
+
+                    <button
+                        class="cube cube--tiny cube--white cube--pos-4"
+                        type="button"
+                        aria-label="Faire tourner le cube"
+                        data-speed="21"
+                        data-phase="300"
+                    ></button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        </div>
+</main>
+
+
+    <!-- -------------------- PIED DE PAGE -------------------- -->
+
+    <footer class="footer">
+
+        <div class="footer__row">
+
+            <div>
+                <h2 class="footer__title">Navigation</h2>
+                <ul class="footer__list">
+                    <li><a href="#home">Accueil</a></li>
+                    <li><a href="#projects">Projets</a></li>
+                    <li><a href="#skills">Compétences</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h2 class="footer__title">Ressources et crédits</h2>
+                <p class="footer__credits">
+                    Photo, dessins et textes : créations personnelles d'Axel FOLLET. Les cubes 3D et les icônes sont réalisés en HTML, CSS et JavaScript. Aucune image, police ou thème tiers n'est utilisé : la police est celle du système (Avenir lorsqu'elle est disponible).
+                </p>
+            </div>
+
+        </div>
+
+        <p class="footer__copyright">
+            &copy; 2026 Axel FOLLET
+        </p>
+
+    </footer>
+
+    <div
+        id="game-modal"
+        class="game-modal"
+        aria-hidden="true"
+    >
+        <button
+            class="game-modal__backdrop"
+            type="button"
+            data-game-close
+            aria-label="Fermer le jeu"
+        ></button>
+
+        <div
+            class="game-modal__dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="game-modal-title"
+        >
+            <div class="game-modal__header">
+                <h2 id="game-modal-title">Jeu</h2>
+
+                <button
+                    id="game-modal-close"
+                    class="game-modal__close"
+                    type="button"
+                    data-game-close
+                    aria-label="Fermer le jeu"
+                >
+                    ×
+                </button>
+            </div>
+
+            <!-- L'iframe héberge son propre document et ses commandes clavier. Son adresse est choisie au clic ; about:blank décharge le jeu à la fermeture. -->
+            <div class="game-modal__content">
+                <iframe
+                    id="game-frame"
+                    title="Jeu jouable"
+                    src="about:blank"
+                 class="game-modal__frame"></iframe>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

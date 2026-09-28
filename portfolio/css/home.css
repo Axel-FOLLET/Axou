@@ -1,0 +1,138 @@
+/* -------------------- ACCUEIL -------------------- */
+
+.hero {
+    min-height: calc(100vh - 80px);
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 60px 8% 100px;
+}
+
+
+.hero__text {
+    width: 52%;
+}
+
+
+.hero__title {
+    margin: 10px 0;
+
+    font-size: 6rem;
+    line-height: 0.9;
+    letter-spacing: -0.2rem;
+
+    text-transform: uppercase;
+}
+
+
+.hero__catchphrase {
+    margin: 30px 0 20px;
+
+    font-size: 1.6rem;
+    font-weight: normal;
+}
+
+
+.hero__intro {
+    max-width: 600px;
+}
+
+
+.hero__visual {
+    width: 40%;
+    height: 520px;
+
+    position: relative;
+}
+
+
+/* -------------------- CARTES DE NAVIGATION (ACCUEIL) -------------------- */
+
+.teaser-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: 25px;
+
+    margin: 0;
+    padding: 0;
+
+    list-style: none;
+}
+
+
+.teaser {
+    display: block;
+
+    height: 100%;
+
+    padding: 30px;
+
+    border: 1px solid var(--white);
+
+    background-color: var(--veil-strong);
+
+    text-decoration: none;
+
+    transition:
+        transform 0.3s ease,
+        background-color 0.3s ease;
+}
+
+
+.teaser:hover, .teaser:focus-within {
+    transform: translateY(-8px);
+
+
+    /* Neutral base prevents red from tinting the translucent blue. */
+    background-color: #141422;
+    background-image: linear-gradient(rgba(13,10,155,.72),rgba(13,10,155,.72));
+}
+
+
+.teaser__number {
+    margin: 0 0 10px;
+
+    font-size: 0.9rem;
+    letter-spacing: 0.1rem;
+}
+
+
+.teaser__title {
+    margin: 0 0 14px;
+
+    font-size: 1.8rem;
+}
+
+
+.teaser__text {
+    margin: 0;
+}
+
+
+/* -------------------- LOGIQUE DU PORTFOLIO -------------------- */
+
+.logic {
+    max-width: 950px;
+
+    padding: 40px;
+
+    border-left: 6px solid var(--blue);
+
+    background-color: var(--veil);
+}
+
+
+.logic__list {
+    margin: 0;
+    padding-left: 22px;
+}
+
+
+.logic__item + .logic__item {
+    margin-top: 12px;
+}
+
+

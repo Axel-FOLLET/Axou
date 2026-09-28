@@ -1,0 +1,22 @@
+/*
+ * Mise en page des pages de jeu. Le canvas conserve sa résolution interne tout en s'adaptant à l'espace.
+ * BEM : bloc__element désigne une partie du bloc ; bloc--modificateur désigne une variante.
+ */
+html, body { margin: 0; height: 100%; overflow: hidden; background: #E1001A; }
+.game-player { display: flex; align-items: center; justify-content: center; padding: 16px; box-sizing: border-box; }
+.game-player__root { width: 100%; display: flex; justify-content: center; }
+.game-player__canvas {
+    /*
+     * Définit le mode de disposition ; flex aligne les enfants sur un axe, grid sur une grille.
+     */
+    display: block; width: auto; height: auto; max-width: 100%;
+    max-height: calc(100vh - 32px); margin: 0 auto; background-color: #E1001A; outline: none;
+}
+
+/* Voile blanc autour du jeu : le canvas conserve ses couleurs et ses dimensions. */
+.game-player { background: rgba(255, 255, 255, .13); }
+.game-player__canvas {
+    outline: 1px solid rgba(255, 255, 255, .5);
+    outline-offset: 0;
+    box-shadow: 0 0 0 8px rgba(255, 255, 255, .1);
+}

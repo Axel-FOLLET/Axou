@@ -1,0 +1,115 @@
+/*
+    Convention d'écriture : BEM
+    bloc            .project-card
+    élément         .project-card__title
+    modificateur    .project-card--placeholder
+*/
+
+
+/* -------------------- COULEURS -------------------- */
+
+/*
+    Mêmes couleurs que le site CV, mais inversées :
+    le rouge devient dominant et le bleu devient secondaire.
+*/
+:root {
+    --red: #E1001A;
+    --blue: #0D0A9B;
+    --white: #FFFFFF;
+
+    /* Voile blanc léger pour les cartes posées sur le rouge */
+    --veil: rgba(255, 255, 255, 0.07);
+    --veil-strong: rgba(255, 255, 255, 0.13);
+}
+
+
+/* -------------------- BASE -------------------- */
+
+* {
+    box-sizing: border-box;
+}
+
+
+html {
+    scroll-behavior: smooth;
+}
+
+
+body {
+    margin: 0;
+
+    background-color: var(--red);
+    color: var(--white);
+
+    font-family: Avenir, "Avenir Next", sans-serif;
+    line-height: 1.6;
+
+    overflow-x: hidden;
+}
+
+
+img {
+    max-width: 100%;
+}
+
+
+h1,
+h2,
+h3 {
+    line-height: 1.1;
+}
+
+
+a {
+    color: var(--white);
+}
+
+
+/* Visible au clavier sur tous les éléments interactifs */
+a:focus-visible,
+button:focus-visible,
+select:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+    outline: 3px solid var(--white);
+    outline-offset: 4px;
+}
+
+
+/* Lien caché qui apparaît au premier appui sur Tab */
+.skip-link {
+    position: absolute;
+
+    top: -60px;
+    left: 16px;
+
+    z-index: 2000;
+
+    padding: 10px 16px;
+
+    background-color: var(--blue);
+    color: var(--white);
+
+    transition: top 0.2s;
+}
+
+
+.skip-link:focus {
+    top: 12px;
+}
+
+
+/* Texte lu par les lecteurs d'écran mais invisible à l'écran */
+.visually-hidden {
+    position: absolute;
+
+    width: 1px;
+    height: 1px;
+
+    overflow: hidden;
+
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+
