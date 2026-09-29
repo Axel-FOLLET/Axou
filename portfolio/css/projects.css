@@ -154,6 +154,85 @@
 
 
 
+/* -------------------- DÉMOS DES PROJETS -------------------- */
+
+/* Outil déplié sous les boutons de la carte ; les champs reprennent le style du formulaire de contact */
+.demo {
+    margin-top: 28px;
+    padding-top: 24px;
+
+    border-top: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+
+.demo__select {
+    cursor: pointer;
+}
+
+
+/* Sans fond explicite, la liste déroulante afficherait du texte blanc sur fond blanc */
+.demo__select option {
+    background-color: var(--red);
+    color: var(--white);
+}
+
+
+.demo__output {
+    display: block;
+
+    min-height: 3.2em;
+
+    padding: 15px 16px;
+
+    border: 1px dashed var(--white);
+
+    background-color: var(--veil);
+
+    /* Garde les retours à la ligne du texte et coupe les mots trop longs */
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+
+.demo__verdict {
+    margin: 0;
+
+    font-size: 1.25rem;
+}
+
+
+.demo__ranking {
+    margin: 8px 0 0;
+    padding-left: 1.4em;
+}
+
+
+.demo__note {
+    margin: 12px 0 0;
+
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+
+.demo__actions {
+    display: flex;
+    flex-wrap: wrap;
+
+    gap: 12px;
+
+    margin-top: 20px;
+}
+
+
+/* .button impose display: inline-block, qui l'emporterait sur l'attribut hidden */
+.demo__actions [hidden] {
+    display: none;
+}
+
+
+
+
 /* -------------------- DÉPÔTS GITHUB -------------------- */
 
 /* Trois cartes côte à côte sur ordinateur, empilées sur tablette et téléphone */

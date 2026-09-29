@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Projets | Axel FOLLET — Portfolio</title>
-    <meta name="description" content="Projets d'Axel FOLLET : site CV bilingue et jeux Snake et Pendu en Python, avec contexte, technologies, bilan, code source et démos jouables.">
+    <meta name="description" content="Projets d'Axel FOLLET : site CV bilingue, jeux Snake et Pendu, détecteur de langue et chiffrements de César et de Vigenère en Python, avec code source, jeux et démos à tester.">
     <meta name="author" content="Axel FOLLET">
     <link rel="icon" href="../assets/images/favicon.svg" type="image/svg+xml">
 
@@ -18,7 +18,7 @@
     <!-- Aperçu lors du partage du lien -->
     <meta property="og:type" content="website">
     <meta property="og:title" content="Projets | Axel FOLLET — Portfolio">
-    <meta property="og:description" content="Projets d'Axel FOLLET : site CV bilingue et jeux Snake et Pendu en Python, avec contexte, technologies, bilan, code source et démos jouables.">
+    <meta property="og:description" content="Projets d'Axel FOLLET : site CV bilingue, jeux Snake et Pendu, détecteur de langue et chiffrements de César et de Vigenère en Python, avec code source, jeux et démos à tester.">
     <meta property="og:url" content="https://axel-follet.github.io/portfolio/pages/projects.html">
     <meta property="og:image" content="https://axel-follet.github.io/portfolio/assets/images/profile.jpg">
 
@@ -29,7 +29,7 @@
     <link rel="stylesheet" href="../css/buttons.css?v=599c22311f6c">
     <link rel="stylesheet" href="../css/home.css?v=5f1d3105fd39">
     <link rel="stylesheet" href="../css/cubes.css?v=94dd18a8abb4">
-    <link rel="stylesheet" href="../css/projects.css?v=ab70d15e31da">
+    <link rel="stylesheet" href="../css/projects.css?v=1dafd3d3c3ce">
     <link rel="stylesheet" href="../css/career.css?v=4ee40a2862e9">
     <link rel="stylesheet" href="../css/skills.css?v=35c3209e8b26">
     <link rel="stylesheet" href="../css/contact.css?v=394b5c5ceee5">
@@ -137,7 +137,7 @@
             <h1 class="section__title" id="projects-title">Mes projets techniques</h1>
 
             <p class="section__intro">
-                Chaque projet marque une étape : les jeux Python ont posé les bases de la programmation, le site CV celles du web. Pour chacun : le contexte, l'objectif, ce que j'en retiens, les technologies, et les liens pour parcourir le code ou tester les jeux.
+                Chaque projet marque une étape : les exercices et les jeux Python ont posé les bases de la programmation, le site CV celles du web. Pour chacun : le contexte, l'objectif, ce que j'en retiens, les technologies, et les liens pour parcourir le code, jouer ou tester directement sur cette page.
             </p>
 
             <button
@@ -300,6 +300,165 @@
 
                 </article>
 
+                <article class="project-card">
+
+                    <div class="project-card__media">
+                        <button
+                            class="cube cube--medium cube--blue "
+                            type="button"
+                            aria-label="Faire tourner le cube"
+                            data-speed="14"
+                            data-phase="200"
+                        ></button>
+                    </div>
+
+                    <div class="project-card__body">
+
+                        <h3 class="project-card__title">Chiffrements de César et de Vigenère</h3>
+
+                        <dl class="project-card__details">
+
+                            <dt class="project-card__label">Contexte</dt>
+                            <dd class="project-card__text">Exercice de la piscine Python : programmer deux chiffrements historiques, puis casser le premier sans connaître sa clé.</dd>
+
+                            <dt class="project-card__label">Objectif</dt>
+                            <dd class="project-card__text project-card__text--goal">Chiffrer et déchiffrer un message avec César (décalage fixe) et Vigenère (décalage donné par un mot-clé), et retrouver seul la clé d'un César par l'analyse des fréquences.</dd>
+
+                            <dt class="project-card__label">Ce que j'en retiens</dt>
+                            <dd class="project-card__text">Le modulo fait boucler l'alphabet de « z » à « a », et déchiffrer revient à décaler dans l'autre sens : une seule fonction sert aux deux opérations. Pour casser César, j'ai réutilisé la comparaison de fréquences du détecteur de langue : essayer les 26 clés et garder le texte le plus proche du français.</dd>
+
+                            <dt class="project-card__label">Compétences et technologies</dt>
+                            <dd class="project-card__text">
+                                <ul class="project-card__tags">
+                                <li class="tag">Python</li>
+                                <li class="tag">Algorithmique</li>
+                                <li class="tag">Chaînes de caractères</li>
+                                <li class="tag">Analyse de fréquences</li>
+                                <li class="tag">JavaScript (démo)</li>
+                                </ul>
+                            </dd>
+
+                        </dl>
+
+                        <div class="project-card__actions">
+                            <a class="button" href="https://github.com/Axel-FOLLET/Axou/tree/main/piscine_python/chiffrement" target="_blank" rel="noopener noreferrer">Code source sur GitHub</a>
+                            <button class="button project-card__demo-toggle" type="button" aria-expanded="false" aria-controls="demo-cipher" data-label-open="Tester" data-label-close="Masquer la démo">Tester</button>
+                        </div>
+
+                        <!-- Démo : project-demos.js recalcule le résultat à chaque saisie -->
+                        <div class="demo demo--cipher" id="demo-cipher" hidden>
+
+                            <div class="form__row">
+                                <div class="form__field">
+                                    <label class="form__label" for="cipher-method">Méthode</label>
+                                    <select class="form__input demo__select" id="cipher-method" data-cipher-method>
+                                        <option value="caesar">César</option>
+                                        <option value="vigenere">Vigenère</option>
+                                    </select>
+                                </div>
+                                <div class="form__field">
+                                    <label class="form__label" for="cipher-direction">Opération</label>
+                                    <select class="form__input demo__select" id="cipher-direction" data-cipher-direction>
+                                        <option value="1">Chiffrer</option>
+                                        <option value="-1">Déchiffrer</option>
+                                    </select>
+                                </div>
+                                <div class="form__field">
+                                    <label class="form__label" for="cipher-key">Clé</label>
+                                    <input class="form__input" id="cipher-key" type="text" value="3" autocomplete="off" spellcheck="false" aria-describedby="cipher-message" data-cipher-key>
+                                </div>
+                            </div>
+
+                            <div class="form__field">
+                                <label class="form__label" for="cipher-text">Texte</label>
+                                <textarea class="form__input form__input--area demo__input" id="cipher-text" rows="3">Rendez-vous demain à la bibliothèque, près de la fenêtre.</textarea>
+                            </div>
+
+                            <div class="form__field">
+                                <label class="form__label" for="cipher-result">Résultat</label>
+                                <output class="demo__output" id="cipher-result" for="cipher-method cipher-direction cipher-key cipher-text"></output>
+                            </div>
+
+                            <p class="demo__note" id="cipher-message" aria-live="polite"></p>
+
+                            <div class="demo__actions">
+                                <button class="button" type="button" data-cipher-swap>Repartir du résultat</button>
+                                <button class="button" type="button" data-cipher-crack hidden>Trouver la clé</button>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </article>
+
+                <article class="project-card">
+
+                    <div class="project-card__media">
+                        <button
+                            class="cube cube--medium cube--blue "
+                            type="button"
+                            aria-label="Faire tourner le cube"
+                            data-speed="18"
+                            data-phase="310"
+                        ></button>
+                    </div>
+
+                    <div class="project-card__body">
+
+                        <h3 class="project-card__title">Détecteur de langue</h3>
+
+                        <dl class="project-card__details">
+
+                            <dt class="project-card__label">Contexte</dt>
+                            <dd class="project-card__text">Exercice de la piscine Python : identifier la langue d'un texte sans dictionnaire, à partir de ses seules lettres.</dd>
+
+                            <dt class="project-card__label">Objectif</dt>
+                            <dd class="project-card__text project-card__text--goal">Reconnaître la langue d'un texte parmi dix, en comparant la fréquence de ses lettres aux fréquences connues de chaque langue.</dd>
+
+                            <dt class="project-card__label">Ce que j'en retiens</dt>
+                            <dd class="project-card__text">Une méthode statistique a besoin de volume : fiable dès deux phrases, elle hésite sur quelques mots. Les accents faussaient aussi le comptage ; je les ramène à leur lettre de base avant l'analyse. La démo reprend le programme Python, porté en JavaScript.</dd>
+
+                            <dt class="project-card__label">Compétences et technologies</dt>
+                            <dd class="project-card__text">
+                                <ul class="project-card__tags">
+                                <li class="tag">Python</li>
+                                <li class="tag">Dictionnaires</li>
+                                <li class="tag">Statistiques</li>
+                                <li class="tag">Unicode</li>
+                                <li class="tag">JavaScript (démo)</li>
+                                </ul>
+                            </dd>
+
+                        </dl>
+
+                        <div class="project-card__actions">
+                            <a class="button" href="https://github.com/Axel-FOLLET/Axou/tree/main/piscine_python/detecteur_de_langue" target="_blank" rel="noopener noreferrer">Code source sur GitHub</a>
+                            <button class="button project-card__demo-toggle" type="button" aria-expanded="false" aria-controls="demo-language" data-label-open="Tester" data-label-close="Masquer la démo">Tester</button>
+                        </div>
+
+                        <!-- Démo : project-demos.js recalcule le classement à chaque saisie -->
+                        <div class="demo demo--language" id="demo-language" hidden>
+
+                            <div class="form__field">
+                                <label class="form__label" for="language-text">Texte à analyser</label>
+                                <textarea class="form__input form__input--area demo__input" id="language-text" rows="4" placeholder="Quelques phrases en français, anglais, espagnol, portugais, italien, allemand, néerlandais, suédois, polonais ou turc."></textarea>
+                            </div>
+
+                            <p class="demo__verdict" aria-live="polite"></p>
+                            <ol class="demo__ranking"></ol>
+                            <p class="demo__note"></p>
+
+                            <div class="demo__actions">
+                                <button class="button demo__example" type="button">Charger un exemple</button>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </article>
+
                 <!-- -------------------- FUTURS PROJETS -------------------- -->
 
                 <article class="project-card project-card--placeholder">
@@ -357,7 +516,7 @@
                     <h3 class="repo-card__title">
                         <a class="repo-card__link" href="https://github.com/Axel-FOLLET/Axou" target="_blank" rel="noopener noreferrer">Axou</a>
                     </h3>
-                    <p class="repo-card__text">Mon dépôt de travail : les jeux Python (Snake, Pendu) et les sources de mes deux sites.</p>
+                    <p class="repo-card__text">Mon dépôt de travail : mes programmes Python (Snake, Pendu, détecteur de langue, chiffrements) et les sources de mes deux sites.</p>
                 </li>
             </ul>
 
