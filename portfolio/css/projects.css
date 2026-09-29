@@ -1,94 +1,411 @@
-/* -------------------- PAGE PROJETS -------------------- */
+/* -------------------- PAGE PROJETS : BANDE DES THÈMES -------------------- */
 
-.project-list {
-    display: flex;
-    flex-direction: column;
+/*
+    Une seule bande qu'on fait défiler : chaque thème est un classeur (onglet + cartes),
+    la carte « Prochains projets » la ferme. Sous la bande, une bulle reliée à la carte active
+    affiche son objectif et ce que j'en retiens. project-showcase.js gère la carte active,
+    le raccord entre carte et bulle, les flèches, le glisser à la souris et l'agrandissement.
+*/
+.showcase {
+    --card-width: clamp(250px, 24vw, 310px);
 
-    gap: 40px;
+    /* Bleu du survol (#0D0A9B à 72 % sur #141422) en couleur pleine : carte, raccord et bulle se fondent */
+    --active-fill: #0F0D79;
+
+    /* Fond des classeurs : l'onglet et son panneau partagent la même teinte */
+    --folder: rgba(255, 255, 255, 0.08);
+
+    --neck-height: 34px;
+
+    position: relative;
 }
 
 
-.project-card {
-    display: grid;
-    grid-template-columns: 34% 1fr;
+/* Consigne ajoutée par project-showcase.js au-dessus de la bande */
+.showcase__hint {
+    display: flex;
+    align-items: center;
 
-    background-color: var(--veil-strong);
+    gap: 10px;
+
+    margin: 0 0 18px;
+
+    font-size: 0.9rem;
+}
+
+
+/* Chevrons du mode tactile : ils pulsent vers la droite, là où se trouvent les autres projets */
+.showcase__hint-icon {
+    display: none;
+
+    font-size: 1.4rem;
+    font-weight: bold;
+    letter-spacing: -0.1rem;
+    line-height: 1;
+}
+
+
+.showcase--touch .showcase__hint {
+    font-weight: bold;
+}
+
+
+.showcase--touch .showcase__hint-icon {
+    display: inline-block;
+
+    animation: hint-swipe 1.6s ease-in-out infinite;
+}
+
+
+@keyframes hint-swipe {
+    0%,
+    100% {
+        opacity: 0.35;
+        translate: -4px 0;
+    }
+
+    50% {
+        opacity: 1;
+        translate: 10px 0;
+    }
+}
+
+
+/* Au doigt, les flèches recouvriraient les cartes : on balaie la bande */
+.showcase--touch .showcase__arrow {
+    display: none;
+}
+
+
+/* Cadre ajouté autour de la bande : repère des flèches */
+.showcase__frame {
+    position: relative;
+}
+
+
+/* Sur ordinateur, les flèches se placent dans la marge de la section, de part et d'autre de la bande */
+.showcase__arrow {
+    position: absolute;
+    top: 50%;
+    z-index: 2;
+
+    translate: 0 -50%;
+
+    width: 44px;
+    height: 44px;
+
+    padding: 0;
 
     border: 1px solid var(--white);
 
+    background-color: var(--veil-strong);
+    color: var(--white);
+
+    font-family: inherit;
+    font-size: 1.3rem;
+    line-height: 1;
+
+    cursor: pointer;
+
     transition:
-        transform 0.3s ease,
-        border-color 0.3s ease;
+        background-color 0.3s ease,
+        opacity 0.3s ease,
+        scale 0.1s ease-out;
 }
 
 
-.project-card:not(.project-card--placeholder):hover, .project-card:not(.project-card--placeholder):focus-within {
-    transform: translateY(-6px);
+.showcase__arrow--previous {
+    left: -64px;
 }
 
 
-/* Surbrillance bleue limitée au texte : le cube et les dessins gardent le voile blanc. */
-.project-card:not(.project-card--placeholder):hover .project-card__body,
-.project-card:not(.project-card--placeholder):focus-within .project-card__body {
-    /* Neutral base prevents red from tinting the translucent blue. */
-    background-color: #141422;
-    background-image: linear-gradient(rgba(13, 10, 155, 0.72),rgba(13, 10, 155, 0.72));
+.showcase__arrow--next {
+    right: -64px;
 }
 
 
-/* Zone transparente : le voile blanc de la carte apparaît derrière les dessins bleus */
+.showcase__arrow:hover:not(:disabled),
+.showcase__arrow:focus-visible {
+    background-color: var(--active-fill);
+}
+
+
+.showcase__arrow:active:not(:disabled) {
+    scale: 0.94;
+}
+
+
+.showcase__arrow:disabled {
+    opacity: 0.35;
+
+    cursor: default;
+}
+
+
+/*
+    Défilement horizontal natif (doigt, pavé tactile, Maj + molette, clavier) :
+    l'accroche (scroll-snap) cale toujours une carte sur le bord gauche.
+*/
+.showcase__track {
+    display: flex;
+    align-items: stretch;
+
+    gap: 24px;
+
+    padding-bottom: 14px;
+
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 16px;
+
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.6) transparent;
+}
+
+
+.showcase__track:focus-visible {
+    outline: 2px solid var(--white);
+    outline-offset: 4px;
+}
+
+
+/* Glisser à la souris : l'accroche attend le lâcher, sinon elle retiendrait la bande à chaque pixel */
+@media (pointer: fine) {
+
+    .showcase--ready .showcase__track {
+        cursor: grab;
+    }
+
+}
+
+
+.showcase--dragging .showcase__track {
+    scroll-snap-type: none;
+
+    cursor: grabbing;
+    user-select: none;
+}
+
+
+/* -------------------- CLASSEUR D'UN THÈME -------------------- */
+
+.showcase__theme {
+    flex: 0 0 auto;
+
+    display: flex;
+    flex-direction: column;
+}
+
+
+/*
+    Onglet incliné, dans l'esprit des onglets du menu : seule la silhouette penche, pas le texte.
+    sticky : quand on fait défiler, l'onglet reste au bord gauche tant que son thème est visible.
+*/
+.showcase__tab {
+    position: sticky;
+    left: 0;
+    z-index: 0;
+
+    align-self: flex-start;
+
+    margin: 0 0 0 10px;
+    padding: 10px 30px 8px;
+
+    font-size: 0.95rem;
+    letter-spacing: 0.1rem;
+
+    text-transform: uppercase;
+}
+
+
+.showcase__tab::before {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+
+    border-radius: 7px 7px 0 0;
+
+    background-color: var(--folder);
+
+    transform: skewX(-12deg);
+    transform-origin: bottom left;
+}
+
+
+.showcase__cards {
+    flex: 1;
+
+    display: flex;
+    align-items: stretch;
+
+    gap: 16px;
+
+    padding: 16px;
+
+    background-color: var(--folder);
+}
+
+
+/* -------------------- CARTE D'UN PROJET -------------------- */
+
+.project-card {
+    position: relative;
+
+    flex: 0 0 var(--card-width);
+
+    display: flex;
+
+    border: 1px solid var(--white);
+
+    background-color: var(--veil-strong);
+
+    scroll-snap-align: start;
+
+    transition:
+        background-color 0.3s ease,
+        border-color 0.3s ease,
+        flex-basis 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+
+.project-card:not(.project-card--upcoming):not(.project-card--active):hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+
+/*
+    Carte active : même bleu que la bulle ; le bas s'ouvre sur le raccord.
+    Le bleu se limite au texte : les dessins et les cubes bleus gardent le voile blanc de la carte.
+*/
+.project-card--active {
+    border-bottom-color: var(--active-fill);
+}
+
+
+.project-card--active .project-card__body,
+.project-card--active .project-card__stage {
+    background-color: var(--active-fill);
+}
+
+
+/* Partie fixe de la carte : elle garde sa largeur quand la carte s'agrandit pour un jeu ou une démo */
+.project-card__main {
+    flex: 0 0 calc(var(--card-width) - 2px);
+
+    display: flex;
+    flex-direction: column;
+
+    min-width: 0;
+}
+
+
 .project-card__media {
     display: flex;
     align-items: center;
     justify-content: center;
 
-    min-height: 260px;
+    height: 140px;
 
-    margin: 0;
-    padding: 20px;
-
-    background-color: transparent;
+    padding: 16px 16px 0;
 }
 
 
 /*
     Les attributs width/height du HTML réservent la place avant le chargement.
-    height: auto garde les proportions du dessin au lieu de sa hauteur d'origine.
+    object-fit: contain garde les proportions du dessin dans la hauteur fixée.
 */
 .project-card__image {
     width: 100%;
-    height: auto;
-    max-height: 260px;
+    height: 100%;
 
     object-fit: contain;
 }
 
 
+/* flex-direction: column + margin-top: auto sur les actions : les boutons s'alignent en bas de chaque carte */
 .project-card__body {
-    padding: 32px 36px;
+    flex: 1;
+
+    display: flex;
+    flex-direction: column;
+
+    padding: 20px 22px 22px;
+
+    transition: background-color 0.3s ease;
 }
 
 
 .project-card__title {
-    margin: 0 0 20px;
+    margin: 0 0 10px;
 
-    font-size: 2rem;
+    font-size: 1.3rem;
 }
 
 
-.project-card__details {
+.project-card__tags {
+    display: flex;
+    flex-wrap: wrap;
+
+    gap: 6px;
+
+    margin: 14px 0 0;
+    padding: 0;
+
+    list-style: none;
+}
+
+
+/* Étiquette de technologie */
+.tag {
+    padding: 3px 10px;
+
+    border: 1px solid var(--white);
+
+    font-size: 0.8rem;
+}
+
+
+/* Sans JavaScript, l'objectif et « ce que j'en retiens » restent lisibles dans la carte */
+.project-card__story {
+    margin: 18px 0 0;
+}
+
+
+/*
+    Avec JavaScript, ils s'affichent dans la bulle. Dans la carte, ils restent lus
+    par les lecteurs d'écran (la bulle, simple copie visuelle, leur est masquée).
+*/
+.showcase--ready .project-card .project-card__story {
+    position: absolute;
+
+    width: 1px;
+    height: 1px;
+
     margin: 0;
+
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
 }
 
 
 .project-card__label {
-    margin-top: 18px;
+    margin-top: 14px;
 
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-weight: bold;
     letter-spacing: 0.1rem;
 
     text-transform: uppercase;
+}
+
+
+.project-card__label:first-child {
+    margin-top: 0;
 }
 
 
@@ -97,58 +414,314 @@
 }
 
 
-/* L'objectif est l'information clé du projet : plus grand et en gras */
-.project-card__text--goal {
-    font-size: 1.25rem;
-    font-weight: bold;
-    line-height: 1.45;
-}
-
-
-.project-card__tags {
-    display: flex;
-    flex-wrap: wrap;
-
-    gap: 8px;
-
-    margin: 8px 0 0;
-    padding: 0;
-
-    list-style: none;
-}
-
-
 .project-card__actions {
     display: flex;
     flex-wrap: wrap;
 
-    gap: 12px;
+    gap: 10px;
 
-    margin-top: 26px;
+    margin-top: auto;
+    padding-top: 20px;
 }
 
 
-/* Carte d'un futur projet */
-.project-card--placeholder {
-    transition: none;
-    border-style: dashed;
+.project-card__actions .button {
+    flex: 1 1 auto;
 
-    background-color: var(--veil);
+    padding: 10px 14px;
+
+    font-size: 0.95rem;
 }
 
 
-.project-card--placeholder .project-card__media {
+/* -------------------- CARTE AGRANDIE : JEU OU DÉMO -------------------- */
+
+/* --showcase-width est la largeur visible de la bande, mesurée par project-showcase.js */
+.project-card--expanded {
+    flex-basis: min(1040px, var(--showcase-width, 1040px) - 32px);
+}
+
+
+/* Espace du jeu ou de la démo, à droite de la partie fixe */
+.project-card__stage {
+    flex: 1 1 auto;
+
+    min-width: 0;
+
+    padding: 24px 26px;
+
+    border-left: 1px solid rgba(255, 255, 255, 0.35);
+
+    animation: stage-in 0.3s ease-out 0.15s both;
+}
+
+
+.project-card__stage[hidden] {
+    display: none;
+}
+
+
+@keyframes stage-in {
+    from {
+        opacity: 0;
+    }
+}
+
+
+.project-card__stage--game {
+    padding: 0;
+}
+
+
+/* L'iframe est créée à l'ouverture ; le jeu adapte son canvas à la hauteur disponible */
+.project-card__frame {
+    display: block;
+
+    width: 100%;
+    height: min(72vh, 700px);
+
+    border: none;
+}
+
+
+/* -------------------- PROCHAINS PROJETS -------------------- */
+
+/*
+    Pas encore de thème : son classeur n'a ni onglet visible ni fond.
+    L'onglet vide garde la place : la carte a la taille et la hauteur des autres.
+*/
+.showcase__theme--untitled .showcase__tab::before {
+    content: none;
+}
+
+
+.showcase__theme--untitled .showcase__cards {
     background-color: transparent;
 }
 
 
-/* Étiquette de technologie */
-.tag {
-    padding: 4px 12px;
+.project-card--upcoming {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 14px;
+
+    padding: 28px;
+
+    border-style: dashed;
+
+    background-color: var(--veil);
+
+    text-align: center;
+}
+
+
+.project-card--upcoming .project-card__title {
+    margin: 0;
+}
+
+
+.project-card--upcoming .project-card__text {
+    margin: 0;
+}
+
+
+/* -------------------- BULLE ET RACCORD -------------------- */
+
+/*
+    Raccord créé par project-showcase.js : un trapèze qui part du bas de la carte active
+    et s'évase jusqu'à la bulle. Les variables --neck-top-left et --neck-top-right placent
+    le haut du trapèze ; les transitions le font glisser d'une carte à l'autre.
+*/
+.showcase__neck {
+    position: absolute;
+    z-index: 1;
+
+    background-color: var(--active-fill);
+
+    clip-path: polygon(var(--neck-top-left) 0, var(--neck-top-right) 0, 100% 100%, 0 100%);
+
+    pointer-events: none;
+
+    transition:
+        left 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
+        top 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
+        width 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
+        height 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
+        clip-path 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
+        opacity 0.2s ease;
+}
+
+
+/* Pendant le défilement, le raccord suit la carte sans retard */
+.showcase--scrolling .showcase__neck,
+.showcase--dragging .showcase__neck {
+    transition: opacity 0.2s ease;
+}
+
+
+/* Carte active sortie de la bande : le raccord disparaît, la bulle reste */
+.showcase__neck--hidden {
+    opacity: 0;
+}
+
+
+.showcase__bubble {
+    position: relative;
+
+    min-height: 10.5em;
+
+    margin-top: var(--neck-height);
+    padding: 24px 32px 28px;
 
     border: 1px solid var(--white);
 
+    background-color: var(--active-fill);
+}
+
+
+.showcase__bubble[hidden] {
+    display: none;
+}
+
+
+.showcase__bubble-eyebrow {
+    margin: 0 0 16px;
+
     font-size: 0.9rem;
+    letter-spacing: 0.1rem;
+
+    text-transform: uppercase;
+}
+
+
+/* Objectif et « ce que j'en retiens » côte à côte : le second, plus long, a plus de place */
+.showcase__bubble-content .project-card__story {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr) minmax(0, 1.7fr);
+
+    column-gap: 40px;
+
+    margin: 0;
+}
+
+
+.showcase__bubble-content .project-card__label {
+    margin-top: 0;
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+
+    .project-card,
+    .showcase__neck {
+        transition: none;
+    }
+
+    .project-card__stage,
+    .showcase--touch .showcase__hint-icon {
+        animation: none;
+    }
+
+}
+
+
+/* -------------------- TABLETTE + TÉLÉPHONE -------------------- */
+
+@media (max-width: 1024px) {
+
+    .showcase {
+        --card-width: min(78vw, 340px);
+    }
+
+
+    /* La démo s'ouvre sous la partie fixe : la carte s'élargit à toute la bande */
+    .project-card--expanded {
+        flex-direction: column;
+    }
+
+
+    .project-card--expanded .project-card__main {
+        flex-basis: auto;
+    }
+
+
+    .project-card__stage {
+        border-top: 1px solid rgba(255, 255, 255, 0.35);
+        border-left: none;
+    }
+
+
+    .showcase__bubble {
+        padding: 22px 20px 24px;
+    }
+
+
+    .showcase__bubble-content .project-card__story {
+        grid-template-rows: none;
+        grid-auto-flow: row;
+        grid-auto-columns: auto;
+    }
+
+
+    .showcase__bubble-content .project-card__label + .project-card__text + .project-card__label {
+        margin-top: 16px;
+    }
+
+}
+
+
+/*
+    Les jeux se jouent au clavier : réservés à l'ordinateur, comme avant.
+    Écrans tactiles compris, même larges (tablette en paysage) ; project-showcase.js suit la même condition.
+*/
+@media (max-width: 1024px), (hover: none) and (pointer: coarse) {
+
+    .project-card__toggle--game,
+    .project-card__stage--game {
+        display: none;
+    }
+
+}
+
+
+@media (max-width: 767px) {
+
+    /*
+        Cartes plus étroites et espacements réduits : le bord de la carte suivante
+        reste visible à droite, signe que la bande continue.
+    */
+    .showcase {
+        --card-width: 70vw;
+    }
+
+
+    .showcase__track {
+        gap: 12px;
+
+        scroll-padding-inline: 12px;
+    }
+
+
+    .showcase__cards {
+        gap: 12px;
+
+        padding: 12px;
+    }
+
+
+    .project-card__body {
+        padding: 18px 18px 20px;
+    }
+
+
+    .project-card__stage {
+        padding: 20px 18px;
+    }
+
 }
 
 
@@ -156,15 +729,7 @@
 
 /* -------------------- DÉMOS DES PROJETS -------------------- */
 
-/* Outil déplié sous les boutons de la carte ; les champs reprennent le style du formulaire de contact */
-.demo {
-    margin-top: 28px;
-    padding-top: 24px;
-
-    border-top: 1px solid rgba(255, 255, 255, 0.4);
-}
-
-
+/* Outil affiché dans la carte agrandie (.project-card__stage) ; les champs reprennent le style du formulaire de contact */
 .demo__select {
     cursor: pointer;
 }

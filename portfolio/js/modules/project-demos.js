@@ -1,6 +1,6 @@
 /*
- * Démos des projets : le bouton « Tester » déplie un petit outil sous la carte.
- * Contrairement aux jeux, ces outils se testent aussi sur téléphone (pas de clavier requis).
+ * Démos des projets : « Tester » agrandit la carte pour afficher l'outil (voir project-showcase.js).
+ * Ce module calcule les résultats. Contrairement aux jeux, ces outils se testent aussi sur téléphone (pas de clavier requis).
  */
 import { RELIABLE_LENGTH, rankLanguages } from "../tools/language-detector.js";
 import { caesar, findCaesarKey, isValidVigenereKey, vigenere } from "../tools/ciphers.js";
@@ -62,23 +62,6 @@ function createElement(tag, className, text) {
     element.className = className;
     element.textContent = text;
     return element;
-}
-
-
-/*
- * Bouton « Tester » : affiche ou masque la démo qu'il contrôle (aria-controls).
- * Les deux libellés sont lus dans le HTML (data-label-open, data-label-close).
- */
-function initToggle(button) {
-    const demo = document.getElementById(button.getAttribute("aria-controls"));
-    if (!demo) return;
-    button.addEventListener("click", () => {
-        const open = button.getAttribute("aria-expanded") !== "true";
-        button.setAttribute("aria-expanded", String(open));
-        button.textContent = open ? button.dataset.labelClose : button.dataset.labelOpen;
-        demo.hidden = !open;
-        if (open) demo.querySelector("textarea")?.focus({ preventScroll: true });
-    });
 }
 
 
@@ -197,7 +180,6 @@ function initCipherDemo(demo, texts, language) {
 
 export function initProjectDemos(language) {
     const texts = TEXTS[language] ?? TEXTS.fr;
-    document.querySelectorAll(".project-card__demo-toggle").forEach(initToggle);
     document.querySelectorAll(".demo--language").forEach(demo => initLanguageDemo(demo, texts));
     document.querySelectorAll(".demo--cipher").forEach(demo => initCipherDemo(demo, texts, language));
 }

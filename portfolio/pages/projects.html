@@ -23,19 +23,18 @@
     <meta property="og:image" content="https://axel-follet.github.io/portfolio/assets/images/profile.jpg">
 
     <!-- Versions CSS : recharge les styles modifies apres publication. -->
-    <link rel="stylesheet" href="../css/base.css?v=6f050952e6b7">
+    <link rel="stylesheet" href="../css/base.css?v=9fecb4c9a040">
     <link rel="stylesheet" href="../css/navigation.css?v=4a3d2ca7cf75">
     <link rel="stylesheet" href="../css/sections.css?v=5f1431c8fd16">
     <link rel="stylesheet" href="../css/buttons.css?v=599c22311f6c">
     <link rel="stylesheet" href="../css/home.css?v=5f1d3105fd39">
     <link rel="stylesheet" href="../css/cubes.css?v=94dd18a8abb4">
-    <link rel="stylesheet" href="../css/projects.css?v=b6f9aeaf61fe">
-    <link rel="stylesheet" href="../css/career.css?v=4ee40a2862e9">
+    <link rel="stylesheet" href="../css/projects.css?v=d88f8a22f3ca">
+    <link rel="stylesheet" href="../css/career.css?v=c78eff950e96">
     <link rel="stylesheet" href="../css/skills.css?v=35c3209e8b26">
     <link rel="stylesheet" href="../css/contact.css?v=394b5c5ceee5">
     <link rel="stylesheet" href="../css/footer.css?v=8d7b4ac03775">
-    <link rel="stylesheet" href="../css/responsive.css?v=afbe15f64498">
-    <link rel="stylesheet" href="../css/game-modal.css?v=8321015a760b">
+    <link rel="stylesheet" href="../css/responsive.css?v=28a52991d104">
     <link rel="stylesheet" href="../css/folder-tabs.css?v=043a3ac3284d">
     <!-- blocking="render" : la page ne s'affiche qu'une fois le script exécuté, cubes compris.
          Le fondu entre pages part ainsi d'une page complète au lieu de la voir se construire. -->
@@ -137,7 +136,7 @@
             <h1 class="section__title" id="projects-title">Mes projets techniques</h1>
 
             <p class="section__intro">
-                Chaque projet marque une étape : les exercices et les jeux Python ont posé les bases de la programmation, le site CV celles du web. Pour chacun : le contexte, l'objectif, ce que j'en retiens, les technologies, et les liens pour parcourir le code, jouer ou tester directement sur cette page.
+                Chaque projet marque une étape : les exercices et les jeux Python ont posé les bases de la programmation, le site CV celles du web. Les projets sont rangés par thème : faites défiler la bande, puis choisissez une carte pour lire son objectif et ce que j'en retiens. Les jeux et les démos s'ouvrent directement dans la carte.
             </p>
 
             <button
@@ -155,335 +154,370 @@
             </div>
 
 
-            <div class="project-list">
+            <div class="showcase" data-label-prev="Projet précédent" data-label-next="Projet suivant" data-label-hint="Faites glisser la bande ou utilisez les flèches." data-label-hint-touch="Balayez la bande pour voir tous les projets">
+
+                <!-- Flèches ajoutées au-dessus de la bande par project-showcase.js ; sans script, la bande défile nativement. -->
 
                 <!--
                     POUR AJOUTER UN PROJET :
-                    copier un bloc <article class="project-card"> ci-dessous,
-                    puis changer le titre, l'image, le contexte, l'objectif,
-                    les technologies et les liens.
+                    copier un bloc <article class="project-card"> dans l'onglet de son thème,
+                    ou copier tout un bloc <section class="showcase__theme"> pour créer un thème.
+                    L'objectif et « ce que j'en retiens » (project-card__story) s'affichent dans la bulle sous la bande.
                 -->
+                <div class="showcase__track" role="region" aria-label="Projets par thème">
 
-                <article class="project-card">
+                    <!-- -------------------- THÈME : WEB -------------------- -->
 
-                    <div class="project-card__media">
-                        <button
-                            class="cube cube--medium cube--blue "
-                            type="button"
-                            aria-label="Faire tourner le cube"
-                            data-speed="16"
-                            data-phase="90"
-                        ></button>
-                    </div>
+                    <section class="showcase__theme" aria-labelledby="theme-web">
 
-                    <div class="project-card__body">
+                        <h2 class="showcase__tab" id="theme-web">Web</h2>
 
-                        <h3 class="project-card__title">Site web de mon CV</h3>
+                        <div class="showcase__cards">
 
-                        <dl class="project-card__details">
+                            <article class="project-card">
 
-                            <dt class="project-card__label">Contexte</dt>
-                            <dd class="project-card__text">Projet Epitech de la piscine web : concevoir un site CV en HTML, CSS et JavaScript, sans framework, en français et en anglais.</dd>
+                                <div class="project-card__main">
 
-                            <dt class="project-card__label">Objectif</dt>
-                            <dd class="project-card__text project-card__text--goal">Présenter mon passage de la gestion de projets RH à l'informatique sur un site responsive, interactif et bilingue, avec un formulaire de contact fonctionnel.</dd>
+                                    <div class="project-card__media">
+                                        <button
+                                            class="cube cube--small cube--blue"
+                                            type="button"
+                                            aria-label="Faire tourner le cube"
+                                            data-speed="16"
+                                            data-phase="90"
+                                        ></button>
+                                    </div>
 
-                            <dt class="project-card__label">Ce que j'en retiens</dt>
-                            <dd class="project-card__text">Un fichier par responsabilité (menu, cubes, formulaire, jeux) m'a obligé à comprendre comment chaque partie échange avec les autres. Face à un bug, je sais où chercher et pourquoi il survient : je corrige la cause plutôt que le symptôme, sans effet de bord sur le reste du site.</dd>
+                                    <div class="project-card__body">
 
-                            <dt class="project-card__label">Compétences et technologies</dt>
-                            <dd class="project-card__text">
-                                <ul class="project-card__tags">
-                                <li class="tag">HTML</li>
-                                <li class="tag">CSS</li>
-                                <li class="tag">JavaScript</li>
-                                <li class="tag">Responsive</li>
-                                <li class="tag">Animations 3D en CSS</li>
-                                <li class="tag">GitHub Pages</li>
-                                </ul>
-                            </dd>
+                                        <h3 class="project-card__title">Site web de mon CV</h3>
 
-                        </dl>
+                                        <ul class="project-card__tags" aria-label="Compétences et technologies">
+                                            <li class="tag">HTML</li>
+                                            <li class="tag">CSS</li>
+                                            <li class="tag">JavaScript</li>
+                                            <li class="tag">Responsive</li>
+                                            <li class="tag">Animations 3D en CSS</li>
+                                            <li class="tag">GitHub Pages</li>
+                                        </ul>
 
-                        <div class="project-card__actions">
-                            <a class="button" href="https://axel-follet.github.io/website_resume/" target="_blank" rel="noopener noreferrer">Voir le site en ligne</a>
-                            <a class="button" href="https://github.com/Axel-FOLLET/website_resume" target="_blank" rel="noopener noreferrer">Code source sur GitHub</a>
-                        </div>
+                                        <dl class="project-card__story">
+                                            <dt class="project-card__label">Objectif</dt>
+                                            <dd class="project-card__text">Présenter mon passage de la gestion de projets RH à l'informatique sur un site responsive, interactif et bilingue, avec un formulaire de contact fonctionnel.</dd>
+                                            <dt class="project-card__label">Ce que j'en retiens</dt>
+                                            <dd class="project-card__text">Projet de la piscine web Epitech, sans framework. Un fichier par responsabilité (menu, cubes, formulaire, jeux) m'a obligé à comprendre comment chaque partie échange avec les autres. Face à un bug, je sais où chercher et pourquoi il survient : je corrige la cause plutôt que le symptôme, sans effet de bord sur le reste du site.</dd>
+                                        </dl>
 
-                    </div>
+                                        <div class="project-card__actions">
+                                            <a class="button" href="https://axel-follet.github.io/website_resume/" target="_blank" rel="noopener noreferrer">Voir le site en ligne</a>
+                                            <a class="button" href="https://github.com/Axel-FOLLET/website_resume" target="_blank" rel="noopener noreferrer">Code source</a>
+                                        </div>
 
-                </article>
+                                    </div>
 
-                <article class="project-card">
-
-                    <div class="project-card__media">
-                        <img class="project-card__image" src="../assets/images/dessin_snake_blue.png" alt="Illustration du jeu Snake développé en Python" width="1448" height="1086" loading="lazy" decoding="async">
-                    </div>
-
-                    <div class="project-card__body">
-
-                        <h3 class="project-card__title">Jeu du Snake</h3>
-
-                        <dl class="project-card__details">
-
-                            <dt class="project-card__label">Contexte</dt>
-                            <dd class="project-card__text">Projet personnel, réalisé après le Pendu pour passer d'un jeu au tour par tour à un jeu en temps réel.</dd>
-
-                            <dt class="project-card__label">Objectif</dt>
-                            <dd class="project-card__text project-card__text--goal">Développer un Snake complet : déplacements au clavier, collisions, pommes, score et effets visuels. La version jouable ici est adaptée en JavaScript.</dd>
-
-                            <dt class="project-card__label">Ce que j'en retiens</dt>
-                            <dd class="project-card__text">Le temps réel impose de séparer la boucle de jeu, l'affichage et les règles. Le code est découpé en modules (serpent, pomme, collisions, score) : une règle se corrige sans toucher au reste.</dd>
-
-                            <dt class="project-card__label">Compétences et technologies</dt>
-                            <dd class="project-card__text">
-                                <ul class="project-card__tags">
-                                <li class="tag">Python</li>
-                                <li class="tag">Pygame</li>
-                                <li class="tag">Événements clavier</li>
-                                <li class="tag">Collisions</li>
-                                <li class="tag">Organisation en modules</li>
-                                </ul>
-                            </dd>
-
-                        </dl>
-
-                        <div class="project-card__actions">
-                            <a class="button" href="https://github.com/Axel-FOLLET/Axou/tree/5f52f135fe0bb45800351c035b74ff3e00f64e5e/jeu_du_snake" target="_blank" rel="noopener noreferrer">Code source sur GitHub</a>
-                            <button class="button project-card__play" type="button" data-game="snake" data-game-title="Snake">Jouer</button>
-                        </div>
-
-                    </div>
-
-                </article>
-
-                <article class="project-card">
-
-                    <div class="project-card__media">
-                        <img class="project-card__image" src="../assets/images/dessin_pendu_blue.png" alt="Illustration du jeu du Pendu développé en Python" width="1448" height="1086" loading="lazy" decoding="async">
-                    </div>
-
-                    <div class="project-card__body">
-
-                        <h3 class="project-card__title">Jeu du Pendu</h3>
-
-                        <dl class="project-card__details">
-
-                            <dt class="project-card__label">Contexte</dt>
-                            <dd class="project-card__text">Premier projet personnel, réalisé pour mettre en pratique les bases de Python sur un programme complet.</dd>
-
-                            <dt class="project-card__label">Objectif</dt>
-                            <dd class="project-card__text project-card__text--goal">Créer un Pendu jouable de bout en bout : tirage d'un mot, saisie des lettres, gestion des erreurs et sauvegarde du meilleur score.</dd>
-
-                            <dt class="project-card__label">Ce que j'en retiens</dt>
-                            <dd class="project-card__text">Mon premier programme complet : lire des mots dans un fichier, garder le meilleur score, anticiper les saisies invalides. Je l'ai repris une fois Pygame maîtrisé pour en faire un jeu concret, avec une vraie interface graphique.</dd>
-
-                            <dt class="project-card__label">Compétences et technologies</dt>
-                            <dd class="project-card__text">
-                                <ul class="project-card__tags">
-                                <li class="tag">Python</li>
-                                <li class="tag">Pygame</li>
-                                <li class="tag">Conditions et boucles</li>
-                                <li class="tag">Fonctions</li>
-                                <li class="tag">Lecture de fichiers</li>
-                                </ul>
-                            </dd>
-
-                        </dl>
-
-                        <div class="project-card__actions">
-                            <a class="button" href="https://github.com/Axel-FOLLET/Axou/tree/5f52f135fe0bb45800351c035b74ff3e00f64e5e/jeu_du_pendu" target="_blank" rel="noopener noreferrer">Code source sur GitHub</a>
-                            <button class="button project-card__play" type="button" data-game="pendu" data-game-title="Pendu">Jouer</button>
-                        </div>
-
-                    </div>
-
-                </article>
-
-                <article class="project-card">
-
-                    <div class="project-card__media">
-                        <button
-                            class="cube cube--medium cube--blue "
-                            type="button"
-                            aria-label="Faire tourner le cube"
-                            data-speed="14"
-                            data-phase="200"
-                        ></button>
-                    </div>
-
-                    <div class="project-card__body">
-
-                        <h3 class="project-card__title">Chiffrements de César et de Vigenère</h3>
-
-                        <dl class="project-card__details">
-
-                            <dt class="project-card__label">Contexte</dt>
-                            <dd class="project-card__text">Exercice de la piscine Python : programmer deux chiffrements historiques, puis casser le premier sans connaître sa clé.</dd>
-
-                            <dt class="project-card__label">Objectif</dt>
-                            <dd class="project-card__text project-card__text--goal">Chiffrer et déchiffrer un message avec César (décalage fixe) et Vigenère (décalage donné par un mot-clé), et retrouver seul la clé d'un César par l'analyse des fréquences.</dd>
-
-                            <dt class="project-card__label">Ce que j'en retiens</dt>
-                            <dd class="project-card__text">Le modulo fait boucler l'alphabet de « z » à « a », et déchiffrer revient à décaler dans l'autre sens : une seule fonction sert aux deux opérations. Pour casser César, j'ai réutilisé la comparaison de fréquences du détecteur de langue : essayer les 26 clés et garder le texte le plus proche du français.</dd>
-
-                            <dt class="project-card__label">Compétences et technologies</dt>
-                            <dd class="project-card__text">
-                                <ul class="project-card__tags">
-                                <li class="tag">Python</li>
-                                <li class="tag">Algorithmique</li>
-                                <li class="tag">Chaînes de caractères</li>
-                                <li class="tag">Analyse de fréquences</li>
-                                <li class="tag">JavaScript (démo)</li>
-                                </ul>
-                            </dd>
-
-                        </dl>
-
-                        <div class="project-card__actions">
-                            <a class="button" href="https://github.com/Axel-FOLLET/Axou/tree/main/piscine_python/chiffrement" target="_blank" rel="noopener noreferrer">Code source sur GitHub</a>
-                            <button class="button project-card__demo-toggle" type="button" aria-expanded="false" aria-controls="demo-cipher" data-label-open="Tester" data-label-close="Masquer la démo">Tester</button>
-                        </div>
-
-                        <!-- Démo : project-demos.js recalcule le résultat à chaque saisie -->
-                        <div class="demo demo--cipher" id="demo-cipher" hidden>
-
-                            <div class="form__row">
-                                <div class="form__field">
-                                    <label class="form__label" for="cipher-method">Méthode</label>
-                                    <select class="form__input demo__select" id="cipher-method" data-cipher-method>
-                                        <option value="caesar">César</option>
-                                        <option value="vigenere">Vigenère</option>
-                                    </select>
                                 </div>
-                                <div class="form__field">
-                                    <label class="form__label" for="cipher-direction">Opération</label>
-                                    <select class="form__input demo__select" id="cipher-direction" data-cipher-direction>
-                                        <option value="1">Chiffrer</option>
-                                        <option value="-1">Déchiffrer</option>
-                                    </select>
+
+                            </article>
+
+                        </div>
+
+                    </section>
+
+                    <!-- -------------------- THÈME : JEUX -------------------- -->
+
+                    <section class="showcase__theme" aria-labelledby="theme-games">
+
+                        <h2 class="showcase__tab" id="theme-games">Jeux</h2>
+
+                        <div class="showcase__cards">
+
+                            <article class="project-card">
+
+                                <div class="project-card__main">
+
+                                    <div class="project-card__media">
+                                        <img class="project-card__image" src="../assets/images/dessin_snake_blue.png" alt="Illustration du jeu Snake développé en Python" width="1448" height="1086" loading="lazy" decoding="async">
+                                    </div>
+
+                                    <div class="project-card__body">
+
+                                        <h3 class="project-card__title">Jeu du Snake</h3>
+
+                                        <ul class="project-card__tags" aria-label="Compétences et technologies">
+                                            <li class="tag">Python</li>
+                                            <li class="tag">Pygame</li>
+                                            <li class="tag">Événements clavier</li>
+                                            <li class="tag">Collisions</li>
+                                            <li class="tag">Organisation en modules</li>
+                                        </ul>
+
+                                        <dl class="project-card__story">
+                                            <dt class="project-card__label">Objectif</dt>
+                                            <dd class="project-card__text">Développer un Snake complet : déplacements au clavier, collisions, pommes, score et effets visuels. La version jouable ici est adaptée en JavaScript.</dd>
+                                            <dt class="project-card__label">Ce que j'en retiens</dt>
+                                            <dd class="project-card__text">Projet personnel, réalisé après le Pendu pour passer du tour par tour au temps réel. Le temps réel impose de séparer la boucle de jeu, l'affichage et les règles. Le code est découpé en modules (serpent, pomme, collisions, score) : une règle se corrige sans toucher au reste.</dd>
+                                        </dl>
+
+                                        <div class="project-card__actions">
+                                            <a class="button" href="https://github.com/Axel-FOLLET/Axou/tree/5f52f135fe0bb45800351c035b74ff3e00f64e5e/jeu_du_snake" target="_blank" rel="noopener noreferrer">Code source</a>
+                                            <button class="button project-card__toggle project-card__toggle--game" type="button" aria-expanded="false" aria-controls="stage-snake" data-label-open="Jouer" data-label-close="Fermer le jeu">Jouer</button>
+                                        </div>
+
+                                    </div>
+
                                 </div>
-                                <div class="form__field">
-                                    <label class="form__label" for="cipher-key">Clé</label>
-                                    <input class="form__input" id="cipher-key" type="text" value="3" autocomplete="off" spellcheck="false" aria-describedby="cipher-key-hint cipher-key-error" data-cipher-key>
-                                    <p class="demo__hint" id="cipher-key-hint" data-cipher-hint></p>
-                                    <p class="form__error" id="cipher-key-error" aria-live="polite" data-cipher-error></p>
+
+                                <!-- Jeu : project-showcase.js charge games/snake.html dans cet espace à l'ouverture et le décharge à la fermeture. -->
+                                <div class="project-card__stage project-card__stage--game" id="stage-snake" data-game="snake" data-game-title="Jeu du Snake jouable" hidden></div>
+
+                            </article>
+
+                            <article class="project-card">
+
+                                <div class="project-card__main">
+
+                                    <div class="project-card__media">
+                                        <img class="project-card__image" src="../assets/images/dessin_pendu_blue.png" alt="Illustration du jeu du Pendu développé en Python" width="1448" height="1086" loading="lazy" decoding="async">
+                                    </div>
+
+                                    <div class="project-card__body">
+
+                                        <h3 class="project-card__title">Jeu du Pendu</h3>
+
+                                        <ul class="project-card__tags" aria-label="Compétences et technologies">
+                                            <li class="tag">Python</li>
+                                            <li class="tag">Pygame</li>
+                                            <li class="tag">Conditions et boucles</li>
+                                            <li class="tag">Fonctions</li>
+                                            <li class="tag">Lecture de fichiers</li>
+                                        </ul>
+
+                                        <dl class="project-card__story">
+                                            <dt class="project-card__label">Objectif</dt>
+                                            <dd class="project-card__text">Créer un Pendu jouable de bout en bout : tirage d'un mot, saisie des lettres, gestion des erreurs et sauvegarde du meilleur score.</dd>
+                                            <dt class="project-card__label">Ce que j'en retiens</dt>
+                                            <dd class="project-card__text">Mon premier projet personnel et mon premier programme complet : lire des mots dans un fichier, garder le meilleur score, anticiper les saisies invalides. Je l'ai repris une fois Pygame maîtrisé pour en faire un jeu concret, avec une vraie interface graphique.</dd>
+                                        </dl>
+
+                                        <div class="project-card__actions">
+                                            <a class="button" href="https://github.com/Axel-FOLLET/Axou/tree/5f52f135fe0bb45800351c035b74ff3e00f64e5e/jeu_du_pendu" target="_blank" rel="noopener noreferrer">Code source</a>
+                                            <button class="button project-card__toggle project-card__toggle--game" type="button" aria-expanded="false" aria-controls="stage-pendu" data-label-open="Jouer" data-label-close="Fermer le jeu">Jouer</button>
+                                        </div>
+
+                                    </div>
+
                                 </div>
-                            </div>
 
-                            <div class="form__field">
-                                <label class="form__label" for="cipher-text">Texte</label>
-                                <textarea class="form__input form__input--area demo__input" id="cipher-text" rows="3">Rendez-vous demain à la bibliothèque, près de la fenêtre.</textarea>
-                            </div>
+                                <div class="project-card__stage project-card__stage--game" id="stage-pendu" data-game="pendu" data-game-title="Jeu du Pendu jouable" hidden></div>
 
-                            <div class="form__field">
-                                <label class="form__label" for="cipher-result">Résultat</label>
-                                <output class="demo__output" id="cipher-result" for="cipher-method cipher-direction cipher-key cipher-text"></output>
-                            </div>
+                            </article>
 
-                            <p class="demo__note" id="cipher-message" aria-live="polite"></p>
+                        </div>
 
-                            <div class="demo__actions">
-                                <button class="button" type="button" data-cipher-swap>Repartir du résultat</button>
-                                <button class="button" type="button" data-cipher-crack hidden>Trouver la clé</button>
-                            </div>
+                    </section>
+
+                    <!-- -------------------- THÈME : ALGORITHMIQUE -------------------- -->
+
+                    <section class="showcase__theme" aria-labelledby="theme-algorithms">
+
+                        <h2 class="showcase__tab" id="theme-algorithms">Algorithmique</h2>
+
+                        <div class="showcase__cards">
+
+                            <article class="project-card">
+
+                                <div class="project-card__main">
+
+                                    <div class="project-card__media">
+                                        <button
+                                            class="cube cube--small cube--blue"
+                                            type="button"
+                                            aria-label="Faire tourner le cube"
+                                            data-speed="14"
+                                            data-phase="200"
+                                        ></button>
+                                    </div>
+
+                                    <div class="project-card__body">
+
+                                        <h3 class="project-card__title">Chiffrements de César et de Vigenère</h3>
+
+                                        <ul class="project-card__tags" aria-label="Compétences et technologies">
+                                            <li class="tag">Python</li>
+                                            <li class="tag">Algorithmique</li>
+                                            <li class="tag">Chaînes de caractères</li>
+                                            <li class="tag">Analyse de fréquences</li>
+                                            <li class="tag">JavaScript (démo)</li>
+                                        </ul>
+
+                                        <dl class="project-card__story">
+                                            <dt class="project-card__label">Objectif</dt>
+                                            <dd class="project-card__text">Chiffrer et déchiffrer un message avec César (décalage fixe) et Vigenère (décalage donné par un mot-clé), et retrouver seul la clé d'un César par l'analyse des fréquences.</dd>
+                                            <dt class="project-card__label">Ce que j'en retiens</dt>
+                                            <dd class="project-card__text">Exercice de la piscine Python. Le modulo fait boucler l'alphabet de « z » à « a », et déchiffrer revient à décaler dans l'autre sens : une seule fonction sert aux deux opérations. Pour casser César, j'ai réutilisé la comparaison de fréquences du détecteur de langue : essayer les 26 clés et garder le texte le plus proche du français.</dd>
+                                        </dl>
+
+                                        <div class="project-card__actions">
+                                            <a class="button" href="https://github.com/Axel-FOLLET/Axou/tree/main/piscine_python/chiffrement" target="_blank" rel="noopener noreferrer">Code source</a>
+                                            <button class="button project-card__toggle" type="button" aria-expanded="false" aria-controls="demo-cipher" data-label-open="Tester" data-label-close="Masquer la démo">Tester</button>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <!-- Démo : project-demos.js recalcule le résultat à chaque saisie -->
+                                <div class="project-card__stage demo demo--cipher" id="demo-cipher" hidden>
+
+                                    <div class="form__row">
+                                        <div class="form__field">
+                                            <label class="form__label" for="cipher-method">Méthode</label>
+                                            <select class="form__input demo__select" id="cipher-method" data-cipher-method>
+                                                <option value="caesar">César</option>
+                                                <option value="vigenere">Vigenère</option>
+                                            </select>
+                                        </div>
+                                        <div class="form__field">
+                                            <label class="form__label" for="cipher-direction">Opération</label>
+                                            <select class="form__input demo__select" id="cipher-direction" data-cipher-direction>
+                                                <option value="1">Chiffrer</option>
+                                                <option value="-1">Déchiffrer</option>
+                                            </select>
+                                        </div>
+                                        <div class="form__field">
+                                            <label class="form__label" for="cipher-key">Clé</label>
+                                            <input class="form__input" id="cipher-key" type="text" value="3" autocomplete="off" spellcheck="false" aria-describedby="cipher-key-hint cipher-key-error" data-cipher-key>
+                                            <p class="demo__hint" id="cipher-key-hint" data-cipher-hint></p>
+                                            <p class="form__error" id="cipher-key-error" aria-live="polite" data-cipher-error></p>
+                                        </div>
+                                    </div>
+
+                                    <div class="form__field">
+                                        <label class="form__label" for="cipher-text">Texte</label>
+                                        <textarea class="form__input form__input--area demo__input" id="cipher-text" rows="3">Rendez-vous demain à la bibliothèque, près de la fenêtre.</textarea>
+                                    </div>
+
+                                    <div class="form__field">
+                                        <label class="form__label" for="cipher-result">Résultat</label>
+                                        <output class="demo__output" id="cipher-result" for="cipher-method cipher-direction cipher-key cipher-text"></output>
+                                    </div>
+
+                                    <p class="demo__note" id="cipher-message" aria-live="polite"></p>
+
+                                    <div class="demo__actions">
+                                        <button class="button" type="button" data-cipher-swap>Repartir du résultat</button>
+                                        <button class="button" type="button" data-cipher-crack hidden>Trouver la clé</button>
+                                    </div>
+
+                                </div>
+
+                            </article>
+
+                            <article class="project-card">
+
+                                <div class="project-card__main">
+
+                                    <div class="project-card__media">
+                                        <button
+                                            class="cube cube--small cube--blue"
+                                            type="button"
+                                            aria-label="Faire tourner le cube"
+                                            data-speed="18"
+                                            data-phase="310"
+                                        ></button>
+                                    </div>
+
+                                    <div class="project-card__body">
+
+                                        <h3 class="project-card__title">Détecteur de langue</h3>
+
+                                        <ul class="project-card__tags" aria-label="Compétences et technologies">
+                                            <li class="tag">Python</li>
+                                            <li class="tag">Dictionnaires</li>
+                                            <li class="tag">Statistiques</li>
+                                            <li class="tag">Unicode</li>
+                                            <li class="tag">JavaScript (démo)</li>
+                                        </ul>
+
+                                        <dl class="project-card__story">
+                                            <dt class="project-card__label">Objectif</dt>
+                                            <dd class="project-card__text">Reconnaître la langue d'un texte parmi dix, en comparant la fréquence de ses lettres aux fréquences connues de chaque langue.</dd>
+                                            <dt class="project-card__label">Ce que j'en retiens</dt>
+                                            <dd class="project-card__text">Exercice de la piscine Python, sans dictionnaire : seules les lettres comptent. Une méthode statistique a besoin de volume : fiable dès deux phrases, elle hésite sur quelques mots. Les accents faussaient aussi le comptage ; je les ramène à leur lettre de base avant l'analyse. La démo reprend le programme Python, porté en JavaScript.</dd>
+                                        </dl>
+
+                                        <div class="project-card__actions">
+                                            <a class="button" href="https://github.com/Axel-FOLLET/Axou/tree/main/piscine_python/detecteur_de_langue" target="_blank" rel="noopener noreferrer">Code source</a>
+                                            <button class="button project-card__toggle" type="button" aria-expanded="false" aria-controls="demo-language" data-label-open="Tester" data-label-close="Masquer la démo">Tester</button>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <!-- Démo : project-demos.js recalcule le classement à chaque saisie -->
+                                <div class="project-card__stage demo demo--language" id="demo-language" hidden>
+
+                                    <div class="form__field">
+                                        <label class="form__label" for="language-text">Texte à analyser</label>
+                                        <textarea class="form__input form__input--area demo__input" id="language-text" rows="4" placeholder="Quelques phrases en français, anglais, espagnol, portugais, italien, allemand, néerlandais, suédois, polonais ou turc."></textarea>
+                                        <p class="demo__hint">Au moins 80 lettres pour un résultat fiable : la méthode repose sur des statistiques.</p>
+                                    </div>
+
+                                    <p class="demo__verdict" aria-live="polite"></p>
+                                    <ol class="demo__ranking"></ol>
+                                    <p class="demo__note"></p>
+
+                                    <div class="demo__actions">
+                                        <button class="button demo__example" type="button">Charger un exemple</button>
+                                    </div>
+
+                                </div>
+
+                            </article>
+
+                        </div>
+
+                    </section>
+
+                    <!-- -------------------- FUTURS PROJETS -------------------- -->
+
+                    <!-- Pas encore de thème : un onglet vide et invisible garde la carte à la taille et à la hauteur des autres. -->
+                    <div class="showcase__theme showcase__theme--untitled">
+
+                        <span class="showcase__tab" aria-hidden="true">&nbsp;</span>
+
+                        <div class="showcase__cards">
+
+                            <article class="project-card project-card--upcoming">
+
+                                <button
+                                    class="cube cube--small cube--white"
+                                    type="button"
+                                    aria-label="Faire tourner le cube"
+                                    data-speed="20"
+                                    data-phase="40"
+                                ></button>
+
+                                <h3 class="project-card__title">Prochains projets</h3>
+
+                                <p class="project-card__text">
+                                    Les projets Epitech des prochains mois viendront ici, au fil de ma découverte des différents domaines de l'informatique. Leur thème reste à écrire.
+                                </p>
+
+                            </article>
 
                         </div>
 
                     </div>
 
-                </article>
+                </div>
 
-                <article class="project-card">
-
-                    <div class="project-card__media">
-                        <button
-                            class="cube cube--medium cube--blue "
-                            type="button"
-                            aria-label="Faire tourner le cube"
-                            data-speed="18"
-                            data-phase="310"
-                        ></button>
-                    </div>
-
-                    <div class="project-card__body">
-
-                        <h3 class="project-card__title">Détecteur de langue</h3>
-
-                        <dl class="project-card__details">
-
-                            <dt class="project-card__label">Contexte</dt>
-                            <dd class="project-card__text">Exercice de la piscine Python : identifier la langue d'un texte sans dictionnaire, à partir de ses seules lettres.</dd>
-
-                            <dt class="project-card__label">Objectif</dt>
-                            <dd class="project-card__text project-card__text--goal">Reconnaître la langue d'un texte parmi dix, en comparant la fréquence de ses lettres aux fréquences connues de chaque langue.</dd>
-
-                            <dt class="project-card__label">Ce que j'en retiens</dt>
-                            <dd class="project-card__text">Une méthode statistique a besoin de volume : fiable dès deux phrases, elle hésite sur quelques mots. Les accents faussaient aussi le comptage ; je les ramène à leur lettre de base avant l'analyse. La démo reprend le programme Python, porté en JavaScript.</dd>
-
-                            <dt class="project-card__label">Compétences et technologies</dt>
-                            <dd class="project-card__text">
-                                <ul class="project-card__tags">
-                                <li class="tag">Python</li>
-                                <li class="tag">Dictionnaires</li>
-                                <li class="tag">Statistiques</li>
-                                <li class="tag">Unicode</li>
-                                <li class="tag">JavaScript (démo)</li>
-                                </ul>
-                            </dd>
-
-                        </dl>
-
-                        <div class="project-card__actions">
-                            <a class="button" href="https://github.com/Axel-FOLLET/Axou/tree/main/piscine_python/detecteur_de_langue" target="_blank" rel="noopener noreferrer">Code source sur GitHub</a>
-                            <button class="button project-card__demo-toggle" type="button" aria-expanded="false" aria-controls="demo-language" data-label-open="Tester" data-label-close="Masquer la démo">Tester</button>
-                        </div>
-
-                        <!-- Démo : project-demos.js recalcule le classement à chaque saisie -->
-                        <div class="demo demo--language" id="demo-language" hidden>
-
-                            <div class="form__field">
-                                <label class="form__label" for="language-text">Texte à analyser</label>
-                                <textarea class="form__input form__input--area demo__input" id="language-text" rows="4" placeholder="Quelques phrases en français, anglais, espagnol, portugais, italien, allemand, néerlandais, suédois, polonais ou turc."></textarea>
-                                <p class="demo__hint">Au moins 80 lettres pour un résultat fiable : la méthode repose sur des statistiques.</p>
-                            </div>
-
-                            <p class="demo__verdict" aria-live="polite"></p>
-                            <ol class="demo__ranking"></ol>
-                            <p class="demo__note"></p>
-
-                            <div class="demo__actions">
-                                <button class="button demo__example" type="button">Charger un exemple</button>
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </article>
-
-                <!-- -------------------- FUTURS PROJETS -------------------- -->
-
-                <article class="project-card project-card--placeholder">
-
-                    <div class="project-card__media">
-                        <button
-                    class="cube cube--small cube--white "
-                    type="button"
-                    aria-label="Faire tourner le cube"
-                    data-speed="20"
-                    data-phase="40"
-                ></button>
-                    </div>
-
-                    <div class="project-card__body">
-                        <h3 class="project-card__title">Prochains projets</h3>
-                        <p class="project-card__text">
-                            Les projets Epitech des prochains mois viendront ici, au fil de ma découverte des différents domaines de l'informatique.
-                        </p>
-                    </div>
-
-                </article>
+                <!-- Bulle reliée à la carte active : project-showcase.js y recopie son objectif et ce que j'en retiens. -->
+                <div class="showcase__bubble" aria-hidden="true" hidden>
+                    <p class="showcase__bubble-eyebrow"></p>
+                    <div class="showcase__bubble-content"></div>
+                </div>
 
             </div>
 
@@ -558,49 +592,6 @@
         </p>
 
     </footer>
-
-    <div
-        id="game-modal"
-        class="game-modal"
-        aria-hidden="true"
-    >
-        <button
-            class="game-modal__backdrop"
-            type="button"
-            data-game-close
-            aria-label="Fermer le jeu"
-        ></button>
-
-        <div
-            class="game-modal__dialog"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="game-modal-title"
-        >
-            <div class="game-modal__header">
-                <h2 id="game-modal-title">Jeu</h2>
-
-                <button
-                    id="game-modal-close"
-                    class="game-modal__close"
-                    type="button"
-                    data-game-close
-                    aria-label="Fermer le jeu"
-                >
-                    ×
-                </button>
-            </div>
-
-            <!-- L'iframe héberge son propre document et ses commandes clavier. Son adresse est choisie au clic ; about:blank décharge le jeu à la fermeture. -->
-            <div class="game-modal__content">
-                <iframe
-                    id="game-frame"
-                    title="Jeu jouable"
-                    src="about:blank"
-                 class="game-modal__frame"></iframe>
-            </div>
-        </div>
-    </div>
 
 </body>
 

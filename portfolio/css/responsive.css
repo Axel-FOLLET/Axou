@@ -56,12 +56,6 @@
     }
 
 
-    /* -------------------- PROJETS -------------------- */
-    .project-card {
-        grid-template-columns: 1fr;
-    }
-
-
     /* -------------------- PARCOURS -------------------- */
     .banner {
         margin: 0;
@@ -145,11 +139,6 @@
 
 
     /* -------------------- SECTIONS -------------------- */
-    .project-card__body {
-        padding: 24px 20px;
-    }
-
-
     .banner__intro {
         padding: 26px 20px;
     }
@@ -187,7 +176,6 @@
     les déplacements sont supprimés (JavaScript arrête aussi les cubes).
     Moins de mouvement ne veut pas dire aucun retour :
     les changements de couleur restent pour confirmer le survol et le clic.
-    La fenêtre des jeux est traitée dans game-modal.css, chargé après ce fichier.
 */
 @media (prefers-reduced-motion: reduce) {
 
@@ -205,9 +193,7 @@
     .challenge:hover,
     .challenge:focus-within,
     .link-card:hover,
-    .link-card:focus-within,
-    .project-card:not(.project-card--placeholder):hover,
-    .project-card:not(.project-card--placeholder):focus-within {
+    .link-card:focus-within {
         transform: none;
     }
 

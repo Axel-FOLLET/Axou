@@ -170,7 +170,15 @@
 /*
     Révélation : timeline.js ajoute timeline--animated, puis timeline__step--visible
     à chaque étape que la flèche atteint. Le texte glisse depuis la droite, vers la flèche.
+    overflow-x: clip coupe le décalage de départ : sans lui, les blocs pas encore révélés
+    dépassaient du bord sur téléphone et le navigateur dézoomait toute la page.
+    Contrairement à hidden, clip ne crée pas de zone de défilement.
 */
+.timeline--animated {
+    overflow-x: clip;
+}
+
+
 .timeline--animated .timeline__content {
     opacity: 0;
     translate: 24px 0;
