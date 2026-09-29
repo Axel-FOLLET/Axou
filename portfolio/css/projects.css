@@ -44,8 +44,6 @@
     letter-spacing: 0.2rem;
 
     text-transform: uppercase;
-
-    opacity: 0.85;
 }
 
 
@@ -326,7 +324,8 @@
 
     border: 1px solid var(--white);
 
-    background-color: var(--veil-strong);
+    /* Voile léger : ajouté à celui du classeur, le texte blanc garde un contraste de 4,6 */
+    background-color: rgba(255, 255, 255, 0.04);
 
     scroll-snap-align: start;
 
@@ -900,7 +899,8 @@
 
     border: 1px solid var(--white);
 
-    background-color: var(--veil-strong);
+    /* Voile léger : le texte blanc garde un contraste de 4,7 sur le rouge */
+    background-color: rgba(255, 255, 255, 0.08);
 }
 
 

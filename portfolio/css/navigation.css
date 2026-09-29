@@ -90,7 +90,7 @@
 }
 
 
-/* Le visage est agrandi et recadré dans le rond */
+/* Photo déjà recadrée sur le visage (80 × 80 px) : elle remplit simplement le rond */
 .header__photo {
     display: block;
 
@@ -98,9 +98,6 @@
     height: 100%;
 
     object-fit: cover;
-    object-position: 50% 30%;
-
-    transform: scale(1.25);
 }
 
 
@@ -182,7 +179,7 @@
 }
 
 
-/* Liens simples sans soulignement ; cible de 44 px de haut */
+/* Liens simples sans soulignement, en blanc pur (contraste 4,98 sur le rouge) ; cible de 44 px de haut */
 .header__link {
     display: inline-flex;
     align-items: center;
@@ -193,7 +190,7 @@
 
     border-radius: 3px;
 
-    color: rgba(255, 255, 255, 0.85);
+    color: var(--white);
 
     font-weight: 500;
     text-decoration: none;
@@ -204,8 +201,9 @@
 }
 
 
+/* Survol : léger voile, le texte blanc garde un contraste suffisant */
 .header__link:hover {
-    color: var(--white);
+    background-color: rgba(255, 255, 255, 0.08);
 }
 
 

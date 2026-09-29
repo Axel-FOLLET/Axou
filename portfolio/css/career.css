@@ -1,7 +1,11 @@
 /* -------------------- PAGE PARCOURS : BANDEAU BLEU -------------------- */
 
-/* Bandeau bleu d'un bord à l'autre de l'écran ; son texte reste aligné sur la colonne des sections */
+/*
+ * Bandeau bleu d'un bord à l'autre de l'écran ; son texte reste aligné sur la colonne des sections.
+ * Une fine bande rouge le sépare du pied de page.
+ */
 .banner {
+    margin-bottom: 24px;
     padding: 56px var(--gutter);
 
     background-color: var(--blue);
