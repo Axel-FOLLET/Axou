@@ -335,6 +335,22 @@ textarea:focus-visible {
 }
 
 
+/* -------------------- FENÊTRE DES JEUX -------------------- */
+
+/*
+ * Le jeu est réservé à l'ordinateur : game-modal.css n'est chargé qu'au-dessus de 1024 px
+ * (attribut media du <link>), pour ne pas retarder l'affichage sur téléphone et tablette.
+ * En dessous, la fenêtre reste masquée ici, dans un fichier toujours chargé.
+ */
+@media (max-width: 1024px) {
+
+    .game-modal {
+        display: none;
+    }
+
+}
+
+
 /* -------------------- TEXTE POUR LECTEURS D'ÉCRAN -------------------- */
 
 /*

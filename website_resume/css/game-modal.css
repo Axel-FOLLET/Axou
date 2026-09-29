@@ -203,21 +203,3 @@ body.page--game-open {
 
     background-color: #0D0A9B;
 }
-
-
-/* -------------------- TABLETTE + TÉLÉPHONE -------------------- */
-
-/*
-    Le jeu navigateur est volontairement réservé à la version ordinateur :
-    projects.css remplace le bouton par la mention « Jouable sur ordinateur ».
-*/
-/*
- * Cette condition se base sur la largeur de la fenêtre en pixels CSS, pas sur le type d'appareil.
- */
-@media (max-width: 1024px) {
-
-    .game-modal {
-        display: none !important;
-    }
-
-}
