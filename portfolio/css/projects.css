@@ -194,6 +194,14 @@
 }
 
 
+/* Consigne permanente sous un champ ; l'erreur éventuelle (.form__error) s'affiche juste en dessous */
+.demo__hint {
+    margin: 8px 0 0;
+
+    font-size: 0.9rem;
+}
+
+
 .demo__verdict {
     margin: 0;
 

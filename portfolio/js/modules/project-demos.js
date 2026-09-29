@@ -15,8 +15,10 @@ const TEXTS = {
         verdict: "Langue probable :",
         gap: "écart",
         shortText: count => `Texte court (${count} lettres) : ajoutez une ou deux phrases pour un résultat plus sûr.`,
-        caesarKeyError: "La clé de César est un nombre entier (ex. : 3).",
-        vigenereKeyError: "La clé de Vigenère est un mot, sans accents, espaces ni chiffres (ex. : EPITECH).",
+        caesarKeyHint: "César : chiffres uniquement (ex. : 3).",
+        vigenereKeyHint: "Vigenère : lettres uniquement, sans accents (ex. : EPITECH).",
+        caesarKeyError: "Clé invalide : la clé de César ne contient que des chiffres.",
+        vigenereKeyError: "Clé invalide : la clé de Vigenère ne contient que des lettres, sans accents, espaces ni chiffres.",
         foundKey: key => `Clé trouvée : ${key}, celle qui donne le texte le plus proche du français.`
     },
     en: {
@@ -27,8 +29,10 @@ const TEXTS = {
         verdict: "Probable language:",
         gap: "gap",
         shortText: count => `Short text (${count} letters): add a sentence or two for a more reliable result.`,
-        caesarKeyError: "The Caesar key is a whole number (e.g. 3).",
-        vigenereKeyError: "The Vigenère key is a word, without accents, spaces or digits (e.g. EPITECH).",
+        caesarKeyHint: "Caesar: digits only (e.g. 3).",
+        vigenereKeyHint: "Vigenère: letters only, no accents (e.g. EPITECH).",
+        caesarKeyError: "Invalid key: a Caesar key contains digits only.",
+        vigenereKeyError: "Invalid key: a Vigenère key contains letters only, without accents, spaces or digits.",
         foundKey: key => `Key found: ${key}, the one that gives the text closest to English.`
     }
 };
@@ -129,6 +133,8 @@ function initCipherDemo(demo, texts, language) {
     const key = demo.querySelector("[data-cipher-key]");
     const input = demo.querySelector(".demo__input");
     const output = demo.querySelector(".demo__output");
+    const hint = demo.querySelector("[data-cipher-hint]");
+    const keyError = demo.querySelector("[data-cipher-error]");
     const message = demo.querySelector(".demo__note");
     const swapButton = demo.querySelector("[data-cipher-swap]");
     const crackButton = demo.querySelector("[data-cipher-crack]");
@@ -136,16 +142,21 @@ function initCipherDemo(demo, texts, language) {
     /*
      * Retourne le message d'erreur de la clé, ou une chaîne vide si elle est valide.
      */
-    function keyError() {
-        if (method.value === "caesar") return /^-?\d+$/.test(key.value.trim()) ? "" : texts.caesarKeyError;
+    function checkKey() {
+        if (method.value === "caesar") return /^\d+$/.test(key.value.trim()) ? "" : texts.caesarKeyError;
         return isValidVigenereKey(key.value.trim()) ? "" : texts.vigenereKeyError;
     }
 
+    /*
+     * L'erreur s'affiche sous le champ dès la frappe ; le résultat est vidé tant que la clé est invalide.
+     */
     function update() {
         crackButton.hidden = !(method.value === "caesar" && direction.value === "-1");
-        const error = keyError();
+        hint.textContent = method.value === "caesar" ? texts.caesarKeyHint : texts.vigenereKeyHint;
+        message.textContent = "";
+        const error = checkKey();
         key.setAttribute("aria-invalid", String(Boolean(error)));
-        message.textContent = error;
+        keyError.textContent = error;
         if (error) {
             output.value = "";
             return;
@@ -155,7 +166,15 @@ function initCipherDemo(demo, texts, language) {
         output.value = cipher(input.value, cipherKey, Number(direction.value));
     }
 
-    [method, direction, key, input].forEach(field => field.addEventListener("input", update));
+    [direction, key, input].forEach(field => field.addEventListener("input", update));
+
+    /*
+     * Changer de méthode propose une clé d'exemple valide : "3" ne convient pas à Vigenère, "EPITECH" pas à César.
+     */
+    method.addEventListener("input", () => {
+        key.value = method.value === "caesar" ? "3" : "EPITECH";
+        update();
+    });
 
     /*
      * Reprend le résultat comme nouveau texte et inverse l'opération : pratique pour vérifier l'aller-retour.
