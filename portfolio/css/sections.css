@@ -3,30 +3,62 @@
 .section {
     position: relative;
 
-    padding: 100px 8%;
+    padding: var(--space-section) var(--gutter);
 }
 
 
+/* Sur-titre : petit, espacé, légèrement atténué pour laisser la place au titre */
 .section__eyebrow {
-    margin: 0 0 10px;
+    margin: 0 0 14px;
 
-    font-size: 0.9rem;
-    letter-spacing: 0.1rem;
+    font-size: 0.8rem;
+    font-weight: bold;
+    letter-spacing: 0.2rem;
+
+    opacity: 0.85;
 }
 
 
+/* Gros titre resserré : les lettres se rapprochent quand la taille augmente */
 .section__title {
     margin: 0 0 30px;
 
     /* Taille progressive entre 2.2rem (téléphone) et 3rem (ordinateur) */
     font-size: clamp(2.2rem, 5vw, 3rem);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
 }
 
 
+/* 65 caractères par ligne environ : la longueur de lecture la plus confortable */
 .section__intro {
-    max-width: 760px;
+    max-width: 65ch;
 
     margin: 0 0 40px;
+
+    font-size: 1.1rem;
+}
+
+
+/* -------------------- APPARITION AU DÉFILEMENT -------------------- */
+
+/*
+    Classes ajoutées par reveal.js. translate: none à l'arrivée plutôt que 0 :
+    la partie redevient un élément ordinaire, sans nouveau repère pour ses enfants.
+*/
+.reveal {
+    opacity: 0;
+    translate: 0 32px;
+
+    transition:
+        opacity 0.8s ease,
+        translate 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+
+.reveal--visible {
+    opacity: 1;
+    translate: none;
 }
 
 

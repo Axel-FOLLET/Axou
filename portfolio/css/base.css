@@ -23,6 +23,19 @@
 }
 
 
+/* -------------------- ESPACEMENTS -------------------- */
+
+/*
+    Même rythme sur toutes les pages : chaque partie, l'accueil et le pied de page
+    utilisent ces deux valeurs. --gutter passe à 6 % sur tablette (responsive.css).
+*/
+:root {
+    /* Espace vertical d'une partie : 72px sur téléphone, 120px sur grand écran */
+    --space-section: clamp(72px, 10vw, 120px);
+    --gutter: 8%;
+}
+
+
 /* -------------------- BASE -------------------- */
 
 * {
@@ -118,6 +131,26 @@ body {
     line-height: 1.6;
 
     overflow-x: hidden;
+}
+
+
+/*
+    Fond de toutes les pages : le rouge adouci par la lumière.
+    Une lueur plus claire derrière le titre, puis un rouge qui s'approfondit vers le bas.
+    fixed : le fond reste en place pendant que la page défile.
+*/
+body::before {
+    content: "";
+
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+
+    background:
+        radial-gradient(70vw 45vw at 30% 0%, rgba(255, 70, 80, 0.45), transparent 70%),
+        linear-gradient(180deg, transparent 30%, rgba(80, 0, 10, 0.35));
+
+    pointer-events: none;
 }
 
 

@@ -46,6 +46,8 @@
     align-items: center;
 
     padding: 24px 48px;
+
+    transition: padding 0.3s ease;
 }
 
 
@@ -54,6 +56,8 @@
     align-items: center;
 
     gap: 12px;
+
+    transition: padding 0.3s ease;
 }
 
 
@@ -66,6 +70,10 @@
     overflow: hidden;
 
     border-radius: 50%;
+
+    transition:
+        width 0.3s ease,
+        height 0.3s ease;
 }
 
 
@@ -89,6 +97,50 @@
     letter-spacing: 0.15rem;
 
     text-decoration: none;
+
+    transition: font-size 0.3s ease;
+}
+
+
+/*
+    En-tête compact, ajouté par navigation.js après quelques pixels de défilement :
+    marges réduites, photo et initiales plus petites, plus de place pour le contenu.
+    Sur ordinateur, seul le haut rétrécit : les onglets restent posés sur le bas de l'en-tête.
+*/
+.header--compact .header__nav {
+    padding-top: 10px;
+}
+
+
+.header--compact .header__avatar {
+    width: 32px;
+    height: 32px;
+}
+
+
+.header--compact .header__logo {
+    font-size: 1.25rem;
+}
+
+
+@media (max-width: 1024px) {
+
+    .header--compact .header__nav {
+        padding-bottom: 10px;
+    }
+
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+
+    .header__nav,
+    .header__identity,
+    .header__avatar,
+    .header__logo {
+        transition: none;
+    }
+
 }
 
 

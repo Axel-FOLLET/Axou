@@ -7,7 +7,7 @@
     align-items: center;
     justify-content: space-between;
 
-    padding: 60px 8% 100px;
+    padding: 60px var(--gutter) var(--space-section);
 }
 
 

@@ -38,11 +38,13 @@ function clearFieldError(field) {
 
 /*
  * validity est fourni par le navigateur à partir de required et type="email".
+ * Un champ correct et rempli reçoit une coche (form__input--valid).
  */
 function checkField(field, form) {
     if (field.validity.valueMissing) showFieldError(field, form.dataset.invalidRequired);
     else if (field.validity.typeMismatch) showFieldError(field, form.dataset.invalidEmail);
     else clearFieldError(field);
+    field.classList.toggle("form__input--valid", field.validity.valid && field.value.trim() !== "");
 }
 
 
@@ -88,17 +90,25 @@ async function sendForm(form) {
 
 
 /*
- * Pendant l'envoi, le bouton est désactivé pour éviter un double envoi.
- * Le message d'état (role="status") est lu par les lecteurs d'écran.
+ * Pendant l'envoi, le bouton est désactivé pour éviter un double envoi et affiche une roue.
+ * Le message d'état (role="status") est lu par les lecteurs d'écran ; sa classe choisit
+ * l'encadré de confirmation ou d'erreur.
  */
 function watchSubmit(form, status, submitButton) {
     form.addEventListener("submit", async event => {
         event.preventDefault();
         submitButton.disabled = true;
+        submitButton.classList.add("button--loading");
+        status.className = "form__status";
         status.textContent = form.dataset.sending;
         const isSent = await sendForm(form);
         status.textContent = isSent ? form.dataset.success : form.dataset.error;
-        if (isSent) form.reset();
+        status.classList.add(isSent ? "form__status--success" : "form__status--error");
+        if (isSent) {
+            form.reset();
+            form.querySelectorAll(".form__input--valid").forEach(field => field.classList.remove("form__input--valid"));
+        }
+        submitButton.classList.remove("button--loading");
         submitButton.disabled = false;
     });
 }

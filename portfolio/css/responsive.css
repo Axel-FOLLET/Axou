@@ -2,6 +2,11 @@
 
 @media (max-width: 1024px) {
 
+    :root {
+        --gutter: 6%;
+    }
+
+
     .header__nav {
         padding: 20px 32px;
     }
@@ -12,7 +17,7 @@
         flex-direction: column;
         align-items: flex-start;
 
-        padding: 50px 6% 80px;
+        padding-top: 50px;
     }
 
 
@@ -35,11 +40,6 @@
 
 
     /* -------------------- SECTIONS -------------------- */
-    .section {
-        padding: 80px 6%;
-    }
-
-
     /*
         Sur tablette, les cubes de coin quittent leur position
         absolue pour éviter de recouvrir le texte.

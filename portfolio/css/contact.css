@@ -93,8 +93,28 @@
 }
 
 
+/*
+    Champ correct et rempli : une coche blanche à droite (image SVG écrite dans l'URL).
+    Le padding droit empêche le texte de passer sous la coche.
+*/
+.form__input--valid {
+    padding-right: 44px;
+
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M2 8.5l4 4 8-9' fill='none' stroke='white' stroke-width='2'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    background-size: 16px;
+}
+
+
 .form__input--area {
     resize: vertical;
+}
+
+
+/* Zone de message : la coche reste en haut, près de la première ligne */
+.form__input--area.form__input--valid {
+    background-position: right 16px top 18px;
 }
 
 
@@ -112,6 +132,101 @@
     margin: 20px 0 0;
 
     font-weight: bold;
+}
+
+
+/* Résultat de l'envoi : un encadré qui apparaît en remontant, avec ✓ ou ! devant le texte */
+.form__status--success,
+.form__status--error {
+    display: flex;
+    align-items: center;
+
+    gap: 14px;
+
+    padding: 14px 18px;
+
+    border: 1px solid var(--white);
+
+    background-color: var(--veil-strong);
+
+    animation: status-in 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+
+.form__status--success::before,
+.form__status--error::before {
+    flex: 0 0 auto;
+
+    display: grid;
+    place-items: center;
+
+    width: 28px;
+    height: 28px;
+
+    border-radius: 50%;
+
+    background-color: var(--white);
+    color: var(--blue);
+}
+
+
+/* Après « / », le texte lu par les lecteurs d'écran : vide, le symbole est décoratif */
+.form__status--success::before {
+    content: "✓";
+    content: "✓" / "";
+}
+
+
+.form__status--error::before {
+    content: "!";
+    content: "!" / "";
+}
+
+
+@keyframes status-in {
+    from {
+        opacity: 0;
+        translate: 0 8px;
+    }
+}
+
+
+/* Roue affichée dans le bouton pendant l'envoi */
+.button--loading::after {
+    content: "";
+
+    display: inline-block;
+
+    width: 14px;
+    height: 14px;
+
+    margin-left: 10px;
+
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+
+    vertical-align: -2px;
+
+    animation: spin 0.8s linear infinite;
+}
+
+
+@keyframes spin {
+    to {
+        rotate: 360deg;
+    }
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+
+    .form__status--success,
+    .form__status--error,
+    .button--loading::after {
+        animation: none;
+    }
+
 }
 
 

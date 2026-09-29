@@ -4,15 +4,16 @@
  * pour y afficher le jeu ou la démo, sans ouvrir de nouvelle fenêtre.
  * Sans ce module, la bande défile quand même et chaque carte garde tout son texte.
  */
+import { initProjectFilter } from "./project-filter.js";
 
 /*
  * En dessous de 6 px, un appui à la souris reste un clic et ne fait pas glisser la bande.
  */
 const DRAG_THRESHOLD = 6;
 /*
- * Évasement du raccord de chaque côté, en pixels, entre le bas de la carte et la bulle.
+ * Largeur visible minimale de la carte active, en pixels, pour que la flèche de la bulle la désigne.
  */
-const NECK_FLARE = 18;
+const POINTER_MIN_WIDTH = 48;
 /*
  * Délai sans défilement après lequel la bande est considérée comme arrêtée.
  */
@@ -48,7 +49,7 @@ export function initProjectShowcase(language) {
     let drag = null;
     let suppressClick = false;
     let settleTimer = null;
-    let neckFrame = null;
+    let pointerFrame = null;
 
     function scrollBehavior() {
         return reducedMotion.matches ? "auto" : "smooth";
@@ -123,12 +124,12 @@ export function initProjectShowcase(language) {
     /* -------------------- CARTE ACTIVE ET BULLE -------------------- */
 
     /*
-     * Le raccord est un simple bloc découpé en trapèze par clip-path (voir projects.css).
+     * Flèche de la bulle : un petit carré tourné à 45°, posé sur le bord haut de la bulle (voir projects.css).
      */
-    const neck = document.createElement("div");
-    neck.className = "showcase__neck showcase__neck--hidden";
-    neck.setAttribute("aria-hidden", "true");
-    showcase.append(neck);
+    const pointer = document.createElement("div");
+    pointer.className = "showcase__pointer showcase__pointer--hidden";
+    pointer.setAttribute("aria-hidden", "true");
+    showcase.append(pointer);
 
     /*
      * Fait défiler la bande (et la page si besoin) pour caler la carte sur le bord gauche.
@@ -157,14 +158,14 @@ export function initProjectShowcase(language) {
             updateArrows();
         }
         if (scroll) scrollToCard(card);
-        placeNeck();
+        placePointer();
     }
 
     /*
-     * Place le raccord entre la partie visible du bas de la carte active et le haut de la bulle.
+     * Place la flèche sur le bord haut de la bulle, sous le milieu de la partie visible de la carte active.
      * Les positions sont calculées dans le repère de .showcase (position: relative).
      */
-    function placeNeck() {
+    function placePointer() {
         if (!active) return;
         const origin = showcase.getBoundingClientRect();
         const view = track.getBoundingClientRect();
@@ -172,33 +173,26 @@ export function initProjectShowcase(language) {
         const target = bubble.getBoundingClientRect();
         const left = Math.max(card.left, view.left);
         const right = Math.min(card.right, view.right);
-        const height = target.top - card.bottom + 2;
         /*
-         * Carte presque sortie de la bande : le raccord s'efface au lieu de pointer dans le vide.
+         * Carte presque sortie de la bande : la flèche s'efface au lieu de pointer dans le vide.
          */
-        if (right - left < 48 || height <= 0) {
-            neck.classList.add("showcase__neck--hidden");
+        if (right - left < POINTER_MIN_WIDTH) {
+            pointer.classList.add("showcase__pointer--hidden");
             return;
         }
-        const bottomLeft = Math.max(left - NECK_FLARE, target.left + 1);
-        const bottomRight = Math.min(right + NECK_FLARE, target.right - 1);
-        neck.classList.remove("showcase__neck--hidden");
-        neck.style.left = bottomLeft - origin.left + "px";
-        neck.style.top = card.bottom - origin.top - 1 + "px";
-        neck.style.width = bottomRight - bottomLeft + "px";
-        neck.style.height = height + "px";
-        neck.style.setProperty("--neck-top-left", left - bottomLeft + "px");
-        neck.style.setProperty("--neck-top-right", right - bottomLeft + "px");
+        pointer.classList.remove("showcase__pointer--hidden");
+        pointer.style.left = (left + right) / 2 - origin.left + "px";
+        pointer.style.top = target.top - origin.top + "px";
     }
 
     /*
      * Regroupe les recalculs demandés pendant une même image (défilement, redimensionnement).
      */
-    function requestNeck() {
-        if (neckFrame) return;
-        neckFrame = requestAnimationFrame(() => {
-            neckFrame = null;
-            placeNeck();
+    function requestPointer() {
+        if (pointerFrame) return;
+        pointerFrame = requestAnimationFrame(() => {
+            pointerFrame = null;
+            placePointer();
         });
     }
 
@@ -243,7 +237,7 @@ export function initProjectShowcase(language) {
 
     track.addEventListener("scroll", () => {
         showcase.classList.add("showcase--scrolling");
-        requestNeck();
+        requestPointer();
         clearTimeout(settleTimer);
         settleTimer = setTimeout(() => {
             showcase.classList.remove("showcase--scrolling");
@@ -412,9 +406,9 @@ export function initProjectShowcase(language) {
             element.animate(keyframes, { duration: 1400, easing: "ease-in-out" });
         });
         /*
-         * Le raccord relie la bulle, qui ne bouge pas : il s'efface le temps du mouvement.
+         * La flèche est posée sur la bulle, qui ne bouge pas : elle s'efface le temps du mouvement.
          */
-        neck.animate([{ opacity: 1 }, { opacity: 0, offset: 0.1 }, { opacity: 0, offset: 0.9 }, { opacity: 1 }], { duration: 1400 });
+        pointer.animate([{ opacity: 1 }, { opacity: 0, offset: 0.1 }, { opacity: 0, offset: 0.9 }, { opacity: 1 }], { duration: 1400 });
     }
 
     const nudgeObserver = new IntersectionObserver(entries => {
@@ -429,19 +423,20 @@ export function initProjectShowcase(language) {
 
     /*
      * --showcase-width donne sa largeur maximale à une carte agrandie.
-     * Tout changement de taille (fenêtre, carte qui s'agrandit, bulle) replace le raccord.
+     * Tout changement de taille (fenêtre, carte qui s'agrandit, bulle) replace la flèche.
      */
     const resizeObserver = new ResizeObserver(() => {
         showcase.style.setProperty("--showcase-width", track.clientWidth + "px");
-        requestNeck();
+        requestPointer();
         updateArrows();
     });
     resizeObserver.observe(track);
     resizeObserver.observe(bubble);
     cards.forEach(card => resizeObserver.observe(card));
-    window.addEventListener("resize", requestNeck);
+    window.addEventListener("resize", requestPointer);
 
     updateMode();
+    initProjectFilter(showcase, cards, language, card => setActive(card, true));
     showcase.classList.add("showcase--ready");
     bubble.hidden = false;
     setActive(cards[0]);
