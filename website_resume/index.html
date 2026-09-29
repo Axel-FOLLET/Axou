@@ -19,10 +19,15 @@
     <meta property="og:title" content="Axel FOLLET | Curriculum Vitae">
     <meta property="og:description" content="CV d’Axel FOLLET : parcours de la gestion de projets RH vers l’informatique, expériences, compétences, projets et contact.">
     <meta property="og:url" content="https://axel-follet.github.io/website_resume/index.html">
-    <meta property="og:image" content="https://axel-follet.github.io/website_resume/assets/images/profile.jpg">
+    <meta property="og:image" content="https://axel-follet.github.io/website_resume/assets/images/share.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="CV d'Axel FOLLET : Des projets RH aux projets IT : même rigueur, nouveaux outils.">
+    <meta name="twitter:card" content="summary_large_image">
 
     <!-- Ordre de la cascade : base, composants, adaptations responsive, fenêtre des jeux, puis préférences d'accessibilité. -->
     <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/buttons.css">
     <link rel="stylesheet" href="css/navigation.css">
     <link rel="stylesheet" href="css/home.css">
     <link rel="stylesheet" href="css/cubes.css">
@@ -71,8 +76,8 @@
             <div class="navigation__identity">
 
                 <img
-                    src="assets/images/profile.jpg"
-                    alt="Photo de profil Axel FOLLET" width="679" height="1236"
+                    src="assets/images/profile-small.png"
+                    alt="Photo de profil Axel FOLLET" width="80" height="80"
                 >
 
                 <a href="#home">AF</a>
@@ -127,7 +132,7 @@
             <!-- Partie texte principale -->
             <div class="home__text">
 
-                <p>CURRICULUM VITAE / 2026</p>
+                <p class="eyebrow">CURRICULUM VITAE / 2026</p>
 
                 <h1>
                     Axel<br>
@@ -138,14 +143,10 @@
                     Chargé de projets IT chez QUANTEAM
                 </h2>
 
-                <p>
-                    Ce site a été créé par mes soins, en HTML, CSS et JavaScript.
-                    N'hésitez pas à le découvrir !
-                </p>
 
-                <a href="#reconversion">
-                    Découvrir mon parcours
-                </a>
+                <div class="button-group">
+                    <a class="button button--primary" href="#formation">Découvrir mon parcours</a>
+                </div>
 
             </div>
 
@@ -166,49 +167,44 @@
 
 
                 <!-- Petits cubes autour du cube principal -->
-                <button
+                <span
                     class="cube cube--small cube--red home__cube--satellite-1 home__cube"
-                    type="button"
-                    aria-label="Faire tourner le cube"
+                    aria-hidden="true"
                     data-speed="21"
                     data-phase="70"
-                ></button>
+                ></span>
 
-                <button
+                <span
                     class="cube cube--small cube--red home__cube--satellite-2 home__cube"
-                    type="button"
-                    aria-label="Faire tourner le cube"
+                    aria-hidden="true"
                     data-speed="18"
                     data-phase="150"
-                ></button>
+                ></span>
 
-                <button
+                <span
                     class="cube cube--tiny cube--red home__cube--satellite-3 home__cube"
-                    type="button"
-                    aria-label="Faire tourner le cube"
+                    aria-hidden="true"
                     data-speed="23"
                     data-phase="220"
-                ></button>
+                ></span>
 
-                <button
+                <span
                     class="cube cube--tiny cube--red home__cube--satellite-4 home__cube"
-                    type="button"
-                    aria-label="Faire tourner le cube"
+                    aria-hidden="true"
                     data-speed="19"
                     data-phase="290"
-                ></button>
+                ></span>
 
             </div>
 
 
-            <!-- Cube placé en bas de la section -->
-            <button
+            <!-- Cube de transition, en bas à gauche de la section -->
+            <span
                 class="cube cube--tiny cube--red cube--transition"
-                type="button"
-                aria-label="Faire tourner le cube"
+                aria-hidden="true"
                 data-speed="13"
                 data-phase="40"
-            ></button>
+            ></span>
 
         </section>
 
@@ -217,86 +213,56 @@
 
         <section id="formation" class="education">
 
-            <!-- Petit cube décoratif -->
-            <button
-                class="cube cube--tiny cube--red cube--section education__cube"
-                type="button"
-                aria-label="Faire tourner le cube"
-                data-speed="17"
-                data-phase="120"
-            ></button>
 
 
-            <!-- Formation actuelle -->
-            <div class="education__content">
+            <p class="eyebrow">01 / FORMATION</p>
 
-                <p>01 / FORMATION</p>
+            <h2 class="section-title">Parcours académique</h2>
 
-                <h2>
-                    Epitech
-                </h2>
+            <div class="education__list">
 
-                <h3>
-                    Architecte des Systèmes d'Information
-                </h3>
+                <article class="education__card">
 
-                <p>
-                    Parcours en informatique orienté développement,
-                    systèmes et gestion de projets IT.
-                </p>
+                    <p class="education__date">2026 - 2029</p>
 
-                <p>
-                    Ce cursus me permet de développer des compétences
-                    en développement logiciel, architecture des systèmes
-                    d'information et pilotage de projets technologiques.
-                </p>
+                    <h3 class="education__school">Epitech</h3>
 
-                <p>
-                    La pédagogie par projets renforce également mon autonomie,
-                    ma capacité à résoudre des problèmes complexes
-                    et à travailler en équipe.
-                </p>
+                    <p class="education__degree">Architecte des Systèmes d'Information</p>
 
-                <p>
-                    2026 - 2029
-                </p>
+                    <p class="education__text">
+                        Cursus orienté développement logiciel, systèmes et gestion de projets IT.
+                    </p>
+
+                    <p class="education__text">
+                        La pédagogie par projets fait apprendre en construisant : chaque notion est mise en pratique dans un programme rendu et versionné avec Git. Premières étapes : la piscine Python, puis la piscine web.
+                    </p>
+
+                </article>
+
+                <article class="education__card">
+
+                    <p class="education__date">2022 - 2024</p>
+
+                    <h3 class="education__school">Sup des RH & EDC Paris</h3>
+
+                    <p class="education__degree">Double Master - Management du développement RH & Conduite du changement</p>
+
+                    <p class="education__text">
+                        Management des ressources humaines, gestion de projets et conduite du changement, en parallèle de deux années de projets RH chez SFR Distribution.
+                    </p>
+
+                </article>
 
             </div>
 
 
-            <!-- Formation précédente -->
-            <div class="education__content">
-
-                <h2>
-                    Sup des RH & EDC Paris
-                </h2>
-
-                <h3>
-                    Double Master - Management du développement RH
-                    & Conduite du changement
-                </h3>
-
-                <p>
-                    Formation en management des Ressources Humaines,
-                    gestion de projets, accompagnement du changement
-                    et développement des organisations.
-                </p>
-
-                <p>
-                    2022 - 2024
-                </p>
-
-            </div>
-
-
-            <!-- Cube placé en bas de la section -->
-            <button
+            <!-- Cube de transition, en bas à gauche de la section -->
+            <span
                 class="cube cube--tiny cube--red cube--transition"
-                type="button"
-                aria-label="Faire tourner le cube"
+                aria-hidden="true"
                 data-speed="14"
                 data-phase="180"
-            ></button>
+            ></span>
 
         </section>
 
@@ -305,309 +271,204 @@
 
         <section id="experience" class="experience">
 
-            <!-- Petit cube décoratif -->
-            <button
-                class="cube cube--tiny cube--red cube--section experience__cube"
-                type="button"
-                aria-label="Faire tourner le cube"
-                data-speed="18"
-                data-phase="250"
-            ></button>
 
 
-            <p>02 / EXPÉRIENCES</p>
+            <p class="eyebrow">02 / EXPÉRIENCES</p>
 
-            <!-- Titre de section lu par les lecteurs d'écran, invisible à l'écran (le repère ci-dessus reste décoratif) -->
-            <h2 class="visually-hidden">Expériences professionnelles</h2>
+            <h2 class="section-title">Expériences professionnelles</h2>
 
-            <p>
-                Sélectionnez une expérience pour découvrir
-                les outils et compétences associés.
+            <p class="section-intro">
+                Du premier stage à la conduite du changement, étape par étape. Dépliez « Compétences & outils » pour voir ce que chaque poste m'a fait pratiquer.
             </p>
 
+            <!-- Frise chronologique, comme la progression du portfolio : la flèche descend au fil du défilement (timeline.js). Chaque carré porte l'année de début, et celle de fin si elle diffère. -->
+            <ol class="timeline">
 
-            <!-- -------------------- CONTENEUR GLOBAL -------------------- -->
+                <li class="timeline__step" id="experience-enedis">
 
-            <div class="experience__layout">
+                    <span class="timeline__number" aria-hidden="true">2019</span>
 
+                    <article class="timeline__content">
 
-                <!-- -------------------- LISTE DES EXPÉRIENCES -------------------- -->
+                        <p class="timeline__date">Décembre 2019</p>
 
-                <!-- tabindex="0" rend chaque carte atteignable avec Tab ; Entrée ou Espace l'active (experience.js). -->
-                <div class="experience__list">
+                        <h3 class="timeline__title">Enedis</h3>
 
+                        <p class="timeline__role">Assistant RH - Stage</p>
 
-                    <!-- -------------------- SFR -------------------- -->
+                        <p class="timeline__text">
+                            Première expérience professionnelle, au sein d'une équipe RH.
+                        </p>
 
-                    <div class="experience-card" id="experience-sfr" tabindex="0">
+                        <!-- Le bouton déplie la liste qu'il désigne (aria-controls) ; experience.js tient aria-expanded à jour. -->
+                        <button class="timeline__toggle" type="button" aria-expanded="false" aria-controls="skills-enedis">Compétences & outils</button>
 
-                        <div class="experience-card__inner">
+                        <ul class="timeline__skills" id="skills-enedis" hidden>
+                            <li>Première expérience professionnelle</li>
+                            <li>Insertion au domaine RH</li>
+                        </ul>
 
-                            <!-- Recto -->
-                            <div class="experience-card__front">
+                    </article>
 
-                                <h3>SFR Distribution</h3>
+                </li>
 
-                                <h4>
-                                    Chargé de projets RH & Conduite du changement
-                                </h4>
+                <li class="timeline__step" id="experience-natixis">
 
-                                <p>
-                                    Gestion et accompagnement de projets RH,
-                                    conduite du changement et coordination de projets
-                                    pouvant concerner jusqu'à 3 000 collaborateurs.
-                                </p>
+                    <span class="timeline__number" aria-hidden="true">2020</span>
 
-                                <p>
-                                    Communication, conception de formations,
-                                    suivi d'indicateurs de performance,
-                                    reporting et analyse de données sociales.
-                                </p>
+                    <article class="timeline__content">
 
-                                <p>
-                                    Septembre 2022 - Octobre 2024
-                                </p>
+                        <p class="timeline__date">Novembre 2020 - Décembre 2020</p>
 
-                            </div>
+                        <h3 class="timeline__title">Natixis</h3>
 
+                        <p class="timeline__role">Chargé SIRH - Stage</p>
 
-                            <!-- Verso -->
-                            <div class="experience-card__back">
+                        <p class="timeline__text">
+                            Premier projet géré en autonomie : phase de test d'un outil SIRH, en lien entre les équipes RH et SIRH.
+                        </p>
 
-                                <h4>Compétences & outils</h4>
+                        <!-- Le bouton déplie la liste qu'il désigne (aria-controls) ; experience.js tient aria-expanded à jour. -->
+                        <button class="timeline__toggle" type="button" aria-expanded="false" aria-controls="skills-natixis">Compétences & outils</button>
 
-                                <ul>
-                                    <li>Gestion de projets</li>
-                                    <li>Conduite du changement</li>
-                                    <li>Communication et diplomatie</li>
-                                    <li>Conception de formations</li>
-                                    <li>CapCut</li>
-                                    <li>Caption</li>
-                                    <li>edit2Emotions</li>
-                                    <li>Suivi d'indicateurs</li>
-                                    <li>Reporting</li>
-                                    <li>Analyse de données sociales</li>
-                                </ul>
+                        <ul class="timeline__skills" id="skills-natixis" hidden>
+                            <li>Premier projet géré en autonomie</li>
+                            <li>Compréhension d'une phase test dans la création d'un outil</li>
+                            <li>Lien entre l'équipe RH et SIRH</li>
+                        </ul>
 
-                            </div>
+                    </article>
 
-                        </div>
+                </li>
 
-                    </div>
+                <li class="timeline__step" id="experience-ocp">
 
+                    <span class="timeline__number" aria-hidden="true"><span>2021</span><span>2022</span></span>
 
-                    <!-- -------------------- BPCE IT -------------------- -->
+                    <article class="timeline__content">
 
-                    <div class="experience-card" id="experience-bpce" tabindex="0">
+                        <p class="timeline__date">Septembre 2021 - Février 2022</p>
 
-                        <div class="experience-card__inner">
+                        <h3 class="timeline__title">OCP Répartition</h3>
 
-                            <!-- Recto -->
-                            <div class="experience-card__front">
+                        <p class="timeline__role">Chargé de recrutement</p>
 
-                                <h3>BPCE Infogérance et Technologies</h3>
+                        <p class="timeline__text">
+                            Sourcing, préqualifications téléphoniques, entretiens et suivi des recrutements.
+                        </p>
 
-                                <h4>
-                                    Chargé de recrutement
-                                </h4>
+                        <p class="timeline__text">
+                            Participation à la conception d'un outil de préparation et de suivi des recrutements sous SmartRecruiters, et formation des managers.
+                        </p>
 
-                                <p>
-                                    Gestion de la campagne d'alternance
-                                    et recrutement de 52 alternants sur des profils IT.
-                                </p>
+                        <!-- Le bouton déplie la liste qu'il désigne (aria-controls) ; experience.js tient aria-expanded à jour. -->
+                        <button class="timeline__toggle" type="button" aria-expanded="false" aria-controls="skills-ocp">Compétences & outils</button>
 
-                                <p>
-                                    Interface avec les établissements scolaires,
-                                    suivi des tableaux de bord, reporting
-                                    et communication autour de la campagne.
-                                </p>
+                        <ul class="timeline__skills" id="skills-ocp" hidden>
+                            <li>Sourcing</li>
+                            <li>SmartRecruiters</li>
+                            <li>APEC</li>
+                            <li>Pôle Emploi</li>
+                            <li>Entretiens téléphoniques</li>
+                            <li>Entretiens Microsoft Teams</li>
+                            <li>Suivi des recrutements</li>
+                            <li>Gestion administrative</li>
+                            <li>Formation des managers</li>
+                        </ul>
 
-                                <p>
-                                    Mars 2022 - Juillet 2022
-                                </p>
+                    </article>
 
-                            </div>
+                </li>
 
+                <li class="timeline__step" id="experience-bpce">
 
-                            <!-- Verso -->
-                            <div class="experience-card__back">
+                    <span class="timeline__number" aria-hidden="true">2022</span>
 
-                                <h4>Compétences & outils</h4>
+                    <article class="timeline__content">
 
-                                <ul>
-                                    <li>Gestion de campagne d’alternance</li>
-                                    <li>Recrutement IT</li>
-                                    <li>Travail en autonomie</li>
-                                    <li>Communication LinkedIn</li>
-                                    <li>Tableaux de bord</li>
-                                    <li>Reporting</li>
-                                    <li>Coordination avec les écoles</li>
-                                    <li>Gestion administrative</li>
-                                    <li>Forums recrutement</li>
-                                </ul>
+                        <p class="timeline__date">Mars 2022 - Juillet 2022</p>
 
-                            </div>
+                        <h3 class="timeline__title">BPCE Infogérance et Technologies</h3>
 
-                        </div>
+                        <p class="timeline__role">Chargé de recrutement</p>
 
-                    </div>
+                        <p class="timeline__text">
+                            Pilotage de la campagne d'alternance : 52 alternants recrutés sur des profils IT.
+                        </p>
 
+                        <p class="timeline__text">
+                            Relations avec les écoles, tableaux de bord, reporting et communication sur LinkedIn et en forums de recrutement.
+                        </p>
 
-                    <!-- -------------------- OCP -------------------- -->
+                        <!-- Le bouton déplie la liste qu'il désigne (aria-controls) ; experience.js tient aria-expanded à jour. -->
+                        <button class="timeline__toggle" type="button" aria-expanded="false" aria-controls="skills-bpce">Compétences & outils</button>
 
-                    <div class="experience-card" id="experience-ocp" tabindex="0">
+                        <ul class="timeline__skills" id="skills-bpce" hidden>
+                            <li>Gestion de campagne d’alternance</li>
+                            <li>Recrutement IT</li>
+                            <li>Travail en autonomie</li>
+                            <li>Communication LinkedIn</li>
+                            <li>Tableaux de bord</li>
+                            <li>Reporting</li>
+                            <li>Coordination avec les écoles</li>
+                            <li>Gestion administrative</li>
+                            <li>Forums recrutement</li>
+                        </ul>
 
-                        <div class="experience-card__inner">
+                    </article>
 
-                            <!-- Recto -->
-                            <div class="experience-card__front">
+                </li>
 
-                                <h3>OCP Répartition</h3>
+                <li class="timeline__step" id="experience-sfr">
 
-                                <h4>
-                                    Chargé de recrutement
-                                </h4>
+                    <span class="timeline__number" aria-hidden="true"><span>2022</span><span>2024</span></span>
 
-                                <p>
-                                    Sourcing, préqualifications téléphoniques,
-                                    entretiens et suivi des recrutements.
-                                </p>
+                    <article class="timeline__content">
 
-                                <p>
-                                    Participation au développement d'un outil
-                                    de préparation et de suivi du recrutement
-                                    avec SmartRecruiters.
-                                </p>
+                        <p class="timeline__date">Septembre 2022 - Octobre 2024</p>
 
-                                <p>
-                                    Septembre 2021 - Février 2022
-                                </p>
+                        <h3 class="timeline__title">SFR Distribution</h3>
 
-                            </div>
+                        <p class="timeline__role">Chargé de projets RH & Conduite du changement</p>
 
+                        <p class="timeline__text">
+                            Pilotage et accompagnement de projets RH et de conduite du changement, dont un projet touchant jusqu'à 3 000 collaborateurs.
+                        </p>
 
-                            <!-- Verso -->
-                            <div class="experience-card__back">
+                        <p class="timeline__text">
+                            Conception de formations, communication interne, suivi d'indicateurs, reporting et analyse de données sociales.
+                        </p>
 
-                                <h4>Compétences & outils</h4>
+                        <!-- Le bouton déplie la liste qu'il désigne (aria-controls) ; experience.js tient aria-expanded à jour. -->
+                        <button class="timeline__toggle" type="button" aria-expanded="false" aria-controls="skills-sfr">Compétences & outils</button>
 
-                                <ul>
-                                    <li>Sourcing</li>
-                                    <li>SmartRecruiters</li>
-                                    <li>APEC</li>
-                                    <li>Pôle Emploi</li>
-                                    <li>Entretiens téléphoniques</li>
-                                    <li>Entretiens Microsoft Teams</li>
-                                    <li>Suivi des recrutements</li>
-                                    <li>Gestion administrative</li>
-                                    <li>Formation des managers</li>
-                                </ul>
+                        <ul class="timeline__skills" id="skills-sfr" hidden>
+                            <li>Gestion de projets</li>
+                            <li>Conduite du changement</li>
+                            <li>Communication et diplomatie</li>
+                            <li>Conception de formations</li>
+                            <li>CapCut</li>
+                            <li>Caption</li>
+                            <li>edit2Emotions</li>
+                            <li>Suivi d'indicateurs</li>
+                            <li>Reporting</li>
+                            <li>Analyse de données sociales</li>
+                        </ul>
 
-                            </div>
+                    </article>
 
-                        </div>
+                </li>
 
-                    </div>
+            </ol>
 
 
-                    <!-- -------------------- NATIXIS -------------------- -->
-
-                    <div class="experience-card" id="experience-natixis" tabindex="0">
-
-                        <div class="experience-card__inner">
-
-                            <!-- Recto -->
-                            <div class="experience-card__front">
-
-                                <h3>Natixis</h3>
-
-                                <h4>
-                                    Chargé SIRH - Stage
-                                </h4>
-
-                                <p>
-                                    Novembre 2020 - Décembre 2020
-                                </p>
-
-                            </div>
-
-
-                            <!-- Verso -->
-                            <div class="experience-card__back">
-
-                                <h4>Compétences & outils</h4>
-
-                                <ul>
-                                    <li>Premier projet géré en autonomie</li>
-                                    <li>Compréhension d'une phase test dans la création d'un outil</li>
-                                    <li>Lien entre l'équipe RH et SIRH</li>
-                                </ul>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- -------------------- ENEDIS -------------------- -->
-
-                    <div class="experience-card" id="experience-enedis" tabindex="0">
-
-                        <div class="experience-card__inner">
-
-                            <!-- Recto -->
-                            <div class="experience-card__front">
-
-                                <h3>Enedis</h3>
-
-                                <h4>
-                                    Assistant RH - Stage
-                                </h4>
-
-                                <p>
-                                    Décembre 2019
-                                </p>
-
-                            </div>
-
-
-                            <!-- Verso -->
-                            <div class="experience-card__back">
-
-                                <h4>Compétences & outils</h4>
-
-                                <ul>
-                                    <li>Première expérience professionnelle</li>
-                                    <li>Insertion au domaine RH</li>
-                                </ul>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <!-- -------------------- BULLE COMPÉTENCES DESKTOP -------------------- -->
-
-                <div id="skills-bubble" class="experience__skills" aria-live="polite">
-                    Sélectionnez une expérience
-                </div>
-
-            </div>
-
-
-            <!-- Cube placé en bas de la section -->
-            <button
+            <!-- Cube de transition, en bas à gauche de la section -->
+            <span
                 class="cube cube--tiny cube--red cube--transition"
-                type="button"
-                aria-label="Faire tourner le cube"
+                aria-hidden="true"
                 data-speed="13"
                 data-phase="310"
-            ></button>
+            ></span>
 
         </section>
 
@@ -618,17 +479,19 @@
 
             <div class="career__banner">
 
-                <p class="career__number">
+                <p class="career__number eyebrow">
                     03 / RECONVERSION IT
                 </p>
 
 
-                <div class="career__line"></div>
 
 
                 <!-- -------------------- INTRODUCTION -------------------- -->
 
+                <!-- Deux colonnes : le parcours à gauche, l'objectif à droite -->
                 <div class="career__intro">
+
+                    <div class="career__story">
 
                     <h2>
                         Du pilotage de projets RH
@@ -636,24 +499,20 @@
                     </h2>
 
                     <p>
-                        Après plusieurs années d'expérience en Ressources Humaines
-                        et en conduite du changement, j'ai décidé d'ouvrir une nouvelle page
-                        de mon parcours professionnel et de me réorienter vers
-                        les métiers de l'informatique.
+                        Après plusieurs années en ressources humaines, dont deux à piloter des projets de conduite du changement chez SFR Distribution, j'ai rejoint Epitech en 2026 pour me former à un domaine qui m'a toujours attiré.
                     </p>
 
-                    <p class="career__goal">
-                        L'objectif était clair : m'adapter aux évolutions de la société,
-                        dans laquelle l'informatique prend une place toujours plus importante,
-                        et rejoindre un domaine qui m'a toujours intéressé.
-                    </p>
+                    </div>
 
-                    <p>
-                        Mon parcours à Epitech me permet aujourd'hui de développer
-                        progressivement mes compétences techniques tout en mobilisant
-                        les compétences déjà acquises en gestion de projets,
-                        communication et autonomie.
-                    </p>
+                    <div class="career__goal">
+
+                        <p class="career__goal-label">Mon objectif</p>
+
+                        <p class="career__goal-text">
+                            Progresser dans les différents domaines de l'informatique, avec une appétence pour la gestion de projets IT et la data science.
+                        </p>
+
+                    </div>
 
                 </div>
 
@@ -663,13 +522,12 @@
                 <div class="career__skills skills">
 
                     <!-- Cube bleu -->
-                    <button
+                    <span
                         class="cube cube--medium cube--blue career__cube"
-                        type="button"
-                        aria-label="Faire tourner le cube"
+                        aria-hidden="true"
                         data-speed="16"
                         data-phase="90"
-                    ></button>
+                    ></span>
 
 
                     <h3>
@@ -677,48 +535,26 @@
                     </h3>
 
 
-                    <div class="skills__list">
-
-                        <button class="skills__button" data-skill="python" type="button" aria-pressed="false">
-                            Python
-                        </button>
-
-                        <button class="skills__button" data-skill="html" type="button" aria-pressed="false">
-                            HTML
-                        </button>
-
-                        <button class="skills__button" data-skill="css" type="button" aria-pressed="false">
-                            CSS
-                        </button>
-
-                        <button class="skills__button" data-skill="javascript" type="button" aria-pressed="false">
-                            JavaScript
-                        </button>
-
-                        <button class="skills__button" data-skill="git" type="button" aria-pressed="false">
-                            Git
-                        </button>
-
-                    </div>
-
-
-                    <div id="skill-description" class="skills__description" aria-live="polite">
-                        Sélectionnez une compétence pour en savoir plus.
-                    </div>
+                    <ul class="skills__list">
+                        <li>Python</li>
+                        <li>HTML</li>
+                        <li>CSS</li>
+                        <li>JavaScript</li>
+                        <li>Git</li>
+                    </ul>
 
                 </div>
 
             </div>
 
 
-            <!-- Cube placé en bas de la section -->
-            <button
+            <!-- Cube de transition, en bas à gauche de la section -->
+            <span
                 class="cube cube--tiny cube--red cube--transition"
-                type="button"
-                aria-label="Faire tourner le cube"
+                aria-hidden="true"
                 data-speed="14"
                 data-phase="200"
-            ></button>
+            ></span>
 
         </section>
 
@@ -727,171 +563,134 @@
 
         <section id="projects" class="projects">
 
-            <p>04 / PROJETS</p>
+            <p class="eyebrow">04 / PROJETS</p>
 
-            <h2>
-                Mes projets techniques
-            </h2>
+            <h2 class="section-title">Mes projets techniques</h2>
 
 
-            <!-- Petit cube décoratif -->
-            <button
-                class="cube cube--tiny cube--red cube--section projects__cube"
-                type="button"
-                aria-label="Faire tourner le cube"
-                data-speed="18"
-                data-phase="140"
-            ></button>
 
 
-            <!-- -------------------- CONTENEUR DES PROJETS -------------------- -->
+            <!-- Grille des projets : le portfolio en grande carte carrée à gauche, deux cartes rectangulaires empilées à droite. Chaque carte garde les compétences utilisées, le code sur GitHub et un essai. -->
+            <!-- Enveloppe : ses dimensions servent de repère aux unités cqw de la grille (projects.css). -->
+            <div class="projects__layout">
+            <div class="projects__grid">
 
-            <div class="projects__list">
 
+                <!-- -------------------- PORTFOLIO -------------------- -->
 
-                <!-- -------------------- PYTHON -------------------- -->
+                <article class="project-card project-card--featured">
 
-                <div class="project-card">
+                    <span class="cube cube--white project-card__cube" aria-hidden="true" data-speed="16" data-phase="35"></span>
 
-                    <div class="project-card__image project-card__visual"><button class="cube cube--white project-card__cube" type="button" aria-label="Faire tourner le cube blanc" data-speed="16" data-phase="35"></button></div>
+                    <h3>Mon portfolio</h3>
 
-                    <h3>Python & Web</h3>
-
-                    <p>
-                        Développement de projets en Python et création d'interfaces web
-                        en HTML, CSS et JavaScript, avec une attention portée à la logique,
-                        au responsive design et à l'interactivité.
+                    <p class="project-card__text">
+                        Mon site vitrine en quatre pages bilingues : des projets à tester en direct, des compétences reliées à chaque projet et le chemin parcouru depuis la gestion de projets RH.
                     </p>
 
-                    <p>
-                        Compétences développées : algorithmique, fonctions et structures
-                        de données, DOM, animations, débogage et organisation du code.
-                    </p>
+                    <ul class="project-card__tags" aria-label="Compétences utilisées">
+                        <li>HTML</li>
+                        <li>CSS</li>
+                        <li>JavaScript</li>
+                        <li>Accessibilité</li>
+                        <li>Référencement</li>
+                        <li>GitHub Pages</li>
+                    </ul>
 
                     <div class="project-card__actions">
-
                         <a
+                            class="button project-card__action project-card__link"
+                            href="https://github.com/Axel-FOLLET/portfolio"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >Voir sur GitHub<span class="visually-hidden"> : Mon portfolio (nouvel onglet)</span></a>
+                        <a
+                            class="button button--primary project-card__action"
                             href="https://axel-follet.github.io/portfolio/"
                             target="_blank"
                             rel="noopener noreferrer"
-                        >
-                            Voir mon portfolio
-                        </a>
-
-                        <!-- Invisible : donne au bouton la même largeur que ceux de Snake et Pendu -->
-                        <span class="project-card__sizer" aria-hidden="true">
-                            Tester le jeu maintenant ?
-                        </span>
-
+                        >Tester<span class="visually-hidden"> : Mon portfolio (nouvel onglet)</span></a>
                     </div>
 
-                </div>
+                </article>
+
+
+                <!-- -------------------- CHIFFREMENTS -------------------- -->
+
+                <article class="project-card">
+
+                    <h3>Chiffrements de César et de Vigenère</h3>
+
+                    <ul class="project-card__tags" aria-label="Compétences utilisées">
+                        <li>Python</li>
+                        <li>Algorithmique</li>
+                        <li>Chaînes de caractères</li>
+                        <li>Analyse de fréquences</li>
+                    </ul>
+
+                    <div class="project-card__actions">
+                        <a
+                            class="button project-card__action project-card__link"
+                            href="https://github.com/Axel-FOLLET/Axou/tree/main/piscine_python/chiffrement"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >Voir sur GitHub<span class="visually-hidden"> : Chiffrements de César et de Vigenère (nouvel onglet)</span></a>
+                        <a
+                            class="button button--primary project-card__action"
+                            href="https://axel-follet.github.io/portfolio/pages/projects.html#theme-algorithms"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="Tester la démo sur le portfolio (nouvel onglet)"
+                        >Tester</a>
+                    </div>
+
+                </article>
 
 
                 <!-- -------------------- SNAKE -------------------- -->
 
-                <div class="project-card">
-
-                    <img
-                        src="assets/images/dessin_snake.png"
-                        alt="Illustration du jeu Snake développé en Python"
-                        class="project-card__image" width="1448" height="1086" loading="lazy" decoding="async"
-                    >
+                <article class="project-card">
 
                     <h3>Jeu du Snake</h3>
 
-                    <p>
-                        Jeu du Snake développé en Python et Pygame.
-                    </p>
+                    <ul class="project-card__tags" aria-label="Compétences utilisées">
+                        <li>Python</li>
+                        <li>Pygame</li>
+                        <li>Événements clavier</li>
+                        <li>Collisions</li>
+                        <li>Organisation en modules</li>
+                    </ul>
 
-                    <p>
-                        Le projet m'a permis de travailler sur la gestion
-                        des déplacements, des collisions, du score,
-                        des événements clavier et de l'affichage graphique.
-                    </p>
-
+                    <!-- Le jeu s'ouvre dans une fenêtre sur ordinateur ; sur téléphone, la mention le remplace. -->
                     <div class="project-card__actions">
-
                         <a
-                            href="https://github.com/Axel-FOLLET/Axou/tree/main/jeux/jeu_du_snake"
+                            class="button project-card__action project-card__link"
+                            href="https://github.com/Axel-FOLLET/Axou/tree/5f52f135fe0bb45800351c035b74ff3e00f64e5e/jeu_du_snake"
                             target="_blank"
                             rel="noopener noreferrer"
-                        >
-                            Voir le projet sur GitHub
-                        </a>
-
-                        <!-- Disponible uniquement sur ordinateur -->
+                        >Voir sur GitHub<span class="visually-hidden"> : Jeu du Snake (nouvel onglet)</span></a>
                         <button
-                            class="project-card__play"
+                            class="button button--primary project-card__action project-card__play"
                             type="button"
                             data-game="snake"
                             data-game-title="Jeu du Snake"
-                        >
-                            Tester le jeu maintenant ?
-                        </button>
-
+                        >Tester</button>
+                        <p class="project-card__note">Jouable sur ordinateur</p>
                     </div>
 
-                </div>
+                </article>
 
-
-                <!-- -------------------- PENDU -------------------- -->
-
-                <div class="project-card">
-
-                    <img
-                        src="assets/images/dessin_pendu.png"
-                        alt="Illustration du jeu du Pendu développé en Python"
-                        class="project-card__image" width="1448" height="1086" loading="lazy" decoding="async"
-                    >
-
-                    <h3>Jeu du Pendu</h3>
-
-                    <p>
-                        Jeu du Pendu développé en Python et Pygame.
-                    </p>
-
-                    <p>
-                        Ce projet m'a permis de travailler sur les conditions,
-                        les boucles, les fonctions, la gestion des entrées utilisateur
-                        et l'organisation générale d'un programme.
-                    </p>
-
-                    <div class="project-card__actions">
-
-                        <a
-                            href="https://github.com/Axel-FOLLET/Axou/tree/main/jeux/jeu_du_pendu"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            Voir le projet sur GitHub
-                        </a>
-
-                        <!-- Disponible uniquement sur ordinateur -->
-                        <button
-                            class="project-card__play"
-                            type="button"
-                            data-game="pendu"
-                            data-game-title="Jeu du Pendu"
-                        >
-                            Tester le jeu maintenant ?
-                        </button>
-
-                    </div>
-
-                </div>
-
+            </div>
             </div>
 
 
-            <!-- Cube placé en bas de la section -->
-            <button
+            <!-- Cube de transition, en bas à gauche de la section -->
+            <span
                 class="cube cube--tiny cube--red cube--transition"
-                type="button"
-                aria-label="Faire tourner le cube"
+                aria-hidden="true"
                 data-speed="13"
                 data-phase="260"
-            ></button>
+            ></span>
 
         </section>
 
@@ -900,14 +699,12 @@
 
         <section id="contact" class="contact">
 
-            <p>05 / CONTACT</p>
+            <p class="eyebrow">05 / CONTACT</p>
 
-            <h2>Me contacter</h2>
+            <h2 class="section-title">Me contacter</h2>
 
             <p class="contact__intro">
-                Vous souhaitez échanger avec moi à propos d'une opportunité,
-                d'un projet ou simplement en savoir plus sur mon parcours ?
-                N'hésitez pas à me contacter !
+                Une opportunité, un projet ou une question sur mon parcours ? Le formulaire ci-dessous m'arrive directement ; LinkedIn et mon portfolio sont aussi à portée de clic.
             </p>
 
 
@@ -919,15 +716,17 @@
                     href="https://www.linkedin.com/in/axel-follet/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    class="linkedin-link"
+                    class="contact-link"
                 >
 
                     <img
+                        class="contact-link__logo"
                         src="assets/images/linkedin-logo.png"
-                        alt="Logo LinkedIn" width="840" height="779" loading="lazy" decoding="async"
+                        alt="" width="840" height="779" loading="lazy" decoding="async"
                     >
 
-                    Vous souhaitez consulter mon profil LinkedIn ?
+                    <span class="contact-link__label">LinkedIn</span>
+                    <span class="contact-link__hint">axel-follet</span>
 
                 </a>
 
@@ -935,7 +734,7 @@
                     href="https://axel-follet.github.io/portfolio/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    class="linkedin-link portfolio-link"
+                    class="contact-link"
                 >
 
                     <!-- Petit cube blanc animé à la place d'un logo -->
@@ -946,18 +745,21 @@
                         data-phase="60"
                     ></span>
 
-                    Vous souhaitez découvrir mon portfolio ?
+                    <span class="contact-link__label">Mon portfolio</span>
+                    <span class="contact-link__hint">axel-follet.github.io/portfolio</span>
 
                 </a>
 
             </div>
 
 
-            <!-- Barres d'accent -->
-            <div class="contact__bars">
-                <span></span>
-                <span></span>
-                <span></span>
+
+
+            <!-- Trois barres d'accent, comme sur le portfolio -->
+            <div class="bars" aria-hidden="true">
+                <span class="bars__bar"></span>
+                <span class="bars__bar"></span>
+                <span class="bars__bar"></span>
             </div>
 
 
@@ -983,10 +785,11 @@
                             <div class="contact-form__field">
 
                                 <label for="surname">
-                                    NOM
+                                    Nom
                                 </label>
 
                                 <input
+                                    class="contact-form__control"
                                     type="text"
                                     id="surname"
                                     name="surname"
@@ -1004,6 +807,7 @@
                                 </label>
 
                                 <input
+                                    class="contact-form__control"
                                     type="text"
                                     id="name"
                                     name="name"
@@ -1019,10 +823,11 @@
                         <div class="contact-form__field">
 
                             <label for="email">
-                                Email
+                                E-mail
                             </label>
 
                             <input
+                                class="contact-form__control"
                                 type="email"
                                 id="email"
                                 name="email"
@@ -1040,6 +845,7 @@
                             </label>
 
                             <input
+                                class="contact-form__control"
                                 type="text"
                                 id="subject"
                                 name="subject"
@@ -1057,6 +863,7 @@
                             </label>
 
                             <textarea
+                                class="contact-form__control"
                                 id="message"
                                 name="message"
                                 rows="6"
@@ -1070,7 +877,7 @@
                         <input class="contact-form__trap" type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true">
 
 
-                        <button type="submit" class="contact-form__submit">
+                        <button type="submit" class="button button--primary contact-form__submit">
                             Envoyer
                         </button>
 
@@ -1095,43 +902,39 @@
                         data-phase="30"
                     ></button>
 
-                    <button
+                    <span
                         class="cube cube--small cube--red contact__cube--satellite-1 contact__cube"
-                        type="button"
-                        aria-label="Faire tourner le cube"
+                        aria-hidden="true"
                         data-speed="20"
                         data-phase="110"
-                    ></button>
+                    ></span>
 
-                    <button
+                    <span
                         class="cube cube--small cube--red contact__cube--satellite-2 contact__cube"
-                        type="button"
-                        aria-label="Faire tourner le cube"
+                        aria-hidden="true"
                         data-speed="18"
                         data-phase="210"
-                    ></button>
+                    ></span>
 
-                    <button
+                    <span
                         class="cube cube--tiny cube--red contact__cube--satellite-3 contact__cube"
-                        type="button"
-                        aria-label="Faire tourner le cube"
+                        aria-hidden="true"
                         data-speed="21"
                         data-phase="300"
-                    ></button>
+                    ></span>
 
                 </div>
 
             </div>
 
 
-            <!-- Dernier cube -->
-            <button
+            <!-- Cube de transition, en bas à gauche de la section -->
+            <span
                 class="cube cube--tiny cube--red cube--transition"
-                type="button"
-                aria-label="Faire tourner le cube"
+                aria-hidden="true"
                 data-speed="13"
                 data-phase="330"
-            ></button>
+            ></span>
 
         </section>
 
@@ -1157,17 +960,28 @@
             </div>
 
             <div>
+                <h2 class="footer__title">Liens</h2>
+                <ul class="footer__list">
+                    <li><a class="footer__external" href="https://axel-follet.github.io/portfolio/" target="_blank" rel="noopener noreferrer">Mon portfolio<span class="visually-hidden"> (nouvel onglet)</span></a></li>
+                    <li><a class="footer__external" href="https://www.linkedin.com/in/axel-follet/" target="_blank" rel="noopener noreferrer">LinkedIn<span class="visually-hidden"> (nouvel onglet)</span></a></li>
+                    <li><a class="footer__external" href="https://github.com/Axel-FOLLET" target="_blank" rel="noopener noreferrer">GitHub<span class="visually-hidden"> (nouvel onglet)</span></a></li>
+                </ul>
+            </div>
+
+            <div>
                 <h2 class="footer__title">Ressources et crédits</h2>
                 <p class="footer__credits">
-                    Photo, dessins et textes : créations personnelles d'Axel FOLLET. Les cubes 3D et les icônes sont réalisés en HTML, CSS et JavaScript. LinkedIn® et le logo [in]® sont des marques de LinkedIn Corporation et de ses sociétés affiliées. Ce site personnel n’est ni affilié à LinkedIn ni approuvé par LinkedIn. Aucune police ni thème tiers n'est utilisé : la police est celle du système (Avenir lorsqu'elle est disponible).
+                    Photo et textes : créations personnelles d'Axel FOLLET. Les cubes 3D et les icônes sont réalisés en HTML, CSS et JavaScript. LinkedIn® et le logo [in]® sont des marques de LinkedIn Corporation et de ses sociétés affiliées. Ce site personnel n’est ni affilié à LinkedIn ni approuvé par LinkedIn. Aucune police ni thème tiers n'est utilisé : la police est celle du système.
                 </p>
             </div>
 
         </div>
 
-        <p class="footer__copyright">
-            &copy; 2026 Axel FOLLET
-        </p>
+        <!-- Dernière ligne : droits à gauche, retour en haut à droite -->
+        <div class="footer__bottom">
+            <p class="footer__copyright">&copy; 2026 Axel FOLLET</p>
+            <a class="footer__top" href="#home">Retour en haut ↑</a>
+        </div>
 
     </footer>
 

@@ -1,148 +1,70 @@
 /*
- * En-tête et navigation. Le bouton de menu est masqué ici puis affiché par responsive.css.
+ * En-tête collant et navigation : barre compacte, liens en pilule sur ordinateur,
+ * menu déroulant derrière un bouton sous 1024 px.
  * BEM : bloc__element désigne une partie du bloc ; bloc--modificateur désigne une variante.
  */
-/* -------------------- NAVIGATION -------------------- */
+/* -------------------- EN-TÊTE -------------------- */
 
+/*
+ * Fond bleu légèrement transparent : le contenu défile dessous, flouté par backdrop-filter
+ * (préfixe -webkit- pour Safari). Filet très discret en bas.
+ */
 .site-header {
-    width: 100%;
-
-    /*
-     * Le positionnement définit le repère utilisé par top/right/bottom/left ; les valeurs sont précisées ici.
-     */
     position: sticky;
     top: 0;
-
-    /*
-     * Règle l'ordre de superposition à l'intérieur du contexte d'empilement.
-     */
     z-index: 1000;
 
-    /*
-     * Fond bleu semi-transparent : le contenu défile dessous, flouté par backdrop-filter.
-     * Le préfixe -webkit- couvre Safari.
-     */
-    background-color: rgba(13, 10, 155, 0.72);
+    width: 100%;
+
+    border-bottom: 1px solid var(--border-subtle);
+
+    background-color: rgb(13 10 155 / 80%);
 
     -webkit-backdrop-filter: blur(20px) saturate(160%);
     backdrop-filter: blur(20px) saturate(160%);
+
+    transition: box-shadow var(--duration-ui) var(--ease-ui);
 }
 
 
-/* Navigateur sans flou : on revient au fond plein pour garder le texte lisible. */
+/* Navigateur sans flou : fond plein pour garder le texte lisible. */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
     .site-header {
-        background-color: #0D0A9B;
+        background-color: var(--color-bg);
     }
 }
 
 
-.navigation {
-    /*
-     * Définit le mode de disposition ; flex aligne les enfants sur un axe, grid sur une grille.
-     */
-    display: flex;
-    /*
-     * Répartit les enfants sur l'axe principal du conteneur flex.
-     */
-    justify-content: space-between;
-    /*
-     * Aligne les enfants sur l'axe transversal du conteneur.
-     */
-    align-items: center;
-
-    /*
-     * Espacement intérieur : 2 valeurs = vertical/horizontal ; 3 = haut/horizontal/bas.
-     */
-    padding: 24px 48px;
-}
-
-
-.navigation__toggle {
-    display: none;
-
-    width: 44px;
-    height: 44px;
-    align-items: center;
-    justify-content: center;
-
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    background: transparent;
-    color: white;
-
-    cursor: pointer;
-
-    transition: scale 0.1s ease-out;
-}
-
-
-.navigation__toggle:active {
-    scale: 0.94;
-}
-
-
-.navigation__toggle-icon {
-    display: flex;
-    /*
-     * column empile les enfants verticalement ; row les dispose horizontalement.
-     */
-    flex-direction: column;
-    /*
-     * Ajoute de l'espace entre les enfants sans marge extérieure.
-     */
-    gap: 5px;
-}
-
-
-.navigation__toggle-icon span {
-    display: block;
-    width: 22px;
-    height: 2px;
-    background: currentColor;
-    /*
-     * Anime un changement de propriété, par exemple lors d'un survol ou d'un changement de classe.
-     */
-    transition: transform 0.2s ease;
-}
-
-
-.navigation__toggle:hover,
-.navigation__toggle:focus-visible {
-    border-color: #E1001A;
-    outline: 2px solid #E1001A;
-    /*
-     * Écarte l'indicateur de focus du bord sans modifier la taille de l'élément.
-     */
-    outline-offset: 3px;
-}
-
-
-.navigation a {
-    color: white;
-    text-decoration: none;
-
-    transition: color 0.3s ease;
-}
-
-
-.navigation a:hover {
-    color: #E1001A;
+/* En-tête compact (navigation-menu.js, après quelques pixels de défilement) : barre plus basse, ombre douce. */
+.site-header--compact {
+    box-shadow: 0 8px 24px rgb(3 2 45 / 30%);
 }
 
 
 /*
- * Section en cours de lecture (aria-current posé par section-tracker.js).
- * Un soulignement ne change pas la taille du lien : le menu ne bouge pas.
+ * Même colonne centrée que les sections : l'identité s'aligne sur les titres.
  */
-.navigation__links a[aria-current="location"] {
-    text-decoration: underline;
-    text-decoration-color: #E1001A;
-    text-decoration-thickness: 2px;
-    text-underline-offset: 6px;
+.navigation {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 24px;
+
+    min-height: var(--header-height);
+
+    padding-inline: max(var(--gutter), (100% - var(--container)) / 2);
+
+    transition: min-height var(--duration-ui) var(--ease-ui);
 }
 
 
-/* -------------------- PHOTO + AF -------------------- */
+.site-header--compact .navigation {
+    min-height: 60px;
+}
+
+
+/* -------------------- PHOTO + AF + LANGUE -------------------- */
 
 .navigation__identity {
     display: flex;
@@ -153,34 +75,44 @@
 
 
 .navigation__identity img {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
 
     /*
-     * contain conserve toute l'image ; cover remplit le cadre en recadrant si nécessaire.
+     * cover remplit le cadre en recadrant si nécessaire.
      */
     object-fit: cover;
 
     border-radius: 50%;
+
+    transition:
+        width var(--duration-ui) var(--ease-ui),
+        height var(--duration-ui) var(--ease-ui);
+}
+
+
+.site-header--compact .navigation__identity img {
+    width: 30px;
+    height: 30px;
 }
 
 
 .navigation__identity a {
-    /*
-     * rem se rapporte à la taille de police de l'élément html.
-     */
-    font-size: 1.5rem;
-    font-weight: bold;
-    letter-spacing: 0.15rem;
-}
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 
+    min-width: 44px;
+    min-height: 44px;
 
-.navigation__identity a:hover {
     color: white;
+
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-decoration: none;
 }
 
-
-/* -------------------- CHOIX DE LA LANGUE -------------------- */
 
 .language-switch {
     display: flex;
@@ -189,32 +121,231 @@
 
 
 .language-switch__select {
-    padding: 6px 8px;
+    min-height: 44px;
 
-    border: 1px solid rgba(255, 255, 255, 0.4);
+    padding: 4px 10px;
 
-    background-color: #0D0A9B;
+    border: 1px solid white;
+    border-radius: var(--radius-field);
+
+    background-color: var(--color-bg);
     color: white;
 
-    font-family: inherit;
-    font-size: 0.85rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
 
     cursor: pointer;
-
-    outline: none;
-}
-
-/* La bordure devient rouge au survol ou lorsque le menu est sélectionné */
-.language-switch__select:hover,
-.language-switch__select:focus {
-    border-color: #E1001A;
 }
 
 
-/* -------------------- LIENS DE NAVIGATION -------------------- */
+.language-switch__select:hover {
+    border-color: white;
+}
+
+
+/* -------------------- LIENS (ORDINATEUR) -------------------- */
 
 .navigation__links {
     display: flex;
+    align-items: center;
 
-    gap: 32px;
+    gap: 4px;
+}
+
+
+/* Pilule : cible de 44 px de haut au moins, confortable à la souris comme au doigt. */
+.navigation__links a {
+    display: inline-flex;
+    align-items: center;
+
+    min-height: 44px;
+
+    padding: 10px 16px;
+
+    border-radius: var(--radius-pill);
+
+    color: var(--color-text-muted);
+
+    font-size: 0.9375rem;
+    font-weight: 500;
+    text-decoration: none;
+
+    transition:
+        background-color var(--duration-fast) var(--ease-ui),
+        color var(--duration-fast) var(--ease-ui);
+}
+
+
+.navigation__links a:hover {
+    color: white;
+}
+
+
+/*
+ * Section en cours de lecture (aria-current posé par section-tracker.js) :
+ * pilule éclairée et cerclée de blanc, repérable sans dépendre de la couleur.
+ */
+.navigation__links a[aria-current="location"] {
+    background-color: var(--color-surface-raised);
+    color: white;
+
+    box-shadow: inset 0 0 0 1px white;
+}
+
+
+/* -------------------- BOUTON DU MENU -------------------- */
+
+/* Masqué sur ordinateur, affiché sous 1024 px */
+.navigation__toggle {
+    display: none;
+
+    width: 44px;
+    height: 44px;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    border: 1px solid var(--border-control);
+    border-radius: var(--radius-control);
+
+    background: transparent;
+    color: white;
+
+    cursor: pointer;
+
+    transition:
+        border-color var(--duration-fast) var(--ease-ui),
+        scale 0.1s ease-out;
+}
+
+
+.navigation__toggle:hover {
+    border-color: white;
+}
+
+
+.navigation__toggle:active {
+    scale: 0.94;
+}
+
+
+.navigation__toggle-icon {
+    display: flex;
+    flex-direction: column;
+
+    gap: 5px;
+}
+
+
+.navigation__toggle-icon span {
+    display: block;
+
+    width: 20px;
+    height: 2px;
+
+    border-radius: 2px;
+
+    background: currentColor;
+
+    transition:
+        transform var(--duration-ui) var(--ease-ui),
+        opacity var(--duration-ui) var(--ease-ui);
+}
+
+
+/*
+ * Menu ouvert : les traits du haut et du bas pivotent en croix, celui du milieu s'efface.
+ * 7px = hauteur d'un trait (2px) + écart entre deux traits (5px).
+ */
+.navigation--open .navigation__toggle-icon span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+}
+
+
+.navigation--open .navigation__toggle-icon span:nth-child(2) {
+    opacity: 0;
+}
+
+
+.navigation--open .navigation__toggle-icon span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+}
+
+
+/* -------------------- MENU DÉROULANT (TABLETTE ET TÉLÉPHONE) -------------------- */
+
+@media (max-width: 1024px) {
+
+    .navigation {
+        position: relative;
+    }
+
+
+    .navigation__toggle {
+        display: inline-flex;
+
+        flex: 0 0 44px;
+    }
+
+
+    /*
+     * Le menu reste en place mais caché : visibility le retire aussi du clavier.
+     * clip-path le découvre depuis le haut ; visibility attend la fin de la fermeture.
+     */
+    .navigation__links {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        left: 0;
+        z-index: 1001;
+
+        flex-direction: column;
+        align-items: stretch;
+
+        gap: 4px;
+
+        padding: 12px var(--gutter) 20px;
+
+        border-bottom: 1px solid var(--border-subtle);
+
+        background-color: var(--color-bg);
+
+        box-shadow: 0 16px 32px rgb(3 2 45 / 35%);
+
+        visibility: hidden;
+        opacity: 0;
+        clip-path: inset(0 0 100% 0);
+
+        transition:
+            clip-path 0.2s cubic-bezier(0.8, 0, 0.8, 0.2),
+            opacity 0.2s ease,
+            visibility 0s linear 0.2s;
+    }
+
+
+    .navigation--open .navigation__links {
+        visibility: visible;
+        opacity: 1;
+        clip-path: inset(0 0 -40px 0);
+
+        transition:
+            clip-path 0.25s var(--ease-reveal),
+            opacity 0.2s ease,
+            visibility 0s;
+    }
+
+
+    /* Cibles de 48 px de haut, alignées à gauche */
+    .navigation__links a {
+        min-height: 48px;
+
+        padding: 12px 16px;
+
+        border-radius: var(--radius-control);
+
+        font-size: 1rem;
+    }
+
 }

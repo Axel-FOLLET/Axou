@@ -9,13 +9,11 @@
 
 /* Sur-titre : petit, espacé, légèrement atténué pour laisser la place au titre */
 .section__eyebrow {
-    margin: 0 0 14px;
+    margin: 0 0 16px;
 
-    font-size: 0.8rem;
-    font-weight: bold;
-    letter-spacing: 0.2rem;
-
-    opacity: 0.85;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
 }
 
 
@@ -25,8 +23,8 @@
 
     /* Taille progressive entre 2.2rem (téléphone) et 3rem (ordinateur) */
     font-size: clamp(2.2rem, 5vw, 3rem);
-    line-height: 1.05;
-    letter-spacing: -0.02em;
+    line-height: 1.08;
+    letter-spacing: -0.04em;
 }
 
 
@@ -62,21 +60,21 @@
 }
 
 
-/* Les trois barres bleues d'accent, comme les barres rouges du CV */
+/* Les trois barres bleues d'accent, fines, identiques aux barres rouges du CV */
 .bars {
     display: flex;
     flex-direction: column;
 
-    gap: 9px;
+    gap: 6px;
 
-    margin: 40px 0 45px;
+    margin: 24px 0 28px;
 }
 
 
 .bars__bar {
     display: block;
 
-    height: 12px;
+    height: 4px;
 
     background-color: var(--blue);
 }

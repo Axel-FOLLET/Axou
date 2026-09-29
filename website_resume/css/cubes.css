@@ -7,8 +7,13 @@
 /*
     Tous les cubes utilisent le même système.
     JavaScript gère directement leur rotation.
+    Le cube principal de chaque figure est un bouton (atteignable au clavier) ;
+    les cubes décoratifs sont des span masqués aux lecteurs d'écran.
+    inline-block donne au span les dimensions qu'un bouton a déjà.
 */
 .cube {
+    display: inline-block;
+
     width: var(--cube-size);
     height: var(--cube-size);
 
@@ -24,14 +29,21 @@
 
     background-color: transparent;
 
-    cursor: pointer;
-
     /*
      * Donne de la profondeur aux transformations 3D des descendants.
      */
     perspective: 900px;
 
     -webkit-tap-highlight-color: transparent;
+
+    /*
+     * Le cube s'attrape et se lance (drag-cube.js).
+     * pan-y : sur écran tactile, glisser verticalement fait toujours défiler la page ;
+     * glisser horizontalement fait tourner le cube.
+     */
+    touch-action: pan-y;
+
+    cursor: grab;
 
     /*
      * scale est indépendant de transform : il ne remplace pas le placement translate() des cubes.
@@ -43,22 +55,7 @@
 /* Retour immédiat à l'appui, avant même le relâchement */
 .cube:active {
     scale: 0.92;
-}
 
-
-/*
- * Le cube s'attrape et se lance (drag-cube.js).
- * pan-y : sur écran tactile, glisser verticalement fait toujours défiler la page ;
- * glisser horizontalement fait tourner le cube.
- */
-.cube {
-    touch-action: pan-y;
-
-    cursor: grab;
-}
-
-
-.cube:active {
     cursor: grabbing;
 }
 
@@ -69,11 +66,8 @@ a .cube {
 }
 
 
+/* Contour commun (base.css), un peu plus écarté pour ne pas toucher les faces qui tournent. */
 .cube:focus-visible {
-    outline: 2px solid white;
-    /*
-     * Écarte l'indicateur de focus du bord sans modifier la taille de l'élément.
-     */
     outline-offset: 8px;
 }
 
@@ -116,12 +110,14 @@ a .cube {
     width: 100%;
     height: 100%;
 
+    /*
+     * Trait de 2 px et halo lumineux, comme sur le portfolio.
+     */
     border: 2px solid var(--cube-border);
 
     background-color: var(--cube-fill);
 
-    box-shadow:
-        0 0 18px var(--cube-glow);
+    box-shadow: 0 0 18px var(--cube-glow);
 
     /*
      * Anime un changement de propriété, par exemple lors d'un survol ou d'un changement de classe.
@@ -135,8 +131,7 @@ a .cube {
 .cube:hover .cube__face {
     background-color: var(--cube-hover);
 
-    box-shadow:
-        0 0 28px var(--cube-glow);
+    box-shadow: 0 0 28px var(--cube-glow);
 }
 
 
@@ -234,76 +229,38 @@ a .cube {
 }
 
 
-/* -------------------- CUBES ACCUEIL -------------------- */
+/* Cube blanc : carte Python & Web et icône du lien vers le portfolio */
+.cube--white {
+    --cube-border: white;
 
-.home__cubes {
-    width: 42%;
-    height: 430px;
+    --cube-fill: rgba(255, 255, 255, 0.06);
+    --cube-hover: rgba(255, 255, 255, 0.2);
 
-    position: relative;
-}
-
-
-/* Cube principal */
-.home__cube--main {
-    position: absolute;
-
-    top: 50%;
-    left: 50%;
-
-    transform: translate(-50%, -50%);
-}
-
-
-/* Cubes satellites */
-.home__cube--satellite-1 {
-    position: absolute;
-
-    top: 10%;
-    left: 10%;
-}
-
-
-.home__cube--satellite-2 {
-    position: absolute;
-
-    top: 13%;
-    right: 8%;
-}
-
-
-.home__cube--satellite-3 {
-    position: absolute;
-
-    bottom: 14%;
-    left: 16%;
-}
-
-
-.home__cube--satellite-4 {
-    position: absolute;
-
-    right: 12%;
-    bottom: 9%;
+    --cube-glow: rgba(255, 255, 255, 0.25);
 }
 
 
 /* -------------------- CUBE DE TRANSITION -------------------- */
 
 /*
-    Petit cube présent en bas à gauche
-    de chaque section.
+    Petit cube rouge en bas à gauche de chaque section : il marque le passage à la suivante.
+    La section (position: relative, base.css) sert de repère au placement absolu.
 */
 .cube--transition {
     position: absolute;
 
     left: 3%;
-    bottom: 20px;
+    bottom: 24px;
 
-    /*
-     * Règle l'ordre de superposition à l'intérieur du contexte d'empilement.
-     */
     z-index: 5;
 }
 
-.cube--white { --cube-border: #fff; --cube-fill: rgba(255,255,255,.06); --cube-hover: rgba(255,255,255,.18); --cube-glow: rgba(255,255,255,.25); }
+
+@media (max-width: 767px) {
+
+    .cube--transition {
+        left: 18px;
+        bottom: 16px;
+    }
+
+}

@@ -1,229 +1,321 @@
 /*
- * Cartes de projets. Flexbox aligne leur contenu et place les actions en bas.
+ * Projets en grille « bento » : le portfolio en grand carré rouge à gauche,
+ * deux rectangles empilés à sa droite. Le carré a exactement la hauteur des deux rectangles
+ * et de leur gouttière : leurs bords haut et bas s'alignent.
  * BEM : bloc__element désigne une partie du bloc ; bloc--modificateur désigne une variante.
  */
-/* -------------------- PROJETS -------------------- */
+/* -------------------- GRILLE BENTO -------------------- */
 
-.projects {
-    /*
-     * Fixe une hauteur minimale sans empêcher le contenu de grandir ; vh dépend de la hauteur de la fenêtre.
-     */
-    min-height: 100vh;
+/*
+ * container-type fait de l'enveloppe un repère : dans la grille, 100cqw vaut sa largeur.
+ */
+.projects__layout {
+    margin-top: 40px;
 
-    /*
-     * Espacement intérieur : 2 valeurs = vertical/horizontal ; 3 = haut/horizontal/bas.
-     */
-    padding: 120px 8% 110px;
+    container-type: inline-size;
 }
 
 
-.projects > p:first-child {
-    margin-bottom: 10px;
+/* Une colonne par défaut (tablette, téléphone) */
+.projects__grid {
+    --bento-gap: 24px;
 
-    /*
-     * rem se rapporte à la taille de police de l'élément html.
-     */
-    font-size: 0.9rem;
-    letter-spacing: 0.1rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+
+    gap: var(--bento-gap);
 }
 
 
-.projects > h2 {
-    margin-bottom: 50px;
+/*
+ * À partir de 900 px de large : deux colonnes égales.
+ * Pour une largeur W et une gouttière g, le carré mesure (W − g) / 2 de côté ;
+ * chaque rectangle mesure donc (W − 3g) / 4 de haut. minmax(…, auto) laisse une ligne
+ * grandir si son texte ne tient pas (texte agrandi, traduction) : la lecture passe avant le carré.
+ */
+@container (min-width: 900px) {
 
-    /* Taille progressive : 2.2rem sur téléphone, 3rem sur ordinateur */
-    font-size: clamp(2.2rem, 5vw, 3rem);
-}
+    .projects__grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-rows: repeat(2, minmax(calc((100cqw - 3 * var(--bento-gap)) / 4), auto));
+    }
 
-
-/* -------------------- LISTE DES PROJETS -------------------- */
-
-.projects__list {
-    /*
-     * Définit le mode de disposition ; flex aligne les enfants sur un axe, grid sur une grille.
-     */
-    display: flex;
-    /*
-     * Aligne les enfants sur l'axe transversal du conteneur.
-     */
-    align-items: stretch;
 
     /*
-     * Ajoute de l'espace entre les enfants sans marge extérieure.
+     * Titre rapproché du cube (136 px du haut) plutôt que tassé en bas ;
+     * les actions, elles, restent calées en bas du carré.
      */
-    gap: 25px;
+    .project-card--featured {
+        grid-row: 1 / 3;
+
+        padding: 36px;
+    }
+
+
+    .projects__grid .project-card--featured h3 {
+        margin-top: 136px;
+
+        font-size: 2.75rem;
+    }
+
+
+    .projects__grid .project-card--featured .project-card__actions {
+        margin-top: auto;
+    }
+
 }
 
 
 /* -------------------- CARTE PROJET -------------------- */
 
+/*
+ * Colonne flex : les actions (margin-top: auto) se calent en bas de la carte.
+ */
 .project-card {
-    /*
-     * Définit croissance, réduction et taille de base de cet enfant flex.
-     */
-    flex: 1;
+    position: relative;
 
     display: flex;
-    /*
-     * column empile les enfants verticalement ; row les dispose horizontalement.
-     */
     flex-direction: column;
 
-    padding: 30px;
+    min-width: 0;
 
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 32px;
 
-    background-color: rgba(255, 255, 255, 0.04);
+    border-radius: var(--radius-card);
 
-    /*
-     * Contrôle ce qui dépasse de la boîte ; hidden le masque.
-     */
-    overflow: hidden;
+    background-color: var(--color-surface);
 
-    /*
-     * Anime un changement de propriété, par exemple lors d'un survol ou d'un changement de classe.
-     */
-    transition:
-        transform 0.3s ease,
-        background-color 0.3s ease,
-        border-color 0.3s ease;
+    box-shadow: var(--shadow-card);
+
+    transition: background-color var(--duration-ui) var(--ease-ui);
 }
 
 
-.project-card:hover {
-    /*
-     * Transforme le rendu sans déplacer les voisins dans le flux normal.
-     */
-    transform: translateY(-8px);
+@media (hover: hover) {
 
-    background-color: rgba(255, 255, 255, 0.08);
+    .project-card:not(.project-card--featured):hover {
+        background-color: var(--color-surface-raised);
+    }
 
-    border-color: #E1001A;
 }
 
 
-/* -------------------- IMAGES DES PROJETS -------------------- */
+.project-card h3 {
+    margin: 0;
 
-.project-card__image {
-    width: 100%;
-    height: 220px;
+    font-size: clamp(1.5rem, 2.2vw, 1.875rem);
+    font-weight: 650;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+}
 
-    /*
-     * contain conserve toute l'image ; cover remplit le cadre en recadrant si nécessaire.
-     */
-    object-fit: contain;
 
-    margin-bottom: 25px;
+/* -------------------- GRAND CARRÉ : PORTFOLIO -------------------- */
 
+.project-card--featured {
+    padding: clamp(28px, 3.4vw, 44px);
+
+    border-radius: var(--radius-feature);
+
+    background-color: var(--color-red);
+
+    box-shadow: var(--shadow-feature);
+}
+
+
+/* Titre en bas du carré, avec le reste du texte : margin-top: auto repousse le bloc. */
+.project-card--featured h3 {
+    margin-top: auto;
+
+    font-size: clamp(2rem, 3.4vw, 3.25rem);
+    letter-spacing: -0.04em;
+}
+
+
+/* Cube blanc, coin supérieur droit du carré, sorti du flux */
+.project-card__cube {
+    --cube-size: 104px;
+    --cube-half: 52px;
+
+    position: absolute;
+    top: clamp(28px, 3.4vw, 44px);
+    right: clamp(28px, 3.4vw, 44px);
+}
+
+
+/* Phrase explicative, réservée au carré */
+.project-card__text {
+    max-width: 40ch;
+
+    margin: 16px 0 0;
+
+    font-size: 1.0625rem;
+    line-height: 1.55;
+}
+
+
+/* -------------------- COMPÉTENCES UTILISÉES -------------------- */
+
+.project-card__tags {
+    display: flex;
+    flex-wrap: wrap;
+
+    gap: 6px;
+
+    margin: 16px 0 0;
+    padding: 0;
+
+    list-style: none;
+}
+
+
+/* Pastilles pleines, sans contour */
+/* Étiquettes cerclées de blanc, sur fond transparent, comme les tags du portfolio */
+.project-card__tags li {
+    padding: 5px 9px;
+
+    border: 1px solid white;
+    border-radius: var(--radius-xs);
+
+    font-size: 0.75rem;
+    line-height: 17px;
+}
+
+
+/* -------------------- ACTIONS : TESTER ET GITHUB -------------------- */
+
+/*
+ * « Tester », action principale, passe devant (order: -1) ; « GitHub » suit en lien souligné.
+ */
+/* Deux encadrés à la largeur de leur texte : Tester, puis le code sur GitHub */
+.project-card__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+
+    gap: 12px;
+
+    margin-top: auto;
+    padding-top: 24px;
+}
+
+
+.project-card--featured .project-card__actions {
+    margin-top: 0;
+}
+
+
+.project-card__actions .button:not(.project-card__link) {
+    order: -1;
+}
+
+
+/*
+ * « Tester » plein blanc (.button--primary), texte rouge sur la grande carte ;
+ * GitHub simplement cerclé de blanc, sans voile. Au survol, les deux montent légèrement (.button).
+ */
+.project-card__actions .button {
+    min-height: 44px;
+
+    padding: 10px 20px;
+
+    font-size: 0.9375rem;
+    font-weight: 600;
+}
+
+
+.project-card--featured .project-card__actions .button:not(.project-card__link) {
+    color: var(--color-red);
+}
+
+
+.project-card__actions .project-card__link {
     background-color: transparent;
 }
 
 
-/* -------------------- TITRES ET TEXTES -------------------- */
+@media (hover: hover) {
 
-.project-card h3 {
-    /*
-     * Espacement extérieur ; auto peut absorber l'espace disponible selon la disposition.
-     */
-    margin: 0 0 20px;
+    .project-card__actions .project-card__link:hover {
+        background: rgb(255 255 255 / 13%);
+    }
 
-    font-size: 2rem;
 }
 
 
-.project-card p {
-    /*
-     * Une valeur sans unité multiplie la taille de police pour fixer l'interligne.
-     */
-    line-height: 1.6;
+/* Flèche décorative du lien GitHub, tirée du CSS */
+
+
+.project-card__link::after {
+    content: "↗";
+    content: "↗" / "";
 }
 
 
-/* -------------------- LIEN PROJET -------------------- */
+
+
+
+/* Mention « Jouable sur ordinateur » : affichée seulement quand le bouton du jeu est masqué. */
+.project-card__note {
+    display: none;
+
+    margin: 0;
+
+    color: var(--color-text-muted);
+
+    font-size: 0.875rem;
+}
+
+
+/* -------------------- TABLETTE ET TÉLÉPHONE -------------------- */
 
 /*
-    Les deux boutons (GitHub + test du jeu) sont empilés dans un conteneur
-    qui prend la largeur du plus large : ils ont ainsi la même taille.
-*/
-.project-card__actions {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-
-    align-self: flex-start;
-
-    max-width: 100%;
-    margin-top: auto;
-}
-
-
-.project-card a {
-    display: block;
-    /*
-     * border-box inclut padding et bordures dans les dimensions annoncées.
-     */
-    box-sizing: border-box;
-
-    padding: 12px 18px;
-
-    border: 1px solid white;
-
-    color: white;
-    text-align: center;
-    text-decoration: none;
-
-    transition:
-        background-color 0.3s ease,
-        color 0.3s ease,
-        scale 0.1s ease-out;
-}
-
-
-.project-card a:hover {
-    background-color: white;
-    color: #0D0A9B;
-}
-
-
-.project-card a:active {
-    scale: 0.97;
-}
-
-
-/*
-    Copie invisible du bouton "Tester le jeu" : elle ne prend aucune hauteur
-    mais impose la même largeur au bouton portfolio de la carte Python.
-*/
-.project-card__sizer {
-    display: block;
-    height: 0;
-    overflow: hidden;
-
-    margin-top: -10px;
-    padding: 0 18px;
-
-    border-left: 1px solid transparent;
-    border-right: 1px solid transparent;
-
-    /*
-     * hidden masque l'élément tout en conservant sa place, contrairement à display: none.
-     */
-    visibility: hidden;
-}
-
-
-/* Le bouton de test des jeux est masqué sur mobile : la copie aussi */
-/*
- * Cette condition se base sur la largeur de la fenêtre en pixels CSS, pas sur le type d'appareil.
+ * Le jeu ne s'ouvre pas en dessous de 1024 px (game-modal.js) : le bouton disparaît ;
+ * la mention ne s'affiche que sur téléphone.
  */
 @media (max-width: 1024px) {
 
-    .project-card__sizer {
+    .project-card__play {
         display: none;
     }
 
 }
 
-/* Le cadre garde les hauteurs responsive des illustrations. */
-.project-card__visual { display:flex; align-items:center; justify-content:center; flex-shrink:0; min-width:0; container-type:inline-size; }
-.project-card__cube { --cube-size:min(100px,50cqw); --cube-half:calc(var(--cube-size) / 2); flex-shrink:0; }
+
+@media (max-width: 767px) {
+
+    .project-card__note {
+        display: block;
+
+        order: -1;
+    }
+
+}
+
+
+/* Carte portfolio empilée : le cube reprend sa place au-dessus du titre. */
+@container (max-width: 899px) {
+
+    .project-card__cube {
+        position: static;
+
+        margin: 8px 0 32px 8px;
+    }
+
+}
+
+
+@media (max-width: 767px) {
+
+    .project-card,
+    .project-card--featured {
+        padding: 24px;
+    }
+
+
+    .project-card__cube {
+        --cube-size: 80px;
+        --cube-half: 40px;
+    }
+
+}

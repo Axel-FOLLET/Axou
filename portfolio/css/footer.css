@@ -37,21 +37,21 @@
 }
 
 
-.footer__list li + li {
-    margin-top: 6px;
-}
-
-
+/* 32 px de haut : cible confortable au doigt, sans soulignement */
 .footer__list a,
 .footer__top {
+    display: inline-flex;
+    align-items: center;
+
+    min-height: 32px;
+
     text-decoration: none;
-    text-underline-offset: 4px;
 }
 
 
 .footer__list a:hover,
 .footer__top:hover {
-    text-decoration: underline;
+    opacity: 0.75;
 }
 
 

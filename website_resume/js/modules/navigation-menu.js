@@ -3,10 +3,36 @@
  * export rend une valeur utilisable ailleurs ; import récupère uniquement les noms nécessaires.
  */
 /*
- * Installe les interactions du menu mobile : clic, choix d'un lien et Échap.
+ * Seuils de l'en-tête compact, en pixels défilés. L'écart entre les deux évite un clignotement :
+ * en rétrécissant, l'en-tête fait remonter la page d'une vingtaine de pixels.
+ */
+const COMPACT_FROM = 80;
+const EXPAND_UNDER = 20;
+
+
+/*
+ * Compacte l'en-tête quand la page défile, le rend à sa taille en revenant en haut.
+ * passive: true promet au navigateur que l'écouteur ne bloque pas le défilement.
+ */
+function watchScroll(header) {
+    function update() {
+        if (window.scrollY > COMPACT_FROM) header.classList.add("site-header--compact");
+        else if (window.scrollY < EXPAND_UNDER) header.classList.remove("site-header--compact");
+    }
+
+    window.addEventListener("scroll", update, { passive: true });
+    update();
+}
+
+
+/*
+ * Installe l'en-tête compact et les interactions du menu mobile : clic, choix d'un lien et Échap.
  * Les classes pilotent le CSS ; les attributs ARIA décrivent le même état aux lecteurs d'écran.
  */
 export function initNavigationMenu() {
+    const header = document.querySelector(".site-header");
+    if (header) watchScroll(header);
+
     const navigation = document.querySelector(".navigation");
     const toggle = document.querySelector(".navigation__toggle");
     const links = document.querySelector(".navigation__links");

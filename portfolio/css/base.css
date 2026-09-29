@@ -6,7 +6,7 @@
 */
 
 
-/* -------------------- COULEURS -------------------- */
+/* -------------------- COULEURS ET ESPACEMENTS -------------------- */
 
 /*
     Mêmes couleurs que le site CV, mais inversées :
@@ -20,19 +20,16 @@
     /* Voile blanc léger pour les cartes posées sur le rouge */
     --veil: rgba(255, 255, 255, 0.07);
     --veil-strong: rgba(255, 255, 255, 0.13);
-}
 
-
-/* -------------------- ESPACEMENTS -------------------- */
-
-/*
-    Même rythme sur toutes les pages : chaque partie, l'accueil et le pied de page
-    utilisent ces deux valeurs. --gutter passe à 6 % sur tablette (responsive.css).
-*/
-:root {
+    /*
+        Même rythme sur toutes les pages : chaque partie, l'accueil et le pied de page
+        utilisent ces deux valeurs.
+        --gutter, comme sur le CV : marge de 20 à 56 px selon l'écran, et au-delà de 1200 px de contenu,
+        la marge grandit pour centrer une colonne de 1200 px. Le % se calcule sur la largeur de la partie.
+    */
     /* Espace vertical d'une partie : 72px sur téléphone, 120px sur grand écran */
     --space-section: clamp(72px, 10vw, 120px);
-    --gutter: 8%;
+    --gutter: max(clamp(20px, 4vw, 56px), (100% - 1200px) / 2);
 }
 
 
@@ -127,7 +124,7 @@ body {
     background-color: var(--red);
     color: var(--white);
 
-    font-family: Avenir, "Avenir Next", sans-serif;
+    font-family: Avenir, "Avenir Next", Arial, sans-serif;
     line-height: 1.6;
 
     overflow-x: hidden;
@@ -195,6 +192,8 @@ textarea:focus-visible {
 
     background-color: var(--blue);
     color: var(--white);
+
+    text-decoration: none;
 
     transition: top 0.2s;
 }

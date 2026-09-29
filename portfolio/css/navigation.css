@@ -1,5 +1,10 @@
 /* -------------------- NAVIGATION -------------------- */
 
+/*
+ * En-tête commun aux pages, aux proportions du CV : identité à gauche (photo, AF, langue),
+ * liens simples à droite ; la page en cours est éclairée et cerclée de blanc.
+ * Sous 1024 px, les liens passent dans un menu déroulant ouvert par le bouton burger.
+ */
 .header {
     width: 100%;
 
@@ -7,6 +12,8 @@
     top: 0;
 
     z-index: 1000;
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
 
     /*
      * Rouge semi-transparent : le contenu défile dessous, flouté par backdrop-filter.
@@ -40,14 +47,22 @@
 }
 
 
+/*
+ * Bords alignés sur la colonne des sections (--gutter, base.css) ;
+ * 76 px de haut sur ordinateur, 60 px une fois l'en-tête compact, comme sur le CV.
+ */
 .header__nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
 
-    padding: 24px 48px;
+    min-height: 76px;
 
-    transition: padding 0.3s ease;
+    padding: 0 var(--gutter);
+
+    transition:
+        min-height 0.3s ease,
+        padding 0.3s ease;
 }
 
 
@@ -56,16 +71,14 @@
     align-items: center;
 
     gap: 12px;
-
-    transition: padding 0.3s ease;
 }
 
 
 .header__avatar {
     display: block;
 
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
 
     overflow: hidden;
 
@@ -91,63 +104,76 @@
 }
 
 
+/* Initiales : cible de 44 px, comme les autres éléments cliquables de l'en-tête */
 .header__logo {
-    font-size: 1.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 44px;
+    min-height: 44px;
+
+    font-size: 1.25rem;
     font-weight: bold;
-    letter-spacing: 0.15rem;
+    letter-spacing: 0.06em;
 
     text-decoration: none;
-
-    transition: font-size 0.3s ease;
 }
 
 
 /*
-    En-tête compact, ajouté par navigation.js après quelques pixels de défilement :
-    marges réduites, photo et initiales plus petites, plus de place pour le contenu.
-    Sur ordinateur, seul le haut rétrécit : les onglets restent posés sur le bas de l'en-tête.
-*/
+ * En-tête compact, ajouté par navigation.js après quelques pixels de défilement :
+ * barre moins haute et photo plus petite, plus de place pour le contenu.
+ */
 .header--compact .header__nav {
-    padding-top: 10px;
+    min-height: 60px;
 }
 
 
 .header--compact .header__avatar {
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
 }
 
 
-.header--compact .header__logo {
-    font-size: 1.25rem;
+/* -------------------- CHOIX DE LA LANGUE -------------------- */
+
+.language-select {
+    min-height: 44px;
+
+    padding: 4px 10px;
+
+    border: 1px solid var(--white);
+    border-radius: 3px;
+
+    background-color: var(--red);
+    color: var(--white);
+
+    font-family: inherit;
+    font-size: 0.8125rem;
+    font-weight: 600;
+
+    cursor: pointer;
 }
 
 
-@media (max-width: 1024px) {
-
-    .header--compact .header__nav {
-        padding-bottom: 10px;
-    }
-
+.language-select:hover {
+    background-color: var(--veil-strong);
 }
 
 
-@media (prefers-reduced-motion: reduce) {
+/* -------------------- LIENS -------------------- */
 
-    .header__nav,
-    .header__identity,
-    .header__avatar,
-    .header__logo {
-        transition: none;
-    }
-
+/* Nom de la page en cours, affiché seulement sur tablette et téléphone (menu replié) */
+.header__current {
+    display: none;
 }
 
 
 .header__links {
     display: flex;
 
-    gap: 32px;
+    gap: 4px;
 
     margin: 0;
     padding: 0;
@@ -156,43 +182,70 @@
 }
 
 
+/* Liens simples sans soulignement ; cible de 44 px de haut */
 .header__link {
-    padding-bottom: 4px;
+    display: inline-flex;
+    align-items: center;
 
-    border-bottom: 3px solid transparent;
+    min-height: 44px;
 
+    padding: 10px 16px;
+
+    border-radius: 3px;
+
+    color: rgba(255, 255, 255, 0.85);
+
+    font-weight: 500;
     text-decoration: none;
 
-    transition: border-color 0.3s;
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease;
 }
 
 
-/* Blanc atténué : le bleu sur le rouge manque de contraste (2,75 pour 3 minimum) */
 .header__link:hover {
-    border-bottom-color: rgba(255, 255, 255, 0.5);
+    color: var(--white);
 }
 
 
-/* Page en cours : le visiteur sait toujours où il se trouve */
+/*
+ * Page en cours, repérable sans dépendre de la couleur : fond éclairé et contour blanc.
+ * Même nom sur le lien actif de chaque page : pendant le changement de page,
+ * le navigateur fait glisser le cadre de son ancienne place vers la nouvelle.
+ */
 .header__link[aria-current="page"] {
-    border-bottom-color: var(--white);
+    view-transition-name: active-tab;
 
-    font-weight: bold;
+    background-color: var(--veil-strong);
+    color: var(--white);
+
+    box-shadow: inset 0 0 0 1px var(--white);
+
+    font-weight: 600;
 }
 
 
-/* Bouton menu, visible uniquement sur téléphone */
+/* -------------------- BOUTON MENU -------------------- */
+
+/* Visible uniquement sur tablette et téléphone */
 .header__toggle {
     display: none;
-    width: 44px;
-    height: 44px;
-    padding: 0;
     align-items: center;
     justify-content: center;
+
+    width: 44px;
+    height: 44px;
+
+    padding: 0;
+
     border: 1px solid rgba(255, 255, 255, 0.4);
+
     background: transparent;
     color: var(--white);
+
     cursor: pointer;
+
     transition: scale 0.1s ease-out;
 }
 
@@ -205,14 +258,17 @@
 .header__toggle-icon {
     display: flex;
     flex-direction: column;
+
     gap: 5px;
 }
 
 
 .header__toggle-icon span {
     display: block;
+
     width: 22px;
     height: 2px;
+
     background: currentColor;
 }
 
@@ -221,29 +277,147 @@
 .header__toggle:hover,
 .header__toggle:focus-visible {
     border-color: var(--white);
+
     outline: 2px solid var(--white);
     outline-offset: 3px;
 }
 
 
-/* -------------------- CHOIX DE LA LANGUE -------------------- */
-.language-select {
-    padding: 6px 8px;
+/* -------------------- TABLETTE ET TÉLÉPHONE -------------------- */
 
-    border: 1px solid var(--white);
+@media (max-width: 1024px) {
 
-    background-color: var(--red);
-    color: var(--white);
+    .header__nav {
+        position: relative;
 
-    font-family: inherit;
-    font-size: 0.85rem;
+        flex-wrap: wrap;
 
-    cursor: pointer;
+        gap: 12px 20px;
+
+        min-height: 0;
+
+        padding-block: 16px;
+    }
+
+
+    .header--compact .header__nav {
+        min-height: 0;
+
+        padding-block: 10px;
+    }
+
+
+    .header__toggle {
+        display: inline-flex;
+        flex: 0 0 44px;
+    }
+
+
+    .header__current {
+        display: block;
+        flex-basis: 100%;
+
+        margin: 0;
+
+        font-size: 0.9rem;
+    }
+
+
+    /*
+     * Le menu reste en place mais caché : visibility le retire du clavier.
+     * clip-path le découvre depuis le haut (sous le bouton) et le recouvre par le même chemin.
+     * Fermeture : courbe inverse de l'ouverture ; visibility attend la fin (délai 0.2s).
+     */
+    .header__links {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        z-index: 1001;
+
+        flex-direction: column;
+
+        gap: 0;
+
+        max-height: calc(100dvh - 130px);
+
+        padding: 10px var(--gutter) 20px;
+
+        overflow-y: auto;
+
+        background-color: var(--red);
+
+        box-shadow: 0 12px 18px rgba(0, 0, 0, 0.2);
+
+        visibility: hidden;
+        opacity: 0;
+        clip-path: inset(0 0 100% 0);
+
+        transition:
+            clip-path 0.2s cubic-bezier(0.8, 0, 0.8, 0.2),
+            opacity 0.2s ease,
+            visibility 0s linear 0.2s;
+    }
+
+
+    .header__nav--open .header__links {
+        visibility: visible;
+        opacity: 1;
+        /* Marge négative : l'ombre portée reste visible */
+        clip-path: inset(0 0 -40px 0);
+
+        transition:
+            clip-path 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
+            opacity 0.2s ease,
+            visibility 0s;
+    }
+
+
+    /* Liens pleine largeur, séparés par un filet ; la page en cours décale son texte de son cadre */
+    .header__link {
+        display: flex;
+
+        padding: 13px 0;
+
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 0;
+    }
+
+
+    .header__link[aria-current="page"] {
+        padding-left: 14px;
+    }
+
 }
 
 
-.language-select:hover {
-    background-color: var(--veil-strong);
+@media (max-width: 767px) {
+
+    .header__identity {
+        gap: 8px;
+    }
+
 }
 
 
+/* -------------------- MOUVEMENT RÉDUIT -------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .header__nav,
+    .header__avatar {
+        transition: none;
+    }
+
+}
+
+
+/* Le menu apparaît par simple fondu, sans se déplier */
+@media (max-width: 1024px) and (prefers-reduced-motion: reduce) {
+
+    .header__links,
+    .header__nav--open .header__links {
+        clip-path: none;
+    }
+
+}

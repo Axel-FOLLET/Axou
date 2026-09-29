@@ -1,215 +1,348 @@
 /*
- * Disposition des expériences sur grand écran ; responsive.css adapte les cartes aux petits écrans.
+ * Expériences en frise chronologique, comme la progression du portfolio : une flèche blanche
+ * descend au fil du défilement, chaque poste (carré daté + carte) apparaît quand elle l'atteint.
  * BEM : bloc__element désigne une partie du bloc ; bloc--modificateur désigne une variante.
  */
-/* -------------------- EXPÉRIENCES -------------------- */
+/* -------------------- FRISE -------------------- */
 
-.experience {
-    /*
-     * Fixe une hauteur minimale sans empêcher le contenu de grandir ; vh dépend de la hauteur de la fenêtre.
-     */
-    min-height: 100vh;
+/*
+ * --node : côté des carrés datés ; la flèche passe par leur centre.
+ * --axis-top : départ de la flèche, au centre du premier carré (décalé de 40 px, voir .timeline__number).
+ * --progress (de 0 à 1) est mis à jour par timeline.js ; sans JavaScript, il vaut 1 : flèche entière.
+ * --arrow-length : longueur du corps de la flèche quand elle est entière.
+ */
+.timeline {
+    --node: 56px;
+    --axis-top: calc(40px + var(--node) / 2);
+    --arrow-space: 20px;
+    --progress: 1;
+    --arrow-length: calc(100% - var(--axis-top) - var(--arrow-space));
 
-    /*
-     * Espacement intérieur : 2 valeurs = vertical/horizontal ; 3 = haut/horizontal/bas.
-     */
-    padding: 120px 8% 110px;
+    position: relative;
+
+    display: grid;
+
+    gap: 24px;
+
+    max-width: 1040px;
+
+    margin: 40px 0 0;
+    padding: 0 0 var(--arrow-space);
+
+    list-style: none;
 }
 
 
-.experience > p:first-of-type {
-    margin-bottom: 10px;
+/* Corps de la flèche : il s'allonge avec le défilement */
+.timeline::before {
+    content: "";
 
-    /*
-     * rem se rapporte à la taille de police de l'élément html.
-     */
-    font-size: 0.9rem;
-    letter-spacing: 0.1rem;
-}
-
-
-.experience > p:nth-of-type(2) {
-    margin-bottom: 40px;
-
-    color: rgba(255, 255, 255, 0.7);
-}
-
-
-/* -------------------- PETITS CUBES DES SECTIONS -------------------- */
-
-.cube--section {
-    /*
-     * Le positionnement définit le repère utilisé par top/right/bottom/left ; les valeurs sont précisées ici.
-     */
     position: absolute;
+    top: var(--axis-top);
+    left: calc(var(--node) / 2);
 
-    /*
-     * Règle l'ordre de superposition à l'intérieur du contexte d'empilement.
-     */
-    z-index: 2;
+    width: 2px;
+    height: calc(var(--progress) * var(--arrow-length));
+
+    background-color: white;
+
+    translate: -50% 0;
 }
 
 
-.education__cube {
-    top: 150px;
-    right: 8%;
+/* Pointe de la flèche, toujours au bout du corps */
+.timeline::after {
+    content: "";
+
+    position: absolute;
+    top: calc(var(--axis-top) + var(--progress) * var(--arrow-length));
+    left: calc(var(--node) / 2);
+
+    border-top: 16px solid white;
+    border-right: 9px solid transparent;
+    border-left: 9px solid transparent;
+
+    translate: -50% 0;
 }
 
 
-.experience__cube {
-    top: 115px;
-    right: 7%;
-}
+/* Deux colonnes : le carré daté, puis la carte du poste */
+.timeline__step {
+    position: relative;
 
+    display: grid;
+    grid-template-columns: var(--node) minmax(0, 1fr);
+    align-items: start;
 
-.projects__cube {
-    top: 105px;
-    right: 8%;
-}
-
-
-/* -------------------- DISPOSITION DES EXPÉRIENCES -------------------- */
-
-.experience__layout {
-    /*
-     * Définit le mode de disposition ; flex aligne les enfants sur un axe, grid sur une grille.
-     */
-    display: flex;
-    /*
-     * Aligne les enfants sur l'axe transversal du conteneur.
-     */
-    align-items: flex-start;
-
-    /*
-     * Ajoute de l'espace entre les enfants sans marge extérieure.
-     */
-    gap: 60px;
-}
-
-
-.experience__list {
-    width: 65%;
-}
-
-
-/* -------------------- CARTES EXPÉRIENCES -------------------- */
-
-.experience-card {
-    width: 100%;
-    max-width: 850px;
-
-    margin-bottom: 25px;
-
-    border-left: 3px solid transparent;
-
-    background-color: rgba(255, 255, 255, 0.03);
-
-    cursor: pointer;
-
-    /*
-     * Anime un changement de propriété, par exemple lors d'un survol ou d'un changement de classe.
-     */
-    transition:
-        transform 0.3s ease,
-        background-color 0.3s ease,
-        border-left-color 0.3s ease,
-        scale 0.1s ease-out;
-}
-
-
-/* La carte reçoit le focus clavier (tabindex) : l'indicateur doit rester visible. */
-.experience-card:focus-visible {
-    outline: 2px solid #E1001A;
-    outline-offset: 4px;
-}
-
-
-.experience-card:active {
-    scale: 0.99;
+    gap: 24px;
 }
 
 
 /*
- * Carte dont les compétences sont affichées dans la bulle (aria-current posé par experience.js).
- * Grand écran seulement : sur téléphone, la carte retournée suffit à le montrer.
+ * Carré daté : année de début, et de fin en dessous si elle diffère.
+ * Creux, il se remplit de blanc quand la flèche l'atteint (timeline.js).
+ * z-index le place au-dessus de la flèche ; tabular-nums aligne les chiffres.
  */
-@media (min-width: 1025px) {
+.timeline__number {
+    position: relative;
+    z-index: 1;
 
-    .experience-card[aria-current="true"] {
-        border-left-color: #E1001A;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 
-        background-color: rgba(255, 255, 255, 0.07);
-    }
+    width: var(--node);
+    height: var(--node);
 
+    /* 40 px : le centre du carré tombe sur le nom de l'entreprise */
+    margin-top: 40px;
+
+    border: 2px solid white;
+    border-radius: var(--radius-xs);
+
+    background-color: var(--color-bg);
+
+    font-size: 0.8125rem;
+    font-weight: 650;
+    line-height: 1.2;
+    font-variant-numeric: tabular-nums;
+
+    transition:
+        background-color var(--duration-ui) var(--ease-ui),
+        color var(--duration-ui) var(--ease-ui);
 }
 
 
-.experience-card__front {
-    padding: 30px 35px;
+.timeline__step--visible .timeline__number,
+.timeline:not(.timeline--animated) .timeline__number {
+    background-color: white;
+    color: var(--color-on-light);
 }
 
 
-.experience-card__back {
+/* Carte du poste : surface un peu plus claire que la page, sans survol (ce n'est pas un lien) */
+.timeline__content {
+    padding: 32px;
+
+    border-radius: var(--radius-card);
+
+    background-color: var(--color-surface);
+
+    box-shadow: var(--shadow-card);
+}
+
+
+.timeline__date {
+    margin: 0;
+
+    color: white;
+
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+
+.timeline__title {
+    margin: 10px 0 0;
+
+    font-size: 1.625rem;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+}
+
+
+.timeline__role {
+    margin: 6px 0 0;
+
+    font-size: 1.0625rem;
+    font-weight: 500;
+}
+
+
+.timeline__text {
+    max-width: 70ch;
+
+    margin: 12px 0 0;
+
+    color: white;
+}
+
+
+.timeline__role + .timeline__text {
+    margin-top: 20px;
+}
+
+
+/* -------------------- COMPÉTENCES DÉPLIABLES -------------------- */
+
+/*
+ * Bouton « Compétences & outils » en petit encadré blanc : discret, il ne concurrence pas le poste.
+ * Le signe + devient − une fois la liste dépliée ; « / "" » le retire de la lecture vocale,
+ * aria-expanded annonce déjà l'état. La cible garde 44 px de haut.
+ */
+.timeline__toggle {
+    display: inline-flex;
+    align-items: center;
+
+    gap: 8px;
+
+    min-height: 44px;
+
+    margin-top: 16px;
+    padding: 8px 14px;
+
+    border: 1px solid white;
+    border-radius: var(--radius-xs);
+
+    background-color: transparent;
+    color: white;
+
+    font-size: 0.9375rem;
+    font-weight: 500;
+
+    cursor: pointer;
+
+    transition:
+        background-color var(--duration-fast) var(--ease-ui),
+        scale 0.1s ease-out;
+}
+
+
+.timeline__toggle::after {
+    content: "+";
+    content: "+" / "";
+
+    font-size: 1.1rem;
+    line-height: 1;
+}
+
+
+.timeline__toggle[aria-expanded="true"]::after {
+    content: "−";
+    content: "−" / "";
+}
+
+
+.timeline__toggle:hover {
+    background-color: rgb(255 255 255 / 13%);
+}
+
+
+.timeline__toggle:active {
+    scale: 0.97;
+}
+
+
+/* Étiquettes cerclées de blanc, comme les tags du portfolio */
+.timeline__skills {
+    display: flex;
+    flex-wrap: wrap;
+
+    gap: 8px;
+
+    margin: 16px 0 0;
+    padding: 0;
+
+    list-style: none;
+}
+
+
+/* [hidden] l'emporte sur display: flex : la liste repliée disparaît vraiment. */
+.timeline__skills[hidden] {
     display: none;
 }
 
 
-.experience-card:hover {
-    border-left-color: #E1001A;
+/*
+ * --index (posé par experience.js) décale chaque étiquette de 25 ms : elles arrivent l'une après l'autre.
+ * both garde l'état de départ pendant le délai.
+ */
+.timeline__skills li {
+    padding: 5px 9px;
 
-    background-color: rgba(255, 255, 255, 0.07);
+    border: 1px solid white;
+    border-radius: var(--radius-sm);
 
-    /*
-     * Transforme le rendu sans déplacer les voisins dans le flux normal.
-     */
-    transform: translateX(8px);
+    font-size: 0.75rem;
+    line-height: 17px;
+
+    animation: skill-in var(--duration-ui) var(--ease-reveal) both;
+    animation-delay: calc(var(--index, 0) * 25ms);
 }
 
 
-.experience-card h3 {
-    /*
-     * Espacement extérieur ; auto peut absorber l'espace disponible selon la disposition.
-     */
-    margin: 0 0 8px;
-
-    font-size: 2rem;
+@keyframes skill-in {
+    from {
+        opacity: 0;
+        translate: 0 6px;
+    }
 }
 
 
-.experience-card h4 {
-    margin: 0 0 20px;
+/* -------------------- APPARITION DES POSTES -------------------- */
 
-    font-size: 1.2rem;
-    font-weight: normal;
+/*
+ * Classes ajoutées par timeline.js : chaque carte glisse depuis la droite, vers la flèche, en fondu.
+ * overflow-x: clip coupe le décalage de départ sans créer de zone de défilement
+ * (sinon, sur téléphone, la page dépasserait et le navigateur dézoomerait).
+ */
+.timeline--animated {
+    overflow-x: clip;
 }
 
 
-.experience-card p {
-    max-width: 700px;
+.timeline--animated .timeline__content {
+    opacity: 0;
+    translate: 24px 0;
 
-    /*
-     * Une valeur sans unité multiplie la taille de police pour fixer l'interligne.
-     */
-    line-height: 1.6;
+    transition:
+        opacity var(--duration-reveal) var(--ease-reveal),
+        translate var(--duration-reveal) var(--ease-reveal);
 }
 
 
-/* -------------------- BULLE COMPÉTENCES DESKTOP -------------------- */
+.timeline--animated .timeline__step--visible .timeline__content {
+    opacity: 1;
+    translate: none;
+}
 
-.experience__skills {
-    width: 35%;
-    max-width: 850px;
 
-    position: sticky;
-    top: 120px;
+/* -------------------- TÉLÉPHONE -------------------- */
 
-    padding: 25px 30px;
+@media (max-width: 767px) {
 
-    border: 1px solid rgba(255, 255, 255, 0.25);
+    .timeline {
+        --node: 48px;
+        --axis-top: calc(35px + var(--node) / 2);
 
-    background-color: rgba(255, 255, 255, 0.06);
+        gap: 16px;
 
-    line-height: 1.8;
+        margin-top: 28px;
+    }
 
-    transition: 0.3s;
+
+    .timeline__step {
+        gap: 12px;
+    }
+
+
+    .timeline__number {
+        margin-top: 35px;
+
+        font-size: 0.75rem;
+    }
+
+
+    .timeline__content {
+        padding: 24px 20px;
+    }
+
+
+    .timeline__title {
+        font-size: 1.375rem;
+    }
+
 }

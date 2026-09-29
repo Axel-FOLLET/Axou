@@ -18,6 +18,7 @@ function showFieldError(field, message) {
     }
     error.textContent = message;
     field.setAttribute("aria-invalid", "true");
+    field.classList.remove("contact-form__control--valid");
 }
 /*
  * Retire le message et les attributs d'erreur d'un champ corrigé.
@@ -29,11 +30,15 @@ function clearFieldError(field) {
 }
 /*
  * validity est fourni par le navigateur à partir de required et type="email".
+ * Un champ correct et non vide reçoit la coche de validation (contact.css).
  */
 function checkField(field, messages) {
     if (field.validity.valueMissing) showFieldError(field, messages.required);
     else if (field.validity.typeMismatch) showFieldError(field, messages.email);
-    else clearFieldError(field);
+    else {
+        clearFieldError(field);
+        field.classList.toggle("contact-form__control--valid", field.value.trim() !== "");
+    }
 }
 /*
  * Envoie le formulaire sans quitter la page et affiche l'état sous le bouton.
@@ -45,9 +50,10 @@ export function initContactForm(messages) {
     const status = document.querySelector(".contact-form__status");
     if (!form || !submit || !status) return;
     /*
-     * matches vérifie qu'un élément correspond au sélecteur : seuls les champs du formulaire sont testés.
+     * matches vérifie qu'un élément correspond au sélecteur : seuls les champs visibles sont testés,
+     * pas le champ piège anti-robots.
      */
-    const isField = element => element.matches("input, textarea");
+    const isField = element => element.matches(".contact-form__control");
     /*
      * Vérifie un champ quand le visiteur le quitte, pas pendant sa première saisie.
      */
@@ -55,10 +61,14 @@ export function initContactForm(messages) {
         if (isField(event.target)) checkField(event.target, messages);
     });
     /*
-     * Un champ déjà signalé est revérifié à chaque frappe : l'erreur disparaît dès la correction.
+     * Un champ déjà vérifié (en erreur ou coché) est revérifié à chaque frappe :
+     * l'erreur disparaît dès la correction, la coche dès qu'il redevient incorrect.
      */
     form.addEventListener("input", event => {
-        if (event.target.getAttribute("aria-invalid") === "true") checkField(event.target, messages);
+        const field = event.target;
+        const wasChecked = field.getAttribute("aria-invalid") === "true"
+            || field.classList.contains("contact-form__control--valid");
+        if (isField(field) && wasChecked) checkField(field, messages);
     });
     /*
      * À l'envoi, le navigateur déclenche "invalid" sur chaque champ incorrect.
@@ -86,6 +96,7 @@ export function initContactForm(messages) {
          */
         event.preventDefault();
         submit.disabled = true;
+        submit.classList.add("contact-form__submit--loading");
         showStatus("sending");
         /*
          * try essaie l'envoi ; catch traite l'erreur réseau ou serveur ; finally s'exécute dans tous les cas.
@@ -104,11 +115,15 @@ export function initContactForm(messages) {
              */
             if (!response.ok) throw new Error("Réponse " + response.status);
             form.reset();
+            form.querySelectorAll(".contact-form__control--valid").forEach(field => {
+                field.classList.remove("contact-form__control--valid");
+            });
             showStatus("success");
         } catch {
             showStatus("error");
         } finally {
             submit.disabled = false;
+            submit.classList.remove("contact-form__submit--loading");
         }
     });
 }

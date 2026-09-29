@@ -1,131 +1,209 @@
 /*
- * Accueil et repères des sections. position: relative sert d'ancrage aux cubes absolus.
+ * Accueil : grand nom sur deux lignes à gauche, figure de cubes à droite.
  * BEM : bloc__element désigne une partie du bloc ; bloc--modificateur désigne une variante.
  */
-/* -------------------- SECTIONS -------------------- */
-
-/*
-    Toutes les sections servent aussi de référence
-    pour les cubes placés en position absolue.
-*/
-.home,
-.education,
-.experience,
-.career,
-.projects,
-.contact {
-    /*
-     * Le positionnement définit le repère utilisé par top/right/bottom/left ; les valeurs sont précisées ici.
-     */
-    position: relative;
-}
-
-
 /* -------------------- ACCUEIL -------------------- */
 
+/*
+ * Deux colonnes (texte plus large que la figure) ; au moins la hauteur de l'écran sous l'en-tête.
+ * svh : hauteur de l'écran barre d'adresse mobile affichée, l'accueil ne saute pas au défilement.
+ */
 .home {
-    /*
-     * Fixe une hauteur minimale sans empêcher le contenu de grandir ; vh dépend de la hauteur de la fenêtre.
-     */
-    min-height: calc(100vh - 80px);
-
-    /*
-     * Définit le mode de disposition ; flex aligne les enfants sur un axe, grid sur une grille.
-     */
-    display: flex;
-    /*
-     * Aligne les enfants sur l'axe transversal du conteneur.
-     */
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
     align-items: center;
-    /*
-     * Répartit les enfants sur l'axe principal du conteneur flex.
-     */
-    justify-content: space-between;
 
-    /*
-     * Espacement intérieur : 2 valeurs = vertical/horizontal ; 3 = haut/horizontal/bas.
-     */
-    padding: 60px 8% 110px;
+    gap: 48px;
+
+    min-height: calc(100svh - var(--header-height));
 }
 
 
-/* -------------------- PARTIE TEXTE -------------------- */
-
-.home__text {
-    width: 50%;
-}
-
-
+/* Mêmes tailles que le portfolio : le nom suit la largeur de l'écran, entre 3.4rem et 6rem */
 .home h1 {
-    /*
-     * Espacement extérieur ; auto peut absorber l'espace disponible selon la disposition.
-     */
-    margin: 10px 0;
+    margin: 0;
 
-    /*
-     * clamp(minimum, idéal, maximum) : la taille suit la largeur de la fenêtre (8vw)
-     * sans descendre sous 4rem ni dépasser 6rem. Remplace les paliers fixes du responsive.
-     */
-    font-size: clamp(4rem, 8vw, 6rem);
-    /*
-     * Une valeur sans unité multiplie la taille de police pour fixer l'interligne.
-     */
+    font-size: clamp(3.4rem, 8vw, 6rem);
+    font-weight: 700;
     line-height: 0.9;
-
-    /*
-     * em se rapporte à la taille de ce texte : le resserrement reste proportionnel au titre.
-     */
     letter-spacing: -0.035em;
-
     text-transform: uppercase;
 }
 
 
+/* Poste actuel, sous le nom, à la taille de la phrase d'accroche du portfolio */
 .home h2 {
-    margin-top: 30px;
-
-    font-size: 1.5rem;
-    font-weight: normal;
-}
-
-
-.home p {
-    max-width: 600px;
-
-    line-height: 1.6;
-}
-
-
-/* -------------------- BOUTON ACCUEIL -------------------- */
-
-.home a {
-    display: inline-block;
-
-    margin-top: 20px;
-    padding: 14px 24px;
-
-    border: 1px solid white;
+    margin: 30px 0 0;
 
     color: white;
-    text-decoration: none;
 
-    /*
-     * Nommer les propriétés évite d'animer par accident une autre modification.
-     */
-    transition:
-        background-color 0.3s ease,
-        color 0.3s ease,
-        scale 0.1s ease-out;
+    font-size: 1.6rem;
+    font-weight: 400;
 }
 
 
-.home a:hover {
-    background-color: white;
-    color: #0D0A9B;
+/* -------------------- FIGURE DE CUBES -------------------- */
+
+/*
+ * Zone carrée de 440 px au plus : les cubes s'y placent en pourcentages.
+ * Les sélecteurs passent par .home__cubes : plus précis que .cube--large (cubes.css, chargé après),
+ * ils imposent leurs tailles.
+ */
+.home__cubes {
+    position: relative;
+
+    width: 100%;
+    max-width: 440px;
+    aspect-ratio: 1;
+
+    justify-self: end;
 }
 
 
-/* Retour immédiat à l'appui, utile sur écran tactile où le survol n'existe pas */
-.home a:active {
-    scale: 0.97;
+.home__cube {
+    position: absolute;
+}
+
+
+.home__cubes .home__cube--main {
+    --cube-size: 200px;
+    --cube-half: 100px;
+
+    top: 50%;
+    left: 50%;
+
+    transform: translate(-50%, -50%);
+}
+
+
+.home__cubes .home__cube--satellite-1 {
+    --cube-size: 64px;
+    --cube-half: 32px;
+
+    top: 0;
+    left: 0;
+}
+
+
+.home__cubes .home__cube--satellite-2 {
+    --cube-size: 80px;
+    --cube-half: 40px;
+
+    top: 2%;
+    right: 0;
+}
+
+
+.home__cubes .home__cube--satellite-3 {
+    --cube-size: 48px;
+    --cube-half: 24px;
+
+    bottom: 2%;
+    left: 4%;
+}
+
+
+.home__cubes .home__cube--satellite-4 {
+    --cube-size: 56px;
+    --cube-half: 28px;
+
+    right: 4%;
+    bottom: 0;
+}
+
+
+/* Sur ordinateur : cube principal plus présent, comme sur le portfolio */
+@media (min-width: 1025px) {
+
+    .home__cubes .home__cube--main {
+        --cube-size: 250px;
+        --cube-half: 125px;
+    }
+
+}
+
+
+/* -------------------- TABLETTE ET TÉLÉPHONE -------------------- */
+
+/* Une colonne : la figure passe sous le texte, plus basse. */
+@media (max-width: 1024px) {
+
+    .home {
+        grid-template-columns: minmax(0, 1fr);
+
+        min-height: auto;
+    }
+
+
+    .home__cubes {
+        max-width: 360px;
+
+        justify-self: center;
+    }
+
+
+    /* Cubes réduits : en tournant, ils ne se chevauchent plus */
+    .home__cubes .home__cube--main {
+        --cube-size: 150px;
+        --cube-half: 75px;
+    }
+
+
+    .home__cubes .home__cube--satellite-1 {
+        --cube-size: 52px;
+        --cube-half: 26px;
+    }
+
+
+    .home__cubes .home__cube--satellite-2 {
+        --cube-size: 60px;
+        --cube-half: 30px;
+    }
+
+}
+
+
+@media (max-width: 767px) {
+
+    .home h2 {
+        font-size: 1.3rem;
+    }
+
+
+    /* Figure réduite, plus proche du texte : cube principal et deux satellites */
+    .home {
+        gap: 24px;
+
+        padding-bottom: 32px;
+    }
+
+
+    .home__cubes {
+        max-width: 240px;
+    }
+
+
+    .home__cubes .home__cube--main {
+        --cube-size: 100px;
+        --cube-half: 50px;
+    }
+
+
+    .home__cubes .home__cube--satellite-1 {
+        --cube-size: 40px;
+        --cube-half: 20px;
+    }
+
+
+    .home__cubes .home__cube--satellite-2 {
+        --cube-size: 46px;
+        --cube-half: 23px;
+    }
+
+
+    .home__cubes .home__cube--satellite-3,
+    .home__cubes .home__cube--satellite-4 {
+        display: none;
+    }
+
 }

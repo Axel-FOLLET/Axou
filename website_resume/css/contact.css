@@ -1,338 +1,140 @@
 /*
- * Formulaire, liens et décor de la section contact. Les champs restent des éléments HTML natifs.
+ * Contact : liens en cartes, formulaire à champs arrondis, figure de cubes à droite.
+ * Les champs restent des éléments HTML natifs.
  * BEM : bloc__element désigne une partie du bloc ; bloc--modificateur désigne une variante.
  */
-/* -------------------- CONTACT -------------------- */
-
-.contact {
-    /*
-     * Fixe une hauteur minimale sans empêcher le contenu de grandir ; vh dépend de la hauteur de la fenêtre.
-     */
-    min-height: 100vh;
-
-    /*
-     * Espacement intérieur : 2 valeurs = vertical/horizontal ; 3 = haut/horizontal/bas.
-     */
-    padding: 120px 8% 110px;
-}
-
-
-.contact > p:first-child {
-    margin-bottom: 10px;
-
-    /*
-     * rem se rapporte à la taille de police de l'élément html.
-     */
-    font-size: 0.9rem;
-    letter-spacing: 0.1rem;
-}
-
-
-.contact h2 {
-    margin-bottom: 20px;
-
-    /* Taille progressive : 2.2rem sur téléphone, 3rem sur ordinateur */
-    font-size: clamp(2.2rem, 5vw, 3rem);
-}
-
+/* -------------------- INTRODUCTION -------------------- */
 
 .contact__intro {
-    max-width: 700px;
+    max-width: 800px;
 
-    margin-bottom: 30px;
+    margin: 20px 0 0;
 
-    /*
-     * Une valeur sans unité multiplie la taille de police pour fixer l'interligne.
-     */
-    line-height: 1.7;
+    color: var(--color-text-muted);
+
+    font-size: 1.25rem;
+    line-height: 1.5;
+
+    /* Évite un mot seul sur la dernière ligne */
+    text-wrap: pretty;
 }
 
 
-/* -------------------- BANDES ROUGES -------------------- */
+/* -------------------- LIENS LINKEDIN ET PORTFOLIO -------------------- */
 
-.contact__bars {
-    /*
-     * Définit le mode de disposition ; flex aligne les enfants sur un axe, grid sur une grille.
-     */
-    display: flex;
-    /*
-     * column empile les enfants verticalement ; row les dispose horizontalement.
-     */
-    flex-direction: column;
+.contact__links {
+    display: grid;
 
-    /*
-     * Ajoute de l'espace entre les enfants sans marge extérieure.
-     */
-    gap: 9px;
+    gap: 12px;
 
-    /*
-     * Espacement extérieur ; auto peut absorber l'espace disponible selon la disposition.
-     */
-    margin: 50px 0 45px;
-}
+    max-width: 800px;
 
-
-.contact__bars span {
-    display: block;
-
-    height: 12px;
-
-    background-color: #E1001A;
-}
-
-
-.contact__bars span:nth-child(3) {
-    width: 72%;
-}
-
-
-.contact__bars span:nth-child(2) {
-    width: 52%;
-}
-
-
-.contact__bars span:nth-child(1) {
-    width: 32%;
-}
-
-
-/* -------------------- MISE EN PAGE CONTACT -------------------- */
-
-.contact__layout {
-    display: flex;
-    /*
-     * Aligne les enfants sur l'axe transversal du conteneur.
-     */
-    align-items: flex-start;
-
-    gap: 80px;
-}
-
-
-.contact__main {
-    width: 60%;
-    max-width: 750px;
-}
-
-
-/* -------------------- NOM + PRÉNOM -------------------- */
-
-.contact-form__name-row {
-    display: flex;
-
-    gap: 20px;
-}
-
-
-.contact-form__name-row .contact-form__field {
-    /*
-     * Définit croissance, réduction et taille de base de cet enfant flex.
-     */
-    flex: 1;
-}
-
-
-/* -------------------- FORMULAIRE -------------------- */
-
-.contact-form {
-    width: 100%;
-}
-
-
-.contact-form__field {
-    display: flex;
-    flex-direction: column;
-
-    margin-bottom: 25px;
-}
-
-
-.contact-form__field label {
-    margin-bottom: 10px;
-
-    font-size: 0.9rem;
-    letter-spacing: 0.05rem;
-}
-
-
-.contact-form__field input,
-.contact-form__field textarea {
-    width: 100%;
-
-    padding: 15px 16px;
-
-    border: 1px solid rgba(255, 255, 255, 0.3);
-
-    background-color: rgba(255, 255, 255, 0.04);
-
-    color: white;
-
-    font-family: inherit;
-    font-size: 1rem;
-
-    outline: none;
-
-    /*
-     * Anime un changement de propriété, par exemple lors d'un survol ou d'un changement de classe.
-     */
-    transition:
-        border-color 0.3s ease,
-        background-color 0.3s ease;
-}
-
-
-.contact-form__field input:focus,
-.contact-form__field textarea:focus {
-    border-color: #E1001A;
-
-    background-color: rgba(255, 255, 255, 0.08);
-}
-
-
-.contact-form__field textarea {
-    /*
-     * Limite les directions dans lesquelles le visiteur peut redimensionner le champ.
-     */
-    resize: vertical;
+    margin: 32px 0 0;
 }
 
 
 /*
- * Champ en erreur : bordure gauche épaisse, repérable sans dépendre de la couleur.
- * Le padding compense les 5 px ajoutés pour que le texte ne bouge pas.
+ * Carte de lien : icône, nom, identifiant poussé à droite (margin-left: auto), flèche finale.
  */
-.contact-form__field [aria-invalid="true"] {
-    border-left: 6px solid #E1001A;
+.contact-link {
+    display: flex;
+    align-items: center;
 
-    padding-left: 11px;
-}
+    gap: 16px;
 
+    min-height: 64px;
 
-/* Message créé par contact-form.js sous le champ concerné */
-.contact-form__error {
-    margin: 8px 0 0;
+    padding: 12px 24px;
 
-    font-size: 0.9rem;
-    font-weight: bold;
-}
+    border: 1px solid transparent;
+    border-radius: var(--radius-control);
 
+    background-color: var(--color-surface);
 
-/* -------------------- BOUTON ENVOYER -------------------- */
-
-.contact-form__submit {
-    padding: 14px 26px;
-
-    border: 1px solid white;
-
-    background-color: transparent;
     color: white;
-
-    font-family: inherit;
-    font-size: 1rem;
-
-    cursor: pointer;
+    text-decoration: none;
 
     transition:
-        background-color 0.3s ease,
-        color 0.3s ease,
-        transform 0.3s ease,
+        background-color var(--duration-fast) var(--ease-ui),
+        border-color var(--duration-fast) var(--ease-ui),
         scale 0.1s ease-out;
 }
 
 
-.contact-form__submit:hover {
-    background-color: white;
-    color: #0D0A9B;
+/* Flèche décorative : « / "" » la retire de la lecture vocale */
+.contact-link::after {
+    content: "→";
+    content: "→" / "";
 
-    /*
-     * Transforme le rendu sans déplacer les voisins dans le flux normal.
-     */
-    transform: translateY(-3px);
+    font-size: 1.25rem;
+
+    transition: translate var(--duration-fast) var(--ease-ui);
 }
 
 
-.contact-form__submit:active {
-    scale: 0.97;
+@media (hover: hover) {
+
+    .contact-link:hover {
+        background-color: var(--color-surface-raised);
+    }
+
+
+    .contact-link:hover::after {
+        translate: 4px 0;
+    }
+
 }
 
 
-/* Bouton désactivé pendant l'envoi : évite un double envoi */
-.contact-form__submit:disabled {
-    cursor: wait;
-    opacity: 0.6;
-}
-
-
-/* -------------------- ÉTAT DE L'ENVOI -------------------- */
-
-/*
- * role="status" fait lire le message par les lecteurs d'écran sans déplacer le focus.
- * La couleur est portée par la bordure : du rouge sur ce bleu serait peu lisible en texte.
- */
-.contact-form__status {
-    min-height: 1.6em;
-
-    margin: 18px 0 0;
-    padding-left: 12px;
-
-    border-left: 3px solid transparent;
-
-    line-height: 1.6;
-}
-
-
-.contact-form__status--success {
-    border-left-color: white;
-}
-
-
-.contact-form__status--error {
-    border-left-color: #E1001A;
-}
-
-
-/* -------------------- LINKEDIN -------------------- */
-
-.contact__links {
-    display: flex;
-    flex-direction: column;
-    /* Les deux liens prennent la largeur du plus large */
-    align-items: stretch;
-    width: fit-content;
-
-    gap: 14px;
-
-    margin: 35px 0 50px;
+.contact-link:active {
+    scale: 0.99;
 }
 
 
 /*
-    Petit cube blanc qui remplace le logo dans le lien portfolio.
-    Le cube fait 18px, la marge le centre dans un carré de 30px
-    comme le logo LinkedIn.
+    Le logo officiel est noir avec le fond et le « in » transparents.
+    Sur le fond bleu, on le passe en blanc (version inversée autorisée).
 */
+.contact-link__logo {
+    flex-shrink: 0;
+
+    width: 24px;
+    height: 24px;
+
+    object-fit: contain;
+
+    filter: brightness(0) invert(1);
+}
+
+
+.contact-link__label {
+    font-size: 1.0625rem;
+    font-weight: 600;
+}
+
+
+.contact-link__hint {
+    margin-left: auto;
+
+    color: var(--color-text-muted);
+
+    font-size: 0.875rem;
+
+    /* Une longue adresse peut passer à la ligne n'importe où plutôt que déborder. */
+    overflow-wrap: anywhere;
+}
+
+
+/* Petit cube blanc à la place d'un logo, dans le lien vers le portfolio */
 .cube--icon {
     --cube-size: 18px;
     --cube-half: 9px;
 
     flex-shrink: 0;
 
-    margin: 6px;
+    margin: 3px;
 
-    /*
-     * Donne de la profondeur aux transformations 3D des descendants.
-     */
     perspective: 300px;
-}
-
-
-.cube--white {
-    --cube-border: white;
-
-    --cube-fill: rgba(255, 255, 255, 0.06);
-    --cube-hover: rgba(255, 255, 255, 0.2);
-
-    --cube-glow: rgba(255, 255, 255, 0.25);
 }
 
 
@@ -343,120 +145,235 @@
 }
 
 
-.portfolio-link:hover .cube__face {
-    background-color: var(--cube-hover);
+/* -------------------- MISE EN PAGE DU FORMULAIRE -------------------- */
+
+.contact__layout {
+    display: grid;
+    grid-template-columns: minmax(0, 800px) minmax(0, 1fr);
+    align-items: start;
+
+    gap: 48px;
+
+    margin-top: 32px;
 }
 
 
-.linkedin-link {
-    display: inline-flex;
-    align-items: center;
+/* -------------------- FORMULAIRE -------------------- */
 
-    gap: 14px;
+.contact-form__name-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
 
-    padding: 12px 18px;
+    gap: 24px;
+}
 
-    border: 1px solid rgba(255, 255, 255, 0.35);
 
-    background-color: rgba(255, 255, 255, 0.04);
+.contact-form__field {
+    display: flex;
+    flex-direction: column;
 
-    color: white;
-    text-decoration: none;
+    margin-bottom: 24px;
+}
 
-    transition:
-        background-color 0.3s ease,
-        border-color 0.3s ease,
-        transform 0.3s ease,
-        scale 0.1s ease-out;
+
+.contact-form__field label {
+    margin-bottom: 8px;
+
+    font-size: 0.875rem;
+    font-weight: 600;
 }
 
 
 /*
-    Le logo officiel est noir avec le fond et le « in » transparents.
-    Sur le fond bleu, on le passe en blanc (version inversée autorisée) :
-    le « in » transparent laisse voir le bleu de la page.
-*/
-.linkedin-link img {
-    width: 30px;
-    height: 30px;
+ * Champ : surface bleue, contour fonctionnel (3,8:1), coins arrondis.
+ * Au focus : contour blanc commun (base.css) et surface éclaircie.
+ */
+.contact-form__control {
+    width: 100%;
+    min-height: 56px;
+
+    padding: 14px 16px;
+
+    border: 1px solid var(--border-control);
+    border-radius: var(--radius-field);
+
+    background-color: var(--color-surface);
+
+    color: white;
+
+    font-size: 1rem;
+
+    transition:
+        border-color var(--duration-fast) var(--ease-ui),
+        background-color var(--duration-fast) var(--ease-ui);
+}
+
+
+.contact-form__control:hover {
+    border-color: white;
+}
+
+
+.contact-form__control:focus {
+    border-color: white;
+
+    background-color: var(--color-surface-raised);
+}
+
+
+textarea.contact-form__control {
+    min-height: 180px;
 
     /*
-     * contain conserve toute l'image ; cover remplit le cadre en recadrant si nécessaire.
+     * Limite les directions dans lesquelles le visiteur peut redimensionner le champ.
      */
-    object-fit: contain;
-
-    /*
-     * Applique un effet visuel sans modifier le fichier image.
-     */
-    filter: brightness(0) invert(1);
+    resize: vertical;
 }
 
 
-.linkedin-link:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-
-    border-color: #E1001A;
-
-    transform: translateX(5px);
+/*
+ * Champ en erreur : bordure blanche de 2 px, repérable sans dépendre de la couleur.
+ */
+.contact-form__control[aria-invalid="true"] {
+    border: 2px solid white;
 }
 
 
-.linkedin-link:active {
-    scale: 0.97;
+/*
+ * Champ correctement rempli (contact-form.js) : coche blanche dessinée en SVG à droite.
+ * L'image est intégrée à la feuille (data:) : aucun fichier de plus à charger.
+ */
+.contact-form__control--valid {
+    padding-right: 44px;
+
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M2 8.5l4 4 8-9' fill='none' stroke='white' stroke-width='2'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    background-size: 16px;
 }
 
 
-/* -------------------- CUBES CONTACT -------------------- */
-
-.contact__cubes {
-    flex: 1;
-
-    min-height: 520px;
-
-    /*
-     * Le positionnement définit le repère utilisé par top/right/bottom/left ; les valeurs sont précisées ici.
-     */
-    position: relative;
+/* Dans la zone de message, la coche reste en haut à droite plutôt qu'au milieu. */
+textarea.contact-form__control--valid {
+    background-position: right 16px top 18px;
 }
 
 
-.contact__cube--main {
-    position: absolute;
+/* Message créé par contact-form.js sous le champ concerné */
+.contact-form__error {
+    margin: 8px 0 0;
 
-    top: 45%;
-    left: 50%;
-
-    transform: translate(-50%, -50%);
+    font-size: 0.875rem;
+    font-weight: 600;
 }
 
 
-.contact__cube--satellite-1 {
-    position: absolute;
+/* -------------------- BOUTON ENVOYER -------------------- */
 
-    top: 10%;
-    left: 12%;
+/* Apparence commune .button (buttons.css) ; seul le cercle de chargement est propre au formulaire. */
+
+/*
+ * Pendant l'envoi : petit cercle ouvert qui tourne à droite du texte.
+ * currentColor reprend la couleur du texte du bouton.
+ */
+.contact-form__submit--loading::after {
+    content: "";
+
+    display: inline-block;
+
+    width: 14px;
+    height: 14px;
+
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+
+    animation: spin 0.8s linear infinite;
 }
 
 
-.contact__cube--satellite-2 {
-    position: absolute;
-
-    top: 18%;
-    right: 8%;
+@keyframes spin {
+    to {
+        rotate: 360deg;
+    }
 }
 
 
-.contact__cube--satellite-3 {
-    position: absolute;
+/* -------------------- ÉTAT DE L'ENVOI -------------------- */
 
-    right: 18%;
-    bottom: 10%;
+/*
+ * role="status" fait lire le message par les lecteurs d'écran sans déplacer le focus.
+ */
+.contact-form__status {
+    min-height: 1.6em;
+
+    margin: 20px 0 0;
+
+    font-weight: 600;
+    line-height: 1.6;
 }
 
-/* Cadres des liens de profil : largeur et hauteur communes. */
-.contact__links { width: 100%; max-width: 750px; }
-.linkedin-link { box-sizing: border-box; min-height: 76px; width: 100%; }
-.linkedin-link img { flex-shrink: 0; }
+
+/*
+ * Réussite ou échec : encadré qui glisse en place, précédé d'une pastille ✓ ou !.
+ * Le symbole distingue les deux cas sans dépendre de la couleur.
+ */
+.contact-form__status--success,
+.contact-form__status--error {
+    display: flex;
+    align-items: center;
+
+    gap: 14px;
+
+    padding: 16px;
+
+    border-radius: var(--radius-field);
+
+    background-color: var(--color-surface-raised);
+
+    animation: status-in var(--duration-ui) var(--ease-reveal);
+}
+
+
+.contact-form__status--success::before,
+.contact-form__status--error::before {
+    flex: 0 0 auto;
+
+    display: grid;
+    place-items: center;
+
+    width: 28px;
+    height: 28px;
+
+    border-radius: 50%;
+
+    background-color: white;
+    color: var(--color-on-light);
+}
+
+
+/*
+ * La seconde déclaration « / "" » donne un texte alternatif vide : le lecteur d'écran lit
+ * le message sans annoncer le symbole. La première sert aux navigateurs qui l'ignorent.
+ */
+.contact-form__status--success::before {
+    content: "✓";
+    content: "✓" / "";
+}
+
+
+.contact-form__status--error::before {
+    content: "!";
+    content: "!" / "";
+}
+
+
+@keyframes status-in {
+    from {
+        opacity: 0;
+        translate: 0 8px;
+    }
+}
 
 
 /* Champ piège anti-robots : placé hors de l'écran, jamais vu par les visiteurs */
@@ -464,4 +381,146 @@
     position: absolute;
 
     left: -9999px;
+}
+
+
+/* -------------------- CUBES CONTACT -------------------- */
+
+/* Figure compacte, à droite du formulaire, loin des champs */
+.contact__cubes {
+    position: relative;
+
+    width: 100%;
+    max-width: 320px;
+    aspect-ratio: 1;
+
+    justify-self: center;
+
+    margin-top: 40px;
+}
+
+
+.contact__cube {
+    position: absolute;
+}
+
+
+.contact__cubes .contact__cube--main {
+    --cube-size: 150px;
+    --cube-half: 75px;
+
+    top: 50%;
+    left: 50%;
+
+    transform: translate(-50%, -50%);
+}
+
+
+.contact__cubes .contact__cube--satellite-1 {
+    --cube-size: 56px;
+    --cube-half: 28px;
+
+    top: 4%;
+    left: 6%;
+}
+
+
+.contact__cubes .contact__cube--satellite-2 {
+    --cube-size: 64px;
+    --cube-half: 32px;
+
+    top: 10%;
+    right: 2%;
+}
+
+
+.contact__cubes .contact__cube--satellite-3 {
+    --cube-size: 44px;
+    --cube-half: 22px;
+
+    right: 14%;
+    bottom: 4%;
+}
+
+
+/* -------------------- TABLETTE ET TÉLÉPHONE -------------------- */
+
+/* La figure de cubes passe sous le formulaire, plus petite. */
+@media (max-width: 1024px) {
+
+    .contact__layout {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+
+    .contact__cubes {
+        max-width: 260px;
+
+        margin-top: 0;
+    }
+
+
+    /* Cubes réduits : en tournant, ils ne se chevauchent plus */
+    .contact__cubes .contact__cube--main {
+        --cube-size: 110px;
+        --cube-half: 55px;
+    }
+
+
+    .contact__cubes .contact__cube--satellite-1 {
+        --cube-size: 40px;
+        --cube-half: 20px;
+    }
+
+
+    .contact__cubes .contact__cube--satellite-2 {
+        --cube-size: 46px;
+        --cube-half: 23px;
+    }
+
+
+    .contact__cubes .contact__cube--satellite-3 {
+        --cube-size: 32px;
+        --cube-half: 16px;
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .contact-form__name-row {
+        grid-template-columns: minmax(0, 1fr);
+
+        gap: 0;
+    }
+
+
+    /* Identifiant sous le nom, aligné à gauche */
+    .contact-link {
+        display: grid;
+        grid-template-columns: 24px minmax(0, 1fr) auto;
+
+        gap: 2px 16px;
+    }
+
+
+    .contact-link__logo,
+    .contact-link .cube--icon {
+        grid-row: 1 / 3;
+    }
+
+
+    .contact-link__hint {
+        grid-column: 2;
+
+        margin-left: 0;
+    }
+
+
+    .contact-link::after {
+        grid-column: 3;
+        grid-row: 1 / 3;
+    }
+
 }

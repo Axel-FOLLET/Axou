@@ -1,77 +1,115 @@
 /*
- * Présentation des formations et espacement entre leurs panneaux.
+ * Formations : deux blocs côte à côte, voile blanc très léger, sans bordure.
  * BEM : bloc__element désigne une partie du bloc ; bloc--modificateur désigne une variante.
  */
 /* -------------------- FORMATION -------------------- */
 
-.education {
-    /*
-     * Fixe une hauteur minimale sans empêcher le contenu de grandir ; vh dépend de la hauteur de la fenêtre.
-     */
-    min-height: 100vh;
+/*
+ * Deux colonnes égales ; minmax(0, 1fr) laisse une colonne rétrécir sous la largeur de son contenu.
+ */
+.education__list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
 
-    /*
-     * Espacement intérieur : 2 valeurs = vertical/horizontal ; 3 = haut/horizontal/bas.
-     */
-    padding: 120px 8% 110px;
-}
+    gap: 24px;
 
-
-.education__content {
-    max-width: 950px;
-
-    padding: 50px 40px;
-
-    border-left: 3px solid #E1001A;
-
-    background-color: rgba(255, 255, 255, 0.03);
-}
-
-
-.education__content + .education__content {
     margin-top: 40px;
 }
 
 
-.education__content h2 {
-    /*
-     * Espacement extérieur ; auto peut absorber l'espace disponible selon la disposition.
-     */
-    margin: 0 0 10px;
+/*
+ * Voile blanc à 4 % : il détache chaque formation sans l'enfermer dans un cadre.
+ * Pas de survol : ce ne sont pas des liens.
+ */
+.education__card {
+    padding: var(--card-padding);
 
-    /*
-     * Taille progressive : 2.2rem sur téléphone, 2.8rem sur ordinateur.
-     */
-    font-size: clamp(2.2rem, 4.7vw, 2.8rem);
-    letter-spacing: -0.05rem;
+    border-radius: var(--radius-card);
+
+    background-color: rgb(255 255 255 / 4%);
 }
 
 
-.education__content h3 {
-    margin: 0 0 24px;
-
-    font-size: 1.4rem;
-    font-weight: normal;
+/* Années : chiffres de même largeur (tabular-nums), alignés d'une colonne à l'autre */
+.education__date {
+    margin: 0;
 
     color: white;
+
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    font-variant-numeric: tabular-nums;
 }
 
 
-.education__content p {
-    max-width: 760px;
+.education__school {
+    margin: 16px 0 0;
 
-    margin: 14px 0;
-
-    /*
-     * Une valeur sans unité multiplie la taille de police pour fixer l'interligne.
-     */
-    line-height: 1.6;
+    font-size: var(--text-card);
+    line-height: 1.15;
+    letter-spacing: -0.025em;
 }
 
 
-.education__content p:first-child {
-    margin-bottom: 30px;
+.education__degree {
+    margin: 12px 0 0;
 
-    font-size: 0.9rem;
-    letter-spacing: 0.1rem;
+    font-size: 1.0625rem;
+    font-weight: 600;
+    line-height: 1.45;
+}
+
+
+.education__text {
+    max-width: 60ch;
+
+    margin: 12px 0 0;
+
+    color: white;
+
+    line-height: 1.65;
+}
+
+
+.education__degree + .education__text {
+    margin-top: 20px;
+}
+
+
+/* Formation et Expériences s'enchaînent : 128 px entre les deux au lieu de 256 */
+@media (min-width: 768px) {
+
+    .education {
+        padding-bottom: 64px;
+    }
+
+
+    .experience {
+        padding-top: 64px;
+    }
+
+}
+
+
+/* Deux lignes réservées au diplôme (2 × 1.0625rem × 1.45) : les descriptions démarrent à la même hauteur. */
+@media (min-width: 768px) {
+
+    .education__degree {
+        min-height: 3.08125rem;
+    }
+
+}
+
+
+@media (max-width: 767px) {
+
+    .education__list {
+        grid-template-columns: minmax(0, 1fr);
+
+        gap: 16px;
+
+        margin-top: 28px;
+    }
+
 }

@@ -1,16 +1,20 @@
 /* -------------------- CONTACT -------------------- */
 
+/* Liens et formulaire sur une même colonne de 800 px au plus, comme sur le CV */
 .contact {
     display: flex;
     align-items: flex-start;
 
-    gap: 80px;
+    gap: 48px;
 }
 
 
 .contact__main {
-    width: 60%;
-    max-width: 750px;
+    flex: 0 1 800px;
+
+    width: 800px;
+    max-width: 800px;
+    min-width: 0;
 }
 
 
@@ -44,19 +48,22 @@
 
 
 .form__label {
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 
-    font-size: 0.9rem;
-    letter-spacing: 0.05rem;
+    font-size: 0.875rem;
+    font-weight: 600;
 }
 
 
 .form__input {
     width: 100%;
 
-    padding: 15px 16px;
+    min-height: 56px;
+
+    padding: 14px 16px;
 
     border: 1px solid var(--white);
+    border-radius: 3px;
 
     background-color: var(--veil);
     color: var(--white);
@@ -235,9 +242,9 @@
     display: flex;
     flex-direction: column;
 
-    gap: 14px;
+    gap: 12px;
 
-    max-width: 750px;
+    max-width: 800px;
     margin: 0;
     padding: 0;
 
@@ -245,16 +252,24 @@
 }
 
 
+/*
+ * Carte de lien : icône, nom, identifiant aligné à droite.
+ * Les quatre cartes partagent la même grille et la même hauteur.
+ */
 .link-card {
-    display: flex;
+    display: grid;
+    grid-template-columns: 30px minmax(0, 1fr) minmax(0, 1fr);
     align-items: center;
-    justify-content: space-between;
 
     gap: 14px;
 
-    padding: 16px 20px;
+    width: 100%;
+    min-height: 64px;
 
-    border: 1px solid var(--white);
+    padding: 12px 24px;
+
+    border: 1px solid transparent;
+    border-radius: 3px;
 
     background-color: var(--veil-strong);
 
@@ -262,7 +277,6 @@
 
     transition:
         background-color 0.3s ease,
-        transform 0.3s ease,
         scale 0.1s ease-out;
 }
 
@@ -272,32 +286,14 @@
 }
 
 
+/* Survol comme sur le CV : la surface s'éclaircit, sans glisser */
 .link-card:hover, .link-card:focus-within {
-
-    transform: translateX(5px);
-
-    /* Neutral base prevents red from tinting the translucent blue. */
-    background-color: #141422;
-    background-image: linear-gradient(rgba(13, 10, 155, 0.72),rgba(13, 10, 155, 0.72));
+    background-color: rgba(255, 255, 255, 0.2);
 }
 
 
 .link-card__label {
     font-weight: bold;
-}
-
-
-.link-card__hint {
-    font-size: 0.9rem;
-}
-
-
-/* Les quatre liens contact partagent la meme grille et la meme hauteur. */
-.link-card {
-    display: grid;
-    grid-template-columns: 30px minmax(0, 1fr) minmax(0, 1fr);
-    min-height: 76px;
-    width: 100%;
 }
 
 
@@ -325,6 +321,7 @@
 
 
 .link-card__hint {
+    font-size: 0.9rem;
     text-align: right;
 }
 

@@ -2,17 +2,7 @@
 
 @media (max-width: 1024px) {
 
-    :root {
-        --gutter: 6%;
-    }
-
-
-    .header__nav {
-        padding: 20px 32px;
-    }
-
-
-/* -------------------- ACCUEIL -------------------- */
+    /* -------------------- ACCUEIL -------------------- */
     .hero {
         flex-direction: column;
         align-items: flex-start;
@@ -58,13 +48,7 @@
 
     /* -------------------- PARCOURS -------------------- */
     .banner {
-        margin: 0;
-        padding: 50px 5%;
-    }
-
-
-    .challenge-list {
-        grid-template-columns: 1fr;
+        padding-block: 40px;
     }
 
 
@@ -109,22 +93,41 @@
 /* -------------------- TÉLÉPHONE -------------------- */
 @media (max-width: 767px) {
 
-    /* -------------------- NAVIGATION -------------------- */
-    .header__nav {
-        flex-wrap: nowrap;
+    /* -------------------- ACCUEIL -------------------- */
+    /* Figure de cubes moins haute et plus proche du texte, comme sur le CV */
+    .hero {
+        min-height: auto;
 
-        padding: 16px 20px;
+        padding-bottom: 40px;
     }
 
 
-    /* -------------------- ACCUEIL -------------------- */
     .hero__catchphrase {
         font-size: 1.3rem;
     }
 
 
     .hero__visual {
-        height: 420px;
+        height: 300px;
+
+        margin-top: 24px;
+    }
+
+
+    /* -------------------- SECTIONS -------------------- */
+    /* Moins de vide sous l'introduction : le cube de coin suit le texte de près */
+    .section {
+        padding-bottom: 40px;
+    }
+
+
+    .section__intro {
+        margin-bottom: 24px;
+    }
+
+
+    .cube--corner {
+        margin-bottom: 0;
     }
 
 
@@ -138,12 +141,18 @@
     }
 
 
-    /* -------------------- SECTIONS -------------------- */
-    .banner__intro {
-        padding: 26px 20px;
+    /* Figure de l'accueil plus basse : ses cubes rétrécissent dans la même proportion */
+    .hero__visual .cube--huge {
+        --cube-size: 120px;
     }
 
 
+    .hero__visual .cube--large {
+        --cube-size: 85px;
+    }
+
+
+    /* -------------------- SECTIONS -------------------- */
     /* Pastilles plus petites sur téléphone : le texte garde la largeur */
     .timeline {
         --node-size: 44px;
@@ -189,97 +198,8 @@
     .teaser:hover,
     .teaser:focus-within,
     .skill:hover,
-    .skill[aria-pressed="true"],
-    .challenge:hover,
-    .challenge:focus-within,
-    .link-card:hover,
-    .link-card:focus-within {
+    .skill[aria-pressed="true"] {
         transform: none;
     }
 
 }
-
-
-/* Burger adapte du CV : panneau sous la barre, sans deplacer le contenu. */
-@media (max-width: 1024px) {
-    .header__nav {
-        position: relative;
-        padding: 20px 32px;
-        gap: 20px;
-        flex-wrap: nowrap;
-    }
-
-    .header__toggle {
-        display: inline-flex;
-        flex: 0 0 44px;
-    }
-
-    /*
-     * Le menu reste en place mais caché : visibility le retire du clavier.
-     * clip-path le découvre depuis le haut (sous le bouton) et le recouvre par le même chemin.
-     * Fermeture : courbe inverse de l'ouverture ; visibility attend la fin (délai 0.2s).
-     */
-    .header__links {
-        display: flex;
-        visibility: hidden;
-        opacity: 0;
-        clip-path: inset(0 0 100% 0);
-        transition:
-            clip-path 0.2s cubic-bezier(0.8, 0, 0.8, 0.2),
-            opacity 0.2s ease,
-            visibility 0s linear 0.2s;
-        position: absolute;
-        top: 100%; left: 0; right: 0;
-        z-index: 1001;
-        flex-direction: column;
-        gap: 0;
-        padding: 10px 32px 20px;
-        background-color: var(--red);
-        box-shadow: 0 12px 18px rgba(0, 0, 0, 0.2);
-        max-height: calc(100dvh - 84px);
-        overflow-y: auto;
-    }
-    .header__nav--open .header__links {
-        visibility: visible;
-        opacity: 1;
-        clip-path: inset(0 0 -40px 0); /* marge négative : l'ombre portée reste visible */
-        transition:
-            clip-path 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
-            opacity 0.2s ease,
-            visibility 0s;
-    }
-
-    .header__link {
-        display: block;
-        padding: 13px 0;
-        border-top: 1px solid rgba(255, 255, 255, 0.2);
-    }
-}
-
-
-@media (max-width: 767px) {
-    .header__nav {
-        padding: 16px 20px;
-        gap: 12px;
-    }
-
-    .header__identity {
-        gap: 8px;
-    }
-
-    .header__links {
-        padding: 10px 20px 20px;
-    }
-}
-
-
-/* Mouvement réduit : le menu apparaît par simple fondu, sans se déplier. */
-@media (max-width: 1024px) and (prefers-reduced-motion: reduce) {
-    .header__links,
-
-    .header__nav--open .header__links {
-        clip-path: none;
-    }
-}
-
-

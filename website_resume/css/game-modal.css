@@ -3,84 +3,6 @@
  * Les modificateurs BEM d'ouverture sont ajoutés ou retirés par game-modal.js.
  * BEM : bloc__element désigne une partie du bloc ; bloc--modificateur désigne une variante.
  */
-/*
- * Fenêtre superposée des jeux : fond cliquable, dialogue et iframe.
- * Les modificateurs BEM d'ouverture sont ajoutés ou retirés par game-modal.js.
- * BEM : bloc__element désigne une partie du bloc ; bloc--modificateur désigne une variante.
- */
-/* -------------------- BOUTON POUR TESTER LES JEUX -------------------- */
-
-/*
-    Ce bouton reprend volontairement le même style et la même animation
-    que le lien GitHub déjà présent dans les cartes de projets.
-*/
-.project-card__play {
-    /*
-     * Définit le mode de disposition ; flex aligne les enfants sur un axe, grid sur une grille.
-     */
-    display: block;
-    /*
-     * border-box inclut padding et bordures dans les dimensions annoncées.
-     */
-    box-sizing: border-box;
-
-    /*
-     * Espacement extérieur ; auto peut absorber l'espace disponible selon la disposition.
-     */
-    margin: 0;
-    /*
-     * Espacement intérieur : 2 valeurs = vertical/horizontal ; 3 = haut/horizontal/bas.
-     */
-    padding: 12px 18px;
-
-    border: 1px solid white;
-
-    background-color: transparent;
-    color: white;
-
-    font-family: inherit;
-    /*
-     * rem se rapporte à la taille de police de l'élément html.
-     */
-    font-size: inherit;
-    /*
-     * Une valeur sans unité multiplie la taille de police pour fixer l'interligne.
-     */
-    line-height: inherit;
-    text-align: center;
-
-    cursor: pointer;
-
-    /*
-     * Anime un changement de propriété, par exemple lors d'un survol ou d'un changement de classe.
-     */
-    transition:
-        background-color 0.3s ease,
-        color 0.3s ease,
-        scale 0.1s ease-out;
-}
-
-
-.project-card__play:hover,
-.project-card__play:focus-visible {
-    background-color: white;
-    color: #0D0A9B;
-}
-
-
-.project-card__play:active {
-    scale: 0.97;
-}
-
-
-.project-card__play:focus-visible {
-    outline: 2px solid #E1001A;
-    /*
-     * Écarte l'indicateur de focus du bord sans modifier la taille de l'élément.
-     */
-    outline-offset: 4px;
-}
-
 
 /* -------------------- FENÊTRE DES JEUX -------------------- */
 
@@ -170,7 +92,10 @@ body.page--game-open {
      */
     flex-direction: column;
 
-    border: 1px solid rgba(255, 255, 255, 0.35);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-card);
+
+    overflow: hidden;
 
     background-color: #0D0A9B;
 
@@ -224,7 +149,8 @@ body.page--game-open {
     height: 44px;
 
     padding: 0;
-    border: 1px solid white;
+    border: 1px solid var(--border-control);
+    border-radius: 50%;
 
     background-color: transparent;
     color: white;
@@ -244,19 +170,14 @@ body.page--game-open {
 
 .game-modal__close:hover,
 .game-modal__close:focus-visible {
-    background-color: #E1001A;
-    border-color: #E1001A;
+    background-color: white;
+    border-color: white;
+    color: var(--color-on-light);
 }
 
 
 .game-modal__close:active {
     scale: 0.94;
-}
-
-
-.game-modal__close:focus-visible {
-    outline: 2px solid white;
-    outline-offset: 4px;
 }
 
 
@@ -287,18 +208,13 @@ body.page--game-open {
 /* -------------------- TABLETTE + TÉLÉPHONE -------------------- */
 
 /*
-    Le jeu navigateur est volontairement réservé à la version ordinateur.
-    Les cartes, leurs descriptions et les liens GitHub restent inchangés.
+    Le jeu navigateur est volontairement réservé à la version ordinateur :
+    projects.css remplace le bouton par la mention « Jouable sur ordinateur ».
 */
 /*
  * Cette condition se base sur la largeur de la fenêtre en pixels CSS, pas sur le type d'appareil.
  */
 @media (max-width: 1024px) {
-
-    .project-card__play {
-        display: none;
-    }
-
 
     .game-modal {
         display: none !important;

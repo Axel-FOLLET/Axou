@@ -1,8 +1,8 @@
 /* -------------------- PAGE PARCOURS : BANDEAU BLEU -------------------- */
 
+/* Bandeau bleu d'un bord à l'autre de l'écran ; son texte reste aligné sur la colonne des sections */
 .banner {
-    margin: 0 2%;
-    padding: 60px 6%;
+    padding: 56px var(--gutter);
 
     background-color: var(--blue);
 }
@@ -18,13 +18,6 @@
 }
 
 
-.banner__intro {
-    padding: 40px;
-
-    background-color: var(--veil-strong);
-}
-
-
 .banner__title {
     margin: 0 0 24px;
 
@@ -34,8 +27,6 @@
 
 
 .banner__text {
-    max-width: 850px;
-
     margin: 16px 0;
 }
 
@@ -164,6 +155,16 @@
     max-width: 800px;
 
     margin: 0;
+}
+
+
+/* Défi relevé à cette étape : une ligne courte sous le texte */
+.timeline__challenge {
+    max-width: 800px;
+
+    margin: 10px 0 0;
+
+    font-size: 0.875rem;
 }
 
 

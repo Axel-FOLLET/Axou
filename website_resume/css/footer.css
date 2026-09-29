@@ -1,48 +1,41 @@
 /*
- * Pied de page : navigation secondaire, crédits et mentions.
+ * Pied de page rouge sombre, pleine largeur, contenu aligné sur la colonne des sections.
+ * Trois colonnes comme sur le portfolio : navigation, liens, ressources et crédits ;
+ * puis une dernière ligne avec les droits et le retour en haut.
  * BEM : bloc__element désigne une partie du bloc ; bloc--modificateur désigne une variante.
  */
 /* -------------------- PIED DE PAGE -------------------- */
 
 .footer {
-    /*
-     * Espacement intérieur : 2 valeurs = vertical/horizontal ; 3 = haut/horizontal/bas.
-     */
-    padding: 50px 8% 40px;
+    padding-block: 64px 32px;
+    padding-inline: max(var(--gutter), (100% - var(--container)) / 2);
 
-    background-color: #E1001A;
+    background-color: #6B000C;
     color: white;
+
+    font-size: 0.875rem;
 }
 
 
 .footer__row {
-    /*
-     * Définit le mode de disposition ; flex aligne les enfants sur un axe, grid sur une grille.
-     */
     display: flex;
-    /*
-     * Répartit les enfants sur l'axe principal du conteneur flex.
-     */
     justify-content: space-between;
     flex-wrap: wrap;
 
-    /*
-     * Ajoute de l'espace entre les enfants sans marge extérieure.
-     */
-    gap: 30px;
+    gap: 40px;
 }
 
 
+/* Titres de colonne : petites capitales espacées, en retrait */
 .footer__title {
-    /*
-     * Espacement extérieur ; auto peut absorber l'espace disponible selon la disposition.
-     */
-    margin: 0 0 12px;
+    margin: 0 0 14px;
 
-    /*
-     * rem se rapporte à la taille de police de l'élément html.
-     */
-    font-size: 1.1rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+
+    opacity: 0.7;
 }
 
 
@@ -54,38 +47,82 @@
 }
 
 
-.footer__list li {
-    margin-bottom: 6px;
-}
+/* Liens sans soulignement ; le survol les éclaircit. 32 px de haut : cible confortable au doigt. */
+.footer__list a,
+.footer__top {
+    display: inline-flex;
+    align-items: center;
 
+    min-height: 32px;
 
-.footer__list a {
     color: white;
+
     text-decoration: none;
+
+    transition: opacity var(--duration-fast) var(--ease-ui);
 }
 
 
 .footer__list a:hover,
-.footer__list a:focus-visible {
-    text-decoration: underline;
+.footer__top:hover {
+    opacity: 0.75;
+}
+
+
+/* Liens externes : flèche décorative, retirée de la lecture vocale */
+.footer__external::after {
+    content: " ↗";
+    content: " ↗" / "";
 }
 
 
 .footer__credits {
-    max-width: 620px;
+    max-width: 520px;
 
     margin: 0;
 
-    font-size: 0.9rem;
-    /*
-     * Une valeur sans unité multiplie la taille de police pour fixer l'interligne.
-     */
-    line-height: 1.5;
+    font-size: 0.85rem;
+    line-height: 1.6;
+
+    opacity: 0.8;
+}
+
+
+/* Dernière ligne : droits à gauche, retour en haut à droite */
+.footer__bottom {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+
+    gap: 12px;
+
+    margin-top: 48px;
+    padding-top: 20px;
+
+    border-top: 1px solid rgb(255 255 255 / 15%);
+
+    font-size: 0.85rem;
 }
 
 
 .footer__copyright {
-    margin: 30px 0 0;
+    margin: 0;
 
-    font-size: 0.85rem;
+    opacity: 0.7;
+}
+
+
+@media (max-width: 767px) {
+
+    .footer {
+        padding-block: 40px 28px;
+    }
+
+
+    .footer__row {
+        flex-direction: column;
+
+        gap: 28px;
+    }
+
 }

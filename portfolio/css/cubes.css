@@ -3,6 +3,10 @@
 /*
     Tous les cubes utilisent le même système.
     JavaScript gère directement leur rotation.
+
+    Le cube s'attrape et se lance (drag-cube.js).
+    pan-y : sur écran tactile, glisser verticalement fait toujours défiler la page ;
+    glisser horizontalement fait tourner le cube.
 */
 .cube {
     width: var(--cube-size);
@@ -17,7 +21,9 @@
 
     background-color: transparent;
 
-    cursor: pointer;
+    touch-action: pan-y;
+
+    cursor: grab;
 
     perspective: 900px;
 
@@ -31,22 +37,7 @@
 /* Retour immédiat à l'appui, avant même le relâchement */
 .cube:active {
     scale: 0.92;
-}
 
-
-/*
-    Le cube s'attrape et se lance (drag-cube.js).
-    pan-y : sur écran tactile, glisser verticalement fait toujours défiler la page ;
-    glisser horizontalement fait tourner le cube.
-*/
-.cube {
-    touch-action: pan-y;
-
-    cursor: grab;
-}
-
-
-.cube:active {
     cursor: grabbing;
 }
 

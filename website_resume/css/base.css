@@ -1,7 +1,75 @@
 /*
- * Base commune : modèle de boîte, police et fond. Les sections complètent ces règles.
+ * Base commune : jetons de design, gabarit des sections, police et fond.
  * BEM : bloc__element désigne une partie du bloc ; bloc--modificateur désigne une variante.
  */
+/* -------------------- JETONS DE DESIGN -------------------- */
+
+/*
+ * Variables réutilisées par toutes les feuilles : changer une valeur ici l'applique partout.
+ * Couleurs du site (bleu, rouge, blanc) et surfaces dérivées du bleu, un peu plus claires.
+ * Le rouge sur le bleu n'atteint que 2,75:1 : il reste décoratif, jamais pour du texte ou un état.
+ */
+:root {
+    color-scheme: dark;
+
+    --color-bg: #0D0A9B;
+    --color-bg-deep: #09076B;
+    --color-surface: #19169F;
+    --color-surface-raised: #2522A7;
+    --color-surface-hover: #302DB0;
+
+    --color-red: #E1001A;
+    --color-red-deep: #B90016;
+
+    --color-text: #FFFFFF;
+    --color-text-muted: #D4D5F4;
+    --color-on-light: #0D0A9B;
+
+    /* Contour des champs et boutons secondaires : 3,8:1 sur les surfaces, lisible comme indicateur. */
+    --border-control: #9290D3;
+    --border-subtle: rgb(255 255 255 / 12%);
+
+    /*
+     * Arrondis à peine perceptibles : angles presque droits, boutons compris.
+     * Seuls les vrais cercles (photo, pastilles de la frise) restent ronds (border-radius: 50%).
+     */
+    --radius-xs: 2px;
+    --radius-sm: 2px;
+    --radius-field: 3px;
+    --radius-control: 3px;
+    --radius-panel: 3px;
+    --radius-card: 4px;
+    --radius-feature: 4px;
+    --radius-pill: 3px;
+
+    /* Pas d'ombre sous les cartes : sur ce bleu, elles donnaient un effet de panneaux flottants. */
+    --shadow-card: none;
+    --shadow-feature: none;
+
+    --container: 1200px;
+    --gutter: clamp(20px, 4vw, 56px);
+    --section-space: clamp(72px, 9vw, 128px);
+    --card-padding: clamp(24px, 3vw, 40px);
+    --header-height: 76px;
+
+    /* Même police que le portfolio : Avenir lorsqu'elle est installée, sinon Arial. */
+    --font-sans: Avenir, "Avenir Next", Arial, sans-serif;
+
+    --text-small: clamp(0.875rem, 0.84rem + 0.15vw, 0.9375rem);
+    --text-body: clamp(1rem, 0.96rem + 0.2vw, 1.125rem);
+    --text-lead: clamp(1.125rem, 1rem + 0.55vw, 1.5rem);
+    --text-card: clamp(1.5rem, 1.2rem + 1vw, 2rem);
+    --text-section: clamp(2.125rem, 1.4rem + 2.5vw, 3.5rem);
+    --text-hero: clamp(3.5rem, 2rem + 6vw, 7rem);
+
+    --duration-fast: 160ms;
+    --duration-ui: 240ms;
+    --duration-reveal: 560ms;
+    --ease-ui: cubic-bezier(0.2, 0, 0, 1);
+    --ease-reveal: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+
 /* -------------------- BASE -------------------- */
 
 * {
@@ -12,23 +80,226 @@
 }
 
 
+/*
+ * scroll-padding-top : un lien vers une section s'arrête sous l'en-tête collant, pas dessous.
+ */
 html {
     scroll-behavior: smooth;
+    scroll-padding-top: var(--header-height);
 }
 
 
 body {
-    /*
-     * Espacement extérieur ; auto peut absorber l'espace disponible selon la disposition.
-     */
     margin: 0;
 
-    background-color: #0D0A9B;
-    color: white;
+    background-color: var(--color-bg);
+    color: var(--color-text);
 
-    font-family: Avenir, "Avenir Next", sans-serif;
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: 1.6;
+
+    /* Lissage des polices sur Mac, comme les sites Apple */
+    -webkit-font-smoothing: antialiased;
 
     overflow-x: hidden;
+}
+
+
+/*
+ * Fond en relief, discret : un halo clair en haut à gauche et un bleu plus profond vers le bas.
+ * position: fixed le garde immobile ; z-index: -1 le place sous le contenu.
+ */
+body::before {
+    content: "";
+
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+
+    background:
+        radial-gradient(60vw 40vw at 25% 0%, rgb(90 110 255 / 12%), transparent 70%),
+        linear-gradient(180deg, transparent 50%, rgb(9 7 107 / 40%));
+
+    pointer-events: none;
+}
+
+
+h1,
+h2,
+h3 {
+    line-height: 1.08;
+}
+
+
+/* Un <button> ou un champ n'hérite pas de la police : inherit l'aligne sur le texte. */
+button,
+input,
+textarea,
+select {
+    font: inherit;
+}
+
+
+/* -------------------- GABARIT DES SECTIONS -------------------- */
+
+/*
+ * Toutes les sections partagent la même colonne centrée de 1200 px au plus.
+ * max() choisit la plus grande marge : la gouttière, ou ce qu'il reste autour des 1200 px.
+ */
+.home,
+.education,
+.experience,
+.career,
+.projects,
+.contact {
+    position: relative;
+
+    padding-block: var(--section-space);
+    padding-inline: max(var(--gutter), (100% - var(--container)) / 2);
+}
+
+
+/* -------------------- BARRES D'ACCENT -------------------- */
+
+/* Trois barres rouges fines, identiques aux barres bleues du portfolio */
+.bars {
+    display: flex;
+    flex-direction: column;
+
+    gap: 6px;
+
+    margin: 24px 0 28px;
+}
+
+
+.bars__bar {
+    display: block;
+
+    height: 4px;
+
+    background-color: var(--color-red);
+}
+
+
+.bars__bar:nth-child(1) {
+    width: 32%;
+}
+
+
+.bars__bar:nth-child(2) {
+    width: 52%;
+}
+
+
+.bars__bar:nth-child(3) {
+    width: 72%;
+}
+
+
+@media (max-width: 1024px) {
+
+    .bars__bar:nth-child(1) {
+        width: 40%;
+    }
+
+
+    .bars__bar:nth-child(2) {
+        width: 60%;
+    }
+
+
+    .bars__bar:nth-child(3) {
+        width: 80%;
+    }
+
+}
+
+
+/* -------------------- FOCUS CLAVIER -------------------- */
+
+/*
+ * Contour blanc et épais pour tout élément atteint au clavier.
+ * :focus-visible ne s'affiche qu'au clavier, pas au clic de souris.
+ */
+a:focus-visible,
+button:focus-visible,
+select:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+    outline: 3px solid white;
+    outline-offset: 5px;
+}
+
+
+/* -------------------- SURTITRE, TITRE ET INTRODUCTION DE SECTION -------------------- */
+
+/* Petit texte au-dessus des titres (« 01 / FORMATION ») */
+.eyebrow {
+    margin: 0 0 16px;
+
+    color: white;
+
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+}
+
+
+.section-title {
+    max-width: 30ch;
+
+    margin: 0;
+
+    font-size: var(--text-section);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+}
+
+
+/* ch : largeur du caractère « 0 » ; 64ch garde des lignes faciles à suivre. */
+.section-intro {
+    max-width: 640px;
+
+    margin: 20px 0 0;
+
+    color: white;
+
+    font-size: 1.125rem;
+    line-height: 1.55;
+}
+
+
+/* Sur ordinateur, titres aux proportions du portfolio : moins massifs, plus nets. */
+@media (min-width: 1025px) {
+
+    .section-title {
+        font-size: 3rem;
+        line-height: 1.08;
+    }
+
+}
+
+
+/* -------------------- APPARITION AU DÉFILEMENT -------------------- */
+
+/*
+ * Classes ajoutées par reveal.js : fondu et montée de 16 px, une seule fois.
+ * translate: none à l'arrivée : la section ne garde pas de transformation.
+ */
+.reveal {
+    opacity: 0;
+    translate: 0 16px;
+
+    transition:
+        opacity var(--duration-reveal) var(--ease-reveal),
+        translate var(--duration-reveal) var(--ease-reveal);
+}
+
+
+.reveal--visible {
+    opacity: 1;
+    translate: none;
 }
 
 
@@ -48,8 +319,12 @@ body {
 
     padding: 10px 16px;
 
+    border-radius: var(--radius-sm);
+
     background-color: white;
-    color: #0D0A9B;
+    color: var(--color-on-light);
+
+    text-decoration: none;
 
     transition: top 0.2s ease;
 }

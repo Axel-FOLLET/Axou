@@ -18,11 +18,10 @@
     /*
      * Les survols ne déplacent plus les éléments ; les changements de couleur restent.
      */
-    .experience-card:hover,
+    .button:hover,
     .project-card:hover,
-    .skills__button:hover,
     .contact-form__submit:hover,
-    .linkedin-link:hover {
+    .contact-link:hover {
         transform: none;
     }
 
@@ -35,53 +34,41 @@
         transform: none;
     }
 
-    /* Les cubes sont arrêtés dans js/modules/cubes/init-cubes.js. */
-}
-
-
-/*
- * Petit écran : la carte se retourne normalement en 3D.
- * Ici, un fondu remplace la rotation : le verso apparaît par-dessus le recto.
- */
-@media (prefers-reduced-motion: reduce) and (max-width: 1024px) {
 
     /*
-     * Le menu mobile apparaît par simple fondu, sans se déplier.
+     * L'en-tête compact change de taille d'un coup, sans animation.
      */
-    .navigation__links,
-    .navigation--open .navigation__links {
-        clip-path: none;
-    }
-
-
-    .experience-card__inner,
-    .experience-card.experience-card--flipped .experience-card__inner {
-        transform: none;
-
+    .navigation,
+    .navigation__identity,
+    .navigation__identity img,
+    .navigation__identity a {
         transition: none;
     }
 
 
-    .experience-card__front,
-    .experience-card__back {
-        transition: opacity 0.2s ease;
+    /*
+     * Les contenus nouveaux (compétences, message d'envoi) s'affichent sans glisser.
+     * Le cercle de chargement ne tourne plus : « Envoi en cours… » suffit à indiquer l'attente.
+     */
+    .timeline__skills li,
+    .contact-form__status--success,
+    .contact-form__status--error,
+    .contact-form__submit--loading::after {
+        animation: none;
     }
 
-
-    .experience-card__back {
-        transform: none;
-
-        opacity: 0;
-    }
+    /* Les cubes sont arrêtés dans js/modules/cubes/init-cubes.js ; les sections n'apparaissent plus en fondu (reveal.js). */
+}
 
 
-    .experience-card.experience-card--flipped .experience-card__front {
-        opacity: 0;
-    }
+/*
+ * Petit écran : le menu mobile apparaît par simple fondu, sans se déplier.
+ */
+@media (prefers-reduced-motion: reduce) and (max-width: 1024px) {
 
-
-    .experience-card.experience-card--flipped .experience-card__back {
-        opacity: 1;
+    .navigation__links,
+    .navigation--open .navigation__links {
+        clip-path: none;
     }
 }
 
