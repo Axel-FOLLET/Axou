@@ -9,6 +9,7 @@ import { initLanguage } from "./modules/language.js";
 import { initCubes } from "./modules/cubes/init-cubes.js";
 import { initGameModal } from "./modules/game-modal.js";
 import { initRepos } from "./modules/repos.js";
+import { initTimeline } from "./modules/timeline.js";
 
 initNavigation();
 initSkills();
@@ -16,4 +17,5 @@ initContact();
 initLanguage();
 initCubes();
 initRepos();
+initTimeline();
 initGameModal(document.documentElement.lang === "en" ? "en" : "fr");

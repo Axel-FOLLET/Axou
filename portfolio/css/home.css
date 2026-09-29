@@ -123,27 +123,4 @@
 }
 
 
-/* -------------------- LOGIQUE DU PORTFOLIO -------------------- */
-
-.logic {
-    max-width: 950px;
-
-    padding: 40px;
-
-    border-left: 6px solid var(--blue);
-
-    background-color: var(--veil);
-}
-
-
-.logic__list {
-    margin: 0;
-    padding-left: 22px;
-}
-
-
-.logic__item + .logic__item {
-    margin-top: 12px;
-}
-
 

@@ -27,14 +27,14 @@
     <link rel="stylesheet" href="../css/navigation.css?v=4a3d2ca7cf75">
     <link rel="stylesheet" href="../css/sections.css?v=5f1431c8fd16">
     <link rel="stylesheet" href="../css/buttons.css?v=599c22311f6c">
-    <link rel="stylesheet" href="../css/home.css?v=1e14d1951d96">
+    <link rel="stylesheet" href="../css/home.css?v=5f1d3105fd39">
     <link rel="stylesheet" href="../css/cubes.css?v=94dd18a8abb4">
-    <link rel="stylesheet" href="../css/projects.css?v=9b522b099d6c">
-    <link rel="stylesheet" href="../css/career.css?v=54eb30ba776f">
+    <link rel="stylesheet" href="../css/projects.css?v=ab70d15e31da">
+    <link rel="stylesheet" href="../css/career.css?v=4ee40a2862e9">
     <link rel="stylesheet" href="../css/skills.css?v=35c3209e8b26">
     <link rel="stylesheet" href="../css/contact.css?v=394b5c5ceee5">
     <link rel="stylesheet" href="../css/footer.css?v=8d7b4ac03775">
-    <link rel="stylesheet" href="../css/responsive.css?v=0cabce87c1fa">
+    <link rel="stylesheet" href="../css/responsive.css?v=afbe15f64498">
     <link rel="stylesheet" href="../css/game-modal.css?v=8321015a760b">
     <link rel="stylesheet" href="../css/folder-tabs.css?v=043a3ac3284d">
     <!-- blocking="render" : la page ne s'affiche qu'une fois le script exécuté, cubes compris.
@@ -137,7 +137,7 @@
             <h1 class="section__title" id="projects-title">Mes projets techniques</h1>
 
             <p class="section__intro">
-                Trois projets, trois étapes : les jeux Python ont posé les bases de la programmation, le site CV celles du web. Pour chacun : le contexte, l'objectif, ce que j'en retiens, les technologies, et les liens pour vérifier par vous-même.
+                Chaque projet marque une étape : les jeux Python ont posé les bases de la programmation, le site CV celles du web. Pour chacun : le contexte, l'objectif, ce que j'en retiens, les technologies, et les liens pour parcourir le code ou tester les jeux.
             </p>
 
             <button
@@ -183,13 +183,13 @@
                         <dl class="project-card__details">
 
                             <dt class="project-card__label">Contexte</dt>
-                            <dd class="project-card__text">Projet Epitech (Web Day 04-05) : concevoir un site CV en HTML, CSS et JavaScript, sans framework, en français et en anglais.</dd>
+                            <dd class="project-card__text">Projet Epitech de la piscine web : concevoir un site CV en HTML, CSS et JavaScript, sans framework, en français et en anglais.</dd>
 
                             <dt class="project-card__label">Objectif</dt>
-                            <dd class="project-card__text">Présenter mon passage de la gestion de projets RH à l'informatique sur un site responsive, interactif et bilingue, avec un formulaire de contact fonctionnel.</dd>
+                            <dd class="project-card__text project-card__text--goal">Présenter mon passage de la gestion de projets RH à l'informatique sur un site responsive, interactif et bilingue, avec un formulaire de contact fonctionnel.</dd>
 
                             <dt class="project-card__label">Ce que j'en retiens</dt>
-                            <dd class="project-card__text">Un site maintenable se construit par petits modules : un fichier par responsabilité (menu, cubes, formulaire, jeux) garde chaque correction localisée. Les dernières itérations ont porté sur l'accessibilité : navigation au clavier, mouvement réduit, validation du formulaire.</dd>
+                            <dd class="project-card__text">Un fichier par responsabilité (menu, cubes, formulaire, jeux) m'a obligé à comprendre comment chaque partie échange avec les autres. Face à un bug, je sais où chercher et pourquoi il survient : je corrige la cause plutôt que le symptôme, sans effet de bord sur le reste du site.</dd>
 
                             <dt class="project-card__label">Compétences et technologies</dt>
                             <dd class="project-card__text">
@@ -199,7 +199,6 @@
                                 <li class="tag">JavaScript</li>
                                 <li class="tag">Responsive</li>
                                 <li class="tag">Animations 3D en CSS</li>
-                                <li class="tag">Formspree</li>
                                 <li class="tag">GitHub Pages</li>
                                 </ul>
                             </dd>
@@ -231,7 +230,7 @@
                             <dd class="project-card__text">Projet personnel, réalisé après le Pendu pour passer d'un jeu au tour par tour à un jeu en temps réel.</dd>
 
                             <dt class="project-card__label">Objectif</dt>
-                            <dd class="project-card__text">Développer un Snake complet : déplacements au clavier, collisions, pommes, score et effets visuels. La version jouable ici est adaptée en JavaScript.</dd>
+                            <dd class="project-card__text project-card__text--goal">Développer un Snake complet : déplacements au clavier, collisions, pommes, score et effets visuels. La version jouable ici est adaptée en JavaScript.</dd>
 
                             <dt class="project-card__label">Ce que j'en retiens</dt>
                             <dd class="project-card__text">Le temps réel impose de séparer la boucle de jeu, l'affichage et les règles. Le code est découpé en modules (serpent, pomme, collisions, score) : une règle se corrige sans toucher au reste.</dd>
@@ -274,10 +273,10 @@
                             <dd class="project-card__text">Premier projet personnel, réalisé pour mettre en pratique les bases de Python sur un programme complet.</dd>
 
                             <dt class="project-card__label">Objectif</dt>
-                            <dd class="project-card__text">Créer un Pendu jouable de bout en bout : tirage d'un mot, saisie des lettres, gestion des erreurs et sauvegarde du meilleur score.</dd>
+                            <dd class="project-card__text project-card__text--goal">Créer un Pendu jouable de bout en bout : tirage d'un mot, saisie des lettres, gestion des erreurs et sauvegarde du meilleur score.</dd>
 
                             <dt class="project-card__label">Ce que j'en retiens</dt>
-                            <dd class="project-card__text">Passer d'exercices isolés à un programme complet : lire une liste de mots dans un fichier, conserver un score d'une partie à l'autre et anticiper les saisies invalides.</dd>
+                            <dd class="project-card__text">Mon premier programme complet : lire des mots dans un fichier, garder le meilleur score, anticiper les saisies invalides. Je l'ai repris une fois Pygame maîtrisé pour en faire un jeu concret, avec une vraie interface graphique.</dd>
 
                             <dt class="project-card__label">Compétences et technologies</dt>
                             <dd class="project-card__text">

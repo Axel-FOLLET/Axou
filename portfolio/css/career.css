@@ -46,37 +46,115 @@
 }
 
 
-/* -------------------- FRISE DE PROGRESSION -------------------- */
+/* -------------------- CHRONOLOGIE -------------------- */
 
+/*
+    Une flèche verticale descend le long des étapes au fil du défilement.
+    --progress (de 0 à 1) est mis à jour par timeline.js ; sans JavaScript,
+    il vaut 1 : la flèche est entière et toutes les étapes sont affichées.
+*/
 .timeline {
+    --progress: 1;
+    --node-size: 56px;
+    --arrow-space: 20px;
+
+    position: relative;
+
     margin: 50px 0 0;
-    padding: 0;
+    padding: 0 0 var(--arrow-space);
 
     list-style: none;
 }
 
 
-.timeline__step {
-    display: grid;
-    grid-template-columns: 70px 1fr;
+/* Corps de la flèche : il s'allonge avec le défilement */
+.timeline::before {
+    content: "";
 
-    gap: 20px;
+    position: absolute;
+    top: 0;
+    left: calc(var(--node-size) / 2);
 
-    padding: 22px 0;
+    width: 3px;
+    height: calc(var(--progress) * (100% - var(--arrow-space)));
 
-    border-top: 1px solid var(--white);
+    background-color: var(--white);
+
+    translate: -50% 0;
 }
 
 
+/* Pointe de la flèche, toujours au bout du corps */
+.timeline::after {
+    content: "";
+
+    position: absolute;
+    top: calc(var(--progress) * (100% - var(--arrow-space)));
+    left: calc(var(--node-size) / 2);
+
+    border-top: 18px solid var(--white);
+    border-right: 10px solid transparent;
+    border-left: 10px solid transparent;
+
+    translate: -50% 0;
+}
+
+
+.timeline__step {
+    display: grid;
+    grid-template-columns: var(--node-size) minmax(0, 1fr);
+    align-items: start;
+
+    gap: 24px;
+
+    padding-bottom: 32px;
+}
+
+
+/* Pastille numérotée : son fond bleu masque la ligne qui passe derrière */
 .timeline__number {
-    font-size: 2.4rem;
+    position: relative;
+    z-index: 1;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: var(--node-size);
+    height: var(--node-size);
+
+    border: 3px solid var(--white);
+    border-radius: 50%;
+
+    background-color: var(--blue);
+
+    font-size: 1.2rem;
     font-weight: bold;
     line-height: 1;
+
+    transition:
+        background-color 0.3s ease,
+        color 0.3s ease;
+}
+
+
+/* Étape atteinte par la flèche : la pastille se remplit */
+.timeline__step--visible .timeline__number,
+.timeline:not(.timeline--animated) .timeline__number {
+    background-color: var(--white);
+    color: var(--blue);
+}
+
+
+.timeline__content {
+    padding: 20px 26px;
+
+    background-color: var(--veil-strong);
 }
 
 
 .timeline__title {
-    margin: 0 0 6px;
+    margin: 0 0 8px;
 
     font-size: 1.4rem;
 }
@@ -89,3 +167,21 @@
 }
 
 
+/*
+    Révélation : timeline.js ajoute timeline--animated, puis timeline__step--visible
+    à chaque étape que la flèche atteint. Le texte glisse depuis la droite, vers la flèche.
+*/
+.timeline--animated .timeline__content {
+    opacity: 0;
+    translate: 24px 0;
+
+    transition:
+        opacity 0.5s ease,
+        translate 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+
+.timeline--animated .timeline__step--visible .timeline__content {
+    opacity: 1;
+    translate: 0 0;
+}

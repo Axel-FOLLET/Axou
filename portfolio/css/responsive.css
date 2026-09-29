@@ -150,14 +150,24 @@
     }
 
 
-    .banner__intro,
-    .logic {
+    .banner__intro {
         padding: 26px 20px;
     }
 
 
+    /* Pastilles plus petites sur téléphone : le texte garde la largeur */
+    .timeline {
+        --node-size: 44px;
+    }
+
+
     .timeline__step {
-        grid-template-columns: 50px 1fr;
+        gap: 16px;
+    }
+
+
+    .timeline__content {
+        padding: 16px 18px;
     }
 
 

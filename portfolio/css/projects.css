@@ -97,6 +97,14 @@
 }
 
 
+/* L'objectif est l'information clé du projet : plus grand et en gras */
+.project-card__text--goal {
+    font-size: 1.25rem;
+    font-weight: bold;
+    line-height: 1.45;
+}
+
+
 .project-card__tags {
     display: flex;
     flex-wrap: wrap;
@@ -183,6 +191,33 @@
     font-size: 1.4rem;
 
     overflow-wrap: anywhere;
+}
+
+
+/*
+    Pas de soulignement : c'est la flèche qui invite à cliquer.
+    Elle se décale au survol et au focus, comme pour montrer la direction du lien.
+*/
+.repo-card__link {
+    text-decoration: none;
+}
+
+
+/* "↗" / "" : la flèche est décorative, les lecteurs d'écran ne la lisent pas */
+.repo-card__title::after {
+    content: "↗" / "";
+
+    display: inline-block;
+
+    margin-left: 10px;
+
+    transition: translate 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+
+.repo-card:hover .repo-card__title::after,
+.repo-card:focus-within .repo-card__title::after {
+    translate: 4px -4px;
 }
 
 
