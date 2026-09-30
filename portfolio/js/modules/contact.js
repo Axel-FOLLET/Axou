@@ -4,6 +4,8 @@
  * Sans JavaScript, le formulaire garde l'envoi classique vers Formspree.
  */
 
+import { requireHuman } from "./human-check.js";
+
 
 // -------------------- VALIDATION DES CHAMPS --------------------
 
@@ -97,6 +99,8 @@ async function sendForm(form) {
 function watchSubmit(form, status, submitButton) {
     form.addEventListener("submit", async event => {
         event.preventDefault();
+        // Case « Are you human? » pas encore validée : fenêtre obligatoire, l'envoi part après
+        await requireHuman();
         submitButton.disabled = true;
         submitButton.classList.add("button--loading");
         status.className = "form__status";

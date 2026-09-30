@@ -90,3 +90,71 @@
 }
 
 
+
+
+/* Mentions légales repliées : une ligne tant qu'on ne clique pas, le détail s'ouvre sous les crédits */
+.footer__legal {
+    max-width: 520px;
+
+    margin-top: 10px;
+
+    font-size: 0.85rem;
+    line-height: 1.6;
+}
+
+
+/* list-style et ::-webkit-details-marker retirent le triangle du navigateur, remplacé par + / − */
+.footer__legal-toggle {
+    display: inline-flex;
+    align-items: center;
+
+    min-height: 32px;
+
+    font-weight: 600;
+
+    list-style: none;
+    cursor: pointer;
+}
+
+
+.footer__legal-toggle::-webkit-details-marker {
+    display: none;
+}
+
+
+.footer__legal-toggle::after {
+    content: "+";
+
+    margin-left: 8px;
+}
+
+
+.footer__legal[open] .footer__legal-toggle::after {
+    content: "−";
+}
+
+
+.footer__legal-toggle:hover {
+    opacity: 0.75;
+}
+
+
+.footer__legal-toggle:focus-visible {
+    outline: 3px solid white;
+    outline-offset: 4px;
+}
+
+
+.footer__legal p {
+    margin: 8px 0 0;
+
+    opacity: 0.8;
+}
+
+
+.footer__legal a {
+    color: inherit;
+
+    font-weight: 600;
+    text-decoration: none;
+}

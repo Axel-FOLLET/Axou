@@ -12,7 +12,9 @@ import { initRepos } from "./modules/repos.js";
 import { initTimeline } from "./modules/timeline.js";
 import { initProjectDemos } from "./modules/project-demos.js";
 import { initReveal } from "./modules/reveal.js";
+import { initHumanCheck } from "./modules/human-check.js";
 
+initHumanCheck();
 initNavigation();
 initReveal();
 initSkills();

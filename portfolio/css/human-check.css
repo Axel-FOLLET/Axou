@@ -1,0 +1,198 @@
+/* -------------------- FENÊTRE « ARE YOU HUMAN? » -------------------- */
+
+/*
+    Carte bleue centrée sur un fond rouge sombre flouté.
+    La fenêtre est un <dialog> ouvert avec showModal : le navigateur la place au-dessus de tout.
+*/
+.human-check {
+    width: min(340px, calc(100% - 32px));
+
+    padding: 28px 24px 16px;
+
+    border: none;
+    border-radius: 4px;
+
+    background-color: var(--blue);
+    color: var(--white);
+
+    font-family: inherit;
+    text-align: center;
+
+    box-shadow: 0 24px 60px rgba(40, 0, 5, 0.5);
+
+    animation: human-check-in 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+
+/* La fenêtre reçoit le focus à l'ouverture : pas de contour sur la carte entière */
+.human-check:focus {
+    outline: none;
+}
+
+
+.human-check::backdrop {
+    background-color: rgba(60, 0, 8, 0.75);
+    backdrop-filter: blur(6px);
+}
+
+
+@keyframes human-check-in {
+    from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.97);
+    }
+}
+
+
+/* Croix de fermeture (fenêtre facultative seulement) : zone de 44 px, facile à toucher */
+.human-check__close {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+
+    width: 44px;
+    height: 44px;
+
+    border: none;
+    border-radius: 2px;
+
+    background: none;
+    color: var(--white);
+
+    font: inherit;
+    font-size: 1.8rem;
+    line-height: 1;
+
+    cursor: pointer;
+}
+
+
+.human-check__close:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+
+/* Image carrée : object-fit recadre les images plus hautes ou plus larges */
+.human-check__image {
+    display: block;
+
+    /* Marge de chaque côté pour que la croix ne recouvre jamais l'image sur petit écran */
+    width: 100%;
+    max-width: min(240px, 100% - 56px);
+    aspect-ratio: 1;
+
+    margin: 0 auto;
+
+    border-radius: 4px;
+
+    object-fit: cover;
+    object-position: center 30%;
+}
+
+
+.human-check__title {
+    margin: 20px 0 16px;
+
+    font-size: 1.6rem;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+
+/* -------------------- CASE À COCHER -------------------- */
+
+.human-check__box {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+
+    min-height: 48px;
+
+    padding: 10px 18px;
+
+    border-radius: 4px;
+
+    background-color: rgba(255, 255, 255, 0.1);
+
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+
+/* appearance: none remplace la case du système par un carré blanc dessiné ici */
+.human-check__input {
+    appearance: none;
+
+    display: grid;
+    place-content: center;
+
+    width: 26px;
+    height: 26px;
+
+    margin: 0;
+
+    border: 2px solid var(--white);
+    border-radius: 2px;
+
+    cursor: pointer;
+}
+
+
+.human-check__input::before {
+    content: "";
+
+    width: 12px;
+    height: 7px;
+
+    border-left: 3px solid var(--blue);
+    border-bottom: 3px solid var(--blue);
+
+    transform: translateY(-2px) rotate(-45deg) scale(0);
+    transition: transform 0.15s;
+}
+
+
+.human-check__input:checked {
+    background-color: var(--white);
+}
+
+
+.human-check__input:checked::before {
+    transform: translateY(-2px) rotate(-45deg) scale(1);
+}
+
+
+.human-check__input:disabled {
+    cursor: default;
+}
+
+
+/* Message d'échec : la hauteur est réservée pour que la carte ne saute pas */
+.human-check__hint {
+    min-height: 1.6em;
+
+    margin: 12px 0 0;
+
+    font-size: 0.9rem;
+}
+
+
+/* Réussite : le chat amoureux apparaît en douceur */
+.human-check--success .human-check__image {
+    animation: human-check-in 0.3s ease-out;
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+
+    .human-check,
+    .human-check--success .human-check__image {
+        animation: none;
+    }
+
+    .human-check__input::before {
+        transition: none;
+    }
+
+}
