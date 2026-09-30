@@ -2,7 +2,7 @@
  * Clavier dessiné dans le canvas : ses zones cliquables sont mémorisées séparément.
  * export rend une valeur utilisable ailleurs ; import récupère uniquement les noms nécessaires.
  */
-import { CLAVIER_LARGEUR, CLAVIER_X, CLAVIER_Y, FOND_CLAIR, GRIS, LIGNES_CLAVIER, NOIR, ROUGE_CLAIR, TOUCHE_ECART, TOUCHE_HAUTEUR, TOUCHE_LARGEUR, VERT_CLAIR } from "./constants.js";
+import { CLAVIER_LARGEUR, CLAVIER_X, CLAVIER_Y, FOND_CLAIR, LIGNES_CLAVIER, TEXTE, TEXTE_DISCRET, TOUCHE_ECART, TOUCHE_HAUTEUR, TOUCHE_LARGEUR, TOUCHE_RATEE, TOUCHE_TROUVEE } from "./constants.js";
 import { rectangleArrondi, texte } from "./drawing.js";
 import { state } from "./state.js";
 
@@ -16,7 +16,7 @@ export function couleurTouche(lettre) {
         return FOND_CLAIR;
     }
 
-    return state.mot.includes(minuscule) ? VERT_CLAIR : ROUGE_CLAIR;
+    return state.mot.includes(minuscule) ? TOUCHE_TROUVEE : TOUCHE_RATEE;
 }
 
 /*
@@ -41,11 +41,11 @@ export function dessinerClavier() {
                 TOUCHE_HAUTEUR,
                 8,
                 couleurTouche(lettre),
-                GRIS,
+                TEXTE_DISCRET,
                 2
             );
 
-            texte(lettre, x + TOUCHE_LARGEUR / 2, y + 10, 30, NOIR, "center");
+            texte(lettre, x + TOUCHE_LARGEUR / 2, y + 10, 30, TEXTE, "center");
 
             state.zonesTouches.push({
                 lettre: lettre.toLowerCase(),

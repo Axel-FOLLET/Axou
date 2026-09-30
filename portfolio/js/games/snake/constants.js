@@ -1,6 +1,6 @@
 /*
  * Réglages fixes : dimensions, couleurs et limites. Les distances de dessin sont en pixels.
- * Certains noms de couleur viennent du jeu initial ; leur valeur a été adaptée au thème du CV.
+ * Les couleurs sont nommées selon leur rôle dans le jeu ; leurs valeurs reprennent le thème du site.
  * export rend une valeur utilisable ailleurs ; import récupère uniquement les noms nécessaires.
  */
 // -------------------- CONSTANTES --------------------
@@ -13,19 +13,18 @@ export const HAUTEUR_FENETRE = 660;
 
 export const BLANC = "rgb(255,255,255)";
 export const FOND = "#E1001A";
-export const ROUGE_SITE = "#0D0A9B";
-export const NOIR = "#E1001A";
-export const GRIS = "rgba(255,255,255,0.6)";
-export const ROSE_PASTEL = "rgba(255,255,255,0.10)";
-export const BORDEAUX_PASTEL = "rgba(255,255,255,0.04)";
-export const VERT_FORET = "rgb(255,255,255)";
-export const VERT_SERPENT = "rgba(255,255,255,0.85)";
-export const VERT_TETE = "#0D0A9B";
+export const ROUGE = "#E1001A";
+export const TEXTE_DISCRET = "rgba(255,255,255,0.6)";
+export const CASE_CLAIRE = "rgba(255,255,255,0.10)";
+export const CASE_FONCEE = "rgba(255,255,255,0.04)";
+export const ACCENT = "rgb(255,255,255)";
+export const CORPS_SERPENT = "rgba(255,255,255,0.85)";
+export const TETE_SERPENT = "#0D0A9B";
 export const CONTOUR_SERPENT = "#E1001A";
-export const ROUGE_POMME = "#0D0A9B";
-export const ROUGE_LANGUE = "#0D0A9B";
-export const MARRON = "rgba(255,255,255,0.7)";
-export const JAUNE_ETOILE = "rgb(255,255,255)";
+export const COULEUR_POMME = "#0D0A9B";
+export const COULEUR_LANGUE = "#0D0A9B";
+export const QUEUE_POMME = "rgba(255,255,255,0.7)";
+export const COULEUR_ETOILE = "rgb(255,255,255)";
 
 export const COULEURS_FEUX = [
     "#0D0A9B",

@@ -3,7 +3,7 @@
  * export rend une valeur utilisable ailleurs ; import récupère uniquement les noms nécessaires.
  */
 import { ctx } from "./canvas.js";
-import { BLANC, BORDEAUX_PASTEL, CONTOUR_SERPENT, FOND, HAUTEUR_BANDEAU, JAUNE_ETOILE, LARGEUR_FENETRE, MARRON, NOIR, NOMBRE_CASES, ROSE_PASTEL, ROUGE_LANGUE, ROUGE_POMME, TAILLE_CASE, VERT_FORET, VERT_SERPENT, VERT_TETE } from "./constants.js";
+import { ACCENT, BLANC, CASE_CLAIRE, CASE_FONCEE, CONTOUR_SERPENT, CORPS_SERPENT, COULEUR_ETOILE, COULEUR_LANGUE, COULEUR_POMME, FOND, HAUTEUR_BANDEAU, LARGEUR_FENETRE, NOMBRE_CASES, QUEUE_POMME, ROUGE, TAILLE_CASE, TETE_SERPENT } from "./constants.js";
 import { rectangleArrondi, texte } from "./drawing.js";
 import { centreCase, perpendiculaire, pointDecale, rectangleCase } from "./geometry.js";
 import { state } from "./state.js";
@@ -15,7 +15,7 @@ import { t } from "./translations.js";
 export function dessinerGrille() {
     for (let colonne = 0; colonne < NOMBRE_CASES; colonne += 1) {
         for (let ligne = 0; ligne < NOMBRE_CASES; ligne += 1) {
-            ctx.fillStyle = (colonne + ligne) % 2 === 0 ? ROSE_PASTEL : BORDEAUX_PASTEL;
+            ctx.fillStyle = (colonne + ligne) % 2 === 0 ? CASE_CLAIRE : CASE_FONCEE;
             ctx.fillRect(
                 colonne * TAILLE_CASE,
                 HAUTEUR_BANDEAU + ligne * TAILLE_CASE,
@@ -48,9 +48,9 @@ export function dessinerEtoile(centre, rayon) {
     points.slice(1).forEach((point) => ctx.lineTo(point[0], point[1]));
 
     ctx.closePath();
-    ctx.fillStyle = JAUNE_ETOILE;
+    ctx.fillStyle = COULEUR_ETOILE;
     ctx.fill();
-    ctx.strokeStyle = NOIR;
+    ctx.strokeStyle = ROUGE;
     ctx.lineWidth = 1;
     ctx.stroke();
 }
@@ -74,7 +74,7 @@ export function dessinerLogoSerpent(centre, largeur = 170) {
     points.forEach(([x, y, rayon]) => {
         ctx.beginPath();
         ctx.arc(x, y, rayon, 0, Math.PI * 2);
-        ctx.fillStyle = VERT_SERPENT;
+        ctx.fillStyle = CORPS_SERPENT;
         ctx.fill();
         ctx.strokeStyle = CONTOUR_SERPENT;
         ctx.lineWidth = 2;
@@ -84,7 +84,7 @@ export function dessinerLogoSerpent(centre, largeur = 170) {
     const dernier = points[points.length - 1];
     const tete = [dernier[0] + 4, dernier[1]];
 
-    ctx.strokeStyle = ROUGE_LANGUE;
+    ctx.strokeStyle = COULEUR_LANGUE;
     ctx.lineWidth = 3;
     ctx.beginPath();
     ctx.moveTo(tete[0] + 10, tete[1]);
@@ -101,7 +101,7 @@ export function dessinerLogoSerpent(centre, largeur = 170) {
 
     ctx.beginPath();
     ctx.arc(tete[0], tete[1], 13, 0, Math.PI * 2);
-    ctx.fillStyle = VERT_TETE;
+    ctx.fillStyle = TETE_SERPENT;
     ctx.fill();
     ctx.strokeStyle = CONTOUR_SERPENT;
     ctx.lineWidth = 2;
@@ -117,7 +117,7 @@ export function dessinerLogoSerpent(centre, largeur = 170) {
 
         ctx.beginPath();
         ctx.arc(oeil[0] + 1, oeil[1], 2, 0, Math.PI * 2);
-        ctx.fillStyle = NOIR;
+        ctx.fillStyle = ROUGE;
         ctx.fill();
     });
 }
@@ -128,9 +128,9 @@ export function dessinerLogoSerpent(centre, largeur = 170) {
 export function dessinerPommeCentree(centre, rayon) {
     ctx.beginPath();
     ctx.arc(centre[0], centre[1], rayon, 0, Math.PI * 2);
-    ctx.fillStyle = ROUGE_POMME;
+    ctx.fillStyle = COULEUR_POMME;
     ctx.fill();
-    ctx.strokeStyle = NOIR;
+    ctx.strokeStyle = ROUGE;
     ctx.lineWidth = 1;
     ctx.stroke();
 
@@ -139,7 +139,7 @@ export function dessinerPommeCentree(centre, rayon) {
     ctx.beginPath();
     ctx.moveTo(haut[0], haut[1]);
     ctx.lineTo(haut[0] + 1, haut[1] - rayon / 2);
-    ctx.strokeStyle = MARRON;
+    ctx.strokeStyle = QUEUE_POMME;
     ctx.lineWidth = 2;
     ctx.stroke();
 
@@ -151,7 +151,7 @@ export function dessinerPommeCentree(centre, rayon) {
         0,
         Math.PI * 2
     );
-    ctx.fillStyle = VERT_SERPENT;
+    ctx.fillStyle = CORPS_SERPENT;
     ctx.fill();
 }
 
@@ -198,7 +198,7 @@ export function dessinerYeux(caseGrille, directionActuelle) {
 
         ctx.beginPath();
         ctx.arc(pupille[0], pupille[1], 2, 0, Math.PI * 2);
-        ctx.fillStyle = NOIR;
+        ctx.fillStyle = ROUGE;
         ctx.fill();
     });
 }
@@ -214,7 +214,7 @@ export function dessinerLangue(caseGrille, directionActuelle) {
     ctx.beginPath();
     ctx.moveTo(base[0], base[1]);
     ctx.lineTo(pointe[0], pointe[1]);
-    ctx.strokeStyle = ROUGE_LANGUE;
+    ctx.strokeStyle = COULEUR_LANGUE;
     ctx.lineWidth = 3;
     ctx.stroke();
 
@@ -224,7 +224,7 @@ export function dessinerLangue(caseGrille, directionActuelle) {
         ctx.beginPath();
         ctx.moveTo(pointe[0], pointe[1]);
         ctx.lineTo(bout[0], bout[1]);
-        ctx.strokeStyle = ROUGE_LANGUE;
+        ctx.strokeStyle = COULEUR_LANGUE;
         ctx.lineWidth = 2;
         ctx.stroke();
     });
@@ -236,11 +236,11 @@ export function dessinerLangue(caseGrille, directionActuelle) {
  */
 export function dessinerSerpent() {
     state.serpent.slice(1).reverse().forEach((caseGrille) => {
-        dessinerSegment(caseGrille, VERT_SERPENT);
+        dessinerSegment(caseGrille, CORPS_SERPENT);
     });
 
     dessinerLangue(state.serpent[0], state.direction);
-    dessinerSegment(state.serpent[0], VERT_TETE);
+    dessinerSegment(state.serpent[0], TETE_SERPENT);
     dessinerYeux(state.serpent[0], state.direction);
 }
 
@@ -251,7 +251,7 @@ export function dessinerBandeau() {
     ctx.fillStyle = FOND;
     ctx.fillRect(0, 0, LARGEUR_FENETRE, HAUTEUR_BANDEAU);
 
-    ctx.strokeStyle = VERT_FORET;
+    ctx.strokeStyle = ACCENT;
     ctx.lineWidth = 4;
     ctx.beginPath();
     ctx.moveTo(0, HAUTEUR_BANDEAU - 2);

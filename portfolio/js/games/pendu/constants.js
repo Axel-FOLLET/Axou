@@ -1,19 +1,18 @@
 /*
  * Réglages fixes : dimensions, couleurs et limites. Les distances de dessin sont en pixels.
- * Certains noms de couleur viennent du jeu initial ; leur valeur a été adaptée au thème du CV.
+ * Les couleurs sont nommées selon leur rôle dans le jeu ; leurs valeurs reprennent le thème du site.
  * export rend une valeur utilisable ailleurs ; import récupère uniquement les noms nécessaires.
  */
 // -------------------- CONSTANTES --------------------
 
-export const BLANC = "rgb(255,255,255)";
-export const NOIR = "rgb(255,255,255)";
-export const GRIS = "rgba(255,255,255,0.6)";
-export const MARRON = "rgba(255,255,255,0.85)";
-export const ROUGE = "#0D0A9B";
-export const VERT = "rgb(255,255,255)";
-export const ORANGE = "rgba(255,255,255,0.6)";
-export const VERT_CLAIR = "rgba(255,255,255,0.35)";
-export const ROUGE_CLAIR = "rgba(13,10,155,0.75)";
+export const TEXTE = "rgb(255,255,255)";
+export const TEXTE_DISCRET = "rgba(255,255,255,0.6)";
+export const COULEUR_POTENCE = "rgba(255,255,255,0.85)";
+export const BLEU = "#0D0A9B";
+export const ACCENT = "rgb(255,255,255)";
+export const BARRE_MOYENNE = "rgba(255,255,255,0.6)";
+export const TOUCHE_TROUVEE = "rgba(255,255,255,0.35)";
+export const TOUCHE_RATEE = "rgba(13,10,155,0.75)";
 export const FOND_MESSAGE = "#E1001A";
 export const FOND = "#E1001A";
 export const FOND_CLAIR = "rgba(255,255,255,0.10)";

@@ -4,7 +4,7 @@
  */
 import { dessinerBarrePenalites, dessinerHomme, dessinerLogoPendu, dessinerPotence } from "./artwork.js";
 import { canvas, ctx } from "./canvas.js";
-import { CLAVIER_LARGEUR, FOND, FOND_CLAIR, FOND_DEFAITE, FOND_MESSAGE, FOND_VICTOIRE, GRIS, MARRON, MAX_PENALITES, NOIR, ROUGE, VERT } from "./constants.js";
+import { ACCENT, BLEU, CLAVIER_LARGEUR, COULEUR_POTENCE, FOND, FOND_CLAIR, FOND_DEFAITE, FOND_MESSAGE, FOND_VICTOIRE, MAX_PENALITES, TEXTE, TEXTE_DISCRET } from "./constants.js";
 import { ligne, rectangleArrondi, texte, texteCentre } from "./drawing.js";
 import { dessinerClavier } from "./keyboard.js";
 import { motAffiche } from "./rules.js";
@@ -19,16 +19,16 @@ export function afficherAccueil() {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     dessinerLogoPendu(canvas.width / 2, 25);
-    texteCentre(t.title, 120, 50, NOIR);
-    texteCentre(t.subtitle, 190, 30, NOIR);
+    texteCentre(t.title, 120, 50, TEXTE);
+    texteCentre(t.subtitle, 190, 30, TEXTE);
 
-    rectangleArrondi(300, 245, 600, 205, 14, null, MARRON, 4);
-    texteCentre(t.penaltiesAllowed, 270, 30, NOIR);
-    texteCentre(t.badLetter, 320, 30, NOIR);
-    texteCentre(t.badWord, 360, 30, NOIR);
-    texteCentre(t.wordLength(state.mot.length), 410, 30, NOIR);
-    texteCentre(t.start, 520, 30, VERT);
-    texteCentre(t.escapeWelcome, 570, 24, GRIS);
+    rectangleArrondi(300, 245, 600, 205, 14, null, COULEUR_POTENCE, 4);
+    texteCentre(t.penaltiesAllowed, 270, 30, TEXTE);
+    texteCentre(t.badLetter, 320, 30, TEXTE);
+    texteCentre(t.badWord, 360, 30, TEXTE);
+    texteCentre(t.wordLength(state.mot.length), 410, 30, TEXTE);
+    texteCentre(t.start, 520, 30, ACCENT);
+    texteCentre(t.escapeWelcome, 570, 24, TEXTE_DISCRET);
 }
 
 /*
@@ -42,19 +42,19 @@ export function afficherJeu() {
     dessinerHomme();
     dessinerClavier();
 
-    texte(t.penalties(state.penalite), 620, 50, 30, NOIR);
+    texte(t.penalties(state.penalite), 620, 50, 30, TEXTE);
     dessinerBarrePenalites(620, 85, CLAVIER_LARGEUR, 26);
-    texte(t.chances(Math.max(MAX_PENALITES - state.penalite, 0)), 620, 130, 30, NOIR);
-    texte(t.attempts(state.nombreTentatives), 620, 165, 30, GRIS);
+    texte(t.chances(Math.max(MAX_PENALITES - state.penalite, 0)), 620, 130, 30, TEXTE);
+    texte(t.attempts(state.nombreTentatives), 620, 165, 30, TEXTE_DISCRET);
 
-    texte(t.word(motAffiche()), 50, 612, 46, NOIR);
+    texte(t.word(motAffiche()), 50, 612, 46, TEXTE);
     ctx.font = "30px Avenir, 'Avenir Next', sans-serif";
     const xBoite = Math.max(260, 50 + ctx.measureText(t.proposal).width + 20);
 
-    texte(t.proposal, 50, 708, 30, NOIR);
+    texte(t.proposal, 50, 708, 30, TEXTE);
 
-    rectangleArrondi(xBoite, 695, 400, 42, 8, FOND_CLAIR, MARRON, 3);
-    texte(state.saisie.toUpperCase(), xBoite + 12, 704, 30, NOIR);
+    rectangleArrondi(xBoite, 695, 400, 42, 8, FOND_CLAIR, COULEUR_POTENCE, 3);
+    texte(state.saisie.toUpperCase(), xBoite + 12, 704, 30, TEXTE);
 
     /*
      * Alterne toutes les 500 ms pour faire clignoter le curseur de saisie.
@@ -63,7 +63,7 @@ export function afficherJeu() {
         ctx.font = "30px Avenir, 'Avenir Next', sans-serif";
         const largeurSaisie = ctx.measureText(state.saisie.toUpperCase()).width;
         const xCurseur = xBoite + 14 + largeurSaisie;
-        ligne([xCurseur, 703], [xCurseur, 729], NOIR, 2);
+        ligne([xCurseur, 703], [xCurseur, 729], TEXTE, 2);
     }
 
     if (state.message && performance.now() <= state.finMessage) {
@@ -72,8 +72,8 @@ export function afficherJeu() {
         const cadreLargeur = largeur + 40;
         const cadreX = (canvas.width - cadreLargeur) / 2;
 
-        rectangleArrondi(cadreX, 540, cadreLargeur, 50, 10, FOND_MESSAGE, ROUGE, 2);
-        texteCentre(state.message, 550, 30, NOIR);
+        rectangleArrondi(cadreX, 540, cadreLargeur, 50, 10, FOND_MESSAGE, BLEU, 2);
+        texteCentre(state.message, 550, 30, TEXTE);
     } else if (state.message) {
         state.message = "";
     }
@@ -96,19 +96,19 @@ export function afficherFin() {
     ctx.restore();
 
     if (state.victoire) {
-        texteCentre(t.victory, 150, 50, VERT);
-        texteCentre(t.survive, 230, 30, NOIR);
-        texteCentre(state.texteScore, 310, 30, NOIR);
+        texteCentre(t.victory, 150, 50, ACCENT);
+        texteCentre(t.survive, 230, 30, TEXTE);
+        texteCentre(state.texteScore, 310, 30, TEXTE);
     } else {
-        texteCentre(t.defeat, 150, 50, NOIR);
-        texteCentre(t.badLuck, 230, 30, NOIR);
-        texteCentre(t.hanged, 280, 30, NOIR);
-        texteCentre(state.texteScore, 350, 30, NOIR);
+        texteCentre(t.defeat, 150, 50, TEXTE);
+        texteCentre(t.badLuck, 230, 30, TEXTE);
+        texteCentre(t.hanged, 280, 30, TEXTE);
+        texteCentre(state.texteScore, 350, 30, TEXTE);
     }
 
-    texteCentre(t.wordWas(state.motOriginal.toUpperCase()), 450, 30, NOIR);
-    texteCentre(t.replay, 535, 30, VERT);
-    texteCentre(t.escapeEnd, 585, 24, GRIS);
+    texteCentre(t.wordWas(state.motOriginal.toUpperCase()), 450, 30, TEXTE);
+    texteCentre(t.replay, 535, 30, ACCENT);
+    texteCentre(t.escapeEnd, 585, 24, TEXTE_DISCRET);
 }
 
 /*

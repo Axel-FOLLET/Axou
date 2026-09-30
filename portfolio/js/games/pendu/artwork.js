@@ -3,7 +3,7 @@
  * export rend une valeur utilisable ailleurs ; import récupère uniquement les noms nécessaires.
  */
 import { ctx } from "./canvas.js";
-import { FOND_CLAIR, MARRON, MAX_PENALITES, NOIR, ORANGE, ROUGE, VERT } from "./constants.js";
+import { ACCENT, BARRE_MOYENNE, BLEU, COULEUR_POTENCE, FOND_CLAIR, MAX_PENALITES, TEXTE } from "./constants.js";
 import { ligne, rectangleArrondi } from "./drawing.js";
 import { state } from "./state.js";
 
@@ -23,7 +23,7 @@ export function dessinerPotence() {
 
     segments.forEach(([seuil, depart, arrivee]) => {
         if (state.penalite >= seuil) {
-            ligne(depart, arrivee, MARRON, 5);
+            ligne(depart, arrivee, COULEUR_POTENCE, 5);
         }
     });
 }
@@ -35,7 +35,7 @@ export function dessinerHomme() {
     if (state.penalite >= 7) {
         ctx.beginPath();
         ctx.arc(300, 200, 50, 0, Math.PI * 2);
-        ctx.strokeStyle = ROUGE;
+        ctx.strokeStyle = BLEU;
         ctx.lineWidth = 5;
         ctx.stroke();
     }
@@ -50,7 +50,7 @@ export function dessinerHomme() {
 
     segments.forEach(([seuil, depart, arrivee]) => {
         if (state.penalite >= seuil) {
-            ligne(depart, arrivee, ROUGE, 5);
+            ligne(depart, arrivee, BLEU, 5);
         }
     });
 }
@@ -62,15 +62,15 @@ export function dessinerLogoPendu(centreX, haut) {
     const gauche = centreX - 30;
     const bas = haut + 70;
 
-    ligne([gauche - 15, bas], [gauche + 45, bas], MARRON, 5);
-    ligne([gauche, bas], [gauche, haut], MARRON, 5);
-    ligne([gauche, haut], [gauche + 50, haut], MARRON, 5);
-    ligne([gauche, haut + 20], [gauche + 20, haut], MARRON, 4);
-    ligne([gauche + 50, haut], [gauche + 50, haut + 22], NOIR, 3);
+    ligne([gauche - 15, bas], [gauche + 45, bas], COULEUR_POTENCE, 5);
+    ligne([gauche, bas], [gauche, haut], COULEUR_POTENCE, 5);
+    ligne([gauche, haut], [gauche + 50, haut], COULEUR_POTENCE, 5);
+    ligne([gauche, haut + 20], [gauche + 20, haut], COULEUR_POTENCE, 4);
+    ligne([gauche + 50, haut], [gauche + 50, haut + 22], TEXTE, 3);
 
     ctx.beginPath();
     ctx.arc(gauche + 50, haut + 32, 10, 0, Math.PI * 2);
-    ctx.strokeStyle = ROUGE;
+    ctx.strokeStyle = BLEU;
     ctx.lineWidth = 3;
     ctx.stroke();
 }
@@ -80,14 +80,14 @@ export function dessinerLogoPendu(centreX, haut) {
  */
 export function couleurBarre(rapport) {
     if (rapport < 1 / 3) {
-        return VERT;
+        return ACCENT;
     }
 
     if (rapport < 2 / 3) {
-        return ORANGE;
+        return BARRE_MOYENNE;
     }
 
-    return ROUGE;
+    return BLEU;
 }
 
 /*
@@ -103,5 +103,5 @@ export function dessinerBarrePenalites(x, y, largeur, hauteur) {
         rectangleArrondi(x, y, largeur * rapport, hauteur, 10, couleurBarre(rapport));
     }
 
-    rectangleArrondi(x, y, largeur, hauteur, 10, null, NOIR, 2);
+    rectangleArrondi(x, y, largeur, hauteur, 10, null, TEXTE, 2);
 }

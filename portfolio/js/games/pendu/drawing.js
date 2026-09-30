@@ -4,13 +4,13 @@
  * export rend une valeur utilisable ailleurs ; import récupère uniquement les noms nécessaires.
  */
 import { canvas, ctx } from "./canvas.js";
-import { NOIR } from "./constants.js";
+import { TEXTE } from "./constants.js";
 
 /*
  * Dessine texteAffiche aux coordonnées x et y, en pixels du canvas.
  * Les paramètres par défaut permettent d'omettre taille, couleur et alignement.
  */
-export function texte(texteAffiche, x, y, taille = 30, couleur = NOIR, alignement = "left") {
+export function texte(texteAffiche, x, y, taille = 30, couleur = TEXTE, alignement = "left") {
     ctx.font = `${taille}px Avenir, "Avenir Next", sans-serif`;
     ctx.fillStyle = couleur;
     ctx.textAlign = alignement;
@@ -21,7 +21,7 @@ export function texte(texteAffiche, x, y, taille = 30, couleur = NOIR, alignemen
 /*
  * Réutilise texte en plaçant son point d'ancrage au milieu de la largeur du jeu.
  */
-export function texteCentre(texteAffiche, y, taille = 30, couleur = NOIR) {
+export function texteCentre(texteAffiche, y, taille = 30, couleur = TEXTE) {
     texte(texteAffiche, canvas.width / 2, y, taille, couleur, "center");
 }
 

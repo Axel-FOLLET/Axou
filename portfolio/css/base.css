@@ -90,7 +90,7 @@ html {
 }
 
 
-/* Onglet actif : il glisse de l'ancien onglet vers le nouveau (voir folder-tabs.css) */
+/* Onglet actif : il glisse de l'ancien onglet vers le nouveau (voir navigation.css) */
 ::view-transition-group(active-tab) {
     animation-duration: 0.35s;
     animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -201,20 +201,6 @@ textarea:focus-visible {
 
 .skip-link:focus {
     top: 12px;
-}
-
-
-/* Texte lu par les lecteurs d'écran mais invisible à l'écran */
-.visually-hidden {
-    position: absolute;
-
-    width: 1px;
-    height: 1px;
-
-    overflow: hidden;
-
-    clip: rect(0 0 0 0);
-    white-space: nowrap;
 }
 
 

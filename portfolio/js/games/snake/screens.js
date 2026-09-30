@@ -4,7 +4,7 @@
  */
 import { dessinerBandeau, dessinerGrille, dessinerLogoSerpent, dessinerPomme, dessinerSerpent } from "./artwork.js";
 import { ctx } from "./canvas.js";
-import { BLANC, FOND, GRIS, HAUTEUR_BANDEAU, HAUTEUR_FENETRE, LARGEUR_FENETRE, VERT_FORET } from "./constants.js";
+import { ACCENT, BLANC, FOND, HAUTEUR_BANDEAU, HAUTEUR_FENETRE, LARGEUR_FENETRE, TEXTE_DISCRET } from "./constants.js";
 import { rectangleArrondi, texteCentre } from "./drawing.js";
 import { dessinerParticules } from "./effects.js";
 import { state } from "./state.js";
@@ -18,15 +18,15 @@ export function afficherAccueil() {
     ctx.fillRect(0, 0, LARGEUR_FENETRE, HAUTEUR_FENETRE);
 
     dessinerLogoSerpent([LARGEUR_FENETRE / 2 - 14, 40]);
-    texteCentre(t.welcome, 85, 38, VERT_FORET);
-    rectangleArrondi(50, 150, LARGEUR_FENETRE - 100, 270, 14, null, VERT_FORET, 4);
+    texteCentre(t.welcome, 85, 38, ACCENT);
+    rectangleArrondi(50, 150, LARGEUR_FENETRE - 100, 270, 14, null, ACCENT, 4);
 
     t.rules.forEach((ligneRegle, index) => {
         texteCentre(ligneRegle, 182 + index * 38, 21, BLANC);
     });
 
-    texteCentre(t.start, 470, 30, VERT_FORET);
-    texteCentre(t.escapeMenu, 520, 24, GRIS);
+    texteCentre(t.start, 470, 30, ACCENT);
+    texteCentre(t.escapeMenu, 520, 24, TEXTE_DISCRET);
 }
 
 /*
@@ -48,7 +48,7 @@ export function afficherJeu() {
     if (state.pause) {
         ctx.fillStyle = "rgba(13,10,155,0.75)";
         ctx.fillRect(0, HAUTEUR_BANDEAU, LARGEUR_FENETRE, LARGEUR_FENETRE);
-        texteCentre(t.pause, 290, 50, VERT_FORET);
+        texteCentre(t.pause, 290, 50, ACCENT);
     }
 }
 
@@ -66,7 +66,7 @@ export function afficherFin() {
     dessinerLogoSerpent([LARGEUR_FENETRE / 2 - 14, 45]);
 
     if (state.victoire) {
-        texteCentre(t.victory, 100, 50, VERT_FORET);
+        texteCentre(t.victory, 100, 50, ACCENT);
         texteCentre(t.fullGrid, 170, 30, BLANC);
     } else {
         texteCentre(t.lost, 100, 50, BLANC);
@@ -74,9 +74,9 @@ export function afficherFin() {
     }
 
     texteCentre(t.applesEaten(state.score), 250, 30, BLANC);
-    texteCentre(state.recordBattu ? t.newBest : t.best(state.meilleurScore), 300, 30, VERT_FORET);
-    texteCentre(t.replay, 420, 30, VERT_FORET);
-    texteCentre(t.escapeMenu, 470, 24, GRIS);
+    texteCentre(state.recordBattu ? t.newBest : t.best(state.meilleurScore), 300, 30, ACCENT);
+    texteCentre(t.replay, 420, 30, ACCENT);
+    texteCentre(t.escapeMenu, 470, 24, TEXTE_DISCRET);
 }
 
 /*
