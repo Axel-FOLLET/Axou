@@ -243,12 +243,8 @@
 
 /*
  * Page en cours, repérable sans dépendre de la couleur : fond éclairé et contour blanc.
- * Même nom sur le lien actif de chaque page : pendant le changement de page,
- * le navigateur fait glisser le cadre de son ancienne place vers la nouvelle.
  */
 .header__link[aria-current="page"] {
-    view-transition-name: active-tab;
-
     background-color: var(--veil-strong);
     color: var(--white);
 

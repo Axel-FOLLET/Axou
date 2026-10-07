@@ -62,8 +62,9 @@ html {
 
 
 /*
-    Contenu de la page : l'ancien s'efface vite, le nouveau apparaît en remontant
-    de quelques pixels. Les deux ne se superposent presque pas : pas d'image double.
+    Contenu de la page : l'ancien s'efface vite, le nouveau apparaît en fondu, sans aucun déplacement.
+    Les deux ne se superposent presque pas : pas d'image double.
+    L'en-tête, lui, se fond sur place : l'onglet actif change de couleur sans bouger, comme sur le CV.
 */
 ::view-transition-old(root) {
     animation: 0.15s ease-in both page-fade-out;
@@ -71,7 +72,7 @@ html {
 
 
 ::view-transition-new(root) {
-    animation: 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) 0.08s both page-fade-in;
+    animation: 0.3s ease-out 0.08s both page-fade-in;
 }
 
 
@@ -83,35 +84,6 @@ html {
 
 
 @keyframes page-fade-in {
-    from {
-        opacity: 0;
-        transform: translateY(8px);
-    }
-}
-
-
-/* Onglet actif : il glisse de l'ancien onglet vers le nouveau (voir navigation.css) */
-::view-transition-group(active-tab) {
-    animation-duration: 0.35s;
-    animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-
-/* Mouvement réduit : simple fondu, sans déplacement du contenu ni de l'onglet */
-@media (prefers-reduced-motion: reduce) {
-
-    ::view-transition-new(root) {
-        animation-name: page-fade-plain;
-    }
-
-    ::view-transition-group(active-tab) {
-        animation: none;
-    }
-
-}
-
-
-@keyframes page-fade-plain {
     from {
         opacity: 0;
     }
