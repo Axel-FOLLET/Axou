@@ -5,13 +5,6 @@
 import { HAUTEUR_BANDEAU, NOMBRE_CASES, TAILLE_CASE } from "./constants.js";
 
 /*
- * Compare les deux composantes de deux directions [déplacement horizontal, déplacement vertical].
- */
-export function memeDirection(a, b) {
-    return a[0] === b[0] && a[1] === b[1];
-}
-
-/*
  * Vérifie si chaque composante de a est l'opposée de celle de b.
  */
 export function sensOppose(a, b) {

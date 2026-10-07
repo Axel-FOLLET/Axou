@@ -91,6 +91,36 @@ async function sendForm(form) {
 }
 
 
+// ms pendant lesquels le bouton affiche « Envoyé » avant de reprendre son texte
+const SENT_DURATION = 2600;
+
+
+/*
+ * Réussite : le bouton affiche « Envoyé » avec une coche qui se dessine (contact.css), puis redevient normal.
+ */
+function flashSent(button, label) {
+    const original = button.textContent;
+    button.textContent = label;
+    button.classList.add("button--sent");
+    setTimeout(() => {
+        button.textContent = original;
+        button.classList.remove("button--sent");
+    }, SENT_DURATION);
+}
+
+
+/*
+ * Échec : le bouton secoue une fois. Retirer puis remettre la classe relance l'animation ;
+ * lire offsetWidth force le navigateur à prendre en compte le retrait avant l'ajout.
+ */
+function shakeButton(button) {
+    button.classList.remove("button--shake");
+    void button.offsetWidth;
+    button.classList.add("button--shake");
+    button.addEventListener("animationend", () => button.classList.remove("button--shake"), { once: true });
+}
+
+
 /*
  * Pendant l'envoi, le bouton est désactivé pour éviter un double envoi et affiche une roue.
  * Le message d'état (role="status") est lu par les lecteurs d'écran ; sa classe choisit
@@ -114,6 +144,8 @@ function watchSubmit(form, status, submitButton) {
         }
         submitButton.classList.remove("button--loading");
         submitButton.disabled = false;
+        if (isSent) flashSent(submitButton, form.dataset.sent);
+        else shakeButton(submitButton);
     });
 }
 

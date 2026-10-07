@@ -135,27 +135,61 @@
 
 /* -------------------- CHOIX DE LA LANGUE -------------------- */
 
-.language-select {
-    min-height: 44px;
+/*
+    Deux liens côte à côte, la langue active en plein blanc.
+    Ce sont de vrais liens vers la même page dans l'autre langue : aucun JavaScript nécessaire.
+*/
+.language-switch {
+    display: inline-flex;
+    align-items: center;
 
-    padding: 4px 10px;
+    gap: 2px;
+
+    padding: 3px;
 
     border: 1px solid var(--white);
     border-radius: 3px;
-
-    background-color: var(--red);
-    color: var(--white);
-
-    font-family: inherit;
-    font-size: 0.8125rem;
-    font-weight: 600;
-
-    cursor: pointer;
 }
 
 
-.language-select:hover {
-    background-color: var(--veil-strong);
+.language-switch .language-switch__option {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 40px;
+    min-height: 36px;
+
+    padding: 0 10px;
+
+    border-radius: 2px;
+
+    color: var(--white);
+
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-decoration: none;
+
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease;
+}
+
+
+@media (hover: hover) {
+
+    .language-switch a.language-switch__option:hover {
+        background-color: var(--veil-strong);
+    }
+
+}
+
+
+/* Langue en cours : pastille blanche, texte rouge */
+.language-switch .language-switch__option--active {
+    background-color: var(--white);
+    color: var(--red);
 }
 
 

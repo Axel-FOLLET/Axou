@@ -226,11 +226,72 @@
 }
 
 
+/* Réussite : le bouton rebondit une fois et une coche apparaît après « Envoyé » */
+.button--sent {
+    animation: button-pop 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+
+.button--sent::after {
+    content: "";
+
+    display: inline-block;
+
+    width: 12px;
+    height: 7px;
+
+    margin-left: 10px;
+
+    border-bottom: 3px solid currentColor;
+    border-left: 3px solid currentColor;
+
+    rotate: -45deg;
+    translate: 0 -2px;
+
+    animation: button-tick 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+
+/* Échec : une secousse horizontale qui s'amortit */
+.button--shake {
+    animation: button-shake 0.45s ease-in-out;
+}
+
+
+@keyframes button-pop {
+    40% {
+        scale: 1.05;
+    }
+}
+
+
+@keyframes button-tick {
+    from {
+        opacity: 0;
+        scale: 0;
+    }
+}
+
+
+@keyframes button-shake {
+    20%, 60% {
+        translate: -7px 0;
+    }
+
+    40%, 80% {
+        translate: 7px 0;
+    }
+}
+
+
 @media (prefers-reduced-motion: reduce) {
 
     .form__status--success,
     .form__status--error,
-    .button--loading::after {
+    .button--loading::after,
+    .button--sent,
+    .button--sent::after,
+    .button--shake {
         animation: none;
     }
 

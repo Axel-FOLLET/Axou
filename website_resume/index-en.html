@@ -36,6 +36,7 @@
     <link rel="stylesheet" href="css/career.css">
     <link rel="stylesheet" href="css/projects.css">
     <link rel="stylesheet" href="css/contact.css">
+    <link rel="stylesheet" href="css/human-check.css">
     <link rel="stylesheet" href="css/footer.css">
     <link rel="stylesheet" href="css/responsive.css">
     <link rel="stylesheet" href="css/game-modal.css" media="(min-width: 1025px)">
@@ -82,22 +83,9 @@
 
                 <a href="#home">AF</a>
 
-                <div class="language-switch">
-
-                    <select
-                        id="language-select"
-                        aria-label="Choose language"
-                     class="language-switch__select">
-
-                        <option value="index.html">
-                            FR
-                        </option>
-
-                        <option value="index-en.html" selected>
-                            EN
-                        </option>
-
-                    </select>
+                <div class="language-switch" role="group" aria-label="Choose language">
+                    <a class="language-switch__option" href="index.html" hreflang="fr" lang="fr" aria-label="Français">FR</a>
+                    <span class="language-switch__option language-switch__option--active" lang="en" aria-current="true">EN</span>
 
                 </div>
 
@@ -978,7 +966,7 @@
                     <p><strong>Publisher:</strong> Axel FOLLET, personal non-professional website. Contact: the site form or LinkedIn.</p>
                     <p><strong>Host:</strong> GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, United States.</p>
                     <p><strong>Contact form:</strong> your surname, first name, email, subject and message are used only to reply to you. They go through Formspree, a service based in the United States, and are deleted 12 months after our last exchange. You can ask to access, correct or delete them through the form or LinkedIn, and lodge a complaint with the <a href="https://www.cnil.fr/en/complaints" target="_blank" rel="noopener noreferrer">CNIL</a> (French data protection authority).</p>
-                    <p><strong>Browser:</strong> no cookies and no audience tracking. The site only keeps your Snake and Hangman records on your device.</p>
+                    <p><strong>Browser:</strong> no cookies and no audience tracking. The site only keeps your Snake and Hangman records on your device, along with your answer to the form's anti-robot check until the tab is closed.</p>
                 </details>
             </div>
 

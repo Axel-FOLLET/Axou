@@ -28,7 +28,7 @@
 
     <!-- Versions CSS : recharge les styles modifies apres publication. -->
     <link rel="stylesheet" href="css/base.css?v=ddc5c920cc65">
-    <link rel="stylesheet" href="css/navigation.css?v=9bde3c5a6c8e">
+    <link rel="stylesheet" href="css/navigation.css?v=e0f02fef1cc6">
     <link rel="stylesheet" href="css/sections.css?v=cd4522cf6582">
     <link rel="stylesheet" href="css/buttons.css?v=467302261e2d">
     <link rel="stylesheet" href="css/home.css?v=79b2a40ceb2a">
@@ -36,7 +36,7 @@
     <link rel="stylesheet" href="css/projects.css?v=5b7f8018a0f4">
     <link rel="stylesheet" href="css/career.css?v=d572d0c013d7">
     <link rel="stylesheet" href="css/skills.css?v=633c6217dd40">
-    <link rel="stylesheet" href="css/contact.css?v=69d5f57069bb">
+    <link rel="stylesheet" href="css/contact.css?v=49f028298688">
     <link rel="stylesheet" href="css/footer.css?v=d56c3e030fb0">
     <link rel="stylesheet" href="css/responsive.css?v=566faafa8b04">
     <link rel="stylesheet" href="css/human-check.css?v=b476be755147">
@@ -92,14 +92,10 @@
                 <a class="header__logo" href="index.html">AF</a>
 
                 <!-- Chaque page renvoie vers sa page équivalente dans l'autre langue -->
-                <select
-                    class="language-select"
-
-                    aria-label="Choisir la langue"
-                >
-                    <option value="index.html" selected>FR</option>
-                    <option value="index-en.html">EN</option>
-                </select>
+                <div class="language-switch" role="group" aria-label="Choisir la langue">
+                    <span class="language-switch__option language-switch__option--active" lang="fr" aria-current="true">FR</span>
+                    <a class="language-switch__option" href="index-en.html" hreflang="en" lang="en" aria-label="English">EN</a>
+                </div>
 
             </div>
 

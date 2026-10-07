@@ -53,7 +53,10 @@
     .timeline__skills li,
     .contact-form__status--success,
     .contact-form__status--error,
-    .contact-form__submit--loading::after {
+    .contact-form__submit--loading::after,
+    .contact-form__submit--sent,
+    .contact-form__submit--sent::after,
+    .contact-form__submit--shake {
         animation: none;
     }
 

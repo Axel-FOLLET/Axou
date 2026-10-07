@@ -13,7 +13,6 @@ export const HAUTEUR_FENETRE = 660;
 
 export const BLANC = "rgb(255,255,255)";
 export const FOND = "#0D0A9B";
-export const ROUGE_SITE = "#E1001A";
 export const NOIR = "#0D0A9B";
 export const GRIS = "rgba(255,255,255,0.6)";
 export const ROSE_PASTEL = "rgba(255,255,255,0.10)";

@@ -5,7 +5,6 @@
 import { initNavigation } from "./modules/navigation.js";
 import { initSkills } from "./modules/skills.js";
 import { initContact } from "./modules/contact.js";
-import { initLanguage } from "./modules/language.js";
 import { initCubes } from "./modules/cubes/init-cubes.js";
 import { initProjectShowcase } from "./modules/project-showcase.js";
 import { initRepos } from "./modules/repos.js";
@@ -19,7 +18,6 @@ initNavigation();
 initReveal();
 initSkills();
 initContact();
-initLanguage();
 initCubes();
 initRepos();
 initTimeline();

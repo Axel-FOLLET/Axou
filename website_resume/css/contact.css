@@ -299,6 +299,63 @@ textarea.contact-form__control--valid {
 }
 
 
+/* Réussite : le bouton rebondit une fois et une coche apparaît après « Envoyé » */
+.contact-form__submit--sent {
+    animation: submit-pop 0.45s var(--ease-reveal);
+}
+
+
+.contact-form__submit--sent::after {
+    content: "";
+
+    display: inline-block;
+
+    /* Les bordures comptent dans la taille (box-sizing de base.css) : 15 × 10 donne la même coche que le portfolio */
+    width: 15px;
+    height: 10px;
+
+    border-bottom: 3px solid currentColor;
+    border-left: 3px solid currentColor;
+
+    rotate: -45deg;
+    translate: 0 -2px;
+
+    animation: submit-tick 0.35s var(--ease-reveal);
+}
+
+
+/* Échec : une secousse horizontale qui s'amortit */
+.contact-form__submit--shake {
+    animation: submit-shake 0.45s ease-in-out;
+}
+
+
+@keyframes submit-pop {
+    40% {
+        scale: 1.05;
+    }
+}
+
+
+@keyframes submit-tick {
+    from {
+        opacity: 0;
+        scale: 0;
+    }
+}
+
+
+@keyframes submit-shake {
+    20%, 60% {
+        translate: -7px 0;
+    }
+
+    40%, 80% {
+        translate: 7px 0;
+    }
+}
+
+
 /* -------------------- ÉTAT DE L'ENVOI -------------------- */
 
 /*

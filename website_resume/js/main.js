@@ -1,6 +1,5 @@
 import { translations } from "./data/translations.js";
 import { initExperience } from "./modules/experience.js";
-import { initLanguage } from "./modules/language.js";
 import { initCubes } from "./modules/cubes/init-cubes.js";
 import { initGameModal } from "./modules/game-modal.js";
 import { initNavigationMenu } from "./modules/navigation-menu.js";
@@ -26,11 +25,6 @@ initSectionTracker();
 initTimeline();
 initExperience();
 
-// Ajoute les compétences avec leurs informations traduites.
-
-// Initialise le changement de langue de l'interface.
-initLanguage();
-
 // Initialise les cubes interactifs présents sur la page.
 initCubes();
 
@@ -38,4 +32,4 @@ initCubes();
 initGameModal(language);
 
 // Envoie le formulaire de contact sans quitter la page et affiche son état.
-initContactForm(translations[language].contact);
+initContactForm(translations[language].contact, translations[language].humanCheck);

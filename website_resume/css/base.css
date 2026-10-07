@@ -13,13 +13,10 @@
     color-scheme: dark;
 
     --color-bg: #0D0A9B;
-    --color-bg-deep: #09076B;
     --color-surface: #19169F;
     --color-surface-raised: #2522A7;
-    --color-surface-hover: #302DB0;
 
     --color-red: #E1001A;
-    --color-red-deep: #B90016;
 
     --color-text: #FFFFFF;
     --color-text-muted: #D4D5F4;
@@ -37,7 +34,6 @@
     --radius-sm: 2px;
     --radius-field: 3px;
     --radius-control: 3px;
-    --radius-panel: 3px;
     --radius-card: 4px;
     --radius-feature: 4px;
     --radius-pill: 3px;
@@ -55,12 +51,9 @@
     /* Même police que le portfolio : Avenir lorsqu'elle est installée, sinon Arial. */
     --font-sans: Avenir, "Avenir Next", Arial, sans-serif;
 
-    --text-small: clamp(0.875rem, 0.84rem + 0.15vw, 0.9375rem);
     --text-body: clamp(1rem, 0.96rem + 0.2vw, 1.125rem);
-    --text-lead: clamp(1.125rem, 1rem + 0.55vw, 1.5rem);
     --text-card: clamp(1.5rem, 1.2rem + 1vw, 2rem);
     --text-section: clamp(2.125rem, 1.4rem + 2.5vw, 3.5rem);
-    --text-hero: clamp(3.5rem, 2rem + 6vw, 7rem);
 
     --duration-fast: 160ms;
     --duration-ui: 240ms;

@@ -36,6 +36,7 @@
     <link rel="stylesheet" href="css/career.css">
     <link rel="stylesheet" href="css/projects.css">
     <link rel="stylesheet" href="css/contact.css">
+    <link rel="stylesheet" href="css/human-check.css">
     <link rel="stylesheet" href="css/footer.css">
     <link rel="stylesheet" href="css/responsive.css">
     <link rel="stylesheet" href="css/game-modal.css" media="(min-width: 1025px)">
@@ -82,22 +83,9 @@
 
                 <a href="#home">AF</a>
 
-                <div class="language-switch">
-
-                    <select
-                        id="language-select"
-                        aria-label="Choisir la langue"
-                     class="language-switch__select">
-
-                        <option value="index.html" selected>
-                            FR
-                        </option>
-
-                        <option value="index-en.html">
-                            EN
-                        </option>
-
-                    </select>
+                <div class="language-switch" role="group" aria-label="Choisir la langue">
+                    <span class="language-switch__option language-switch__option--active" lang="fr" aria-current="true">FR</span>
+                    <a class="language-switch__option" href="index-en.html" hreflang="en" lang="en" aria-label="English">EN</a>
 
                 </div>
 
@@ -978,7 +966,7 @@
                     <p><strong>Éditeur :</strong> Axel FOLLET, site personnel non professionnel. Contact : formulaire du site ou LinkedIn.</p>
                     <p><strong>Hébergeur :</strong> GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, États-Unis.</p>
                     <p><strong>Formulaire de contact :</strong> vos nom, prénom, e-mail, sujet et message servent uniquement à vous répondre. Ils transitent par Formspree, service situé aux États-Unis, et sont supprimés 12 mois après notre dernier échange. Vous pouvez demander à y accéder, à les corriger ou à les supprimer par le formulaire ou LinkedIn, et adresser une réclamation à la <a href="https://www.cnil.fr/fr/plaintes" target="_blank" rel="noopener noreferrer">CNIL</a>.</p>
-                    <p><strong>Navigateur :</strong> aucun cookie ni mesure d'audience. Le site garde seulement sur votre appareil vos records de Snake et du Pendu.</p>
+                    <p><strong>Navigateur :</strong> aucun cookie ni mesure d'audience. Le site garde seulement sur votre appareil vos records de Snake et du Pendu, ainsi que la réponse à la protection anti-robot du formulaire jusqu'à la fermeture de l'onglet.</p>
                 </details>
             </div>
 
