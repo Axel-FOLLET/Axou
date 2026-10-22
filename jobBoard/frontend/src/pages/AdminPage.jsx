@@ -4,6 +4,7 @@ import { useContext, useState, useEffect, Fragment } from "react";
 import { Link } from "react-router";
 import { apiFetch } from "../api.js";
 import { tables } from "../adminTables.js";
+import { useLang } from "../lang.js";
 
 // Textes longs : zone de texte dans le panneau, une seule ligne coupée dans le tableau.
 const LONG_FIELDS = ["description", "short_description", "message"];
@@ -12,6 +13,7 @@ const NUMERIC_FIELDS = ["siren", "salary", "company_id", "category_id", "contact
 
 export default function AdminPage() {
   const { user } = useContext(AuthContext);
+  const { t, lang } = useLang();
   // Table affichée et pagination : tout changement relance l'appel réseau ci-dessous.
   const [selectedTable, setSelectedTable] = useState("companies");
   const [rows, setRows] = useState([]);
@@ -53,7 +55,8 @@ export default function AdminPage() {
         setTotalPages(Math.ceil(Number(total) / perPage));
       } catch (err) {
         // Message pour l'écran ; le détail technique reste dans la console.
-        setError("Nous n'arrivons pas à charger ces données pour le moment. Merci de réessayer dans quelques instants.");
+        // "load" : texte choisi à l'affichage, dans la langue courante.
+        setError("load");
         console.error("Erreur lors de la récupération des données :", err);
       } finally {
         setLoading(false);
@@ -79,7 +82,7 @@ export default function AdminPage() {
   // --- Suppression ---
   async function handleDelete(id) {
     // Confirmation avant tout appel : la suppression est définitive côté API.
-    if (!window.confirm("Supprimer cette ligne ?")) { return; }
+    if (!window.confirm(t("Supprimer cette ligne ?", "Delete this row?"))) { return; }
     setError(null);
     try {
       const { status, error: apiError } = await apiFetch(`/api/admin/${selectedTable}/${id}`, { method: 'DELETE' });
@@ -95,16 +98,16 @@ export default function AdminPage() {
       // Un message français par code de l'API ; 409 = ligne encore utilisée ailleurs.
       const messages = {
         // 0 : serveur injoignable, signalé par apiFetch au lieu d'une exception.
-        0: "Le serveur est injoignable. La suppression n'a pas pu être confirmée.",
-        401: "Votre session a expiré. Merci de vous reconnecter.",
-        403: "Cette action est réservée à l'administration.",
-        404: "Cette ligne n'existe plus.",
-        409: "Impossible de supprimer : cette ligne est utilisée ailleurs.",
+        0: t("Le serveur est injoignable. La suppression n'a pas pu être confirmée.", "The server cannot be reached. The deletion could not be confirmed."),
+        401: t("Votre session a expiré. Merci de vous reconnecter.", "Your session has expired. Please log in again."),
+        403: t("Cette action est réservée à l'administration.", "This action is restricted to administrators."),
+        404: t("Cette ligne n'existe plus.", "This row no longer exists."),
+        409: t("Impossible de supprimer : cette ligne est utilisée ailleurs.", "Cannot delete: this row is used elsewhere."),
       };
-      setError(messages[status] || "La suppression a échoué. Merci de réessayer.");
+      setError(messages[status] || t("La suppression a échoué. Merci de réessayer.", "The deletion failed. Please try again."));
       console.error("Suppression refusée :", status, apiError);
     } catch (err) {
-      setError("Le serveur est injoignable. La suppression n'a pas pu être confirmée.");
+      setError(t("Le serveur est injoignable. La suppression n'a pas pu être confirmée.", "The server cannot be reached. The deletion could not be confirmed."));
       console.error("Erreur lors de la suppression :", err);
     }
   }
@@ -122,11 +125,11 @@ export default function AdminPage() {
       const previousSiren = String(editingRow?.siren ?? "").trim();
       if (isCreating || siren !== previousSiren) {
         if (!siren) {
-          setEditError("Le SIREN est obligatoire.");
+          setEditError(t("Le SIREN est obligatoire.", "The SIREN is required."));
           return;
         }
         if (!/^[0-9]{9}$/.test(siren)) {
-          setEditError("Le SIREN doit contenir exactement neuf chiffres.");
+          setEditError(t("Le SIREN doit contenir exactement neuf chiffres.", "The SIREN must contain exactly nine digits."));
           return;
         }
       }
@@ -160,7 +163,7 @@ export default function AdminPage() {
         } else {
           // Les autres champs numériques doivent être des entiers.
           if (String(value).trim() === "" || !Number.isInteger(Number(value))) {
-            setEditError("Valeur refusée pour ce champ.");
+            setEditError(t("Valeur refusée pour ce champ.", "Value rejected for this field."));
             return;
           }
           value = Number(value);
@@ -171,7 +174,7 @@ export default function AdminPage() {
 
     // Rien n'a changé : on le dit sans appeler l'API.
     if (!isCreating && Object.keys(changes).length === 0) {
-      setEditError("Aucune modification à enregistrer.");
+      setEditError(t("Aucune modification à enregistrer.", "No changes to save."));
       return;
     }
 
@@ -206,41 +209,41 @@ export default function AdminPage() {
       if (status === 400 && apiError.startsWith("Missing field: ")) {
         const field = apiError.slice("Missing field: ".length);
         const requiredMessages = {
-          name: "Le nom est obligatoire.",
-          siren: "Le SIREN est obligatoire.",
-          first_name: "Le prénom est obligatoire.",
-          last_name: "Le nom est obligatoire.",
-          email: "L'adresse e-mail est obligatoire.",
-          title: "Le titre est obligatoire.",
-          short_description: "La description courte est obligatoire.",
-          company_id: "L'entreprise est obligatoire.",
-          category_id: "La catégorie est obligatoire.",
-          ad_id: "L'annonce est obligatoire.",
-          person_id: "La personne est obligatoire.",
-          message: "Le message est obligatoire.",
+          name: t("Le nom est obligatoire.", "The name is required."),
+          siren: t("Le SIREN est obligatoire.", "The SIREN is required."),
+          first_name: t("Le prénom est obligatoire.", "The first name is required."),
+          last_name: t("Le nom est obligatoire.", "The last name is required."),
+          email: t("L'adresse e-mail est obligatoire.", "The email address is required."),
+          title: t("Le titre est obligatoire.", "The title is required."),
+          short_description: t("La description courte est obligatoire.", "The short description is required."),
+          company_id: t("L'entreprise est obligatoire.", "The company is required."),
+          category_id: t("La catégorie est obligatoire.", "The category is required."),
+          ad_id: t("L'annonce est obligatoire.", "The job offer is required."),
+          person_id: t("La personne est obligatoire.", "The person is required."),
+          message: t("Le message est obligatoire.", "The message is required."),
         };
-        setEditError(requiredMessages[field] || "Un champ obligatoire manque.");
+        setEditError(requiredMessages[field] || t("Un champ obligatoire manque.", "A required field is missing."));
         console.error("Champ obligatoire manquant :", data);
         return;
       }
       // Autres refus : d'abord le message de l'API, puis le code HTTP, puis un message générique.
       const messages = {
-        "No fields to update": "Aucune modification à enregistrer.",
-        "Already exists": "Cette valeur est déjà utilisée.",
-        "Unknown reference": "L'entreprise, la catégorie ou la personne indiquée n'existe pas.",
-        "Invalid value": "Valeur refusée pour ce champ.",
+        "No fields to update": t("Aucune modification à enregistrer.", "No changes to save."),
+        "Already exists": t("Cette valeur est déjà utilisée.", "This value is already in use."),
+        "Unknown reference": t("L'entreprise, la catégorie ou la personne indiquée n'existe pas.", "The specified company, category or person does not exist."),
+        "Invalid value": t("Valeur refusée pour ce champ.", "Value rejected for this field."),
       };
       const statusMessages = {
         // 0 : serveur injoignable, signalé par apiFetch au lieu d'une exception.
-        0: "L'enregistrement n'a pas pu être confirmé. Merci de réessayer.",
-        401: "Votre session a expiré. Merci de vous reconnecter.",
-        403: "Cette action est réservée à l'administration.",
-        404: "Cette ligne n'existe plus.",
+        0: t("L'enregistrement n'a pas pu être confirmé. Merci de réessayer.", "Saving could not be confirmed. Please try again."),
+        401: t("Votre session a expiré. Merci de vous reconnecter.", "Your session has expired. Please log in again."),
+        403: t("Cette action est réservée à l'administration.", "This action is restricted to administrators."),
+        404: t("Cette ligne n'existe plus.", "This row no longer exists."),
       };
-      setEditError(messages[apiError] || statusMessages[status] || "L'enregistrement a échoué. Merci de réessayer.");
+      setEditError(messages[apiError] || statusMessages[status] || t("L'enregistrement a échoué. Merci de réessayer.", "Saving failed. Please try again."));
       console.error("Modification refusée :", status, apiError);
     } catch (err) {
-      setEditError("L'enregistrement n'a pas pu être confirmé. Merci de réessayer.");
+      setEditError(t("L'enregistrement n'a pas pu être confirmé. Merci de réessayer.", "Saving could not be confirmed. Please try again."));
       console.error("Erreur lors de la modification :", err);
     } finally {
       setEditSaving(false);
@@ -285,8 +288,8 @@ export default function AdminPage() {
           <form onSubmit={handleUpdate}>
             <h2 id="admin-drawer-title">
               {isCreating
-                ? tables[selectedTable].addLabel
-                : tables[selectedTable].editTitle(editingRow)}
+                ? tables[selectedTable].addLabel[lang]
+                : tables[selectedTable].editTitle(editingRow, lang)}
             </h2>
 
             <div className="admin-drawer-fields">
@@ -309,7 +312,7 @@ export default function AdminPage() {
 
                 return (
                   <label key={field}>
-                    {column.label}
+                    {column.label[lang]}
                     {isLong ? (
                       <textarea {...props} />
                     ) : (
@@ -327,10 +330,10 @@ export default function AdminPage() {
             <div className="admin-drawer-actions">
               {editError && <p role="alert">{editError}</p>}
               <button type="submit" disabled={editSaving}>
-                {editSaving ? "Enregistrement…" : "Enregistrer"}
+                {editSaving ? t("Enregistrement…", "Saving…") : t("Enregistrer", "Save")}
               </button>
               <button type="button" className="button-secondary" disabled={editSaving} onClick={closeForm}>
-                Annuler
+                {t("Annuler", "Cancel")}
               </button>
             </div>
           </form>
@@ -343,14 +346,14 @@ export default function AdminPage() {
   if (!user || user.role !== 'admin') {
     return (
       <div className="page">
-        <p>Cette page est réservée à l'administration.</p>
-        {user === null && <Link to="/login">Se connecter</Link>}
+        <p>{t("Cette page est réservée à l'administration.", "This page is restricted to administrators.")}</p>
+        {user === null && <Link to="/login">{t("Se connecter", "Log in")}</Link>}
       </div>
     )};
 
   return (
     <div className="page admin-page">
-      <h1>Administration</h1>
+      <h1>{t("Administration", "Admin")}</h1>
       {/* tab-bar (tabs.css) : le choix des tables reste collé sous l'en-tête pendant le défilement. */}
       <div className="tab-bar">
         <div className="admin-tabs">
@@ -363,24 +366,24 @@ export default function AdminPage() {
               setEditError(null);
               setIsCreating(false);
             }}>
-              {tables[table].title}
+              {tables[table].title[lang]}
             </button>
           ))}
         </div>
       </div>
-      <h2>{tables[selectedTable].title}</h2>
+      <h2>{tables[selectedTable].title[lang]}</h2>
 
       
 
       <div className="admin-pagination">
-      <label>Lignes par page :
+      <label>{t("Lignes par page :", "Rows per page:")}
         <select value={perPage} onChange={(e) => {
           setPerPage(Number(e.target.value));
           setCurrentPage(1);
         }}>
-          <option value={10}>10 par page</option>
-          <option value={25}>25 par page</option>
-          <option value={50}>50 par page</option>
+          <option value={10}>{t("10 par page", "10 per page")}</option>
+          <option value={25}>{t("25 par page", "25 per page")}</option>
+          <option value={50}>{t("50 par page", "50 per page")}</option>
         </select>
       </label>
       {/* Flèche du tri : tout le tableau est retrié par l'API, on repart donc de la page 1. */}
@@ -388,7 +391,7 @@ export default function AdminPage() {
         setOrder(order === "asc" ? "desc" : "asc");
         setCurrentPage(1);
       }}>
-        {order === "asc" ? "Plus anciens d'abord ↑" : "Plus récents d'abord ↓"}
+        {order === "asc" ? t("Plus anciens d'abord ↑", "Oldest first ↑") : t("Plus récents d'abord ↓", "Newest first ↓")}
       </button>
       </div>
       <div className="admin-add">
@@ -397,29 +400,29 @@ export default function AdminPage() {
           disabled={editSaving}
           onClick={handleCreate}
         >
-          {tables[selectedTable].addLabel}
+          {tables[selectedTable].addLabel[lang]}
         </button>
       </div>
       {/* Ajout ou modification : un seul panneau latéral, au-dessus de la page. */}
       {formOpen && renderForm()}
       {/* Quatre affichages possibles : chargement, erreur, tableau vide, puis les données. */}
       {loading ? (
-        <p>Chargement…</p>
+        <p>{t("Chargement…", "Loading…")}</p>
       ) : error ? (
-        <p>{error}</p>
+        <p>{error === "load" ? t("Nous n'arrivons pas à charger ces données pour le moment. Merci de réessayer dans quelques instants.", "We cannot load this data at the moment. Please try again in a few moments.") : error}</p>
       ) : rows.length === 0 ? (
-        <p>Aucune donnée disponible pour l'instant.</p>
+        <p>{t("Aucune donnée disponible pour l'instant.", "No data available yet.")}</p>
       ) : (
         <>
-        <div className="table-scroll" role="region" aria-label={tables[selectedTable].title} tabIndex={0}>
+        <div className="table-scroll" role="region" aria-label={tables[selectedTable].title[lang]} tabIndex={0}>
         <table>
           <thead>
             <tr>
               {/* Un en-tête par colonne ; celui des boutons n'est lu que par les lecteurs d'écran. */}
               {tables[selectedTable].columns.map((column) => (
-                <th key={column.key}>{column.label}</th>
+                <th key={column.key}>{column.label[lang]}</th>
               ))}
-              <th className="col-actions"><span className="visually-hidden">Actions</span></th>
+              <th className="col-actions"><span className="visually-hidden">{t("Actions", "Actions")}</span></th>
             </tr>
           </thead>
           <tbody>
@@ -440,8 +443,8 @@ export default function AdminPage() {
                         setEditValues({ ...row });
                         setEditError(null);
                         setIsCreating(false);
-                      }}>Modifier</button>
-                      <button className="button-danger" type="button" onClick={() => handleDelete(row.id)}>Supprimer</button>
+                      }}>{t("Modifier", "Edit")}</button>
+                      <button className="button-danger" type="button" onClick={() => handleDelete(row.id)}>{t("Supprimer", "Delete")}</button>
                     </div>
                   </td>
                 </tr>
@@ -454,11 +457,11 @@ export default function AdminPage() {
         {totalPages > 0 && (
           <div className="pagination-buttons">
             <button className="button-secondary" type="button" onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1}>
-              Précédent
+              {t("Précédent", "Previous")}
             </button>
-            <span>Page {currentPage} sur {totalPages}</span>
+            <span>{t(`Page ${currentPage} sur ${totalPages}`, `Page ${currentPage} of ${totalPages}`)}</span>
             <button className="button-secondary" type="button" onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages}>
-              Suivant
+              {t("Suivant", "Next")}
             </button>
           </div>
         )}

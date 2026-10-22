@@ -4,9 +4,11 @@ import { Link, Navigate, useNavigate } from 'react-router'
 import { AuthContext } from '../AuthContext'
 import { apiFetch } from '../api.js'
 import { FIELD_NAMES } from '../fieldNames.js'
+import { useLang } from '../lang.js'
 
 // --- Page publique : formulaire de création de compte ---
 export default function AccountPage() {
+    const { t, lang } = useLang()
     // Champs du formulaire, vides au départ.
     const [firstName, setFirstName] = useState('')
     const [surname, setSurname] = useState('')
@@ -38,39 +40,39 @@ export default function AccountPage() {
         const newErrors = {}
 
         if (firstName.trim() === '') {
-            newErrors.firstName = "Veuillez indiquer votre prénom."
+            newErrors.firstName = t("Veuillez indiquer votre prénom.", "Please enter your first name.")
             }
         else if (!/^[A-Za-zÀ-ÖØ-öø-ÿ' -]+$/.test(firstName.trim())) {
-            newErrors.firstName = "Votre prénom ne peut contenir que des lettres, des espaces, des tirets ou des apostrophes."
+            newErrors.firstName = t("Votre prénom ne peut contenir que des lettres, des espaces, des tirets ou des apostrophes.", "Your first name can only contain letters, spaces, hyphens or apostrophes.")
         }
 
         if (surname.trim() === '') {
-            newErrors.surname = "Veuillez indiquer votre nom."
-            } 
+            newErrors.surname = t("Veuillez indiquer votre nom.", "Please enter your last name.")
+            }
         else if (!/^[A-Za-zÀ-ÖØ-öø-ÿ' -]+$/.test(surname.trim())) {
-            newErrors.surname = "Votre nom ne peut contenir que des lettres, des espaces, des tirets ou des apostrophes."  
+            newErrors.surname = t("Votre nom ne peut contenir que des lettres, des espaces, des tirets ou des apostrophes.", "Your last name can only contain letters, spaces, hyphens or apostrophes.")
         }
 
         // Téléphone facultatif : contrôlé seulement s'il est rempli.
         if (telephone.trim() !== '' && !/^\+?[0-9 ]+$/.test(telephone.trim())) {
-            newErrors.telephone = "Votre téléphone ne peut contenir que des chiffres, des espaces et un + au début."
+            newErrors.telephone = t("Votre téléphone ne peut contenir que des chiffres, des espaces et un + au début.", "Your phone number can only contain digits, spaces and a leading +.")
         }
 
         if (email.trim() === '') {
-            newErrors.email = "Veuillez indiquer votre adresse e-mail."
+            newErrors.email = t("Veuillez indiquer votre adresse e-mail.", "Please enter your email address.")
         }
         else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-            newErrors.email = "Votre adresse e-mail doit ressembler à nom@exemple.fr."
+            newErrors.email = t("Votre adresse e-mail doit ressembler à nom@exemple.fr.", "Your email address must look like name@example.com.")
         }
 
         if (password.trim() === '') {
-            newErrors.password = "Veuillez indiquer votre mot de passe."
+            newErrors.password = t("Veuillez indiquer votre mot de passe.", "Please enter your password.")
         }
         else if (password.includes(' ')) {
-            newErrors.password = "Le mot de passe ne peut pas contenir d'espaces."
+            newErrors.password = t("Le mot de passe ne peut pas contenir d'espaces.", "The password cannot contain spaces.")
         }
         else if (password.length < 8) {
-            newErrors.password = "Le mot de passe doit contenir au moins 8 caractères."
+            newErrors.password = t("Le mot de passe doit contenir au moins 8 caractères.", "The password must contain at least 8 characters.")
         }
 
         setErrors(newErrors)
@@ -122,16 +124,16 @@ export default function AccountPage() {
 
             // Un message français par code de l'API ; 409 propose la connexion.
             if (httpStatus === 409) {
-                setSendError('Cette adresse e-mail a déjà un compte : connectez-vous.')
+                setSendError(t('Cette adresse e-mail a déjà un compte : connectez-vous.', 'This email address already has an account: log in.'))
                 setNeedLogin(true)
             } else if (httpStatus === 400) {
                 if (apiError === 'Password must be at least 8 characters') {
-                    setSendError('Le mot de passe doit contenir au moins 8 caractères.')
+                    setSendError(t('Le mot de passe doit contenir au moins 8 caractères.', 'The password must contain at least 8 characters.'))
                 } else if (apiError.startsWith('Invalid field: ')) {
                     const field = apiError.replace('Invalid field: ', '')
-                    setSendError(`Merci de vérifier le champ : ${FIELD_NAMES[field] || 'informations du compte'}.`)
+                    setSendError(t(`Merci de vérifier le champ : ${FIELD_NAMES[lang][field] || 'informations du compte'}.`, `Please check the field: ${FIELD_NAMES[lang][field] || 'account details'}.`))
                 } else {
-                    setSendError('Merci de vérifier les informations du compte.')
+                    setSendError(t('Merci de vérifier les informations du compte.', 'Please check the account details.'))
                 }
             } else {
                 throw new Error(`Unexpected response ${httpStatus}`)
@@ -140,7 +142,7 @@ export default function AccountPage() {
             // Serveur arrêté, réponse illisible ou code inattendu.
             console.error(err)
             setStatus('error')
-            setSendError("Nous n'arrivons pas à créer votre compte pour le moment. Merci de réessayer dans quelques instants.")
+            setSendError(t("Nous n'arrivons pas à créer votre compte pour le moment. Merci de réessayer dans quelques instants.", 'We cannot create your account at the moment. Please try again in a few moments.'))
         }
     }
 
@@ -156,12 +158,12 @@ export default function AccountPage() {
     // noValidate : les messages du navigateur sont remplacés par les nôtres, en français.
     return (
       <div className="page account-page">
-        <h1>Créer un compte</h1>
+        <h1>{t('Créer un compte', 'Create an account')}</h1>
         <form className="form-columns" onSubmit={handleSubmit} noValidate>
 
             <div>
                 <label>
-                    Nom
+                    {t('Nom', 'Last name')}
                     <input type="text" name="surname" value={surname} onChange={(e) => setSurname(e.target.value)} />
                 </label>
                 {errors.surname && <p>{errors.surname}</p>}
@@ -169,7 +171,7 @@ export default function AccountPage() {
 
             <div>
                 <label>
-                    Prénom
+                    {t('Prénom', 'First name')}
                     <input type="text" name="firstName" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
                 </label>
                 {errors.firstName && <p>{errors.firstName}</p>}
@@ -177,7 +179,7 @@ export default function AccountPage() {
 
             <div>
                 <label>
-                    Téléphone (facultatif)
+                    {t('Téléphone (facultatif)', 'Phone number (optional)')}
                     <input type="text" name="telephone" value={telephone} onChange={(e) => setTelephone(e.target.value)} />
                 </label>
                 {errors.telephone && <p>{errors.telephone}</p>}
@@ -185,7 +187,7 @@ export default function AccountPage() {
 
             <div>
                 <label>
-                    Adresse e-mail
+                    {t('Adresse e-mail', 'Email address')}
                     <input type="email" name="email" value={email} onChange={(e) => setEmail(e.target.value)} />
                 </label>
                 {errors.email && <p>{errors.email}</p>}
@@ -193,7 +195,7 @@ export default function AccountPage() {
 
             <div className="field-wide">
                 <label>
-                    Mot de passe
+                    {t('Mot de passe', 'Password')}
                     <input type="password" name="password" value={password} onChange={(e) => setPassword(e.target.value)} />
                 </label>
                 {errors.password && <p>{errors.password}</p>}
@@ -208,25 +210,26 @@ export default function AccountPage() {
                             <svg className="checkmark" viewBox="0 0 52 52" aria-hidden="true">
                                 <path fill="none" stroke="currentColor" strokeWidth="5" d="M14 27 l8 8 l16 -16" />
                             </svg>
-                            {status === 'sent' ? 'Compte créé' : 'Lien envoyé'}
+                            {status === 'sent' ? t('Compte créé', 'Account created') : t('Lien envoyé', 'Link sent')}
                         </>
-                    ) :status === 'sending' ? 'Création en cours…' : 'Créer un compte'}
+                    ) :status === 'sending' ? t('Création en cours…', 'Creating…') : t('Créer un compte', 'Create an account')}
                 </button>
             </div>
             <div aria-live="polite">
                 {status === 'sent' && (
-                    <p>Votre compte est créé et votre session est ouverte.</p>
+                    <p>{t('Votre compte est créé et votre session est ouverte.', 'Your account has been created and you are logged in.')}</p>
                 )}
                 {status === 'pending' && (
                     <p>
-                        Votre adresse est déjà enregistrée chez nous, sans compte. Nous venons
-                        d&apos;envoyer un lien de confirmation à {email.trim()} : votre compte
-                        et vos candidatures seront accessibles dès que vous l&apos;aurez ouvert.
+                        {t(
+                            `Votre adresse est déjà enregistrée chez nous, sans compte. Nous venons d'envoyer un lien de confirmation à ${email.trim()} : votre compte et vos candidatures seront accessibles dès que vous l'aurez ouvert.`,
+                            `Your address is already registered with us, without an account. We have just sent a confirmation link to ${email.trim()}: your account and your applications will be available as soon as you open it.`
+                        )}
                     </p>
                 )}
                 {sendError && (
                     <p role="alert">
-                        {sendError} {needLogin && <Link to="/login">Se connecter</Link>}
+                        {sendError} {needLogin && <Link to="/login">{t('Se connecter', 'Log in')}</Link>}
                     </p>
                 )}
             </div>

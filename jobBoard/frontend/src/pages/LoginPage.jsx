@@ -3,8 +3,10 @@ import { useContext, useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { AuthContext } from '../AuthContext'
 import { apiFetch } from '../api.js'
+import { useLang } from '../lang.js'
 
 export default function LoginPage() {
+  const { t } = useLang()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   // errors = un message par champ fautif ; sendError = l'échec global de l'envoi.
@@ -32,17 +34,17 @@ export default function LoginPage() {
     const newErrors = {}
 
     if (email.trim() === '') {
-        newErrors.email = "Veuillez indiquer votre adresse e-mail."
+        newErrors.email = t("Veuillez indiquer votre adresse e-mail.", "Please enter your email address.")
     }
 
     if (password.trim() === '') {
-        newErrors.password = "Veuillez indiquer votre mot de passe."
+        newErrors.password = t("Veuillez indiquer votre mot de passe.", "Please enter your password.")
     }
     else if (password.includes(' ')) {
-        newErrors.password = "Le mot de passe ne peut pas contenir d'espaces."
+        newErrors.password = t("Le mot de passe ne peut pas contenir d'espaces.", "The password cannot contain spaces.")
     }
     else if (password.length < 8) {
-        newErrors.password = "Le mot de passe doit contenir au moins 8 caractères."
+        newErrors.password = t("Le mot de passe doit contenir au moins 8 caractères.", "The password must contain at least 8 characters.")
     }
 
     setErrors(newErrors)
@@ -77,15 +79,15 @@ export default function LoginPage() {
             setStatus('error')
 
             if (httpStatus === 400) {
-                setSendError("Merci de vérifier l'adresse e-mail et le mot de passe.")
+                setSendError(t("Merci de vérifier l'adresse e-mail et le mot de passe.", 'Please check the email address and password.'))
             } else if (httpStatus === 401) {
-                setSendError('Adresse e-mail ou mot de passe incorrects.')
+                setSendError(t('Adresse e-mail ou mot de passe incorrects.', 'Incorrect email address or password.'))
             } else if (httpStatus === 429) {
                 // Trop de tentatives : l'API renvoie l'attente restante dans l'en-tête Retry-After.
                 const minutes = retryAfter === null ? null : Math.ceil(retryAfter / 60)
                 setSendError(minutes === null
-                    ? 'Trop de tentatives de connexion. Merci de réessayer plus tard.'
-                    : `Trop de tentatives de connexion. Merci de réessayer dans ${minutes} minute${minutes > 1 ? 's' : ''}.`)
+                    ? t('Trop de tentatives de connexion. Merci de réessayer plus tard.', 'Too many login attempts. Please try again later.')
+                    : t(`Trop de tentatives de connexion. Merci de réessayer dans ${minutes} minute${minutes > 1 ? 's' : ''}.`, `Too many login attempts. Please try again in ${minutes} minute${minutes > 1 ? 's' : ''}.`))
             } else {
                 throw new Error(`Unexpected response ${httpStatus}`)
             }
@@ -93,18 +95,18 @@ export default function LoginPage() {
             // Serveur arrêté, réponse illisible ou code inattendu.
             console.error(err)
             setStatus('error')
-            setSendError("Nous n'arrivons pas à vous connecter pour le moment. Merci de réessayer dans quelques instants.")
+            setSendError(t("Nous n'arrivons pas à vous connecter pour le moment. Merci de réessayer dans quelques instants.", 'We cannot log you in at the moment. Please try again in a few moments.'))
         }
   }
 
   return (
     <div className="page account-page">
-      <h1>Connexion</h1>
+      <h1>{t('Connexion', 'Log in')}</h1>
       {/* noValidate : les messages du navigateur sont remplacés par les nôtres, en français.
           form-columns (forms.css) : sans carte, comme les autres formulaires ; ici chaque champ prend toute la ligne. */}
       <form className="form-columns" onSubmit={handleSubmit} noValidate>
         <div className="field-wide">
-          <label htmlFor="email">Adresse e-mail</label>
+          <label htmlFor="email">{t('Adresse e-mail', 'Email address')}</label>
           <input
             type="email"
             id="email"
@@ -115,7 +117,7 @@ export default function LoginPage() {
           {errors.email && <p>{errors.email}</p>}
         </div>
         <div className="field-wide">
-          <label htmlFor="password">Mot de passe</label>
+          <label htmlFor="password">{t('Mot de passe', 'Password')}</label>
           <input
             type="password"
             id="password"
@@ -134,18 +136,18 @@ export default function LoginPage() {
                 <svg className="checkmark" viewBox="0 0 52 52" aria-hidden="true">
                   <path fill="none" stroke="currentColor" strokeWidth="5" d="M14 27 l8 8 l16 -16" />
                 </svg>
-                Connecté
+                {t('Connecté', 'Logged in')}
               </>
-            ) : status === 'sending' ? 'Connexion en cours…' : 'Se connecter'}
+            ) : status === 'sending' ? t('Connexion en cours…', 'Logging in…') : t('Se connecter', 'Log in')}
           </button>
           {sendError && <p role="alert">{sendError}</p>}
         </div>
         {/* aria-live : le lecteur d'écran annonce le succès sans que la coche suffise. */}
         <div aria-live="polite">
-          {status === 'sent' && <p className="visually-hidden">Connexion réussie.</p>}
+          {status === 'sent' && <p className="visually-hidden">{t('Connexion réussie.', 'Logged in successfully.')}</p>}
         </div>
       </form>
-      <p><Link to="/account">Pas encore de compte ? Créer un compte</Link></p>
+      <p><Link to="/account">{t('Pas encore de compte ? Créer un compte', 'No account yet? Create an account')}</Link></p>
     </div>
   )
 }

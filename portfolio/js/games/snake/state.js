@@ -19,6 +19,10 @@ export const state = {
      */
     directionDemandee: DROITE,
     /*
+     * Deuxième touche reçue avant le prochain pas, appliquée au pas suivant ; null sinon.
+     */
+    directionSuivante: null,
+    /*
      * Case de la pomme, ou null quand aucune place ne reste.
      */
     pomme: null,

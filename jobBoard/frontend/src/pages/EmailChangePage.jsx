@@ -4,8 +4,10 @@ import { useContext, useEffect, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router'
 import { AuthContext } from '../AuthContext'
 import { apiFetch } from '../api.js'
+import { useLang } from '../lang.js'
 
 export default function EmailChangePage() {
+  const { t } = useLang()
   const [searchParams] = useSearchParams()
   const token = searchParams.get('token') ?? ''
   // Lien tronqué ou recopié sans le jeton : l'état part directement sur le refus, sans appel.
@@ -50,27 +52,27 @@ export default function EmailChangePage() {
 
   return (
     <div className="page">
-      <h1>Changement d&apos;adresse e-mail</h1>
+      <h1>{t("Changement d'adresse e-mail", 'Email address change')}</h1>
 
       <div aria-live="polite">
-        {status === 'checking' && <p>Vérification en cours…</p>}
+        {status === 'checking' && <p>{t('Vérification en cours…', 'Checking…')}</p>}
 
-        {status === 'done' && <p>Votre adresse e-mail a été modifiée.</p>}
+        {status === 'done' && <p>{t('Votre adresse e-mail a été modifiée.', 'Your email address has been changed.')}</p>}
 
         {status === 'taken' && (
-          <p role="alert">Cette adresse a été prise par un autre compte entre-temps.</p>
+          <p role="alert">{t('Cette adresse a été prise par un autre compte entre-temps.', 'This address has been taken by another account in the meantime.')}</p>
         )}
 
         {status === 'invalid' && (
           <p role="alert">
-            Ce lien n&apos;est plus valide. Refaites la demande depuis « Mon compte ».{' '}
-            <Link to="/espace-candidat/informations">Mon compte</Link>
+            {t("Ce lien n'est plus valide. Refaites la demande depuis « Mon compte ».", 'This link is no longer valid. Make the request again from "My account".')}{' '}
+            <Link to="/espace-candidat/informations">{t('Mon compte', 'My account')}</Link>
           </p>
         )}
 
         {status === 'error' && (
           <p role="alert">
-            Nous n&apos;arrivons pas à confirmer votre adresse pour le moment. Merci de réessayer dans quelques instants.
+            {t("Nous n'arrivons pas à confirmer votre adresse pour le moment. Merci de réessayer dans quelques instants.", 'We cannot confirm your address at the moment. Please try again in a few moments.')}
           </p>
         )}
       </div>

@@ -3,8 +3,10 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router'
 import { apiFetch } from '../api.js'
 import SearchBar from '../components/SearchBar.jsx'
+import { useLang } from '../lang.js'
 
 export default function HomePage() {
+  const { t } = useLang()
   // Les deux offres les plus récentes : la liste reste vide tant que l'appel n'a pas répondu.
   const [recent, setRecent] = useState([])
   const [error, setError] = useState(null)
@@ -22,7 +24,8 @@ export default function HomePage() {
       } catch (err) {
         // Détail technique dans la console, message lisible pour le visiteur.
         console.error(err)
-        setError('Offres récentes indisponibles pour le moment.')
+        // Le message est traduit à l'affichage, dans la langue courante.
+        setError(true)
       } finally {
         setLoading(false)
       }
@@ -34,9 +37,9 @@ export default function HomePage() {
     <div className="page">
       {/* Titre seul, précédé d'un grand vide : un seul message à la fois. */}
       <h1 className="home-title">
-        Votre carrière,
+        {t('Votre carrière,', 'Your career,')}
         <br />
-        traitée avec soin.
+        {t('traitée avec soin.', 'handled with care.')}
       </h1>
 
       {/* Sans encadré : la recherche à gauche, les deux offres récentes à droite, en liste discrète. */}
@@ -45,12 +48,12 @@ export default function HomePage() {
         <SearchBar />
 
         <section className="recent-offers" aria-labelledby="recent-offers-title">
-          <h2 id="recent-offers-title">Récemment publiées</h2>
-          {loading && <p>Chargement…</p>}
-          {error && <p>{error}</p>}
+          <h2 id="recent-offers-title">{t('Récemment publiées', 'Recently published')}</h2>
+          {loading && <p>{t('Chargement…', 'Loading…')}</p>}
+          {error && <p>{t('Offres récentes indisponibles pour le moment.', 'Recent job offers are unavailable at the moment.')}</p>}
           {/* Aucune annonce ouverte : on renvoie vers la liste plutôt que d'afficher une case vide. */}
           {!loading && !error && recent.length === 0 && (
-            <p>Aucune offre pour le moment.</p>
+            <p>{t('Aucune offre pour le moment.', 'No job offers at the moment.')}</p>
           )}
           {/* Chaque ligne ouvre la page des offres filtrée sur ce titre (q cherche dans le titre). */}
           <ul>
@@ -63,7 +66,7 @@ export default function HomePage() {
               </li>
             ))}
           </ul>
-          <Link className="recent-offers-all" to="/offres">Toutes les offres</Link>
+          <Link className="recent-offers-all" to="/offres">{t('Toutes les offres', 'All job offers')}</Link>
         </section>
       </div>
     </div>

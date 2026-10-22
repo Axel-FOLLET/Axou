@@ -3,11 +3,12 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useSearchParams } from 'react-router'
 import { apiFetch } from '../api.js'
+import { useLang, dataLabel } from '../lang.js'
 
 // Filtres de GET /api/ads proposés ici (docs/contrat_api.md). Le filtre par catégorie de l'API n'est pas proposé dans la barre.
 const FILTERS = [
-  { name: 'contract_type', label: 'Type de contrat' },
-  { name: 'location', label: 'Lieu' },
+  { name: 'contract_type', label: { fr: 'Type de contrat', en: 'Contract type' } },
+  { name: 'location', label: { fr: 'Lieu', en: 'Location' } },
 ]
 
 // Choix de « Salaire minimum » (salaire annuel brut, en euros). Ce filtre va dans l'adresse (min_salary)
@@ -21,6 +22,7 @@ function resize(textarea) {
 }
 
 export default function SearchBar() {
+  const { t, lang, locale } = useLang()
   const navigate = useNavigate()
   // Valeurs de départ lues dans l'adresse : une recherche déjà faite reste affichée.
   const [searchParams] = useSearchParams()
@@ -91,7 +93,7 @@ export default function SearchBar() {
   return (
     // noValidate : un champ vide ouvre simplement la liste complète, sans message du navigateur.
     <form className="home-search" onSubmit={handleSearch} noValidate role="search">
-      <label htmlFor="home-search-input">Quel poste recherchez-vous ?</label>
+      <label htmlFor="home-search-input">{t('Quel poste recherchez-vous ?', 'What position are you looking for?')}</label>
       {/* Le cadre entoure le champ et la flèche : il grandit avec le texte, comme une zone de composition. */}
       <div className="home-search-box">
         <textarea
@@ -99,7 +101,7 @@ export default function SearchBar() {
           id="home-search-input"
           name="q"
           rows={1}
-          placeholder="Développeur, data, alternance…"
+          placeholder={t('Développeur, data, alternance…', 'Developer, data, work-study…')}
           value={query}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
@@ -110,7 +112,7 @@ export default function SearchBar() {
           className="filters-toggle"
           aria-expanded={filtersOpen}
           aria-controls="search-filters"
-          aria-label={`Filtres${activeCount > 0 ? `, ${activeCount} actif${activeCount > 1 ? 's' : ''}` : ''}`}
+          aria-label={t(`Filtres${activeCount > 0 ? `, ${activeCount} actif${activeCount > 1 ? 's' : ''}` : ''}`, `Filters${activeCount > 0 ? `, ${activeCount} active` : ''}`)}
           onClick={() => setFiltersOpen(!filtersOpen)}
         >
           {/* Hamburger dessiné du même trait que la flèche. */}
@@ -121,7 +123,7 @@ export default function SearchBar() {
         </button>
 
         {/* Flèche vers la droite : le libellé reste lisible par un lecteur d'écran grâce à aria-label. */}
-        <button type="submit" className="home-search-submit" aria-label="Lancer la recherche">
+        <button type="submit" className="home-search-submit" aria-label={t('Lancer la recherche', 'Search')}>
           {/* Icône dessinée plutôt que le caractère →, dont la position dépend de la police : elle reste centrée. */}
           <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
             <path d="M4 10h12M11 5l5 5-5 5" />
@@ -133,27 +135,27 @@ export default function SearchBar() {
         <div id="search-filters" className="search-filters">
           {FILTERS.map(({ name, label }) => (
             <label key={name}>
-              {label}
+              {label[lang]}
               {/* Clé calculée [name] : seul le filtre modifié change, les autres sont recopiés. */}
               <select name={name} value={filters[name]} onChange={(event) => setFilters({ ...filters, [name]: event.target.value })}>
-                <option value="">Tous</option>
+                <option value="">{t('Tous', 'All')}</option>
                 {choices(name).map((value) => (
-                  <option key={value} value={value}>{value}</option>
+                  <option key={value} value={value}>{name === 'contract_type' ? dataLabel(value, lang) : value}</option>
                 ))}
               </select>
             </label>
           ))}
           <label>
-            Salaire minimum
+            {t('Salaire minimum', 'Minimum salary')}
             <select name="min_salary" value={filters.min_salary} onChange={(event) => setFilters({ ...filters, min_salary: event.target.value })}>
-              <option value="">Tous</option>
+              <option value="">{t('Tous', 'All')}</option>
               {SALARY_STEPS.map((step) => (
-                <option key={step} value={step}>{step.toLocaleString('fr-FR')} €</option>
+                <option key={step} value={step}>{t(`${step.toLocaleString(locale)} €`, `€${step.toLocaleString(locale)}`)}</option>
               ))}
             </select>
           </label>
           <button type="button" className="button-danger" onClick={() => setFilters({ contract_type: '', location: '', min_salary: '' })}>
-            Effacer les filtres
+            {t('Effacer les filtres', 'Clear filters')}
           </button>
         </div>
       )}

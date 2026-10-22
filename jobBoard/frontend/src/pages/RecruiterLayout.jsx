@@ -4,9 +4,11 @@ import { useContext, useEffect, useState } from 'react'
 import { Link, NavLink, Outlet } from 'react-router'
 import { AuthContext } from '../AuthContext'
 import { apiFetch } from '../api.js'
+import { useLang } from '../lang.js'
 
 export default function RecruiterLayout() {
   const { user } = useContext(AuthContext)
+  const { t } = useLang()
   // null tant que le serveur n'a pas répondu, puis le code reçu (200, 401, 403…).
   const [accessStatus, setAccessStatus] = useState(null)
 
@@ -23,7 +25,7 @@ export default function RecruiterLayout() {
   if (user === null || accessStatus === 401) {
     return (
       <div className="page">
-        <Link to="/login">Connectez-vous pour accéder à l'espace recruteur.</Link>
+        <Link to="/login">{t("Connectez-vous pour accéder à l'espace recruteur.", 'Log in to access the recruiter area.')}</Link>
       </div>
     )
   }
@@ -31,7 +33,7 @@ export default function RecruiterLayout() {
   if (accessStatus === 403) {
     return (
       <div className="page">
-        <p>Cet espace est réservé aux recruteurs. Demandez à l'administration de rattacher votre compte à votre entreprise.</p>
+        <p>{t("Cet espace est réservé aux recruteurs. Demandez à l'administration de rattacher votre compte à votre entreprise.", 'This area is reserved for recruiters. Ask the administrators to link your account to your company.')}</p>
       </div>
     )
   }
@@ -44,11 +46,11 @@ export default function RecruiterLayout() {
       {/* Onglets en pastilles, comme le choix des tables en administration.
           tab-bar (tabs.css) : bande collée sous l'en-tête pendant le défilement. */}
       <div className="tab-bar">
-        <nav className="tab-switch" aria-label="Espace recruteur">
-          <NavLink to="/recruteur" end>Vue d'ensemble</NavLink>
-          <NavLink to="/recruteur/entreprise">Mon entreprise</NavLink>
-          <NavLink to="/recruteur/postes">Mes postes</NavLink>
-          <NavLink to="/recruteur/nouvelle-offre">Publier une offre</NavLink>
+        <nav className="tab-switch" aria-label={t('Espace recruteur', 'Recruiter area')}>
+          <NavLink to="/recruteur" end>{t("Vue d'ensemble", 'Overview')}</NavLink>
+          <NavLink to="/recruteur/entreprise">{t('Mon entreprise', 'My company')}</NavLink>
+          <NavLink to="/recruteur/postes">{t('Mes postes', 'My positions')}</NavLink>
+          <NavLink to="/recruteur/nouvelle-offre">{t('Publier une offre', 'Post a job offer')}</NavLink>
         </nav>
       </div>
 

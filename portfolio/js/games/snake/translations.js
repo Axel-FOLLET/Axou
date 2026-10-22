@@ -11,7 +11,7 @@ const textes = {
         welcome: "BIENVENUE AU JEU DU SNAKE",
         rules: [
             "Guidez le serpent avec les flèches directionnelles.",
-            "Mangez les pommes rouges pour grandir.",
+            "Mangez les pommes bleues pour grandir.",
             "Chaque pomme mangée vous rapporte 1 point.",
             "Le serpent accélère au fil des pommes.",
             "Toucher un mur ou votre propre corps = défaite.",
@@ -35,7 +35,7 @@ const textes = {
         welcome: "WELCOME TO SNAKE",
         rules: [
             "Guide the snake with the arrow keys.",
-            "Eat the red apples to grow.",
+            "Eat the blue apples to grow.",
             "Each apple earns you 1 point.",
             "The snake gets faster as you collect apples.",
             "Hitting a wall or your own body = defeat.",

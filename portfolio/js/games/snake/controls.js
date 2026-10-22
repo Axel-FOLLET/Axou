@@ -59,7 +59,15 @@ export function initControls() {
         const nouvelleDirection = DIRECTIONS_TOUCHES[event.key];
 
         if (nouvelleDirection && !state.pause) {
-            state.directionDemandee = choisirDirection(state.direction, nouvelleDirection);
+            /*
+             * Un virage attend déjà le prochain pas : la touche suivante est gardée pour le pas d'après,
+             * sinon un double virage rapide (droite, haut, gauche) perdrait la première touche.
+             */
+            if (state.directionDemandee !== state.direction) {
+                state.directionSuivante = choisirDirection(state.directionDemandee, nouvelleDirection);
+            } else {
+                state.directionDemandee = choisirDirection(state.direction, nouvelleDirection);
+            }
         }
     });
 

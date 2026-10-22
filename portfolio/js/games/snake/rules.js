@@ -15,6 +15,7 @@ export function nouvellePartie() {
     state.serpent = creerSerpent();
     state.direction = DROITE;
     state.directionDemandee = DROITE;
+    state.directionSuivante = null;
     state.pomme = placerPomme(state.serpent);
     state.score = 0;
     state.recordBattu = false;
@@ -32,6 +33,7 @@ export function retourMenu() {
     state.serpent = creerSerpent();
     state.direction = DROITE;
     state.directionDemandee = DROITE;
+    state.directionSuivante = null;
     state.pomme = placerPomme(state.serpent);
     state.score = 0;
     state.recordBattu = false;
@@ -64,6 +66,10 @@ export function calculerNouvelleTete() {
  */
 export function faireAvancerPartie() {
     state.direction = state.directionDemandee;
+    if (state.directionSuivante) {
+        state.directionDemandee = state.directionSuivante;
+        state.directionSuivante = null;
+    }
 
     const nouvelleTete = calculerNouvelleTete();
     const mange = casesEgales(nouvelleTete, state.pomme);

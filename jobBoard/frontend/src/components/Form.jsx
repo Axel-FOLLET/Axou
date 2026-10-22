@@ -3,20 +3,33 @@ import { useContext, useEffect, useState } from 'react'
 import { Link } from 'react-router'
 import { AuthContext } from '../AuthContext'
 import { apiFetch } from '../api.js'
+import { useLang } from '../lang.js'
 
-// Nom de chaque champ de l'API, en français, pour le message « Il manque un champ ».
+// Nom de chaque champ de l'API, par langue, pour le message « Il manque un champ » : FIELD_NAMES[lang][champ].
 const FIELD_NAMES = {
-    first_name: 'prénom',
-    last_name: 'nom',
-    email: 'adresse e-mail',
-    message: 'message',
+    fr: {
+        first_name: 'prénom',
+        last_name: 'nom',
+        email: 'adresse e-mail',
+        message: 'message',
+    },
+    en: {
+        first_name: 'first name',
+        last_name: 'last name',
+        email: 'email address',
+        message: 'message',
+    },
 }
 
 // CV facultatif : un PDF de 2 Mo maximum (même limite que l'API).
 const MAX_CV_SIZE = 2 * 1024 * 1024
-const CV_ERROR = 'Votre CV doit être un fichier PDF de 2 Mo maximum.'
+const CV_ERROR = {
+    fr: 'Votre CV doit être un fichier PDF de 2 Mo maximum.',
+    en: 'Your CV must be a PDF file of 2 MB maximum.',
+}
 
 export default function Form({ id, onClose }) {
+    const { t, lang } = useLang()
     // Un visiteur saisit son identité ; une personne connectée ne remplit que le message.
     const { user } = useContext(AuthContext)
     const [firstName, setFirstName] = useState('')
@@ -67,37 +80,37 @@ export default function Form({ id, onClose }) {
         // Les informations personnelles sont nécessaires aux visiteurs seulement.
         if (!user) {
             if (firstName.trim() === '') {
-                newErrors.firstName = 'Veuillez indiquer votre prénom.'
+                newErrors.firstName = t('Veuillez indiquer votre prénom.', 'Please enter your first name.')
             } else if (!/^[A-Za-zÀ-ÖØ-öø-ÿ' -]+$/.test(firstName.trim())) {
-                newErrors.firstName = 'Votre prénom ne peut contenir que des lettres, des espaces, des tirets ou des apostrophes.'
+                newErrors.firstName = t('Votre prénom ne peut contenir que des lettres, des espaces, des tirets ou des apostrophes.', 'Your first name can only contain letters, spaces, hyphens or apostrophes.')
             }
 
             if (surname.trim() === '') {
-                newErrors.surname = 'Veuillez indiquer votre nom.'
+                newErrors.surname = t('Veuillez indiquer votre nom.', 'Please enter your last name.')
             } else if (!/^[A-Za-zÀ-ÖØ-öø-ÿ' -]+$/.test(surname.trim())) {
-                newErrors.surname = 'Votre nom ne peut contenir que des lettres, des espaces, des tirets ou des apostrophes.'
+                newErrors.surname = t('Votre nom ne peut contenir que des lettres, des espaces, des tirets ou des apostrophes.', 'Your last name can only contain letters, spaces, hyphens or apostrophes.')
             }
 
             if (telephone.trim() !== '' && !/^\+?[0-9 ]+$/.test(telephone.trim())) {
-                newErrors.telephone = 'Votre téléphone ne peut contenir que des chiffres, des espaces et un + au début.'
+                newErrors.telephone = t('Votre téléphone ne peut contenir que des chiffres, des espaces et un + au début.', 'Your phone number can only contain digits, spaces and a leading +.')
             }
 
             if (email.trim() === '') {
-                newErrors.email = 'Veuillez indiquer votre adresse e-mail.'
+                newErrors.email = t('Veuillez indiquer votre adresse e-mail.', 'Please enter your email address.')
             } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-                newErrors.email = 'Votre adresse e-mail doit ressembler à nom@exemple.fr.'
+                newErrors.email = t('Votre adresse e-mail doit ressembler à nom@exemple.fr.', 'Your email address must look like name@example.com.')
             }
         }
 
         // Message obligatoire pour tout le monde.
         if (message.trim() === '') {
-            newErrors.message = 'Veuillez indiquer votre message.'
+            newErrors.message = t('Veuillez indiquer votre message.', 'Please enter your message.')
         }
 
         // Le fichier choisi est vérifié avant l'envoi ; l'API refait la vérification.
         const sendFile = cvChoice === 'file' && cvFile !== null
         if (sendFile && (!/\.pdf$/i.test(cvFile.name) || cvFile.size > MAX_CV_SIZE)) {
-            newErrors.cv = CV_ERROR
+            newErrors.cv = CV_ERROR[lang]
         }
 
         // Au moins une erreur de saisie : rien n'est envoyé au serveur.
@@ -150,15 +163,15 @@ export default function Form({ id, onClose }) {
             // Un message français par cas : champ manquant, candidature en double, annonce clôturée, compte existant.
             if (httpStatus === 400 && apiError.startsWith('Missing field: ')) {
                 const field = apiError.replace('Missing field: ', '')
-                setSendError(`Il manque un champ : ${FIELD_NAMES[field] || field}.`)
+                setSendError(t(`Il manque un champ : ${FIELD_NAMES.fr[field] || field}.`, `A field is missing: ${FIELD_NAMES.en[field] || field}.`))
             } else if (httpStatus === 400 && apiError === 'Invalid field: cv') {
-                setSendError(CV_ERROR)
+                setSendError(CV_ERROR[lang])
             } else if (httpStatus === 409 && apiError === 'Already applied') {
-                setSendError('Vous avez déjà candidaté à cette annonce.')
+                setSendError(t('Vous avez déjà candidaté à cette annonce.', 'You have already applied to this job offer.'))
             } else if (httpStatus === 409 && apiError === 'Ad is closed') {
-                setSendError('Cette annonce est clôturée : les candidatures ne sont plus possibles.')
+                setSendError(t('Cette annonce est clôturée : les candidatures ne sont plus possibles.', 'This job offer is closed: applications are no longer possible.'))
             } else if (httpStatus === 401) {
-                setSendError('Cette adresse e-mail correspond à un compte : connectez-vous pour candidater.')
+                setSendError(t('Cette adresse e-mail correspond à un compte : connectez-vous pour candidater.', 'This email address belongs to an account: log in to apply.'))
                 setNeedLogin(true)
             } else {
                 throw new Error(`Unexpected response ${httpStatus}`)
@@ -167,7 +180,7 @@ export default function Form({ id, onClose }) {
             // Serveur arrêté, réponse illisible ou code inattendu.
             console.error(err)
             setStatus('error')
-            setSendError("Nous n'arrivons pas à envoyer votre candidature pour le moment. Merci de réessayer dans quelques instants.")
+            setSendError(t("Nous n'arrivons pas à envoyer votre candidature pour le moment. Merci de réessayer dans quelques instants.", 'We cannot send your application at the moment. Please try again in a few moments.'))
         }
     }
 
@@ -176,32 +189,32 @@ export default function Form({ id, onClose }) {
         <form onSubmit={handleSubmit} noValidate>
             {/* Connecté : l'identité vient de la session, seuls les visiteurs voient ces champs. */}
             {user ? (
-                <p>Vous candidatez en tant que {user.first_name} {user.last_name}.</p>
+                <p>{t('Vous candidatez en tant que ', 'You are applying as ')}{user.first_name} {user.last_name}.</p>
             ) : (
                 <>
                     <label>
-                        Nom
+                        {t('Nom', 'Last name')}
                         <input type="text" name="surname" value={surname}
                             onChange={(event) => setSurname(event.target.value)} />
                     </label>
                     {errors.surname && <p>{errors.surname}</p>}
 
                     <label>
-                        Prénom
+                        {t('Prénom', 'First name')}
                         <input type="text" name="firstName" value={firstName}
                             onChange={(event) => setFirstName(event.target.value)} />
                     </label>
                     {errors.firstName && <p>{errors.firstName}</p>}
 
                     <label>
-                        Téléphone (facultatif)
+                        {t('Téléphone (facultatif)', 'Phone number (optional)')}
                         <input type="text" name="telephone" value={telephone}
                             onChange={(event) => setTelephone(event.target.value)} />
                     </label>
                     {errors.telephone && <p>{errors.telephone}</p>}
 
                     <label>
-                        Adresse e-mail
+                        {t('Adresse e-mail', 'Email address')}
                         <input type="email" name="email" value={email}
                             onChange={(event) => setEmail(event.target.value)} />
                     </label>
@@ -219,18 +232,18 @@ export default function Form({ id, onClose }) {
             {/* Personne connectée qui a un CV dans son espace : il est joint par défaut, ou remplacé par un autre fichier. */}
             {profileCv && (
                 <label>
-                    CV joint
+                    {t('CV joint', 'Attached CV')}
                     <select value={cvChoice} onChange={(event) => setCvChoice(event.target.value)}>
-                        <option value="profile">Mon CV enregistré : {profileCv.filename}</option>
-                        <option value="file">Un autre fichier</option>
-                        <option value="none">Aucun CV</option>
+                        <option value="profile">{t('Mon CV enregistré : ', 'My saved CV: ')}{profileCv.filename}</option>
+                        <option value="file">{t('Un autre fichier', 'Another file')}</option>
+                        <option value="none">{t('Aucun CV', 'No CV')}</option>
                     </select>
                 </label>
             )}
 
             {cvChoice === 'file' && (
                 <label>
-                    {profileCv ? 'Autre CV (PDF, 2 Mo maximum)' : 'CV (PDF, 2 Mo maximum, facultatif)'}
+                    {profileCv ? t('Autre CV (PDF, 2 Mo maximum)', 'Other CV (PDF, 2 MB maximum)') : t('CV (PDF, 2 Mo maximum, facultatif)', 'CV (PDF, 2 MB maximum, optional)')}
                     <input type="file" name="cv" accept="application/pdf,.pdf"
                         onChange={(event) => setCvFile(event.target.files[0] ?? null)} />
                 </label>
@@ -246,19 +259,19 @@ export default function Form({ id, onClose }) {
                             <path fill="none" stroke="currentColor" strokeWidth="5"
                                 d="M14 27 l8 8 l16 -16" />
                         </svg>
-                        Envoyée
+                        {t('Envoyée', 'Sent')}
                     </>
-                ) : status === 'sending' ? 'Envoi en cours…' : 'Envoyer ma candidature'}
+                ) : status === 'sending' ? t('Envoi en cours…', 'Sending…') : t('Envoyer ma candidature', 'Send my application')}
             </button>
 
             {/* aria-live : un lecteur d'écran annonce le résultat sans action de l'utilisateur. */}
             <div aria-live="polite">
                 {status === 'sent' && (
-                    <p className="visually-hidden">Votre candidature est envoyée.</p>
+                    <p className="visually-hidden">{t('Votre candidature est envoyée.', 'Your application has been sent.')}</p>
                 )}
                 {sendError && (
                     <p>
-                        {sendError} {needLogin && <Link to="/login">Se connecter</Link>}
+                        {sendError} {needLogin && <Link to="/login">{t('Se connecter', 'Log in')}</Link>}
                     </p>
                 )}
             </div>

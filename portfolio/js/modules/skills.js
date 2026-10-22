@@ -47,7 +47,7 @@ function showSkill(skill, panel) {
     parts.push(
         createElement("p", "skill-detail__label", panel.dataset.labelList),
         createList(skill.dataset.list),
-        createElement("p", "skill-detail__projects", panel.dataset.labelProjects + " : " + skill.dataset.projects)
+        createElement("p", "skill-detail__projects", panel.dataset.labelProjects + " " + skill.dataset.projects)
     );
     /*
      * replaceChildren remplace l'ancien contenu en une seule opération.

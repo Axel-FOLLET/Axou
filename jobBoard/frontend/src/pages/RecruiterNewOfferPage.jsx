@@ -2,11 +2,17 @@
 import { useState, useEffect } from 'react'
 import { apiFetch } from '../api.js'
 import { useNavigate } from 'react-router'
+import { useLang } from '../lang.js'
 
-// Nom français des champs obligatoires, pour traduire « Missing field: <nom> ».
-const fieldLabels = { title: 'le titre', short_description: 'la description courte', category_id: 'la catégorie' }
+// Nom français et anglais des champs obligatoires, pour traduire « Missing field: <nom> ».
+const fieldLabels = {
+  title: { fr: 'le titre', en: 'the title' },
+  short_description: { fr: 'la description courte', en: 'the short description' },
+  category_id: { fr: 'la catégorie', en: 'the category' },
+}
 
 export default function RecruiterNewOfferPage() {
+  const { t, lang } = useLang()
   // Suggestions de saisie : les lieux et contrats déjà présents dans les annonces ouvertes.
   const [suggestions, setSuggestions] = useState({ location: [], contract_type: [] })
   // Catégories proposées dans la liste déroulante (obligatoires pour publier).
@@ -58,36 +64,37 @@ export default function RecruiterNewOfferPage() {
       return
     }
     const missing = error?.startsWith('Missing field: ') ? error.slice('Missing field: '.length) : null
-    if (missing) setSaveError(`Merci de renseigner ${fieldLabels[missing] ?? missing}.`)
-    else if (error === 'Unknown category_id') setSaveError("Cette catégorie n'existe plus.")
-    else setSaveError("Impossible de publier l'offre pour le moment.")
+    const label = fieldLabels[missing]?.[lang] ?? missing
+    if (missing) setSaveError(t(`Merci de renseigner ${label}.`, `Please fill in ${label}.`))
+    else if (error === 'Unknown category_id') setSaveError(t("Cette catégorie n'existe plus.", 'This category no longer exists.'))
+    else setSaveError(t("Impossible de publier l'offre pour le moment.", 'Unable to post the job offer right now.'))
     console.error('Error creating ad:', status, error)
   }
 
   return (
     <>
-      <h1>Publier une nouvelle offre</h1>
-      <p>Décrivez le poste à pourvoir.</p>
+      <h1>{t('Publier une nouvelle offre', 'Post a new job offer')}</h1>
+      <p>{t('Décrivez le poste à pourvoir.', 'Describe the position to fill.')}</p>
 
       {/* noValidate : les messages du navigateur seront remplacés par les nôtres, en français.
           form-columns (forms.css) : champs courts par paires, descriptions sur toute la ligne. */}
       <form className="form-columns" noValidate onSubmit={handleSubmit}>
         <fieldset>
-          <legend>Le poste</legend>
+          <legend>{t('Le poste', 'The position')}</legend>
           <label className="field-wide">
-            Titre
+            {t('Titre', 'Title')}
             <input type="text" name="title" value={form.title} onChange={handleChange} />
           </label>
 
           <label className="field-wide">
-            Description courte
+            {t('Description courte', 'Short description')}
             <input type="text" name="short_description" value={form.short_description} onChange={handleChange} />
           </label>
 
           <label className="field-wide">
-            Catégorie
+            {t('Catégorie', 'Category')}
             <select name="category_id" value={form.category_id} onChange={handleChange}>
-              <option value="" disabled>Choisissez une catégorie</option>
+              <option value="" disabled>{t('Choisissez une catégorie', 'Choose a category')}</option>
               {categories.map((category) => (
                 <option key={category.id} value={category.id}>{category.name}</option>
               ))}
@@ -95,31 +102,31 @@ export default function RecruiterNewOfferPage() {
           </label>
 
           <label className="field-wide">
-            Description
+            {t('Description', 'Description')}
             <textarea name="description" value={form.description} onChange={handleChange} />
           </label>
         </fieldset>
 
         <fieldset>
-          <legend>Conditions</legend>
+          <legend>{t('Conditions', 'Terms')}</legend>
           <label>
-            Salaire annuel brut
+            {t('Salaire annuel brut', 'Gross annual salary')}
             <input type="number" name="salary" min="0" value={form.salary} onChange={handleChange} />
           </label>
 
           {/* list : suggestions proposées, une autre valeur reste possible (le contrat d'API n'impose pas de liste). */}
           <label>
-            Lieu
+            {t('Lieu', 'Location')}
             <input type="text" name="location" list="suggestions-location" value={form.location} onChange={handleChange} />
           </label>
 
           <label>
-            Temps de travail
+            {t('Temps de travail', 'Working time')}
             <input type="text" name="working_time" value={form.working_time} onChange={handleChange} />
           </label>
 
           <label>
-            Type de contrat
+            {t('Type de contrat', 'Contract type')}
             <input type="text" name="contract_type" list="suggestions-contract" value={form.contract_type} onChange={handleChange} />
           </label>
         </fieldset>
@@ -133,7 +140,7 @@ export default function RecruiterNewOfferPage() {
 
         {saveError && <p role="alert" className="field-wide">{saveError}</p>}
         <div className="form-actions">
-          <button type="submit" disabled={saving}>Publier</button>
+          <button type="submit" disabled={saving}>{t('Publier', 'Post')}</button>
         </div>
       </form>
     </>

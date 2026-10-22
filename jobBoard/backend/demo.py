@@ -3,6 +3,7 @@ leur session.
 
 Le portfolio pointe sur GET /api/demo/login?role=candidat|recruteur|admin : la
 session s'ouvre, puis le navigateur est redirigé vers l'espace correspondant.
+Avec &lang=fr ou &lang=en (liens du portfolio), l'interface s'ouvre dans cette langue.
 Les mots de passe sont tirés au hasard à chaque démarrage : ces comptes ne se
 connectent que par cette route. Hors mode démo, rien n'est enregistré.
 """
@@ -75,4 +76,8 @@ def demo_login():
         return jsonify({"error": "Demo account missing"}), 503
     session.clear()
     session["user_id"] = row["id"]
+    # ?lang=fr|en transmis à la page d'arrivée : le front (LangProvider) le lit et affiche cette langue.
+    lang = request.args.get("lang")
+    if lang in ("fr", "en"):
+        landing += f"?lang={lang}"
     return redirect(landing, code=302)

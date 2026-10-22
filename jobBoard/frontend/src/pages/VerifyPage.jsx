@@ -2,8 +2,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router'
 import { apiFetch } from '../api.js'
+import { useLang } from '../lang.js'
 
 export default function VerifyPage() {
+  const { t } = useLang()
   const [searchParams] = useSearchParams()
   const token = searchParams.get('token') ?? ''
   // Lien tronqué ou recopié sans le jeton : l'état part directement sur le refus, sans appel.
@@ -41,30 +43,29 @@ export default function VerifyPage() {
 
   return (
     <div className="page">
-      <h1>Confirmation de votre adresse</h1>
+      <h1>{t('Confirmation de votre adresse', 'Confirming your address')}</h1>
 
       <div aria-live="polite">
-        {status === 'checking' && <p>Vérification en cours…</p>}
+        {status === 'checking' && <p>{t('Vérification en cours…', 'Checking…')}</p>}
 
         {status === 'done' && (
           <p>
-            Votre adresse est confirmée et votre compte est prêt. Vos candidatures vous
-            attendent dans votre espace candidat. <Link to="/login">Se connecter</Link>
+            {t('Votre adresse est confirmée et votre compte est prêt. Vos candidatures vous attendent dans votre espace candidat.', 'Your address is confirmed and your account is ready. Your applications are waiting for you in your candidate area.')}{' '}
+            <Link to="/login">{t('Se connecter', 'Log in')}</Link>
           </p>
         )}
 
         {status === 'already' && (
           <p>
-            Cette adresse a déjà un compte : ce lien n&apos;est plus utile.{' '}
-            <Link to="/login">Se connecter</Link>
+            {t("Cette adresse a déjà un compte : ce lien n'est plus utile.", 'This address already has an account: this link is no longer needed.')}{' '}
+            <Link to="/login">{t('Se connecter', 'Log in')}</Link>
           </p>
         )}
 
         {status === 'invalid' && (
           <p role="alert">
-            Ce lien n&apos;est plus valable : il a déjà servi, ou il a plus de 24 heures.
-            Recommencez la création de votre compte pour recevoir un nouveau lien.{' '}
-            <Link to="/account">Créer un compte</Link>
+            {t("Ce lien n'est plus valable : il a déjà servi, ou il a plus de 24 heures. Recommencez la création de votre compte pour recevoir un nouveau lien.", 'This link is no longer valid: it has already been used, or it is more than 24 hours old. Create your account again to receive a new link.')}{' '}
+            <Link to="/account">{t('Créer un compte', 'Create an account')}</Link>
           </p>
         )}
       </div>

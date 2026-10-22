@@ -2,11 +2,17 @@
 import { useState, useEffect } from 'react'
 import { apiFetch } from '../api.js'
 import { Link, useParams } from 'react-router'
+import { useLang } from '../lang.js'
 
-// Nom français des champs obligatoires, pour traduire « Missing field: <nom> ».
-const fieldLabels = { title: 'le titre', short_description: 'la description courte', category_id: 'la catégorie' }
+// Nom français et anglais des champs obligatoires, pour traduire « Missing field: <nom> ».
+const fieldLabels = {
+  title: { fr: 'le titre', en: 'the title' },
+  short_description: { fr: 'la description courte', en: 'the short description' },
+  category_id: { fr: 'la catégorie', en: 'the category' },
+}
 
 export default function RecruiterEditOfferPage() {
+  const { t, lang } = useLang()
   // id lu dans l'adresse /recruteur/postes/:id/modifier
   const { id } = useParams()
   const [categories, setCategories] = useState([])
@@ -17,6 +23,7 @@ export default function RecruiterEditOfferPage() {
   const [saveError, setSaveError] = useState('')
   const [saved, setSaved] = useState(false)
   // Annonce impossible à modifier (introuvable, clôturée, serveur indisponible) : message à la place du formulaire.
+  // Message gardé en { fr, en } : l'effet ne dépend pas de la langue, l'affichage choisit.
   const [loadError, setLoadError] = useState('')
 
   // À l'arrivée sur la page (et si l'id de l'adresse change) : catégories puis annonce.
@@ -28,18 +35,18 @@ export default function RecruiterEditOfferPage() {
       const ownResult = await apiFetch('/api/recruiter/ads')
       const isOwn = ownResult.ok && ownResult.data.some((item) => String(item.id) === id)
       if (adResult.status === 404 || (ownResult.ok && !isOwn)) {
-        setLoadError("Cette annonce n'existe pas ou n'appartient pas à votre entreprise.")
+        setLoadError({ fr: "Cette annonce n'existe pas ou n'appartient pas à votre entreprise.", en: 'This job offer does not exist or does not belong to your company.' })
         return
       }
       if (!categoriesResult.ok || !adResult.ok || !ownResult.ok) {
-        setLoadError('Impossible de charger cette annonce pour le moment.')
+        setLoadError({ fr: 'Impossible de charger cette annonce pour le moment.', en: 'Unable to load this job offer right now.' })
         console.error('Error loading ad:', adResult.status, adResult.error)
         return
       }
       const data = adResult.data
       // Une annonce clôturée se lit encore (GET public) mais ne se modifie plus : le serveur répondrait 409.
       if (data.status === 'closed') {
-        setLoadError('Une annonce clôturée ne peut plus être modifiée.')
+        setLoadError({ fr: 'Une annonce clôturée ne peut plus être modifiée.', en: 'A closed job offer can no longer be edited.' })
         return
       }
       // L'API renvoie le nom de la catégorie : on retrouve son id dans la liste.
@@ -77,7 +84,7 @@ export default function RecruiterEditOfferPage() {
     }
     // Rien de changé : pas d'appel à l'API.
     if (Object.keys(changes).length === 0) {
-      setSaveError('Aucune modification à enregistrer.')
+      setSaveError(t('Aucune modification à enregistrer.', 'No changes to save.'))
       return
     }
     // category_id et salary sont des nombres ; un salaire effacé devient null (non communiqué).
@@ -92,11 +99,12 @@ export default function RecruiterEditOfferPage() {
       setSaved(true)
     } else {
       const missing = error?.startsWith('Missing field: ') ? error.slice('Missing field: '.length) : null
-      if (missing) setSaveError(`Merci de renseigner ${fieldLabels[missing] ?? missing}.`)
-      else if (error === 'Unknown category_id') setSaveError("Cette catégorie n'existe plus.")
-      else if (status === 404) setSaveError("Cette annonce n'existe pas ou n'appartient pas à votre entreprise.")
-      else if (error === 'Ad is closed') setSaveError('Une annonce clôturée ne peut plus être modifiée.')
-      else setSaveError("Impossible d'enregistrer pour le moment.")
+      const label = fieldLabels[missing]?.[lang] ?? missing
+      if (missing) setSaveError(t(`Merci de renseigner ${label}.`, `Please fill in ${label}.`))
+      else if (error === 'Unknown category_id') setSaveError(t("Cette catégorie n'existe plus.", 'This category no longer exists.'))
+      else if (status === 404) setSaveError(t("Cette annonce n'existe pas ou n'appartient pas à votre entreprise.", 'This job offer does not exist or does not belong to your company.'))
+      else if (error === 'Ad is closed') setSaveError(t('Une annonce clôturée ne peut plus être modifiée.', 'A closed job offer can no longer be edited.'))
+      else setSaveError(t("Impossible d'enregistrer pour le moment.", 'Unable to save right now.'))
       console.error('Error updating ad:', status, error)
     }
   }
@@ -106,30 +114,30 @@ export default function RecruiterEditOfferPage() {
       {/* Flèche de retour vers « Mes postes », comme sur la page des candidatures : quitter sans enregistrer.
           Flèche seule (button-link) : aria-label et title donnent la destination. */}
       <p className="back-link">
-        <Link className="button-link" to="/recruteur/postes" aria-label="Retour à Mes postes" title="Retour à Mes postes">←</Link>
+        <Link className="button-link" to="/recruteur/postes" aria-label={t('Retour à Mes postes', 'Back to My positions')} title={t('Retour à Mes postes', 'Back to My positions')}>←</Link>
       </p>
-      <h1>Modifier l'annonce</h1>
+      <h1>{t("Modifier l'annonce", 'Edit the job offer')}</h1>
 
       {loadError ? (
-        <p role="alert">{loadError}</p>
+        <p role="alert">{loadError[lang]}</p>
       ) : (
         <form className="form-columns" noValidate onSubmit={handleSubmit}>
           <fieldset>
-            <legend>Le poste</legend>
+            <legend>{t('Le poste', 'The position')}</legend>
             <label className="field-wide">
-              Titre
+              {t('Titre', 'Title')}
               <input type="text" name="title" value={form.title} onChange={handleChange} />
             </label>
 
             <label className="field-wide">
-              Description courte
+              {t('Description courte', 'Short description')}
               <input type="text" name="short_description" value={form.short_description} onChange={handleChange} />
             </label>
 
             <label className="field-wide">
-              Catégorie
+              {t('Catégorie', 'Category')}
               <select name="category_id" value={form.category_id} onChange={handleChange}>
-                <option value="" disabled>Choisissez une catégorie</option>
+                <option value="" disabled>{t('Choisissez une catégorie', 'Choose a category')}</option>
                 {categories.map((category) => (
                   <option key={category.id} value={category.id}>{category.name}</option>
                 ))}
@@ -137,38 +145,38 @@ export default function RecruiterEditOfferPage() {
             </label>
 
             <label className="field-wide">
-              Description
+              {t('Description', 'Description')}
               <textarea name="description" value={form.description} onChange={handleChange} />
             </label>
           </fieldset>
 
           <fieldset>
-            <legend>Conditions</legend>
+            <legend>{t('Conditions', 'Terms')}</legend>
             <label>
-              Salaire annuel brut
+              {t('Salaire annuel brut', 'Gross annual salary')}
               <input type="number" name="salary" min="0" value={form.salary} onChange={handleChange} />
             </label>
 
             <label>
-              Lieu
+              {t('Lieu', 'Location')}
               <input type="text" name="location" value={form.location} onChange={handleChange} />
             </label>
 
             <label>
-              Temps de travail
+              {t('Temps de travail', 'Working time')}
               <input type="text" name="working_time" value={form.working_time} onChange={handleChange} />
             </label>
 
             <label>
-              Type de contrat
+              {t('Type de contrat', 'Contract type')}
               <input type="text" name="contract_type" value={form.contract_type} onChange={handleChange} />
             </label>
           </fieldset>
 
           {saveError && <p role="alert" className="field-wide">{saveError}</p>}
-          {saved && <p role="status" className="field-wide">Modifications enregistrées.</p>}
+          {saved && <p role="status" className="field-wide">{t('Modifications enregistrées.', 'Changes saved.')}</p>}
           <div className="form-actions">
-            <button type="submit" disabled={saving || initialForm === null}>Enregistrer</button>
+            <button type="submit" disabled={saving || initialForm === null}>{t('Enregistrer', 'Save')}</button>
           </div>
         </form>
       )}

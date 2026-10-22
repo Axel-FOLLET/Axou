@@ -3,6 +3,7 @@ import SearchBar from '../components/SearchBar.jsx'
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router'
 import { apiFetch } from '../api.js'
+import { useLang } from '../lang.js'
 
 // Filtres de l'adresse transmis tels quels à l'API (docs/contrat_api.md, filtres de GET /api/ads).
 const API_FILTERS = ['q', 'contract_type', 'location']
@@ -19,6 +20,7 @@ function isNewOffer(createdAt, now) {
 
 // liste les annonces publiées, récupérées depuis /api/ads.
 export default function JobBoardPage() {
+  const { t } = useLang()
   // Liste vide au départ, puis remplie par l'appel réseau ci-dessous.
   const [offers, setOffers] = useState([])
   const [error, setError] = useState(null)
@@ -59,7 +61,8 @@ export default function JobBoardPage() {
       } catch (err) {
         // Détail technique pour nous dans la console (F12), message lisible pour le visiteur.
         console.error(err)
-        setError("Nous n'arrivons pas à charger les offres pour le moment. Merci de réessayer dans quelques instants.")
+        // Le message est traduit à l'affichage, dans la langue courante.
+        setError(true)
       } finally {
         // Dans tous les cas : on sort de l'état « chargement ».
         setLoading(false)
@@ -71,29 +74,29 @@ export default function JobBoardPage() {
   return (
     <div className="page offers-page">
       {/* Titre de page ordinaire, plus petit que celui de l'accueil : les résultats remontent. */}
-      <h1>Offres d&apos;emploi</h1>
+      <h1>{t("Offres d'emploi", 'Job offers')}</h1>
 
       {/* key : la barre est recréée quand l'adresse change (min_salary compris), ses champs reprennent donc la recherche affichée. */}
       <SearchBar key={searchParams.toString()} />
 
       <label className="new-filter">
         <input type="checkbox" checked={onlyNew} onChange={(event) => setOnlyNew(event.target.checked)} />
-        Nouvelles annonces uniquement
+        {t('Nouvelles annonces uniquement', 'New job offers only')}
       </label>
 
       {/* Trois affichages possibles, dans cet ordre : chargement, erreur, puis la liste. La barre reste visible. */}
-      {loading && <p>Chargement…</p>}
-      {!loading && error && <p>{error}</p>}
+      {loading && <p>{t('Chargement…', 'Loading…')}</p>}
+      {!loading && error && <p>{t("Nous n'arrivons pas à charger les offres pour le moment. Merci de réessayer dans quelques instants.", 'We cannot load the job offers at the moment. Please try again in a few moments.')}</p>}
       {!loading && !error && (
         <>
           {/* Recherche ou filtres en cours : on rappelle le texte cherché et le nombre de résultats. */}
           {(apiQuery !== '' || onlyNew || minSalary !== 0) && shownOffers.length > 0 && (
             <p className="results-count">
-              {shownOffers.length} offre{shownOffers.length > 1 ? 's' : ''}
-              {search !== '' ? ` pour « ${search} »` : ' pour ces filtres'}
+              {shownOffers.length} {t(`offre${shownOffers.length > 1 ? 's' : ''}`, `job offer${shownOffers.length > 1 ? 's' : ''}`)}
+              {search !== '' ? t(` pour « ${search} »`, ` for "${search}"`) : t(' pour ces filtres', ' for these filters')}
             </p>
           )}
-          {shownOffers.length === 0 && <p>Aucune offre ne correspond à cette recherche.</p>}
+          {shownOffers.length === 0 && <p>{t('Aucune offre ne correspond à cette recherche.', 'No job offers match this search.')}</p>}
           {/* Une carte par annonce ; key sert à React seul, d'où id en plus. */}
           <div className="offers-grid">
             {shownOffers.map((offer) => (
