@@ -1,0 +1,13 @@
+# Dossiers et fichiers locaux
+node_modules/
+venv/
+.venv/
+__pycache__/
+*.pyc
+*.db
+.env
+frontend/dist/
+
+# Supports de présentation : hors du dépôt public
+docs/*.pptx
+docs/*.pdf

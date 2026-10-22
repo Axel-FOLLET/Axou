@@ -1,0 +1,61 @@
+/* Animations : chargement des boutons, coche de confirmation, et réduction des mouvements. */
+
+/* Indicateur de chargement intégré aux boutons. */
+.spinner {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  margin-right: 0.5em;
+  vertical-align: -0.15em;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+/* Rotation de l'indicateur de chargement. */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Taille de la coche de confirmation. */
+.checkmark {
+  width: 1.4em;
+  height: 1.4em;
+  vertical-align: middle;
+}
+
+/* Tracé progressif de la coche. */
+.checkmark path {
+  stroke-dasharray: 40;
+  stroke-dashoffset: 40;
+  animation: draw 0.6s ease-out forwards;
+}
+
+/* Animation du tracé de confirmation. */
+@keyframes draw {
+  to { stroke-dashoffset: 0; }
+}
+
+/* Respect de la préférence de réduction des animations. */
+@media (prefers-reduced-motion: reduce) {
+  /* Désactiver transitions et enfoncement des boutons, liens-boutons, onglets et cartes. */
+  button,
+  a.button-link,
+  .tab-switch a,
+  .job-offer {
+    transition: none !important;
+    transform: none !important;
+  }
+
+  /* Figer les indicateurs de chargement et de confirmation. */
+  .spinner,
+  .checkmark path {
+    animation: none;
+  }
+
+  /* Afficher la coche déjà tracée. */
+  .checkmark path {
+    stroke-dashoffset: 0;
+  }
+}

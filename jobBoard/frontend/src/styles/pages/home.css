@@ -1,0 +1,240 @@
+/* Accueil (HomePage.jsx) et haut de la page des offres (JobBoardPage.jsx) : grand titre,
+   barre de recherche avec ses filtres (components/SearchBar.jsx), et les offres récentes à sa droite.
+   Aucun encadré : l'espace sépare les blocs, un trait fin seulement là où il guide l'œil. */
+
+/* Grand titre, uni et sans effet, précédé d'un grand vide qui grandit avec la hauteur de l'écran. */
+.home-title {
+  max-width: 880px;
+  margin: clamp(48px, 14vh, 144px) 0 56px;
+  font-size: clamp(32px, 5vw, 56px);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+/* Recherche à gauche (deux tiers), offres récentes à droite (un tiers), sur la même ligne. */
+.home-row {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 64px;
+  margin-bottom: 64px;
+}
+
+/* Formulaire de recherche sans carte : il ne reprend pas l'habillage des autres formulaires (forms.css). */
+.home-search {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  gap: 12px;
+}
+
+/* Page des offres : recherche de largeur lisible, puis les résultats. */
+.offers-page .home-search {
+  max-width: 720px;
+  margin-bottom: 40px;
+}
+
+/* Nombre de résultats, discret, au-dessus de la grille. */
+.results-count {
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  margin: 0 0 16px;
+}
+
+.home-search label {
+  display: block;
+}
+
+/* Cadre de saisie, habillé comme les autres champs : il contient le champ et la flèche, et sa hauteur suit celle du texte.
+   La flèche reste en bas quand le texte passe sur plusieurs lignes. */
+.home-search-box {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 4px 4px 4px 16px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-card);
+  transition: border-color .2s, background-color .2s;
+}
+
+/* Le champ n'a plus de cadre à lui : il démarre à une ligne, grandit ligne par ligne, puis défile au-delà de six.
+   min-height remet à zéro les 140 px imposés à tous les textarea dans forms.css, sinon il démarrerait à cette hauteur. */
+.home-search-box textarea {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  height: 40px;
+  padding: 8px 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  line-height: 1.5;
+  resize: none;
+  overflow-y: auto;
+  max-height: 180px;
+}
+
+/* Le contour de focus est porté par le cadre entier, pas par le champ seul. */
+.home-search-box textarea:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+.home-search-box:hover {
+  border-color: var(--color-blue-deep);
+}
+
+.home-search-box:focus-within {
+  border-color: var(--color-blue-deep);
+  box-shadow: 0 0 0 4px var(--color-blue-halo);
+}
+
+/* Flèche posée au bas du cadre, pour pousser la recherche. */
+.home-search-submit {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: var(--radius-control);
+}
+
+/* Bouton hamburger des filtres : dans le cadre, à gauche de la flèche, sans contour pour ne pas faire deux boutons. */
+.filters-toggle {
+  position: relative;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  color: var(--color-text-secondary);
+  background: transparent;
+  border-color: transparent;
+  border-radius: var(--radius-control);
+}
+
+/* Les icônes dessinées (SearchBar.jsx) ne captent pas le clic, qui revient au bouton. */
+.home-search-submit svg, .filters-toggle svg {
+  display: block;
+  pointer-events: none;
+}
+
+/* Survol et ouverture : texte foncé sur fond bleu très pâle. */
+.filters-toggle:hover:not(:disabled), .filters-toggle[aria-expanded="true"] {
+  color: var(--color-text);
+  background-color: var(--color-surface-blue);
+}
+
+/* Nombre de filtres actifs, en pastille sur le coin du bouton. */
+.filters-count {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: var(--radius-pill);
+  background: var(--color-blue-deep);
+  color: var(--color-surface);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 18px;
+}
+
+/* Filtres ouverts : listes côte à côte, puis l'effacement. */
+.search-filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+  align-items: end;
+  gap: 16px;
+  padding: 20px;
+  background: var(--color-bg);
+  border-radius: var(--radius-control);
+}
+
+/* Libellés des filtres : même style que ceux des formulaires, malgré le display: block de la recherche. */
+.home-search .search-filters label {
+  display: flex;
+}
+
+/* Offres récentes : petite liste éditoriale, sans carte ni bouton, séparée par des traits fins. */
+.recent-offers h2 {
+  margin: 0 0 12px;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.recent-offers p {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+}
+
+.recent-offers ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--color-line);
+}
+
+.recent-offers li {
+  border-bottom: 1px solid var(--color-line);
+}
+
+/* Une ligne par offre : le poste, puis l'entreprise et le lieu en gris. */
+.recent-offers li a {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 14px 0;
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.recent-offer-title {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.recent-offer-meta {
+  color: var(--color-text-secondary);
+  font-size: 13px;
+}
+
+/* Survol : seul le poste se souligne. */
+.recent-offers li a:hover .recent-offer-title {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Lien vers toute la liste, en texte, sous les deux offres. */
+.recent-offers .recent-offers-all {
+  display: inline-block;
+  margin-top: 16px;
+  font-size: 14px;
+}
+
+/* Tablette et téléphone : les offres récentes passent sous la recherche. */
+@media (max-width: 900px) {
+  .home-row {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+}
+
+/* Titre avec un vide réduit sur téléphone. */
+@media (max-width: 600px) {
+  .home-title {
+    margin: 40px 0 32px;
+  }
+}

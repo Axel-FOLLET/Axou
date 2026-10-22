@@ -1,0 +1,254 @@
+/* En-tête du site : barre de navigation, logo, liens et menu mobile (components/Layout.jsx). */
+
+/* En-tête fixe translucide et blanc. */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgb(255 255 255 / 80%);
+  backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1px solid var(--color-line);
+}
+
+/* Barre de navigation centrée. */
+nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 24px;
+  max-width: 1100px;
+  min-height: 64px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Logo semi-gras, séparé des liens par l'espace disponible. */
+.logo {
+  color: var(--color-text);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin-right: auto;
+  white-space: nowrap;
+}
+
+/* Seul le o du logo porte la couleur : en bleu profond, il se lit comme une signature et non comme un défaut d'affichage. */
+.logo-o {
+  color: var(--color-blue-deep);
+}
+
+/* Liens du menu regroupés sur ordinateur. */
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+/* Liens sobres de la navigation, en gris pour que la page courante ressorte. */
+nav a {
+  color: var(--color-text-secondary);
+  font-size: 15px;
+  text-decoration: none;
+  transition: color .2s;
+}
+
+/* Survol des liens du menu. */
+nav a:hover {
+  color: var(--color-link);
+}
+
+/* Focus clavier des liens du menu. */
+nav a:focus-visible {
+  outline: 2px solid var(--color-text);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* Page active : trois repères (couleur, graisse, trait fin), comme le conseille NN/g pour les onglets. */
+nav a.active {
+  color: var(--color-blue-deep);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: currentColor;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 6px;
+}
+
+/* Bouton secondaire de déconnexion et commande mobile. */
+nav button {
+  font: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--color-text);
+  background: transparent;
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-control);
+  padding: 8px 18px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+/* Survol des boutons du menu. */
+nav button:hover:not(:disabled) {
+  background-color: var(--color-surface-blue);
+}
+
+/* Focus clavier des boutons du menu. */
+nav button:focus-visible {
+  outline: 2px solid var(--color-text);
+  outline-offset: 3px;
+}
+
+/* Bouton du menu réservé aux petits écrans. */
+nav .menu-toggle {
+  display: none;
+}
+
+/* Menu mobile : bouton visible, liens repliés, barre plus serrée. */
+@media (max-width: 900px) {
+  /* Afficher la commande du menu mobile. */
+  nav .menu-toggle {
+    display: inline-block;
+  }
+
+  /* Masquer les liens fermés, y compris pour le clavier. */
+  .nav-links {
+    display: none;
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 12px 0;
+  }
+
+  /* Ouvrir le menu à la demande. */
+  .nav-links.is-open {
+    display: flex;
+  }
+
+  /* Agrandir la surface des liens mobiles. */
+  .nav-links a {
+    padding: 10px 0;
+  }
+
+  /* Espacement de la barre mobile. */
+  nav {
+    padding: 12px 16px;
+    gap: 16px;
+  }
+}
+
+/* Pied de page (components/Footer.jsx) : trait fin, texte discret, deux colonnes puis le copyright. */
+.site-footer {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px 24px 48px;
+  border-top: 1px solid var(--color-line);
+  color: var(--color-text-secondary);
+  font-size: 14px;
+}
+
+/* Navigation à gauche, mentions légales à droite, plus larges. */
+.footer-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  align-items: start;
+  gap: 48px;
+}
+
+/* La navigation du pied de page ne reprend pas la barre de l'en-tête (règles nav ci-dessus). */
+.site-footer nav {
+  display: block;
+  max-width: none;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+}
+
+/* Titres des deux colonnes, petits et semi-gras. */
+.footer-title {
+  margin: 0 0 12px;
+  color: var(--color-text);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+/* Liens de navigation empilés, sans puces. */
+.footer-links {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.site-footer nav a {
+  font-size: 14px;
+}
+
+/* Mentions légales repliées : le titre de colonne reste seul tant qu'on ne clique pas. */
+.legal {
+  max-width: 720px;
+}
+
+/* Le triangle du navigateur est remplacé par + / −. */
+.legal summary {
+  display: inline-flex;
+  align-items: center;
+  list-style: none;
+  cursor: pointer;
+}
+
+.legal summary::-webkit-details-marker {
+  display: none;
+}
+
+.legal summary::after {
+  content: "+";
+  margin-left: 8px;
+}
+
+.legal[open] summary::after {
+  content: "−";
+}
+
+.legal summary:focus-visible {
+  outline: 2px solid var(--color-text);
+  outline-offset: 3px;
+  border-radius: var(--radius-control);
+}
+
+/* Intertitres des mentions, petits et proches de leur texte. */
+.legal h3 {
+  margin: 20px 0 4px;
+  color: var(--color-text);
+  font-size: 14px;
+  letter-spacing: 0;
+}
+
+.legal p {
+  margin: 4px 0;
+}
+
+.legal a {
+  color: var(--color-link);
+}
+
+/* Copyright sur toute la largeur, sous les deux colonnes. */
+.site-footer .copyright {
+  margin: 32px 0 0;
+}
+
+/* Pied de page sur téléphone : colonnes empilées, marges réduites. */
+@media (max-width: 600px) {
+  .site-footer {
+    padding: 32px 16px 40px;
+  }
+
+  .footer-columns {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}

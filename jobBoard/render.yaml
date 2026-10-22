@@ -1,0 +1,29 @@
+# Déploiement sur Render : un seul service web, Flask sert l'API et le build React.
+# Système de fichiers éphémère : la base SQLite est recréée à chaque démarrage.
+services:
+  - type: web
+    name: yia-jobs
+    runtime: python
+    plan: free
+    buildCommand: cd frontend && npm ci && npm run build && cd ../backend && pip install -r requirements.txt
+    startCommand: cd backend && python init_db.py && python seed_data.py && python create_admin.py && gunicorn --bind 0.0.0.0:$PORT app:app
+    autoDeployTrigger: commit
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.14.8
+      - key: NODE_VERSION
+        value: 24.22.1
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: DEMO_MODE
+        value: "1"
+      - key: MAIL_ENABLED
+        value: "0"
+      - key: COOKIE_SECURE
+        value: "1"
+      - key: APP_BASE_URL
+        value: https://yia-jobs.onrender.com

@@ -1,0 +1,13 @@
+# Environnement virtuel Python (propre à chaque machine)
+venv/
+.venv/
+
+# Cache de Python
+__pycache__/
+*.pyc
+
+# Base SQLite : recréée avec init_db.py, jamais versionnée
+*.db
+
+# Réglages locaux (mots de passe, clés)
+.env

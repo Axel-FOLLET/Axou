@@ -1,0 +1,151 @@
+/* Formulaires : cadre, libellés, champs et messages de validation. */
+
+/* Présentation commune des formulaires : carte blanche détachée par un trait fin, sans ombre. */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: var(--color-surface);
+  border-radius: var(--radius-card);
+  border: 1px solid var(--color-line);
+  padding: 32px;
+}
+
+/* Libellés au-dessus des champs. */
+form label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Champs de saisie et listes déroulantes. */
+input, textarea, select {
+  width: 100%;
+  min-width: 0;
+  font: inherit;
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-control);
+  padding: 11px 14px;
+  transition: border-color .2s;
+}
+
+/* Survol d'un champ disponible. */
+input:hover:not(:disabled), textarea:hover:not(:disabled), select:hover:not(:disabled) {
+  border-color: var(--color-blue-deep);
+}
+
+/* Zone de message redimensionnable verticalement. */
+textarea {
+  min-height: 140px;
+  resize: vertical;
+}
+
+/* Champ temporairement verrouillé. */
+input:disabled, textarea:disabled, select:disabled {
+  background: var(--color-neutral);
+  color: var(--color-text-secondary);
+}
+
+/* Champ affiché sans être modifiable (adresse e-mail, SIREN). */
+input[readonly] {
+  background: var(--color-neutral);
+  color: var(--color-text-secondary);
+}
+
+/* Messages de validation dans les formulaires. */
+form label + p, form div > input + p, form [role="alert"] {
+  color: var(--color-danger);
+  font-size: 14px;
+  margin: 0;
+}
+
+/* Résultat de l'envoi annoncé dans le formulaire. */
+form [aria-live] p:not(.visually-hidden) {
+  margin: 0;
+}
+
+/* Formulaires des espaces candidat et recruteur : sans carte, deux colonnes, largeur de lecture.
+   Les champs courts vont par paires ; .field-wide (descriptions) et les groupes prennent toute la ligne. */
+.form-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px 24px;
+  max-width: 720px;
+  margin-top: 32px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+}
+
+.form-columns .field-wide, .form-columns fieldset, .form-columns [aria-live] {
+  grid-column: 1 / -1;
+}
+
+/* Groupe nommé (« Le poste », « Conditions ») : sa propre grille, sous un petit intertitre et un trait fin. */
+.form-columns fieldset {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px 24px;
+  min-width: 0;
+  margin: 0 0 12px;
+  padding: 0;
+  border: 0;
+}
+
+.form-columns legend {
+  grid-column: 1 / -1;
+  width: 100%;
+  margin-bottom: 20px;
+  padding: 0 0 10px;
+  border-bottom: 1px solid var(--color-line);
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Descriptions moins hautes dans ces formulaires : elles s'agrandissent à la main si besoin. */
+.form-columns textarea {
+  min-height: 110px;
+}
+
+/* Boutons d'envoi collés au bas de l'écran tant que le formulaire est visible : plus besoin de les chercher. */
+.form-actions {
+  grid-column: 1 / -1;
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 0;
+  background: var(--color-bg);
+  border-top: 1px solid var(--color-line);
+}
+
+/* Phrase en bas d'un formulaire dont l'envoi n'est pas encore ouvert : sous un trait fin, à la place des boutons. */
+.form-note {
+  margin: 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-line);
+  color: var(--color-text-secondary);
+  font-size: 14px;
+}
+
+/* Formulaires moins espacés sur téléphone ; les paires repassent sur une seule colonne. */
+@media (max-width: 600px) {
+  form {
+    padding: 20px;
+  }
+
+  .form-columns, .form-columns fieldset {
+    grid-template-columns: 1fr;
+    padding: 0;
+  }
+}

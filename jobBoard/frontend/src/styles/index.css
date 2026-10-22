@@ -1,0 +1,17 @@
+/* Point d'entrée du CSS, importé une seule fois par main.jsx.
+   L'ordre compte : à priorité égale, la règle du fichier importé le plus bas l'emporte.
+   Les styles communs d'abord, les pages ensuite, pour qu'une page puisse ajuster un style commun. */
+
+@import './base.css';
+@import './buttons.css';
+@import './forms.css';
+@import './layout.css';
+@import './tabs.css';
+@import './animations.css';
+
+@import './pages/home.css';
+@import './pages/offers.css';
+@import './pages/applications.css';
+@import './pages/account.css';
+@import './pages/recruiter.css';
+@import './pages/admin.css';

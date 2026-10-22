@@ -1,0 +1,22 @@
+/* Connexion (LoginPage.jsx) et création de compte (AccountPage.jsx) : formulaires sans carte (form-columns, forms.css). */
+
+/* Largeur de lecture pour la connexion et le compte : deux champs par ligne y tiennent à l'aise. */
+.account-page {
+  max-width: 640px;
+  padding-top: 56px;
+}
+
+/* Les deux champs de la paire gardent la même hauteur même quand un seul affiche un message d'erreur. */
+.account-page .form-columns > div {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+/* Sur téléphone, la connexion reprend la marge haute des autres pages (.page dans base.css). */
+@media (max-width: 600px) {
+  .account-page {
+    padding-top: 24px;
+  }
+}

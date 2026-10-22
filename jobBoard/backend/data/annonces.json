@@ -1,0 +1,746 @@
+{
+  "companies": [
+    {
+      "name": "Orvelune",
+      "siren": "936442573",
+      "description": "Orvelune développe des applications de devis, de facturation et de suivi commercial pour les artisans et les petites entreprises de services. Créée en 2016, la société compte 32 salariés, dont une partie échange chaque semaine avec les clients pour comprendre leurs tâches administratives. Les nouvelles fonctions sont d'abord essayées par quelques utilisateurs volontaires avant leur diffusion. Au bureau, le vendredi matin sert à examiner les demandes reçues et à décider lesquelles méritent une place dans la prochaine livraison.",
+      "location": "75009 Paris",
+      "website": "https://orvelune.example.com"
+    },
+    {
+      "name": "Talvoria",
+      "siren": "802651141",
+      "description": "Talvoria conçoit des interfaces et des services en ligne pour les communes, les médiathèques et les structures de quartier. Fondée en 2018, l'entreprise réunit 24 salariés qui travaillent sur des démarches concrètes, comme réserver une salle ou inscrire un enfant à un atelier. Ses designers rencontrent les agents d'accueil avant de dessiner les écrans. Chaque projet comprend des essais au clavier et une vérification des contrastes, car les services doivent rester utilisables sans équipement récent.",
+      "location": "69003 Lyon",
+      "website": "https://talvoria.example.com"
+    },
+    {
+      "name": "Nerquilio",
+      "siren": "816924450",
+      "description": "Nerquilio édite des outils de suivi des livraisons pour les transporteurs régionaux et les entreprises qui gèrent plusieurs entrepôts. L'entreprise, créée en 2013, emploie 46 salariés et relie les informations des exploitants, des chauffeurs et des responsables de quai. Les équipes observent régulièrement une tournée pour comprendre les contraintes du terrain. Les incidents sont discutés à partir des faits et des journaux techniques, avec une règle simple : chercher la cause avant de désigner un responsable.",
+      "location": "13002 Marseille",
+      "website": "https://nerquilio.example.com"
+    },
+    {
+      "name": "Velsorine",
+      "siren": "800477390",
+      "description": "Velsorine accompagne les associations dans la gestion des adhésions, des dons et des activités proposées aux habitants. Créée en 2019, cette entreprise de 18 salariés adapte les outils aux moyens disponibles, y compris lorsque les bénévoles partagent un ordinateur ancien. Les projets commencent par une séance de travail dans les locaux de l'association. La documentation utilise des exemples tirés des tâches quotidiennes, et les formations laissent du temps aux participants pour refaire seuls les manipulations.",
+      "location": "31000 Toulouse",
+      "website": "https://velsorine.example.com"
+    },
+    {
+      "name": "Praxeline",
+      "siren": "814474490",
+      "description": "Praxeline construit des plateformes de réservation pour les théâtres, les salles de concert et les lieux d'exposition indépendants. Fondée en 2015, elle compte 38 salariés qui suivent aussi bien la vente des billets que leur contrôle à l'entrée. Les équipes préparent les ouvertures de billetterie avec les responsables des lieux pour anticiper les fortes affluences. Une répétition technique précède chaque lancement important, et les retours des agents de caisse orientent les corrections des parcours.",
+      "location": "33000 Bordeaux",
+      "website": "https://praxeline.example.com"
+    },
+    {
+      "name": "Dorlavie",
+      "siren": "988538765",
+      "description": "Dorlavie développe des outils de classement, de recherche et de circulation des documents pour les communes et les établissements publics. Créée en 2012, la société rassemble 41 salariés, parmi lesquels des spécialistes des archives et du développement logiciel. Elle conserve une trace des règles de classement et des décisions prises avec chaque client. Les nouveaux arrivants découvrent d'abord le parcours d'un dossier papier, afin de comprendre ce que sa version numérique doit préserver.",
+      "location": "59000 Lille",
+      "website": "https://dorlavie.example.com"
+    },
+    {
+      "name": "Mirelquaz",
+      "siren": "978207835",
+      "description": "Mirelquaz conçoit des applications de pilotage pour les coopératives agricoles, artisanales et de distribution. Fondée en 2017, l'entreprise emploie 29 salariés et rassemble dans un même outil les commandes, les stocks et les résultats de gestion. Les indicateurs sont définis avec les comptables et les responsables d'activité, puis accompagnés d'une explication de leur calcul. Une démonstration mensuelle permet aux clients de discuter des évolutions avant que l'équipe ne les ajoute au calendrier.",
+      "location": "44000 Nantes",
+      "website": "https://mirelquaz.example.com"
+    },
+    {
+      "name": "Solvenyre",
+      "siren": "823026273",
+      "description": "Solvenyre développe des plateformes de formation pour les centres de formation professionnelle et les organismes associatifs. Créée en 2014, la société compte 35 salariés et travaille sur l'inscription, les contenus pédagogiques et le suivi des parcours. Ses concepteurs assistent à des séances de formation pour observer les difficultés des apprenants. Les échanges internes portent souvent sur un écran ou un exercice précis, et les formateurs disposent d'un espace d'essai avant toute modification importante.",
+      "location": "67000 Strasbourg",
+      "website": "https://solvenyre.example.com"
+    },
+    {
+      "name": "Brumelix",
+      "siren": "874685365",
+      "description": "Brumelix crée des applications de suivi des équipements pour les ateliers de maintenance et les entreprises de location de matériel. Fondée en 2020, elle réunit 22 salariés autour des inventaires, des interventions et de la consultation des historiques sur téléphone. Les développeurs essaient les parcours avec des techniciens qui travaillent parfois sans connexion. Un petit atelier dans les locaux permet de tester la lecture des étiquettes et la saisie d'une intervention dans des conditions proches du terrain.",
+      "location": "35000 Rennes",
+      "website": "https://brumelix.example.com"
+    },
+    {
+      "name": "Caldrivane",
+      "siren": "932147135",
+      "description": "Caldrivane accompagne les maisons de quartier, les associations locales et les petites structures de services dans leurs projets numériques. Créée en 2018, cette entreprise de 27 salariés réalise des applications, organise leur installation et assure l'assistance des utilisateurs. Elle propose des déploiements progressifs pour éviter de changer toutes les habitudes en une semaine. Les responsables de projet réservent chaque mois une demi-journée aux retours des structures accompagnées, puis publient les décisions dans un compte rendu partagé.",
+      "location": "34000 Montpellier",
+      "website": "https://caldrivane.example.com"
+    }
+  ],
+  "categories": [
+    {"name": "Développement"},
+    {"name": "Design"},
+    {"name": "Data"},
+    {"name": "Cybersécurité"},
+    {"name": "Gestion de projet"},
+    {"name": "Support informatique"}
+  ],
+  "contacts": [
+    {
+      "first_name": "Élodie",
+      "last_name": "Varenot",
+      "email": "elodie.varenot@example.com",
+      "phone": "0600000101"
+    },
+    {
+      "first_name": "Mathis",
+      "last_name": "Clervaux",
+      "email": "mathis.clervaux@example.com",
+      "phone": "0600000102"
+    },
+    {
+      "first_name": "Inès",
+      "last_name": "Delrival",
+      "email": "ines.delrival@example.com",
+      "phone": "0600000103"
+    },
+    {
+      "first_name": "Hugo",
+      "last_name": "Montelac",
+      "email": "hugo.montelac@example.com",
+      "phone": "0600000104"
+    },
+    {
+      "first_name": "Anaïs",
+      "last_name": "Brivel",
+      "email": "anais.brivel@example.com",
+      "phone": "0600000105"
+    },
+    {
+      "first_name": "Léo",
+      "last_name": "Savenot",
+      "email": "leo.savenot@example.com",
+      "phone": "0600000106"
+    },
+    {
+      "first_name": "Manon",
+      "last_name": "Rivorel",
+      "email": "manon.rivorel@example.com",
+      "phone": "0600000107"
+    },
+    {
+      "first_name": "Noémie",
+      "last_name": "Valcen",
+      "email": "noemie.valcen@example.com",
+      "phone": "0600000108"
+    },
+    {
+      "first_name": "Jules",
+      "last_name": "Dorlier",
+      "email": "jules.dorlier@example.com",
+      "phone": "0600000109"
+    },
+    {
+      "first_name": "Camille",
+      "last_name": "Lesterval",
+      "email": "camille.lesterval@example.com",
+      "phone": "0600000110"
+    }
+  ],
+  "ads": [
+    {
+      "title": "Développeur React",
+      "short_description": "Donnez aux artisans des écrans qui rendent leurs devis plus simples à préparer.",
+      "description": "Orvelune ajoute un suivi des devis à son application de gestion pour artisans. Vous rejoindrez cinq développeurs et une designer pour construire les écrans de création, de recherche et de relance. Vous utiliserez React et JavaScript, relierez les formulaires aux services existants et écrirez les tests de composants. La première livraison concernera la duplication d'un devis sans ressaisir les coordonnées du client. Vous participerez aux démonstrations avec deux entreprises pilotes et reprendrez les points qui freinent leur travail.\n\nVous avez déjà livré une interface React et savez expliquer vos choix de structure. La maîtrise du clavier, des messages d'erreur et des états de chargement compte autant que le rendu visuel. Orvelune fournit un ordinateur, un second écran et deux jours de télétravail par semaine. Les revues de code ont lieu avant chaque livraison, avec un créneau réservé aux corrections.",
+      "salary": 42000,
+      "location": "75009 Paris",
+      "working_time": "Temps plein",
+      "contract_type": "CDI",
+      "company": "Orvelune",
+      "category": "Développement",
+      "contact_email": "elodie.varenot@example.com"
+    },
+    {
+      "title": "Designer UX",
+      "short_description": "Écoutez les petites entreprises et transformez leurs hésitations en parcours plus clairs.",
+      "description": "Les clients d'Orvelune perdent encore du temps entre la création d'un devis et son envoi. L'équipe produit, composée de trois personnes, ouvre ce poste pour étudier ce passage et revoir les écrans concernés. Vous conduirez des entretiens avec des artisans, observerez leur façon de travailler et construirez des prototypes interactifs. Vous préparerez notamment un parcours permettant de retrouver un client puis de vérifier les informations avant l'envoi. Les développeurs assisteront aux essais pour comprendre directement les difficultés rencontrées.\n\nVous savez mener un entretien sans suggérer la réponse et présenter des observations étayées. Un portfolio montrant vos décisions et les limites de vos recherches aidera à discuter de votre méthode. Vous disposerez d'un outil de prototypage, d'un budget de recrutement des participants et d'une journée hebdomadaire sans réunion. Deux jours de télétravail sont possibles, hors entretiens organisés au bureau.",
+      "salary": 39000,
+      "location": "75009 Paris",
+      "working_time": "Temps plein",
+      "contract_type": "CDI",
+      "company": "Orvelune",
+      "category": "Design",
+      "contact_email": "elodie.varenot@example.com"
+    },
+    {
+      "title": "Analyste de données commerciales",
+      "short_description": "Aidez les commerciaux à comprendre ce qui fait avancer un devis vers une commande.",
+      "description": "Orvelune souhaite remplacer ses exports commerciaux dispersés par un tableau de bord commun. Pendant ce CDD de neuf mois, vous travaillerez avec deux analystes et la responsable commerciale pour réunir les données des devis, des commandes et des abonnements. Vous écrirez les requêtes SQL, contrôlerez les doublons et documenterez les indicateurs retenus. Un premier chantier portera sur les devis acceptés après une relance. Vous distinguerez les changements de comportement des écarts dus à une saisie incomplète avant de présenter vos conclusions.\n\nVous connaissez les jointures, les agrégations et les contrôles de cohérence. Vous devez aussi pouvoir expliquer pourquoi deux rapports donnent des résultats différents. Orvelune met à disposition une base de test, un tableur et un outil de visualisation. Le travail prévoit deux jours de télétravail, une restitution courte chaque semaine et des titres de restauration pour les journées travaillées.",
+      "salary": 36000,
+      "location": "75009 Paris",
+      "working_time": "Temps plein",
+      "contract_type": "CDD",
+      "company": "Orvelune",
+      "category": "Data",
+      "contact_email": "elodie.varenot@example.com"
+    },
+    {
+      "title": "Stagiaire en cybersécurité",
+      "short_description": "Apprenez à trier les alertes avec un référent qui reprend chaque analyse avec vous.",
+      "description": "Le référent sécurité d'Orvelune prépare une meilleure traçabilité des alertes sur les applications de gestion. Vous effectuerez un stage de cinq mois à ses côtés et avec deux administrateurs systèmes. Vous examinerez des journaux d'authentification, classerez les événements selon une procédure et rédigerez des fiches d'incident sur des cas vérifiés. Votre premier sujet sera la distinction entre des erreurs de connexion ordinaires et des tentatives répétées sur un même compte. Le référent validera vos conclusions avant toute transmission aux équipes.\n\nVous préparez un diplôme en informatique ou en cybersécurité et connaissez les bases des réseaux. Vous savez relever un fait sans lui attribuer trop vite une cause. Un laboratoire isolé, des exemples anonymisés et un ordinateur vous seront fournis. Le stage comprend un entretien pédagogique hebdomadaire et une journée de télétravail après la période d'accueil, sans permanence de nuit.",
+      "salary": 9500,
+      "location": "75009 Paris",
+      "working_time": "Temps plein",
+      "contract_type": "Stage",
+      "company": "Orvelune",
+      "category": "Cybersécurité",
+      "contact_email": "elodie.varenot@example.com"
+    },
+    {
+      "title": "Assistant chef de projet en alternance",
+      "short_description": "Suivez une livraison de bout en bout et apprenez à rendre les décisions lisibles.",
+      "description": "Orvelune prépare la livraison d'un module de suivi des paiements pour ses clients artisans. Vous intégrerez une équipe de quatre personnes chargée de coordonner les demandes commerciales et le travail des développeurs. En alternance, vous mettrez à jour le tableau des tâches, préparerez les réunions de suivi et vérifierez que chaque demande contient des critères de validation. Vous suivrez notamment les retours de trois entreprises pilotes sur les relances de factures. Votre tutrice arbitrera les priorités et vous expliquera les conséquences des changements de calendrier.\n\nVous préparez une formation en gestion de projet numérique et savez rédiger une synthèse compréhensible. Une première expérience collective, scolaire ou associative, permettra de discuter de votre organisation. L'entreprise adapte les missions au rythme de votre école. Vous disposerez d'un outil de planification, d'un point individuel chaque semaine et d'une journée de télétravail après votre intégration.",
+      "salary": 17000,
+      "location": "75009 Paris",
+      "working_time": "Temps plein",
+      "contract_type": "Alternance",
+      "company": "Orvelune",
+      "category": "Gestion de projet",
+      "contact_email": "elodie.varenot@example.com"
+    },
+    {
+      "title": "Technicien support informatique",
+      "short_description": "Aidez les agents d'accueil à retrouver un poste prêt à travailler dès le matin.",
+      "description": "Talvoria équipe de nouveaux agents qui utilisent ses services numériques locaux. Vous rejoindrez deux techniciens pour préparer les postes, traiter les demandes et suivre les prêts de matériel. Vous installerez les logiciels autorisés, vérifierez les connexions réseau et consignerez les interventions dans l'outil de tickets. Le premier chantier concerne le remplacement de douze ordinateurs utilisés pour les inscriptions aux activités de quartier. Vous préparerez une procédure de reprise et contrôlerez avec chaque agent que ses accès fonctionnent avant de clôturer la demande.\n\nVous savez diagnostiquer un problème de poste, de périphérique ou de connexion et expliquer les étapes sans jargon. Talvoria prévoit une semaine en binôme, un stock de matériel de remplacement et des déplacements locaux planifiés. Le poste s'exerce principalement sur place, avec une journée de télétravail consacrée à la documentation. Les horaires couvrent l'accueil de journée, sans astreinte.",
+      "salary": 31000,
+      "location": "69003 Lyon",
+      "working_time": "Temps plein",
+      "contract_type": "CDI",
+      "company": "Talvoria",
+      "category": "Support informatique",
+      "contact_email": "mathis.clervaux@example.com"
+    },
+    {
+      "title": "Développeur Java",
+      "short_description": "Construisez les services qui évitent aux habitants de ressaisir leur dossier.",
+      "description": "Talvoria refond le service d'inscription aux ateliers municipaux pour réunir les disponibilités et les dossiers des participants. Vous travaillerez avec quatre développeurs et une responsable de projet sur les services Java et la base relationnelle. Vous concevrez les contrôles de réservation, écrirez les tests et documenterez les échanges avec les interfaces. La première étape consiste à empêcher deux inscriptions simultanées sur la dernière place disponible. Vous examinerez aussi les temps de réponse pendant les ouvertures d'inscription et proposerez des corrections mesurables.\n\nVous avez une expérience de Java, de SQL et des transactions en base de données. Vous savez relire du code et justifier une modification sans compliquer les usages existants. Talvoria fournit une plateforme de test et du temps pour la documentation technique. Le rythme comprend des livraisons toutes les deux semaines, deux jours de télétravail et un budget annuel de formation.",
+      "salary": 46000,
+      "location": "69003 Lyon",
+      "working_time": "Temps plein",
+      "contract_type": "CDI",
+      "company": "Talvoria",
+      "category": "Développement",
+      "contact_email": "mathis.clervaux@example.com"
+    },
+    {
+      "title": "Designer UI",
+      "short_description": "Dessinez des formulaires lisibles pour les habitants et les agents qui les accompagnent.",
+      "description": "Talvoria harmonise les écrans de réservation de salles et d'inscription aux activités locales. Ce CDD de huit mois renforce une équipe de deux designers pendant la refonte des formulaires. Vous créerez les maquettes, définirez les variantes des composants et préciserez leur comportement sur téléphone. Un travail particulier portera sur les champs obligatoires, les messages d'erreur et la confirmation d'une démarche. Vous vérifierez les contrastes et échangerez avec les développeurs pour éviter les écarts entre le prototype et les écrans livrés.\n\nVous maîtrisez la hiérarchie visuelle et savez documenter les états d'un composant dans un outil de dessin vectoriel. Vos exemples doivent montrer comment vos choix répondent à un usage précis. Talvoria propose deux jours de télétravail, des essais avec les agents d'accueil et un écran adapté au travail graphique. Une revue hebdomadaire permet de résoudre les questions avant l'intégration.",
+      "salary": 37000,
+      "location": "69003 Lyon",
+      "working_time": "Temps plein",
+      "contract_type": "CDD",
+      "company": "Talvoria",
+      "category": "Design",
+      "contact_email": "mathis.clervaux@example.com"
+    },
+    {
+      "title": "Stagiaire analyste de données",
+      "short_description": "Cherchez où les habitants abandonnent une démarche et apprenez à interpréter les chiffres.",
+      "description": "Talvoria veut comprendre pourquoi certaines inscriptions aux activités locales restent inachevées. Vous rejoindrez, pour un stage de cinq mois, une analyste et une designer chargées d'étudier ces parcours. Vous préparerez les exports anonymisés, contrôlerez leur contenu et écrirez des requêtes SQL pour comparer les étapes. Votre première étude distinguera les abandons sur téléphone de ceux observés sur ordinateur. Vous construirez des graphiques simples et rapprocherez les résultats des observations recueillies par les agents, sans déduire une cause du seul nombre de visites.\n\nVous étudiez les statistiques ou l'informatique et connaissez les moyennes, les proportions et les bases de SQL. Votre référente relira les requêtes et les interprétations avec vous. Talvoria fournit un espace de données de test, un tableur et une demi-journée hebdomadaire d'apprentissage. Une journée de télétravail devient possible après le premier mois.",
+      "salary": 10000,
+      "location": "69003 Lyon",
+      "working_time": "Temps plein",
+      "contract_type": "Stage",
+      "company": "Talvoria",
+      "category": "Data",
+      "contact_email": "mathis.clervaux@example.com"
+    },
+    {
+      "title": "Analyste cybersécurité en alternance",
+      "short_description": "Suivez les correctifs et découvrez comment une alerte devient une action vérifiée.",
+      "description": "Talvoria renforce le suivi de sécurité de ses services d'inscription en ligne. Vous travaillerez en alternance avec un analyste et deux administrateurs pour tenir l'inventaire des composants et suivre les correctifs. Vous comparerez les versions installées aux bulletins techniques, préparerez les tickets et vérifiererez les preuves de mise à jour. Le premier périmètre sera le serveur de réservation de salles utilisé par plusieurs communes. Les décisions de priorité resteront prises par votre tuteur, qui vous associera aux échanges avec les développeurs.\n\nVous préparez un diplôme en cybersécurité et comprenez les échanges réseau ainsi que les droits d'accès. Vous devez pouvoir décrire précisément un contrôle et son résultat. L'entreprise prévoit un laboratoire séparé de la production, des exercices guidés et un bilan mensuel avec votre école. Le télétravail est possible un jour par semaine, avec des horaires compatibles avec la présence du tuteur.",
+      "salary": 18000,
+      "location": "69003 Lyon",
+      "working_time": "Temps plein",
+      "contract_type": "Alternance",
+      "company": "Talvoria",
+      "category": "Cybersécurité",
+      "contact_email": "mathis.clervaux@example.com"
+    },
+    {
+      "title": "Chef de projet informatique",
+      "short_description": "Coordonnez les outils de livraison en gardant les contraintes du quai dans le planning.",
+      "description": "Nerquilio prépare une nouvelle version de son suivi des livraisons pour un réseau de transporteurs régionaux. Vous piloterez une équipe projet de sept personnes, des premiers ateliers jusqu'à la mise en service. Vous recueillerez les besoins des exploitants, suivrez les dépendances techniques et organiserez les validations avec les responsables de quai. Le chantier initial porte sur la remontée des preuves de livraison depuis les téléphones des chauffeurs. Vous établirez les jalons et préparerez un scénario de retour à la version précédente pour chaque déploiement.\n\nVous avez déjà coordonné un projet informatique comportant plusieurs interlocuteurs et des contraintes de terrain. Vous savez annoncer un retard, proposer un arbitrage et conserver la trace des décisions. Nerquilio fournit un outil de planification et des comptes de démonstration. Deux jours de télétravail sont prévus, tandis que les visites d'entrepôt sont regroupées et leurs frais pris en charge.",
+      "salary": 51000,
+      "location": "13002 Marseille",
+      "working_time": "Temps plein",
+      "contract_type": "CDI",
+      "company": "Nerquilio",
+      "category": "Gestion de projet",
+      "contact_email": "ines.delrival@example.com"
+    },
+    {
+      "title": "Technicien assistance utilisateurs",
+      "short_description": "Résolvez les incidents qui empêchent un chauffeur de transmettre sa livraison.",
+      "description": "Les transporteurs clients de Nerquilio utilisent des téléphones et des terminaux pour signaler les livraisons. Vous rejoindrez une équipe de trois techniciens afin de traiter les incidents et d'améliorer les procédures d'assistance. Vous recueillerez les informations utiles, reproduirez les erreurs sur du matériel de test et transmettrez aux développeurs les cas documentés. Votre premier travail portera sur les photos de livraison qui restent en attente après une coupure réseau. Vous suivrez chaque demande jusqu'à la confirmation du rétablissement par l'utilisateur concerné.\n\nVous connaissez les réglages réseau et savez guider une personne qui dispose de peu de temps pour manipuler son appareil. Nerquilio organise une formation aux outils logistiques et met des terminaux de test à votre disposition. Les permanences de journée sont réparties à l'avance. Une journée de télétravail est possible pour le traitement des tickets, et les déplacements ponctuels sont remboursés.",
+      "salary": 30000,
+      "location": "13002 Marseille",
+      "working_time": "Temps plein",
+      "contract_type": "CDI",
+      "company": "Nerquilio",
+      "category": "Support informatique",
+      "contact_email": "ines.delrival@example.com"
+    },
+    {
+      "title": "Développeur PHP",
+      "short_description": "Faites évoluer le suivi des livraisons sans perdre les informations déjà sur le terrain.",
+      "description": "Nerquilio renouvelle le module qui rapproche les commandes et les preuves de livraison. Ce CDD de dix mois complète une équipe de quatre développeurs chargée de maintenir l'application PHP. Vous corrigerez les anomalies, écrirez les requêtes SQL et ajouterez des tests aux traitements existants. Le premier chantier consiste à gérer une livraison partielle sans marquer toute la commande comme terminée. Vous analyserez les journaux techniques avec le support et préparerez les changements de base sur un environnement de test avant leur validation.\n\nVous maîtrisez PHP, les bases relationnelles et la lecture d'un code déjà utilisé en production. Vous savez limiter une correction au problème observé et expliquer ses effets. L'entreprise fournit un ordinateur, une base anonymisée et un outil de suivi des erreurs. Deux jours de télétravail sont possibles, avec des créneaux de livraison convenus pour ne pas perturber les tournées.",
+      "salary": 40000,
+      "location": "13002 Marseille",
+      "working_time": "Temps plein",
+      "contract_type": "CDD",
+      "company": "Nerquilio",
+      "category": "Développement",
+      "contact_email": "ines.delrival@example.com"
+    },
+    {
+      "title": "Stagiaire designer UX",
+      "short_description": "Observez les gestes des opérateurs pour dessiner des écrans utilisables sur le quai.",
+      "description": "Nerquilio revoit le parcours de signalement d'un colis endommagé sur terminal mobile. Pendant ce stage de quatre mois, vous travaillerez avec une designer et deux développeurs sur les écrans utilisés par les opérateurs logistiques. Vous assisterez aux observations sur site, préparerez des prototypes et organiserez les notes issues des essais. Un premier prototype permettra de joindre une photo et de choisir un motif avec une seule main. Votre référente vous aidera à distinguer les difficultés liées au dessin des écrans de celles dues au matériel.\n\nVous suivez une formation en design numérique et savez construire un prototype simple. Vous devez pouvoir écouter un utilisateur et décrire ce que vous avez observé. Nerquilio fournit l'outil de prototypage, les terminaux et les déplacements accompagnés. Un entretien pédagogique est prévu chaque semaine. Le télétravail convient aux journées de préparation, après accord avec votre référente.",
+      "salary": 9000,
+      "location": "13002 Marseille",
+      "working_time": "Temps plein",
+      "contract_type": "Stage",
+      "company": "Nerquilio",
+      "category": "Design",
+      "contact_email": "ines.delrival@example.com"
+    },
+    {
+      "title": "Analyste de données en alternance",
+      "short_description": "Rendez les délais de livraison comparables, même lorsque les saisies diffèrent.",
+      "description": "Les exploitants clients de Nerquilio comparent des délais calculés avec des règles différentes. Vous intégrerez en alternance une équipe de deux analystes pour fiabiliser ces indicateurs. Vous contrôlerez les dates, repérerez les statuts manquants et préparerez des requêtes SQL sur une base de test. Votre premier dossier concernera les livraisons reportées à la demande du destinataire. Vous documenterez la règle retenue et vérifierez son effet sur plusieurs tournées avant de proposer un tableau de bord au responsable d'exploitation.\n\nVous préparez un diplôme en analyse de données et connaissez les filtres, les jointures et les fonctions d'un tableur. Votre tuteur attend surtout des calculs explicables et des questions lorsque les données sont ambiguës. Nerquilio réserve un créneau de formation hebdomadaire et adapte les échéances à votre calendrier scolaire. Vous disposerez d'un ordinateur et d'une journée de télétravail après votre accueil.",
+      "salary": 17500,
+      "location": "13002 Marseille",
+      "working_time": "Temps plein",
+      "contract_type": "Alternance",
+      "company": "Nerquilio",
+      "category": "Data",
+      "contact_email": "ines.delrival@example.com"
+    },
+    {
+      "title": "Ingénieur sécurité applicative",
+      "short_description": "Protégez les outils associatifs avec des contrôles que les développeurs peuvent reprendre.",
+      "description": "Velsorine rassemble les inscriptions et les adhésions de plusieurs associations dans une application commune. Vous rejoindrez trois développeurs et un administrateur pour renforcer la sécurité de ces services. Vous examinerez les contrôles d'accès, relirez les changements sensibles et préparerez des tests sur un environnement isolé. Le premier chantier concernera la séparation des dossiers entre associations, notamment lors des exports. Vous décrirez les risques observés, proposerez des corrections et vérifierez leur effet avec les personnes qui maintiennent l'application.\n\nVous avez déjà travaillé sur la sécurité d'applications web et maîtrisez les sessions, les permissions et la validation des entrées. Vous savez formuler une recommandation applicable à une petite équipe. Velsorine réserve du temps aux corrections et fournit un laboratoire de test. Deux jours de télétravail, un budget de formation et des revues techniques mensuelles accompagnent le poste, sans astreinte régulière.",
+      "salary": 55000,
+      "location": "31000 Toulouse",
+      "working_time": "Temps plein",
+      "contract_type": "CDI",
+      "company": "Velsorine",
+      "category": "Cybersécurité",
+      "contact_email": "hugo.montelac@example.com"
+    },
+    {
+      "title": "Chef de projet déploiement",
+      "short_description": "Préparez des mises en service que les bénévoles peuvent prendre en main à leur rythme.",
+      "description": "Velsorine déploie un outil de gestion des adhésions auprès d'associations qui utilisent encore des fichiers séparés. Vous coordonnerez une équipe de cinq personnes chargée de la reprise des données, de l'installation et de la formation. Vous préparerez les calendriers avec les responsables associatifs et vérifierez les conditions de démarrage. Le premier déploiement concerne une association proposant des ateliers dans trois lieux. Vous organiserez une séance d'essai, recenserez les points bloquants et déciderez avec le client de la date de bascule.\n\nVous savez conduire une mise en service et adapter votre communication à des interlocuteurs peu disponibles. L'expérience d'une reprise de données ou d'une formation utilisateur sera utile. Velsorine fournit des modèles de suivi et un espace de démonstration. Les déplacements locaux sont planifiés et remboursés. Vous pourrez télétravailler deux jours par semaine, hors formations, avec un créneau réservé au bilan de chaque déploiement.",
+      "salary": 44000,
+      "location": "31000 Toulouse",
+      "working_time": "Temps plein",
+      "contract_type": "CDI",
+      "company": "Velsorine",
+      "category": "Gestion de projet",
+      "contact_email": "hugo.montelac@example.com"
+    },
+    {
+      "title": "Technicien support de proximité",
+      "short_description": "Accompagnez les associations sur place, du branchement d'un poste au premier usage.",
+      "description": "Velsorine accompagne plusieurs associations qui renouvellent leurs ordinateurs et leurs accès aux outils de gestion. Ce CDD de six mois, à temps partiel sur quatre matinées, complète une équipe de deux techniciens. Vous préparerez les postes, configurerez les périphériques et résoudrez les incidents dans les locaux partenaires. Une première intervention concernera l'installation d'un poste partagé pour enregistrer les adhésions. Vous vérifierez les sauvegardes et laisserez une fiche expliquant les manipulations courantes aux bénévoles qui prennent le relais.\n\nVous connaissez la maintenance des postes et les bases d'un réseau local. Vous savez expliquer une opération, puis laisser l'utilisateur la refaire pour vérifier sa compréhension. Velsorine fournit le matériel d'intervention et rembourse les déplacements professionnels. Le planning est fixé deux semaines à l'avance. Les interventions imposent une présence sur site ; une plage à distance peut servir à préparer les procédures.",
+      "salary": 29000,
+      "location": "31000 Toulouse",
+      "working_time": "Temps partiel",
+      "contract_type": "CDD",
+      "company": "Velsorine",
+      "category": "Support informatique",
+      "contact_email": "hugo.montelac@example.com"
+    },
+    {
+      "title": "Stagiaire développeur Python",
+      "short_description": "Écrivez des scripts qui retirent une ressaisie du quotidien des associations.",
+      "description": "Velsorine souhaite automatiser la préparation des listes d'adhérents utilisées pour ses formations. Vous effectuerez un stage de cinq mois avec trois développeurs et une tutrice chargée de la reprise des données. Vous écrirez des scripts Python, contrôlerez les fichiers CSV et préparerez des tests sur des exemples fictifs. Le premier script rapprochera les inscriptions à un atelier et les coordonnées déjà présentes dans la base. Vous documenterez les cas rejetés pour qu'un responsable puisse les corriger sans modifier le programme.\n\nVous étudiez l'informatique et connaissez les fonctions, les fichiers et les structures de données en Python. Une réalisation scolaire suffira pour discuter de votre manière de chercher une erreur. L'entreprise fournit un ordinateur, des exercices progressifs et une revue de votre travail deux fois par semaine. Une journée de télétravail est envisageable après le premier mois, avec votre tutrice disponible.",
+      "salary": 11000,
+      "location": "31000 Toulouse",
+      "working_time": "Temps plein",
+      "contract_type": "Stage",
+      "company": "Velsorine",
+      "category": "Développement",
+      "contact_email": "hugo.montelac@example.com"
+    },
+    {
+      "title": "Designer UI en alternance",
+      "short_description": "Concevez des écrans que les bénévoles comprennent dès leur première inscription.",
+      "description": "Velsorine refait les formulaires utilisés pour inscrire les adhérents aux activités associatives. Vous rejoindrez en alternance une designer et deux développeurs pour préparer les maquettes et les éléments graphiques. Vous déclinerez les champs, les boutons et les messages selon les situations rencontrées. Votre premier sujet sera l'inscription d'une famille dont plusieurs membres participent à des ateliers différents. Vous comparerez les versions sur téléphone et sur ordinateur, puis préparerez les indications nécessaires à leur intégration.\n\nVous préparez un diplôme en design et connaissez un outil de dessin vectoriel ainsi que les principes de contraste. Votre tutrice vous aidera à justifier les choix par les usages observés. Velsorine adapte le calendrier au rythme scolaire et organise une revue de maquettes chaque semaine. Un ordinateur et un écran sont fournis. Une journée de télétravail est possible lorsque les séances avec les associations ne nécessitent pas votre présence.",
+      "salary": 16500,
+      "location": "31000 Toulouse",
+      "working_time": "Temps plein",
+      "contract_type": "Alternance",
+      "company": "Velsorine",
+      "category": "Design",
+      "contact_email": "hugo.montelac@example.com"
+    },
+    {
+      "title": "Ingénieur données",
+      "short_description": "Reliez les réservations et les billets pour donner aux lieux culturels des chiffres fiables.",
+      "description": "Praxeline développe une chaîne de données commune pour les réservations, les remboursements et les entrées en salle. Vous rejoindrez deux ingénieurs données et un développeur afin de construire les traitements en Python et SQL. Vous définirez les contrôles, suivrez les exécutions et documenterez les dépendances entre les sources. Le premier projet rapprochera les billets vendus et les billets scannés pendant un festival. Vous prévoirez la reprise des traitements après une interruption, sans compter deux fois les mêmes événements.\n\nVous maîtrisez les bases relationnelles et avez déjà maintenu des traitements de données automatisés. Vous savez choisir une règle de contrôle et expliquer ce qu'elle ne détecte pas. Praxeline fournit des environnements séparés, un outil d'ordonnancement et des données anonymisées. Deux jours de télétravail sont possibles. Les livraisons suivent un calendrier discuté avec les lieux culturels, et une formation technique annuelle est financée.",
+      "salary": 52000,
+      "location": "33000 Bordeaux",
+      "working_time": "Temps plein",
+      "contract_type": "CDI",
+      "company": "Praxeline",
+      "category": "Data",
+      "contact_email": "anais.brivel@example.com"
+    },
+    {
+      "title": "Administrateur sécurité systèmes",
+      "short_description": "Préparez une infrastructure qui tient ses engagements les soirs de forte réservation.",
+      "description": "Praxeline prépare l'ouverture de nouvelles billetteries et renforce son équipe infrastructure de trois personnes. Vous administrerez les serveurs Linux, gérerez les accès et organiserez les mises à jour de sécurité. Vous vérifierez les sauvegardes et conduirez des exercices de restauration sur un environnement séparé. Le premier chantier portera sur les comptes techniques utilisés par le contrôle des billets. Vous documenterez les droits nécessaires et supprimerez les permissions inutiles après validation avec les responsables applicatifs.\n\nVous avez une expérience en administration Linux, en réseau et en automatisation des configurations. Vous savez préparer une intervention avec ses contrôles et une procédure de retour. Praxeline fournit un laboratoire et du temps pour maintenir la documentation. Deux jours de télétravail sont prévus. Les permanences liées aux événements sont planifiées, réparties dans l'équipe et compensées ; leur fréquence est discutée lors de l'entretien.",
+      "salary": 49000,
+      "location": "33000 Bordeaux",
+      "working_time": "Temps plein",
+      "contract_type": "CDI",
+      "company": "Praxeline",
+      "category": "Cybersécurité",
+      "contact_email": "anais.brivel@example.com"
+    },
+    {
+      "title": "Coordinateur de projet numérique",
+      "short_description": "Faites avancer la refonte des réservations avec des décisions que chacun peut retrouver.",
+      "description": "Praxeline refond le parcours de réservation de plusieurs salles indépendantes. Pendant ce CDD de neuf mois, vous coordonnerez six personnes chargées du design, du développement et des essais. Vous préparerez les réunions, suivrez les demandes et rendrez visibles les dépendances dans l'outil de planification. Le premier lot concerne le choix des places et la confirmation du tarif réduit. Vous consoliderez les retours des agents de billetterie et vérifierez que chaque décision possède un responsable et une date de validation.\n\nVous avez déjà suivi un projet numérique et savez distinguer une demande nouvelle d'une correction attendue. Une rédaction précise sera nécessaire pour éviter les interprétations entre équipes. Praxeline prévoit deux jours de télétravail et des ateliers au bureau avec les lieux partenaires. Vous disposerez de comptes de test, d'un calendrier partagé et d'une demi-journée hebdomadaire consacrée à la préparation des validations.",
+      "salary": 38000,
+      "location": "33000 Bordeaux",
+      "working_time": "Temps plein",
+      "contract_type": "CDD",
+      "company": "Praxeline",
+      "category": "Gestion de projet",
+      "contact_email": "anais.brivel@example.com"
+    },
+    {
+      "title": "Stagiaire technicien support",
+      "short_description": "Découvrez l'assistance informatique au plus près des agents de billetterie.",
+      "description": "Praxeline accueille un stagiaire pour préparer le matériel des lieux culturels avant leur nouvelle saison. Pendant quatre mois, vous travaillerez avec deux techniciens qui vous confieront progressivement les demandes simples. Vous enregistrerez les incidents, préparerez les postes et vérifierez les lecteurs de billets sur une plateforme d'essai. Votre premier dossier portera sur les imprimantes utilisées aux guichets. Vous rédigerez une fiche de vérification et suivrez les essais avec votre tuteur avant qu'un équipement soit envoyé au client.\n\nVous suivez une formation en informatique et connaissez les composants d'un ordinateur ainsi que les bases des connexions réseau. Vous devez pouvoir écouter une demande et noter les informations sans les déformer. Praxeline fournit du matériel de test et un accompagnement quotidien. Le stage se déroule principalement au bureau, aux horaires de journée. Les visites de lieux culturels se font avec un technicien et leurs frais sont pris en charge.",
+      "salary": 8500,
+      "location": "33000 Bordeaux",
+      "working_time": "Temps plein",
+      "contract_type": "Stage",
+      "company": "Praxeline",
+      "category": "Support informatique",
+      "contact_email": "anais.brivel@example.com"
+    },
+    {
+      "title": "Développeur web en alternance",
+      "short_description": "Apprenez le développement web sur des pages que les spectateurs utilisent pour réserver.",
+      "description": "Praxeline améliore les pages de présentation des spectacles et leur accès à la réservation. Vous intégrerez en alternance une équipe de quatre développeurs, avec un tuteur chargé de vos premières tâches. Vous travaillerez en HTML, CSS et JavaScript, corrigerez les affichages sur téléphone et écrirez des tests de parcours. Le premier module permettra de filtrer les séances par date sans perdre les critères sélectionnés. Vous participerez aux revues de code et assisterez aux retours des agents de billetterie sur les pages livrées.\n\nVous préparez un diplôme informatique et savez déjà construire une page web simple. Votre tuteur vous accompagnera sur les tests et la lecture du code existant. Praxeline fournit un ordinateur, un environnement de développement et un créneau hebdomadaire d'apprentissage. Le calendrier respecte les périodes scolaires. Une journée de télétravail devient possible après l'accueil, avec des tâches préparées ensemble.",
+      "salary": 18000,
+      "location": "33000 Bordeaux",
+      "working_time": "Temps plein",
+      "contract_type": "Alternance",
+      "company": "Praxeline",
+      "category": "Développement",
+      "contact_email": "anais.brivel@example.com"
+    },
+    {
+      "title": "Designer de services numériques",
+      "short_description": "Suivez le parcours d'un dossier pour simplifier les démarches des agents.",
+      "description": "Dorlavie revoit la circulation des demandes de subvention entre les services d'une collectivité. Vous travaillerez avec deux designers et une spécialiste des archives pour comprendre les étapes, les documents et les validations. Vous conduirez des ateliers avec les agents, dessinerez le parcours du dossier et préparerez des prototypes. Le premier sujet concerne le retour d'une pièce incomplète sans interrompre toute l'instruction. Vous testerez les propositions avec les personnes qui reçoivent les demandes et celles qui prennent la décision.\n\nVous avez une expérience de recherche utilisateur et savez représenter un service qui dépasse les seuls écrans. Vous devez pouvoir relier une proposition à une difficulté observée. Dorlavie fournit un outil de prototypage et organise les rencontres avec les agents. Le poste prévoit deux jours de télétravail, des déplacements regroupés et une revue mensuelle avec les spécialistes documentaires. Les frais professionnels sont remboursés.",
+      "salary": 43000,
+      "location": "59000 Lille",
+      "working_time": "Temps plein",
+      "contract_type": "CDI",
+      "company": "Dorlavie",
+      "category": "Design",
+      "contact_email": "leo.savenot@example.com"
+    },
+    {
+      "title": "Analyste qualité des données",
+      "short_description": "Retrouvez les incohérences qui empêchent un document d'arriver au bon endroit.",
+      "description": "Dorlavie prépare la reprise de plusieurs fonds documentaires dans son outil de gestion. Vous rejoindrez deux analystes et une archiviste pour contrôler les données avant leur import. Vous écrirez des requêtes SQL, repérerez les doublons et définirez des règles sur les dates, les identifiants et les catégories. Le premier chantier portera sur des dossiers dont les pièces utilisent plusieurs références pour une même affaire. Vous produirez un rapport d'anomalies et suivrez leur correction avec les agents responsables des documents.\n\nVous maîtrisez SQL et savez traiter les valeurs manquantes sans inventer une information. L'expérience d'une migration ou d'un contrôle de données sera utile pour discuter de vos méthodes. Dorlavie fournit des copies anonymisées, un tableur et un outil de suivi des corrections. Deux jours de télétravail sont possibles. Une plage hebdomadaire est réservée aux échanges avec l'archiviste pour clarifier les règles de classement.",
+      "salary": 41000,
+      "location": "59000 Lille",
+      "working_time": "Temps plein",
+      "contract_type": "CDI",
+      "company": "Dorlavie",
+      "category": "Data",
+      "contact_email": "leo.savenot@example.com"
+    },
+    {
+      "title": "Analyste gestion des accès",
+      "short_description": "Attribuez les accès documentaires avec des règles compréhensibles et une trace vérifiable.",
+      "description": "Dorlavie révise les habilitations de sa plateforme documentaire après une réorganisation des services clients. Ce CDD de huit mois renforce une équipe de trois personnes chargée des identités et des accès. Vous examinerez les comptes, rapprocherez les droits des fonctions exercées et préparerez les demandes de validation. Le premier périmètre concerne les dossiers partagés entre les services techniques et financiers. Vous consignerez les décisions, suivrez les retraits d'accès et vérifierez les résultats sur un environnement de test.\n\nVous connaissez les principes de gestion des identités et savez lire une matrice de droits. Vous devez savoir demander une précision lorsqu'une autorisation manque de justification. Dorlavie prévoit une formation au modèle documentaire et fournit un outil de tickets ainsi que des comptes de test. Le travail comprend deux jours de télétravail et des points courts avec les responsables des services, sans permanence en soirée.",
+      "salary": 39000,
+      "location": "59000 Lille",
+      "working_time": "Temps plein",
+      "contract_type": "CDD",
+      "company": "Dorlavie",
+      "category": "Cybersécurité",
+      "contact_email": "leo.savenot@example.com"
+    },
+    {
+      "title": "Stagiaire assistant chef de projet",
+      "short_description": "Apprenez à suivre une migration documentaire sans perdre les décisions en chemin.",
+      "description": "Dorlavie prépare le passage d'un fonds de dossiers papier vers sa plateforme numérique. Pendant ce stage de cinq mois, vous rejoindrez une équipe projet de quatre personnes pilotée par votre tutrice. Vous mettrez à jour le planning, préparerez les réunions et suivrez les actions confiées aux services clients. Votre premier sujet sera la validation d'un lot de dossiers numérisés, depuis leur réception jusqu'au contrôle des références. Vous tiendrez le registre des décisions et signalerez les éléments manquants avant la réunion suivante.\n\nVous étudiez la gestion de projet et savez structurer un compte rendu avec des actions datées. Une expérience de travail collectif servira à discuter de votre méthode. Dorlavie fournit des modèles de suivi et un accès à la plateforme d'essai. Votre tutrice prévoit un bilan hebdomadaire. Une journée de télétravail est possible après votre intégration, hors ateliers avec les agents.",
+      "salary": 10000,
+      "location": "59000 Lille",
+      "working_time": "Temps plein",
+      "contract_type": "Stage",
+      "company": "Dorlavie",
+      "category": "Gestion de projet",
+      "contact_email": "leo.savenot@example.com"
+    },
+    {
+      "title": "Consultant support informatique indépendant",
+      "short_description": "Transformez les incidents documentaires récurrents en procédures que le support peut utiliser.",
+      "description": "Dorlavie recherche un consultant indépendant pour revoir l'organisation de son assistance documentaire. La mission initiale dure six mois et implique quatre techniciens ainsi que la responsable du support. Vous analyserez les tickets, observerez le traitement des demandes et proposerez des procédures de diagnostic. Le premier chantier concerne les documents introuvables après une modification de leurs références. Vous construirez un guide de résolution, le testerez avec les techniciens et définirez des indicateurs permettant de suivre son utilisation.\n\nVous avez déjà structuré un service support et savez distinguer un problème de procédure d'une anomalie logicielle. Vos recommandations devront préciser le travail nécessaire et les personnes concernées. Dorlavie met à disposition les tickets anonymisés, un environnement de démonstration et les interlocuteurs métier. La mission peut être réalisée trois jours par semaine à distance. Le calendrier, les livrables et les modalités de facturation seront fixés avant son démarrage.",
+      "salary": 58000,
+      "location": "59000 Lille",
+      "working_time": "Temps plein",
+      "contract_type": "Freelance",
+      "company": "Dorlavie",
+      "category": "Support informatique",
+      "contact_email": "leo.savenot@example.com"
+    },
+    {
+      "title": "Développeur applications métier",
+      "short_description": "Développez les outils qui relient les commandes aux stocks des coopératives.",
+      "description": "Mirelquaz ajoute un suivi des commandes à son application de pilotage des coopératives. Vous rejoindrez quatre développeurs et une responsable produit pour concevoir les fonctions en Python et JavaScript. Vous relierez les mouvements de stock aux commandes, écrirez les tests et surveillerez les temps de réponse. Le premier chantier concerne la réservation d'un même lot par plusieurs points de vente. Vous préparerez les règles avec les responsables d'activité et vérifierez leur application lors de la démonstration mensuelle.\n\nVous avez déjà développé une application web utilisant une base relationnelle et des tests automatisés. Vous savez discuter d'une règle métier avant de la traduire en code. Mirelquaz fournit un environnement de test, un ordinateur et deux écrans. Deux jours de télétravail sont possibles, avec des livraisons toutes les trois semaines. Une demi-journée par mois est réservée au partage de connaissances techniques.",
+      "salary": 45000,
+      "location": "44000 Nantes",
+      "working_time": "Temps plein",
+      "contract_type": "CDI",
+      "company": "Mirelquaz",
+      "category": "Développement",
+      "contact_email": "manon.rivorel@example.com"
+    },
+    {
+      "title": "Designer produit numérique",
+      "short_description": "Dessinez des tableaux de pilotage que les responsables de coopérative peuvent lire et expliquer.",
+      "description": "Mirelquaz revoit son tableau de pilotage pour les responsables de coopératives. Vous travaillerez avec une designer, une analyste et quatre développeurs afin de rapprocher les indicateurs des décisions quotidiennes. Vous rencontrerez les utilisateurs, construirez des prototypes et testerez la compréhension des écrans. Le premier parcours permettra de comparer les stocks de plusieurs magasins tout en repérant les produits réservés. Vous préciserez les filtres, les unités et les messages pour éviter qu'une valeur soit interprétée hors de son contexte.\n\nVous savez conduire une recherche utilisateur et documenter les décisions de conception. Un exemple de tableau de bord ou d'outil métier permettra d'examiner votre démarche. Mirelquaz fournit un outil de prototypage et un accès aux démonstrations clients. Le poste comprend deux jours de télétravail, un budget de formation et un atelier de conception hebdomadaire avec l'analyste pour vérifier les règles de calcul.",
+      "salary": 44000,
+      "location": "44000 Nantes",
+      "working_time": "Temps plein",
+      "contract_type": "CDI",
+      "company": "Mirelquaz",
+      "category": "Design",
+      "contact_email": "manon.rivorel@example.com"
+    },
+    {
+      "title": "Analyste données financières",
+      "short_description": "Aidez les coopératives à comparer leurs résultats avec des calculs que chacun peut reprendre.",
+      "description": "Mirelquaz accompagne des coopératives qui souhaitent rapprocher leurs ventes et leurs charges par activité. Pendant ce CDD de dix mois, vous travaillerez avec deux analystes et une référente comptable sur leurs tableaux de bord. Vous contrôlerez les exports, écrirez les requêtes SQL et documenterez les règles de calcul. Le premier dossier portera sur la répartition des frais de transport entre plusieurs magasins. Vous présenterez les écarts et séparerez les différences réelles des variations dues à une méthode de saisie.\n\nVous maîtrisez SQL et comprenez les notions de marge, de charge et de période comptable. Vous savez rendre un calcul vérifiable sans masquer ses hypothèses. Mirelquaz fournit un tableur, des données anonymisées et un outil de visualisation. Le rythme prévoit une revue des chiffres chaque semaine, deux jours de télétravail et des échanges planifiés avec les comptables pour valider les règles.",
+      "salary": 42000,
+      "location": "44000 Nantes",
+      "working_time": "Temps plein",
+      "contract_type": "CDD",
+      "company": "Mirelquaz",
+      "category": "Data",
+      "contact_email": "manon.rivorel@example.com"
+    },
+    {
+      "title": "Stagiaire analyste sécurité",
+      "short_description": "Découvrez les risques informatiques à partir des équipements réellement utilisés.",
+      "description": "Mirelquaz prépare un inventaire des équipements et des accès utilisés pour ses applications de coopératives. Vous effectuerez un stage de cinq mois auprès d'un référent sécurité et de deux administrateurs. Vous recenserez les actifs, vérifierez les informations disponibles et participerez à des contrôles guidés sur une plateforme isolée. Votre premier sujet sera le suivi des comptes techniques utilisés pour les transferts de fichiers. Vous rédigerez des fiches décrivant leur usage et les points qui demandent une validation.\n\nVous étudiez la cybersécurité et connaissez les bases des réseaux ainsi que les permissions sur un système. Vous devez pouvoir distinguer un contrôle réalisé d'une information encore inconnue. Mirelquaz fournit des exercices, un ordinateur et un entretien pédagogique hebdomadaire. Vous assisterez aux revues de risques avec votre référent. Une journée de télétravail est envisageable après l'accueil, sans intervention autonome sur la production.",
+      "salary": 10500,
+      "location": "44000 Nantes",
+      "working_time": "Temps plein",
+      "contract_type": "Stage",
+      "company": "Mirelquaz",
+      "category": "Cybersécurité",
+      "contact_email": "manon.rivorel@example.com"
+    },
+    {
+      "title": "Chef de projet numérique indépendant",
+      "short_description": "Cadrez la refonte des outils de gestion avec les équipes qui utiliseront chaque livraison.",
+      "description": "Mirelquaz recherche un chef de projet indépendant pour coordonner la refonte de son module de gestion des achats. La mission de huit mois rassemble six personnes et plusieurs représentants de coopératives. Vous organiserez les ateliers, préparerez les jalons et suivrez les dépendances entre la reprise des données et les nouvelles fonctions. Le premier lot concerne l'approbation des commandes selon les montants engagés. Vous tiendrez le registre des décisions et proposerez des arbitrages chiffrés lorsque le calendrier ou le périmètre évolue.\n\nVous avez déjà piloté des applications métier et savez travailler avec des interlocuteurs financiers et techniques. Vos références devront préciser votre responsabilité dans les projets présentés. Mirelquaz donne accès aux outils de suivi, aux équipes et à une plateforme de démonstration. Trois jours de travail à distance sont possibles. Les livrables, les déplacements et les conditions de facturation seront définis dans le contrat de mission.",
+      "salary": 72000,
+      "location": "44000 Nantes",
+      "working_time": "Temps plein",
+      "contract_type": "Freelance",
+      "company": "Mirelquaz",
+      "category": "Gestion de projet",
+      "contact_email": "manon.rivorel@example.com"
+    },
+    {
+      "title": "Responsable support informatique",
+      "short_description": "Organisez un support qui laisse les formateurs se concentrer sur leurs séances.",
+      "description": "Solvenyre prépare l'arrivée de nouveaux organismes sur sa plateforme de formation. Vous encadrerez quatre techniciens pour répartir les demandes et améliorer les réponses aux formateurs et aux apprenants. Vous suivrez les délais, examinerez les incidents récurrents et construirez des procédures avec les développeurs. Le premier chantier concernera les difficultés d'accès au début d'une session, lorsque plusieurs groupes se connectent ensemble. Vous organiserez la remontée des incidents et vérifierez que les solutions proposées permettent réellement de reprendre le cours.\n\nVous avez une expérience du support informatique et de l'accompagnement d'une petite équipe. Vous savez analyser un indicateur sans réduire le travail au nombre de tickets fermés. Solvenyre fournit un outil de tickets, des comptes de test et du temps pour former les techniciens. Le poste prévoit deux jours de télétravail et des horaires de journée définis selon le calendrier des formations.",
+      "salary": 43000,
+      "location": "67000 Strasbourg",
+      "working_time": "Temps plein",
+      "contract_type": "CDI",
+      "company": "Solvenyre",
+      "category": "Support informatique",
+      "contact_email": "noemie.valcen@example.com"
+    },
+    {
+      "title": "Développeur plateforme de formation",
+      "short_description": "Construisez les fonctions qui permettent aux formateurs de suivre un groupe sans ressaisie.",
+      "description": "Solvenyre ajoute un suivi des exercices à sa plateforme de formation professionnelle. Vous travaillerez avec cinq développeurs et une référente pédagogique sur les interfaces JavaScript et les services associés. Vous concevrez les échanges de données, écrirez les tests et intégrerez les retours des formateurs. Le premier module permettra de reprendre un exercice interrompu sans perdre les réponses enregistrées. Vous vérifierez le comportement sur des connexions instables et préparerez les changements avec l'équipe support avant leur mise en service.\n\nVous maîtrisez JavaScript, les interfaces de programmation et les bases relationnelles. Vous savez examiner un parcours complet lorsque l'erreur ne vient pas du seul écran. Solvenyre fournit un environnement d'essai contenant des cours fictifs et un ordinateur équipé pour le développement. Deux jours de télétravail sont possibles. Les livraisons ont lieu toutes les deux semaines, avec une démonstration pédagogique et un budget annuel de formation.",
+      "salary": 47000,
+      "location": "67000 Strasbourg",
+      "working_time": "Temps plein",
+      "contract_type": "CDI",
+      "company": "Solvenyre",
+      "category": "Développement",
+      "contact_email": "noemie.valcen@example.com"
+    },
+    {
+      "title": "Designer interfaces pédagogiques",
+      "short_description": "Donnez aux apprenants des repères clairs entre le cours, l'exercice et leurs résultats.",
+      "description": "Solvenyre refond les écrans utilisés par les apprenants pour retrouver leurs cours et leurs exercices. Ce CDD de sept mois complète une équipe de deux designers et une référente pédagogique. Vous préparerez les maquettes, préciserez les états des composants et organiserez des essais de compréhension. Votre premier parcours concernera la reprise d'une formation après plusieurs semaines d'interruption. Vous travaillerez les repères de progression, les consignes et les messages d'erreur, puis vérifierez leur cohérence avec les développeurs.\n\nVous connaissez les principes de conception accessible et savez tester une interface au clavier. Vos réalisations doivent permettre de comprendre pourquoi vous avez choisi un ordre ou une présentation. Solvenyre fournit un outil de prototypage, un écran et des créneaux avec des apprenants volontaires. Le rythme prévoit deux jours de télétravail et une revue hebdomadaire des maquettes. Les séances de test sont planifiées pendant les horaires de journée.",
+      "salary": 38000,
+      "location": "67000 Strasbourg",
+      "working_time": "Temps plein",
+      "contract_type": "CDD",
+      "company": "Solvenyre",
+      "category": "Design",
+      "contact_email": "noemie.valcen@example.com"
+    },
+    {
+      "title": "Stagiaire analyse de données pédagogiques",
+      "short_description": "Étudiez les parcours de formation en donnant aux chiffres leur contexte pédagogique.",
+      "description": "Solvenyre souhaite comprendre à quelles étapes les apprenants interrompent leurs exercices. Pendant ce stage de cinq mois, vous travaillerez avec une analyste et deux référentes pédagogiques sur des données anonymisées. Vous préparerez les jeux de données en Python, vérifierez les événements enregistrés et construirez des visualisations. La première étude comparera les reprises d'exercices selon leur durée et leur type. Vous présenterez les limites des données et rapprocherez vos observations des explications des formateurs avant de proposer une interprétation.\n\nVous étudiez les statistiques ou l'informatique et connaissez les bases de Python ainsi que les proportions et les distributions. Votre tutrice vous accompagnera dans le choix des comparaisons et la rédaction des résultats. Solvenyre fournit un ordinateur, des exercices d'analyse et un bilan pédagogique hebdomadaire. Une journée de télétravail est possible après le premier mois. Vous assisterez aussi à une séance de formation pour comprendre les usages étudiés.",
+      "salary": 11000,
+      "location": "67000 Strasbourg",
+      "working_time": "Temps plein",
+      "contract_type": "Stage",
+      "company": "Solvenyre",
+      "category": "Data",
+      "contact_email": "noemie.valcen@example.com"
+    },
+    {
+      "title": "Consultant cybersécurité indépendant",
+      "short_description": "Évaluez la sécurité des parcours pédagogiques et accompagnez des corrections vérifiables.",
+      "description": "Solvenyre recherche un consultant indépendant pour évaluer la sécurité de sa plateforme de formation. La mission initiale de quatre mois mobilise trois développeurs et le responsable infrastructure. Vous définirez le périmètre des contrôles, examinerez les accès et réaliserez les essais autorisés sur un environnement dédié. Le premier sujet concerne la séparation des contenus et des résultats entre organismes clients. Vous rédigerez des constats reproductibles, discuterez des corrections avec les équipes et effectuerez une vérification après leur mise en place.\n\nVous avez une expérience confirmée en sécurité applicative et savez préciser les limites d'une évaluation. Vos livrables doivent permettre aux développeurs de comprendre le risque et de vérifier sa résolution. Solvenyre fournit un environnement isolé, des comptes de test et les documents techniques disponibles. La mission se réalise principalement à distance, avec des ateliers de restitution planifiés. Le périmètre, les échéances et la facturation sont contractualisés avant les essais.",
+      "salary": 80000,
+      "location": "67000 Strasbourg",
+      "working_time": "Temps plein",
+      "contract_type": "Freelance",
+      "company": "Solvenyre",
+      "category": "Cybersécurité",
+      "contact_email": "noemie.valcen@example.com"
+    },
+    {
+      "title": "Chef de projet applications métier",
+      "short_description": "Pilotez des applications de maintenance en partant des gestes des techniciens.",
+      "description": "Brumelix prépare une nouvelle version de ses outils de suivi des équipements. Vous coordonnerez six personnes chargées du développement, du design et du support pour cadrer les besoins et organiser les livraisons. Vous rencontrerez les responsables d'atelier, suivrez les décisions et préparerez les validations. Le premier projet concerne la consultation de l'historique d'une machine depuis son étiquette. Vous vérifierez que le parcours fonctionne dans les ateliers où la connexion est irrégulière et préparerez le déploiement avec les techniciens.\n\nVous avez déjà piloté une application métier et savez relier une priorité à un usage observé. Vous devez pouvoir expliquer un arbitrage et suivre ses conséquences sur le calendrier. Brumelix fournit des équipements de test et un outil de planification. Deux jours de télétravail sont possibles. Les visites clients sont regroupées, les frais sont remboursés et une démonstration interne précède chaque livraison importante.",
+      "salary": 50000,
+      "location": "35000 Rennes",
+      "working_time": "Temps plein",
+      "contract_type": "CDI",
+      "company": "Brumelix",
+      "category": "Gestion de projet",
+      "contact_email": "jules.dorlier@example.com"
+    },
+    {
+      "title": "Technicien support systèmes",
+      "short_description": "Gardez les postes et les connexions prêts pour les équipes qui suivent les équipements.",
+      "description": "Brumelix renouvelle les postes de ses équipes et prépare le matériel utilisé pendant les essais clients. Vous rejoindrez deux techniciens pour traiter les incidents, suivre l'inventaire et vérifier les connexions réseau. Vous préparerez les installations, contrôlerez les sauvegardes et documenterez les opérations dans l'outil de tickets. Le premier chantier concerne les postes de l'atelier de démonstration, où les lecteurs d'étiquettes doivent fonctionner avec plusieurs configurations. Vous vérifierez chaque installation avec son utilisateur avant de fermer la demande.\n\nVous connaissez les systèmes de poste de travail, les périphériques et les bases d'un réseau local. Vous savez procéder par vérifications successives et conserver une trace utile. Brumelix fournit du matériel de diagnostic, un stock de remplacement et une formation aux outils internes. Le poste se déroule principalement au bureau. Une journée de télétravail sert au suivi documentaire, avec des horaires de journée sans astreinte.",
+      "salary": 32000,
+      "location": "35000 Rennes",
+      "working_time": "Temps plein",
+      "contract_type": "CDI",
+      "company": "Brumelix",
+      "category": "Support informatique",
+      "contact_email": "jules.dorlier@example.com"
+    },
+    {
+      "title": "Développeur mobile",
+      "short_description": "Développez des parcours mobiles qui continuent à servir lorsque le réseau disparaît.",
+      "description": "Brumelix étend son application mobile de suivi des interventions de maintenance. Ce CDD de neuf mois renforce une équipe de trois développeurs et une designer. Vous construirez les écrans, gérerez le stockage local et écrirez les tests de synchronisation. Le premier parcours permettra de saisir une intervention hors connexion, puis de transmettre les données sans créer de doublon. Vous utiliserez JavaScript et une base embarquée, testerez les cas d'interruption et analyserez les retours des techniciens d'atelier.\n\nVous avez déjà développé une application mobile et comprenez les échanges entre les données locales et le serveur. Vous savez reproduire un incident à partir d'une suite de manipulations. Brumelix fournit plusieurs téléphones de test, un environnement séparé et deux jours de télétravail. Les essais de terrain sont planifiés avec la designer. Une revue technique hebdomadaire permet de valider les choix avant leur intégration.",
+      "salary": 43000,
+      "location": "35000 Rennes",
+      "working_time": "Temps plein",
+      "contract_type": "CDD",
+      "company": "Brumelix",
+      "category": "Développement",
+      "contact_email": "jules.dorlier@example.com"
+    },
+    {
+      "title": "Designer UX en alternance",
+      "short_description": "Observez la maintenance sur le terrain et apprenez à concevoir ses parcours mobiles.",
+      "description": "Brumelix améliore les écrans utilisés par les techniciens pour consulter et compléter une intervention. Vous rejoindrez en alternance une designer et trois développeurs, avec des missions préparées par votre tutrice. Vous assisterez aux entretiens, dessinerez des parcours et construirez des prototypes interactifs. Votre premier sujet sera la saisie d'une observation après lecture de l'étiquette d'une machine. Vous vérifierez la taille des zones tactiles et présenterez les résultats des essais à l'équipe avant de reprendre les maquettes.\n\nVous préparez un diplôme en design et savez expliquer une décision à partir d'un usage. Une réalisation scolaire permettra de discuter de votre méthode. Brumelix fournit un outil de prototypage et des téléphones de test. Votre tutrice prévoit un point individuel hebdomadaire et adapte les tâches au rythme de l'école. Une journée de télétravail est possible, tandis que les observations en atelier se font en binôme.",
+      "salary": 17500,
+      "location": "35000 Rennes",
+      "working_time": "Temps plein",
+      "contract_type": "Alternance",
+      "company": "Brumelix",
+      "category": "Design",
+      "contact_email": "jules.dorlier@example.com"
+    },
+    {
+      "title": "Consultant données indépendant",
+      "short_description": "Construisez des indicateurs de maintenance dont les équipes connaissent les règles.",
+      "description": "Brumelix recherche un consultant indépendant pour structurer les données issues des interventions de maintenance. La mission de six mois implique deux développeurs et une responsable métier. Vous examinerez les sources, proposerez un modèle de données et construirez les premières vues SQL. Le premier tableau de bord comparera les délais d'intervention selon les familles d'équipements. Vous définirez les règles avec les responsables d'atelier et documenterez les exclusions, notamment les périodes pendant lesquelles une machine attend une pièce.\n\nVous avez une expérience en modélisation et en analyse de données métier. Vous devez savoir rendre un indicateur traçable jusqu'aux enregistrements qui le composent. Brumelix met à disposition des exports anonymisés, une base de test et un outil de visualisation. La mission prévoit trois jours par semaine à distance et des ateliers de validation au bureau. Les livrables, les frais de déplacement et la facturation seront convenus avant le démarrage.",
+      "salary": 68000,
+      "location": "35000 Rennes",
+      "working_time": "Temps plein",
+      "contract_type": "Freelance",
+      "company": "Brumelix",
+      "category": "Data",
+      "contact_email": "jules.dorlier@example.com"
+    },
+    {
+      "title": "Analyste sécurité informatique",
+      "short_description": "Transformez les alertes en décisions documentées pour les services de proximité.",
+      "description": "Caldrivane centralise les alertes de sécurité des services numériques qu'elle maintient pour des structures locales. Vous rejoindrez un analyste et deux administrateurs pour qualifier les événements et suivre les corrections. Vous examinerez les journaux, rapprocherez les alertes des changements connus et documenterez les incidents confirmés. Le premier chantier concernera les connexions inhabituelles aux comptes d'administration. Vous préparerez les recommandations avec les administrateurs et vérifierez les mesures prises, sans confondre une alerte automatique avec un incident établi.\n\nVous maîtrisez les bases de la sécurité des systèmes et des réseaux et savez expliquer les éléments qui fondent votre analyse. Une expérience de traitement d'incidents sera utile. Caldrivane fournit une plateforme de test, un outil de centralisation des journaux et un budget de formation. Le poste prévoit deux jours de télétravail et des horaires de journée. Les procédures définissent les relais en cas d'incident hors horaires.",
+      "salary": 45000,
+      "location": "34000 Montpellier",
+      "working_time": "Temps plein",
+      "contract_type": "CDI",
+      "company": "Caldrivane",
+      "category": "Cybersécurité",
+      "contact_email": "camille.lesterval@example.com"
+    },
+    {
+      "title": "Chef de projet transformation numérique",
+      "short_description": "Organisez des changements numériques que les petites structures peuvent absorber.",
+      "description": "Caldrivane accompagne plusieurs maisons de quartier qui souhaitent réunir leurs inscriptions et leurs plannings. Vous piloterez une équipe de cinq personnes pour cadrer les besoins, préparer les livraisons et organiser l'adoption des outils. Vous conduirez les ateliers, suivrez les engagements et coordonnerez les formations. Le premier projet remplacera les fichiers séparés utilisés pour réserver les salles. Vous préparerez un déploiement par étapes et vérifierez avec les responsables que les usages courants restent couverts à chaque passage.\n\nVous avez déjà coordonné un projet numérique et savez travailler avec des interlocuteurs qui disposent de peu de temps. Vous devez pouvoir transformer une demande vague en décision vérifiable. Caldrivane fournit un outil de planification, des modèles de suivi et un espace de démonstration. Deux jours de télétravail sont possibles. Les déplacements locaux sont remboursés, et un bilan avec les utilisateurs suit chaque mise en service.",
+      "salary": 48000,
+      "location": "34000 Montpellier",
+      "working_time": "Temps plein",
+      "contract_type": "CDI",
+      "company": "Caldrivane",
+      "category": "Gestion de projet",
+      "contact_email": "camille.lesterval@example.com"
+    },
+    {
+      "title": "Technicien assistance à distance",
+      "short_description": "Guidez les utilisateurs à distance jusqu'à la résolution de leur demande.",
+      "description": "Caldrivane renforce son assistance aux associations qui utilisent ses outils d'inscription. Ce CDD de six mois, à temps partiel sur cinq matinées, complète une équipe de trois techniciens. Vous prendrez les demandes, vérifierez les symptômes et guiderez les utilisateurs par téléphone ou partage d'écran autorisé. Le premier sujet concerne les accès bloqués après un changement de mot de passe. Vous suivrez une procédure de vérification, consignerez les étapes et demanderez à l'utilisateur de confirmer qu'il peut reprendre son travail.\n\nVous avez des bases en maintenance et savez poser des questions simples sans multiplier les manipulations inutiles. L'écoute et la précision des notes permettront au collègue suivant de reprendre un dossier. Caldrivane fournit un ordinateur, un casque et une formation aux procédures. Deux matinées de télétravail sont possibles après l'accueil. Les horaires sont fixes, avec un relais prévu à la fin de votre présence.",
+      "salary": 30000,
+      "location": "34000 Montpellier",
+      "working_time": "Temps partiel",
+      "contract_type": "CDD",
+      "company": "Caldrivane",
+      "category": "Support informatique",
+      "contact_email": "camille.lesterval@example.com"
+    },
+    {
+      "title": "Développeur logiciel en alternance",
+      "short_description": "Apprenez à développer des modules utiles aux structures qui organisent la vie locale.",
+      "description": "Caldrivane développe une application de gestion des inscriptions pour les structures de quartier. Vous intégrerez en alternance une équipe de quatre développeurs et travaillerez avec un tuteur sur des modules délimités. Vous écrirez du code Python, préparerez les tests et participerez aux revues. Votre premier module vérifiera les places disponibles avant de confirmer une inscription à un atelier. Vous utiliserez une base de test et apprendrez à décrire les erreurs pour que le support puisse les reconnaître.\n\nVous préparez un diplôme informatique et connaissez les fonctions, les objets et les bases de SQL. Un projet scolaire permettra de discuter de votre raisonnement et de vos difficultés. Caldrivane fournit un ordinateur et réserve deux créneaux hebdomadaires au travail avec le tuteur. Le rythme suit le calendrier de l'école. Une journée de télétravail devient possible après votre intégration, avec des tâches préparées à l'avance.",
+      "salary": 19000,
+      "location": "34000 Montpellier",
+      "working_time": "Temps plein",
+      "contract_type": "Alternance",
+      "company": "Caldrivane",
+      "category": "Développement",
+      "contact_email": "camille.lesterval@example.com"
+    },
+    {
+      "title": "Designer UX indépendant",
+      "short_description": "Concevez des démarches de proximité à partir des situations vécues par les habitants.",
+      "description": "Caldrivane recherche un designer UX indépendant pour revoir le parcours d'inscription aux services d'une maison de quartier. La mission de cinq mois réunit une responsable de projet et trois développeurs. Vous conduirez les entretiens, animerez les ateliers et produirez des prototypes testables. Le premier parcours permettra à un habitant de choisir une activité puis de comprendre les justificatifs attendus. Vous organiserez les essais avec les agents d'accueil et distinguerez les problèmes de compréhension des contraintes liées au règlement du service.\n\nVous avez une expérience confirmée en recherche utilisateur et savez restituer les observations avec leurs limites. Vos références devront montrer comment les essais ont orienté vos propositions. Caldrivane fournit les contacts des participants volontaires et un accès à l'outil de prototypage. La mission peut être menée trois jours par semaine à distance. Les ateliers sur place, les livrables et les modalités de facturation seront définis au lancement.",
+      "salary": 64000,
+      "location": "34000 Montpellier",
+      "working_time": "Temps plein",
+      "contract_type": "Freelance",
+      "company": "Caldrivane",
+      "category": "Design",
+      "contact_email": "camille.lesterval@example.com"
+    }
+  ]
+}

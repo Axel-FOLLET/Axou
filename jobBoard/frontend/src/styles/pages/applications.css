@@ -1,0 +1,61 @@
+/* Mes candidatures (ApplicationsPage.jsx) : grille de cartes et statut de chaque candidature. */
+
+/* Liste des candidatures centrée comme les autres pages. */
+.applications-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px 24px 64px;
+}
+
+/* Grille sans puces pour les candidatures. */
+.applications-page ul {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: 24px;
+}
+
+/* Carte d'une candidature, comme la carte d'offre. */
+.applications-page li {
+  background: var(--color-surface);
+  border-radius: var(--radius-card);
+  padding: 28px;
+  border: 1px solid var(--color-line);
+}
+
+/* Informations secondaires des candidatures. */
+.applications-page li p {
+  color: var(--color-text-secondary);
+  font-size: 14px;
+}
+
+/* Statut neutre en pastille : le texte reste toujours visible. */
+.applications-page .application-status {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  color: var(--color-text);
+  background: var(--color-neutral);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* Statut d'une candidature retenue (classe construite par `status-${statut}`). */
+.applications-page .status-accepted {
+  color: var(--color-success);
+  background: var(--color-success-bg);
+}
+
+/* Statut d'une candidature refusée. */
+.applications-page .status-rejected {
+  color: var(--color-danger);
+  background: var(--color-danger-bg);
+}
+
+/* Marges de la page sur téléphone. */
+@media (max-width: 600px) {
+  .applications-page {
+    padding: 24px 16px 48px;
+  }
+}

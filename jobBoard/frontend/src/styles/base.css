@@ -1,0 +1,118 @@
+/* Base du site : variables de couleurs et de formes, fond, police, conteneur des pages, titres, liens et repère clavier communs. */
+
+/* Variables du site : chaque couleur, rayon et ombre n'est écrit qu'ici, les autres fichiers y renvoient avec var(). */
+:root {
+  /* Textes. */
+  --color-text: #1D1D1F;
+  --color-text-secondary: #5F6B76;
+  --color-link: #24577A;
+
+  /* Une seule température, froide comme le baby blue : fond blanc bleuté, surfaces blanches, gris bleutés. */
+  --color-bg: #F7F9FB;
+  --color-surface: #FFFFFF;
+  --color-surface-blue: #F0F5F8;
+  --color-neutral: #EDF1F4;
+
+  /* Bouton principal : bleu profond, la teinte foncée du baby blue ; il fonce encore au survol, sans changer de couleur. */
+  --color-primary: #24577A;
+  --color-primary-hover: #1B4560;
+  --color-on-primary: #FFFFFF;
+
+  /* Famille baby blue : accent clair réservé au halo de focus, bleu profond du logo, des liens et des repères. */
+  --color-blue: #A9CCE3;
+  --color-blue-hover: #8FBBD8;
+  --color-blue-deep: #24577A;
+  --color-blue-halo: rgb(169 204 227 / 35%);
+
+  /* Traits : séparateurs discrets, et contour des champs et boutons secondaires (contraste 3:1 minimum). */
+  --color-line: #E2E8ED;
+  --color-line-strong: #7C8995;
+
+  /* États : erreur et réussite. */
+  --color-danger: #9B3038;
+  --color-danger-bg: #FAECEE;
+  --color-danger-line: #EBCDD1;
+  --color-danger-hover: #F4DDE1;
+  --color-success: #246044;
+  --color-success-bg: #EAF4EE;
+
+  /* Rayons discrets : boutons et champs, cartes, encadré ; la pilule reste aux pastilles (lieu, contrat, statut). */
+  --radius-control: 6px;
+  --radius-card: 10px;
+  --radius-panel: 14px;
+  --radius-pill: 980px;
+}
+
+/* CSS global pour toute l'application : fond uni, sans halo, pour ne pas multiplier les usages du bleu. */
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: 'Manrope', sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Inclure bordures et espacements dans la largeur de chaque élément. */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* données à l'intérieur de la page, pour que le contenu ne touche pas les bords de l'écran */
+.page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px 24px 64px;
+}
+
+/* Éviter les débordements des textes longs. */
+.page, .applications-page, .job-offer {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Hiérarchie des titres des pages. */
+h1, h2, h3 {
+  color: var(--color-text);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  font-weight: 600;
+}
+
+/* Grand titre de chaque page ; l'accueil garde le sien, plus grand (.home-title). */
+h1 {
+  font-size: clamp(28px, 4vw, 40px);
+  letter-spacing: -0.03em;
+  margin: 8px 0 32px;
+}
+
+/* Liens dans les textes. */
+.page a, .applications-page a {
+  color: var(--color-link);
+  text-underline-offset: 3px;
+}
+
+/* Repère clavier commun, avec halo baby blue. */
+button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible, .table-scroll:focus-visible {
+  outline: 2px solid var(--color-text);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 5px var(--color-blue-halo);
+}
+
+/* Texte accessible aux lecteurs d'écran sans affichage visuel. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Marges des pages sur téléphone. */
+@media (max-width: 600px) {
+  .page {
+    padding: 24px 16px 48px;
+  }
+}

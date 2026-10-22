@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Projects | Axel FOLLET — Portfolio</title>
-    <meta name="description" content="Axel FOLLET's projects: bilingual resume website, Snake and Hangman games, language detector and Caesar and Vigenère ciphers in Python, with source code, games and demos to try.">
+    <meta name="description" content="Axel FOLLET's projects: Y.I.A Jobs, a team job board led as project lead, bilingual resume website, Snake and Hangman games, language detector and Caesar and Vigenère ciphers in Python, with source code, games and demos to try.">
     <meta name="author" content="Axel FOLLET">
     <link rel="icon" href="../assets/images/favicon.svg" type="image/svg+xml">
 
@@ -18,7 +18,7 @@
     <!-- Aperçu lors du partage du lien -->
     <meta property="og:type" content="website">
     <meta property="og:title" content="Projects | Axel FOLLET — Portfolio">
-    <meta property="og:description" content="Axel FOLLET's projects: bilingual resume website, Snake and Hangman games, language detector and Caesar and Vigenère ciphers in Python, with source code, games and demos to try.">
+    <meta property="og:description" content="Axel FOLLET's projects: Y.I.A Jobs, a team job board led as project lead, bilingual resume website, Snake and Hangman games, language detector and Caesar and Vigenère ciphers in Python, with source code, games and demos to try.">
     <meta property="og:url" content="https://axel-follet.github.io/portfolio/pages/projects-en.html">
     <meta property="og:image" content="https://axel-follet.github.io/portfolio/assets/images/share-en.png">
     <meta property="og:image:width" content="1200">
@@ -136,7 +136,7 @@
             <h1 class="section__title" id="projects-title">My technical projects</h1>
 
             <p class="section__intro">
-                Each project marks a milestone: the Python exercises and games laid the foundations of programming, the resume website those of the web.<br>
+                Each project marks a milestone: the Python exercises and games laid the foundations of programming, the resume website those of the web, and Y.I.A Jobs those of teamwork, which I led as project lead.<br>
                 Projects are grouped by theme: scroll through the strip, then pick a card to read its goal and key takeaway. Games and demos open right inside the card.
             </p>
 
@@ -174,6 +174,57 @@
                         <h2 class="showcase__tab" id="theme-web">Web</h2>
 
                         <div class="showcase__cards">
+
+                            <article class="project-card">
+
+                                <div class="project-card__main">
+
+                                    <div class="project-card__media">
+                                        <button
+                                            class="cube cube--small cube--blue"
+                                            type="button"
+                                            aria-label="Spin the cube"
+                                            data-speed="16"
+                                            data-phase="250"
+                                        ></button>
+                                    </div>
+
+                                    <div class="project-card__body">
+
+                                        <h3 class="project-card__title">Y.I.A Jobs: a team job board</h3>
+
+                                        <ul class="project-card__tags" aria-label="Skills and technologies">
+                                            <li class="tag">IT project management</li>
+                                            <li class="tag">Teamwork</li>
+                                            <li class="tag">JavaScript</li>
+                                            <li class="tag">React</li>
+                                            <li class="tag">Flask</li>
+                                            <li class="tag">SQLite</li>
+                                            <li class="tag">REST API</li>
+                                            <li class="tag">Render</li>
+                                        </ul>
+
+                                        <dl class="project-card__story">
+                                            <dt class="project-card__label">Goal</dt>
+                                            <dd class="project-card__text">The first team project of three that I led. We built a job board with a candidate area, a recruiter area and an admin back office. I motivated my team and defined the priorities and expectations, how the work was shared and how the GitHub repository was managed.</dd>
+                                            <dt class="project-card__label">Key takeaway</dt>
+                                            <dd class="project-card__text">I adapted the bootcamp system to guide my team towards an agile way of working: iterative work, tasks with an estimated workload and an API contract kept up to date between front end and back end. A third member joining mid-project taught me to handle the unexpected and let us deliver, within the allotted time, a more complete project than planned. I also took on the React framework for the first time, with enthusiasm.</dd>
+                                            <dt class="project-card__label">Live demo</dt>
+                                            <dd class="project-card__text">One demo account per role, no sign-up needed; the site is in French. Free hosting: the first load can take about a minute and the data is reset at each restart.</dd>
+                                        </dl>
+
+                                        <div class="project-card__actions">
+                                            <a class="button" href="https://yia-jobs.onrender.com/api/demo/login?role=candidat" target="_blank" rel="noopener noreferrer">Candidate demo</a>
+                                            <a class="button" href="https://yia-jobs.onrender.com/api/demo/login?role=recruteur" target="_blank" rel="noopener noreferrer">Recruiter demo</a>
+                                            <a class="button" href="https://yia-jobs.onrender.com/api/demo/login?role=admin" target="_blank" rel="noopener noreferrer">Admin demo</a>
+                                            <a class="button" href="https://github.com/Axel-FOLLET/jobBoard" target="_blank" rel="noopener noreferrer">Source code</a>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </article>
 
                             <article class="project-card">
 
@@ -538,6 +589,12 @@
 
             <!-- Date de mise à jour et langages ajoutés par repos.js depuis l'API GitHub ; sans elle, les liens restent utilisables. -->
             <ul class="repo-list" data-locale="en-GB" data-label-updated="Updated on" data-label-languages="Languages:">
+                <li class="repo-card" data-repo="Axel-FOLLET/jobBoard">
+                    <h3 class="repo-card__title">
+                        <a class="repo-card__link" href="https://github.com/Axel-FOLLET/jobBoard" target="_blank" rel="noopener noreferrer">jobBoard</a>
+                    </h3>
+                    <p class="repo-card__text">Y.I.A Jobs, the job board shown above: React and Flask code, API contract, each member's technical choices and how the team used AI (docs in French).</p>
+                </li>
                 <li class="repo-card" data-repo="Axel-FOLLET/portfolio">
                     <h3 class="repo-card__title">
                         <a class="repo-card__link" href="https://github.com/Axel-FOLLET/portfolio" target="_blank" rel="noopener noreferrer">portfolio</a>

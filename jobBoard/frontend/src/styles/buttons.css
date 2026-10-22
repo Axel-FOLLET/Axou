@@ -1,0 +1,88 @@
+/* Boutons du site, et liens présentés comme des boutons : bleu profond qui fonce au survol,
+   ou blancs à contour pour l'action secondaire. */
+
+/* Boutons communs du site. */
+button {
+  font: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--color-on-primary);
+  background: var(--color-primary);
+  border: 1px solid transparent;
+  border-radius: var(--radius-control);
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background-color .2s, color .2s, transform .2s;
+}
+
+/* Survol des boutons disponibles : le même bleu, plus foncé, pour ne pas changer de registre. */
+button:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+}
+
+/* Léger enfoncement au clic. */
+button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+/* Actions indisponibles : gris neutre plutôt qu'un bleu délavé, pour lire « indisponible » d'un coup d'œil. */
+button:disabled {
+  color: var(--color-text-secondary);
+  background: var(--color-neutral);
+  border-color: var(--color-line);
+  cursor: not-allowed;
+}
+
+/* Envoi en cours ou réussi (spinner, coche) : le bouton est verrouillé mais garde son bleu, ce n'est pas une indisponibilité. */
+button:disabled:has(.spinner, .checkmark) {
+  color: var(--color-on-primary);
+  background: var(--color-primary);
+  border-color: transparent;
+  cursor: progress;
+}
+
+/* Action secondaire : blanche, à fine bordure. */
+.button-secondary {
+  color: var(--color-text);
+  background: var(--color-surface);
+  border-color: var(--color-line-strong);
+}
+
+.button-secondary:hover:not(:disabled) {
+  background-color: var(--color-surface-blue);
+}
+
+/* Action qui supprime ou efface (admin, filtres de recherche) : différenciée par son texte et sa couleur. */
+.button-danger {
+  color: var(--color-danger);
+  background: var(--color-danger-bg);
+  border-color: var(--color-danger-line);
+}
+
+.button-danger:hover:not(:disabled) {
+  background-color: var(--color-danger-hover);
+}
+
+/* Lien d'appel à l'action présenté comme un bouton, sans soulignement. */
+a.button-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--color-on-primary);
+  background: var(--color-primary);
+  border: 1px solid transparent;
+  border-radius: var(--radius-control);
+  padding: 10px 20px;
+  text-decoration: none;
+  transition: background-color .2s, color .2s, transform .2s;
+}
+
+a.button-link:hover {
+  background: var(--color-primary-hover);
+}
+
+a.button-link:active {
+  transform: translateY(1px);
+}

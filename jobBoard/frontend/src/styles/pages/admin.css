@@ -1,0 +1,250 @@
+/* Administration (AdminPage.jsx) : choix des tables, pagination, tableau et formulaire. */
+
+/* Choix des tables d'administration : même piste gris bleuté que les onglets des espaces (tabs.css). */
+.admin-tabs {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-width: 100%;
+  margin-bottom: 28px;
+  padding: 4px;
+  background: var(--color-neutral);
+  border-radius: var(--radius-card);
+}
+
+/* Table non sélectionnée, en gris sur la piste. Ce fichier doit rester après buttons.css : il l'emporte sur le survol des boutons. */
+.admin-tabs button[aria-pressed="false"] {
+  color: var(--color-text-secondary);
+  background: transparent;
+  border-color: transparent;
+}
+
+.admin-tabs button[aria-pressed="false"]:hover {
+  color: var(--color-text);
+}
+
+/* Table sélectionnée : case blanche cernée d'un trait fin, texte bleu profond et semi-gras, comme l'onglet courant (tabs.css). */
+.admin-tabs button[aria-pressed="true"] {
+  color: var(--color-blue-deep);
+  font-weight: 600;
+  background: var(--color-surface);
+  box-shadow: 0 0 0 1px var(--color-line);
+}
+
+/* Choix du nombre de lignes, au-dessus du tableau. */
+.admin-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 20px;
+  margin: 20px 0;
+}
+
+/* Libellé discret du nombre de lignes. */
+.admin-pagination label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+}
+
+/* Liste de pagination de largeur naturelle. */
+.admin-pagination select {
+  width: auto;
+}
+
+/* Précédent, compteur et Suivant, centrés sous le tableau. */
+.pagination-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 20px;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+}
+
+/* Boutons de pagination compacts : plus petits que les actions de la page. */
+.pagination-buttons button {
+  padding: 6px 14px;
+  font-size: 14px;
+}
+
+/* Espace autour de l'ajout d'une ligne. */
+.admin-add {
+  margin: 20px 0;
+}
+
+/* Défilement local du tableau, sans élargir la page.
+   position: relative garde aussi dans le cadre l'en-tête masqué « Actions » (.visually-hidden est positionné). */
+.table-scroll {
+  position: relative;
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+}
+
+/* Tableau de données aux bordures partagées. */
+.admin-page table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+/* Cellules lisibles et alignées en haut. */
+.admin-page th, .admin-page td {
+  min-width: 120px;
+  max-width: 320px;
+  padding: 16px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--color-line);
+  overflow-wrap: break-word;
+}
+
+/* En-têtes du tableau, sur une seule ligne. */
+.admin-page th {
+  white-space: nowrap;
+  background: var(--color-surface-blue);
+  font-weight: 600;
+}
+
+/* Garder les libellés des actions du tableau sur une ligne. */
+.admin-page td button {
+  white-space: nowrap;
+}
+
+/* Repère discret lors du survol d'une ligne. */
+.admin-page tbody tr:hover {
+  background: var(--color-bg);
+}
+
+/* Textes longs coupés sur une ligne, avec des points de suspension. */
+.admin-page td.cell-clip {
+  max-width: 240px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Modifier et Supprimer côte à côte, dans une seule cellule (le flex est sur un bloc intérieur : une cellule reste une cellule). */
+.admin-page .row-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.admin-page .row-actions button {
+  padding: 6px 14px;
+  font-size: 14px;
+}
+
+/* Colonne des actions collée au bord droit du cadre : Modifier et Supprimer restent visibles quand le tableau défile vers la droite.
+   Fond opaque pour masquer les colonnes qui passent dessous, trait fin à gauche pour la détacher. */
+.admin-page .col-actions {
+  position: sticky;
+  right: 0;
+  z-index: 1;
+  min-width: 0;
+  background: var(--color-surface);
+  box-shadow: inset 1px 0 0 var(--color-line);
+}
+
+/* L'en-tête garde son fond bleuté, la cellule suit le survol de sa ligne. */
+.admin-page th.col-actions {
+  background: var(--color-surface-blue);
+}
+
+.admin-page tbody tr:hover .col-actions {
+  background: var(--color-bg);
+}
+
+/* Fond voilé derrière le panneau : le tableau reste visible, un clic dessus ferme le panneau. */
+.admin-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  justify-content: flex-end;
+  background: rgb(29 29 31 / 28%);
+}
+
+/* Panneau d'ajout ou de modification, collé à droite, sur toute la hauteur de l'écran. */
+.admin-drawer {
+  width: min(480px, 100%);
+  height: 100%;
+  background: var(--color-surface);
+  border-left: 1px solid var(--color-line);
+  animation: drawer-in .2s ease-out;
+}
+
+/* Le formulaire occupe tout le panneau : titre en haut, champs qui défilent, boutons fixés en bas. */
+.admin-drawer form {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+}
+
+.admin-drawer h2 {
+  margin: 0;
+  padding: 24px 28px 20px;
+  font-size: 20px;
+  border-bottom: 1px solid var(--color-line);
+}
+
+.admin-drawer-fields {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px 28px;
+  overflow-y: auto;
+}
+
+.admin-drawer textarea {
+  min-height: 110px;
+}
+
+.admin-drawer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 28px;
+  border-top: 1px solid var(--color-line);
+}
+
+/* Message d'erreur sur toute la largeur, au-dessus des boutons. */
+.admin-drawer-actions [role="alert"] {
+  flex-basis: 100%;
+}
+
+@keyframes drawer-in {
+  from {
+    transform: translateX(24px);
+    opacity: 0;
+  }
+}
+
+/* Mouvement réduit demandé par le système : le panneau apparaît sans glisser. */
+@media (prefers-reduced-motion: reduce) {
+  .admin-drawer {
+    animation: none;
+  }
+}
+
+/* Téléphone : panneau plein écran, marges réduites. */
+@media (max-width: 600px) {
+  .admin-drawer h2, .admin-drawer-fields, .admin-drawer-actions {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}

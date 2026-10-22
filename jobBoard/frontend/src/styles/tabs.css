@@ -1,0 +1,73 @@
+/* Onglets des espaces recruteur et candidat (CandidateLayout.jsx, RecruiterLayout.jsx) :
+   contrôle segmenté, une piste gris bleuté avec l'onglet courant en case blanche. */
+
+/* Bande des onglets (espaces et administration) collée sous l'en-tête (65 px : 64 de barre + 1 de trait).
+   Fond couleur de la page et même flou que l'en-tête (layout.css) : invisible au repos, le flou n'apparaît que sur le contenu qui passe dessous.
+   Pas de trait : le bas s'efface en fondu sur 12 px (la marge sous les onglets, qui ne pâlissent donc pas).
+   Marges négatives = marges de .page : la bande couvre toute la largeur où le contenu défile, sans 100vw. */
+.tab-bar {
+  position: sticky;
+  top: 65px;
+  z-index: 5;
+  margin: 0 -24px 20px;
+  padding: 12px 24px;
+  background: color-mix(in srgb, var(--color-bg) 85%, transparent);
+  backdrop-filter: saturate(180%) blur(20px);
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 12px), transparent);
+}
+
+/* L'espace sous la piste vient désormais de la bande. */
+.tab-bar .tab-switch, .tab-bar .admin-tabs {
+  margin: 0;
+}
+
+/* Sur mobile, .page n'a plus que 16 px de marge (base.css). */
+@media (max-width: 600px) {
+  .tab-bar {
+    margin-inline: -16px;
+    padding-inline: 16px;
+  }
+}
+
+/* Piste des onglets : annule aussi les marges de la barre de navigation du site. */
+.tab-switch {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-width: 100%;
+  min-height: 0;
+  margin: 0 0 32px;
+  padding: 4px;
+  background: var(--color-neutral);
+  border-radius: var(--radius-card);
+}
+
+/* Un onglet, en gris tant qu'il n'est pas choisi. */
+.tab-switch a {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  background: transparent;
+  border-radius: var(--radius-control);
+  padding: 8px 18px;
+  text-decoration: none;
+  transition: background-color .2s, color .2s, transform .2s;
+}
+
+/* Survol : le texte fonce seulement, pour ne pas imiter la case blanche de l'onglet courant. */
+.tab-switch a:hover {
+  color: var(--color-text);
+}
+
+.tab-switch a:active {
+  transform: translateY(1px);
+}
+
+/* Onglet courant : case blanche cernée d'un trait fin, texte bleu profond et semi-gras (deux repères au moins, selon NN/g). */
+.tab-switch a.active {
+  color: var(--color-blue-deep);
+  font-weight: 600;
+  text-decoration: none;
+  background: var(--color-surface);
+  box-shadow: 0 0 0 1px var(--color-line);
+}
