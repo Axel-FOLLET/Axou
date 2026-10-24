@@ -1,15 +1,16 @@
 /*
- * Apparition au défilement, comme sur le portfolio : chaque section, sauf l'accueil,
- * apparaît en fondu en remontant de quelques pixels quand elle entre à l'écran.
+ * Apparition au défilement : le contenu de chaque partie de page, sauf la première,
+ * apparaît en fondu en remontant de quelques pixels quand il entre à l'écran.
+ * Le fond de la section reste affiché : le bleu de la page ne transparaît pas sous un fond quasi-noir.
  * Sans JavaScript ou en mouvement réduit, tout reste affiché d'emblée.
  */
 
 
 /*
- * La section apparaît quand son haut dépasse 90 % de la hauteur de l'écran.
- * Une section affichée le reste : unobserve arrête de la surveiller.
+ * La partie apparaît quand son haut dépasse 90 % de la hauteur de l'écran.
+ * Une partie affichée le reste : unobserve arrête de la surveiller.
  */
-function revealOnScroll(sections) {
+function revealOnScroll(parts) {
     const observer = new IntersectionObserver(entries => {
         for (const entry of entries) {
             if (!entry.isIntersecting) continue;
@@ -17,18 +18,17 @@ function revealOnScroll(sections) {
             observer.unobserve(entry.target);
         }
     }, { rootMargin: "0px 0px -10% 0px" });
-
-    sections.forEach(section => observer.observe(section));
+    parts.forEach(part => observer.observe(part));
 }
 
 
 /*
- * L'accueil est déjà à l'écran à l'ouverture : il n'est pas animé.
+ * La première partie est déjà à l'écran à l'ouverture : elle n'est pas animée.
+ * Chaque bloc de section (titre, texte, frise, roue…) apparaît séparément.
  */
 export function initReveal() {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
-    const sections = document.querySelectorAll("main > section:not(:first-of-type)");
-    sections.forEach(section => section.classList.add("reveal"));
-    revealOnScroll(sections);
+    const parts = document.querySelectorAll("main > section:not(:first-of-type) > *");
+    parts.forEach(part => part.classList.add("reveal"));
+    revealOnScroll(parts);
 }

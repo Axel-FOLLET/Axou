@@ -38,11 +38,15 @@ function watchSections() {
     const language = document.querySelector("a.language-switch__option");
     if (!links.length || sections.includes(null)) return;
     const languagePage = language ? language.getAttribute("href").split("#")[0] : "";
-    let active = -1;
+    let active = null;
 
+    /*
+     * index vaut -1 tant qu'aucune section du menu n'a atteint la ligne (accueil du CV, absent du menu) :
+     * aucun lien n'est alors marqué.
+     */
     function update() {
         const line = window.innerHeight * ACTIVE_LINE;
-        let index = 0;
+        let index = -1;
         sections.forEach((section, i) => {
             if (section.getBoundingClientRect().top <= line) index = i;
         });
@@ -58,8 +62,10 @@ function watchSections() {
             if (i === index) link.setAttribute("aria-current", "true");
             else link.removeAttribute("aria-current");
         });
-        if (current) current.textContent = links[index].textContent;
-        if (language) language.href = languagePage + (index === 0 ? "" : links[index].hash);
+        if (current) current.textContent = index < 0 ? "" : links[index].textContent;
+        // Sur l'accueil, le lien de langue reste sans ancre
+        const hash = index < 0 || links[index].hash === "#home" ? "" : links[index].hash;
+        if (language) language.href = languagePage + hash;
     }
     window.addEventListener("scroll", update, { passive: true });
     window.addEventListener("resize", update);

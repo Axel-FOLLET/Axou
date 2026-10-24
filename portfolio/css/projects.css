@@ -304,7 +304,7 @@
 
 /*
     Fond opaque, rouge des cartes : les cartes superposées ne se mélangent pas.
-    Contraste du texte blanc : 6,0 sur ce rouge, 5,7 au survol.
+    Contraste du texte blanc cassé : 5,5 sur ce rouge, 5,1 au survol (4,9 au plus fort du halo de motion.css).
 */
 .project-card {
     --card-ground: var(--red-card);
@@ -486,7 +486,7 @@
 }
 
 
-/* Étiquette de technologie : pastille sur un voile léger (texte blanc à 5,7 de contraste) */
+/* Étiquette de technologie : pastille sur un voile léger (texte blanc cassé à 5,1 de contraste) */
 .tag {
     padding: 4px 10px;
 

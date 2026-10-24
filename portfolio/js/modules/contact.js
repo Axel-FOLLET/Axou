@@ -134,7 +134,7 @@ function shakeButton(button) {
 function watchSubmit(form, status, submitButton) {
     form.addEventListener("submit", async event => {
         event.preventDefault();
-        // Case « Are you human? » pas encore validée : fenêtre obligatoire, l'envoi part après
+        // Case anti-robot pas encore validée : fenêtre obligatoire, l'envoi part après
         await requireHuman();
         submitButton.disabled = true;
         submitButton.classList.add("button--loading");
@@ -156,7 +156,21 @@ function watchSubmit(form, status, submitButton) {
 
 
 /*
- * Le formulaire n'existe que sur la page Contact : ailleurs, la fonction s'arrête.
+ * Le lien de la notice vise un paragraphe des mentions légales, repliées dans le pied de page :
+ * le bloc <details> s'ouvre avant que le navigateur n'y descende.
+ */
+function watchNotice(form) {
+    form.querySelectorAll(".form__notice a[href^='#']").forEach(link => {
+        link.addEventListener("click", () => {
+            const details = document.querySelector(link.hash)?.closest("details");
+            if (details) details.open = true;
+        });
+    });
+}
+
+
+/*
+ * Formulaire absent de la page : la fonction s'arrête.
  */
 export function initContact() {
     const form = document.getElementById("contact-form");
@@ -165,4 +179,5 @@ export function initContact() {
     if (!form || !status || !submitButton) return;
     watchFields(form);
     watchSubmit(form, status, submitButton);
+    watchNotice(form);
 }

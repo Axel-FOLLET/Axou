@@ -89,6 +89,25 @@
     }
 
 
+    /* Petits cubes réduits et posés en diagonale, loin du gros cube : en tournant, ils ne le chevauchent plus */
+    .hero__visual .cube--small {
+        --cube-size: 44px;
+    }
+
+
+    .hero__visual .cube--pos-1 {
+        top: 6%;
+        left: 4%;
+    }
+
+
+    .hero__visual .cube--pos-2 {
+        top: auto;
+        right: 6%;
+        bottom: 8%;
+    }
+
+
     /* Pastilles plus petites sur téléphone : le texte garde la largeur */
     .timeline {
         --node-size: 40px;

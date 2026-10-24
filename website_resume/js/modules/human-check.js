@@ -1,32 +1,47 @@
 /*
- * Interactions de la page : ce module expose ses fonctions d'initialisation.
- * export rend une valeur utilisable ailleurs ; import récupère uniquement les noms nécessaires.
- */
-/*
- * Fenêtre « Protection anti-robot » du formulaire de contact : la case doit être cochée par un humain.
+ * Fenêtre « Protection anti-robot » : la case doit être cochée par un humain avant l'envoi du formulaire.
  * Le site est statique : ces contrôles arrêtent les robots simples, pas un vrai navigateur piloté.
  *
- * - Au premier clic dans un champ : fenêtre bloquante, que la croix ou Échap peuvent fermer.
- * - À l'envoi sans validation : fenêtre obligatoire, sans croix ni Échap.
- * La validation est gardée pour l'onglet (sessionStorage) : la fenêtre ne revient plus à l'envoi suivant.
+ * Même fonctionnement que la fenêtre du portfolio : elle s'ouvre seulement à l'envoi du formulaire, sans croix ni Échap.
+ * Une réponse validée est gardée pour l'onglet (sessionStorage) : la question revient quand l'onglet est fermé.
+ * Les textes suivent la langue de la page (attribut lang de <html>).
  */
+
+
+// -------------------- RÉGLAGES --------------------
+
 const STORAGE_KEY = "resume-human-check";
-// ms minimum entre l'ouverture et le clic : le temps de lire la consigne
-const MIN_DELAY = 800;
-// ms pendant lesquels la vérification tourne avant le « Merci »
-const CHECK_DURATION = 900;
-// ms pendant lesquels le « Merci » reste affiché
-const CLOSE_DELAY = 1200;
-// ms après une fermeture pendant lesquels le retour du focus ne rouvre pas la fenêtre
-const REOPEN_GUARD = 500;
-/*
- * Réponse gardée aussi en mémoire : suffit pour la page en cours si le stockage est bloqué.
- */
+const MIN_DELAY = 800;          // ms minimum entre l'ouverture et le clic : le temps de lire la consigne
+const CLOSE_DELAY = 1500;       // ms pendant lesquels « Merci. » reste affiché
+
+const TEXTS = {
+    fr: {
+        title: "Protection anti-robot",
+        text: "Veuillez cocher la case, s'il vous plaît.",
+        box: "Je ne suis pas un robot",
+        success: "Merci.",
+        retry: "Vérification impossible. Réessayez calmement."
+    },
+    en: {
+        title: "Anti-robot protection",
+        text: "Please tick the box.",
+        box: "I'm not a robot",
+        success: "Thank you.",
+        retry: "Verification failed. Please try again, slowly."
+    }
+};
+
+
+// -------------------- MÉMOIRE DE L'ONGLET --------------------
+
+// Réponse gardée aussi en mémoire : suffit pour la page en cours si le stockage est bloqué
 let verifiedOnPage = false;
+
+
 /*
  * sessionStorage peut être bloqué (navigation privée stricte) : try/catch évite de casser la page.
  */
-function readVerified() {
+function isHumanVerified() {
     if (verifiedOnPage) return true;
     try {
         return sessionStorage.getItem(STORAGE_KEY) === "yes";
@@ -34,14 +49,20 @@ function readVerified() {
         return false;
     }
 }
+
+
 function saveVerified() {
     verifiedOnPage = true;
     try {
         sessionStorage.setItem(STORAGE_KEY, "yes");
     } catch {
-        // Stockage indisponible : la fenêtre reviendra après un rechargement
+        // Stockage indisponible : la question reviendra au prochain chargement
     }
 }
+
+
+// -------------------- CONTRÔLES ANTI-ROBOT --------------------
+
 /*
  * Compte les gestes réels (souris, doigt, clavier) pendant que la fenêtre est ouverte.
  * isTrusted vaut false pour un événement fabriqué par un script.
@@ -56,6 +77,8 @@ function watchGestures(dialog) {
     );
     return gestures;
 }
+
+
 /*
  * Un humain : clic réel, après un court délai, avec au moins un geste avant,
  * et un navigateur qui ne se déclare pas automatisé (navigator.webdriver).
@@ -66,20 +89,22 @@ function looksHuman(event, openedAt, gestures) {
         && gestures.count > 0
         && navigator.webdriver !== true;
 }
+
+
+// -------------------- FENÊTRE --------------------
+
 /*
- * Construit la fenêtre. Les textes viennent de translations.js (français ou anglais).
- * La croix n'existe que si la fenêtre peut être fermée.
+ * Bouclier dessiné en SVG à la place des images du portfolio : la coche s'y trace en réussite (human-check.css).
+ * aria-describedby fait lire la consigne avec le titre à l'ouverture.
  */
-function createDialog(texts, canClose) {
+function createDialog(texts) {
     const dialog = document.createElement("dialog");
     dialog.className = "human-check";
     dialog.setAttribute("aria-labelledby", "human-check-title");
     dialog.setAttribute("aria-describedby", "human-check-text");
-    const closeButton = canClose
-        ? `<button class="human-check__close" type="button" aria-label="${texts.close}">×</button>`
-        : "";
+    // tabIndex = -1 : la fenêtre peut recevoir le focus (voir openDialog)
+    dialog.tabIndex = -1;
     dialog.innerHTML = `
-        ${closeButton}
         <svg class="human-check__icon" viewBox="0 0 24 24" width="44" height="44" aria-hidden="true">
             <path class="human-check__shield" d="M12 2.5 4.5 5.6v5.9c0 4.7 3.2 8.2 7.5 10 4.3-1.8 7.5-5.3 7.5-10V5.6z"/>
             <path class="human-check__tick" d="m8.4 12.2 2.5 2.5 4.8-5"/>
@@ -88,113 +113,75 @@ function createDialog(texts, canClose) {
         <p class="human-check__text" id="human-check-text" aria-live="polite">${texts.text}</p>
         <label class="human-check__box">
             <input class="human-check__input" type="checkbox">
-            <span>${texts.label}</span>
+            <span>${texts.box}</span>
         </label>
         <p class="human-check__hint" role="status" aria-live="polite"></p>
     `;
     document.body.append(dialog);
     return dialog;
 }
-/*
- * Vérification en cours (anneau qui tourne), puis « Merci » et fermeture.
- */
-function showVerified(dialog, texts, done) {
-    dialog.classList.add("human-check--checking");
+
+
+function showSuccess(dialog, texts) {
+    dialog.classList.add("human-check--success");
+    dialog.querySelector(".human-check__text").textContent = texts.success;
+    dialog.querySelector(".human-check__hint").textContent = "";
     dialog.querySelector(".human-check__input").disabled = true;
-    dialog.querySelector(".human-check__close")?.remove();
-    setTimeout(() => {
-        dialog.classList.replace("human-check--checking", "human-check--success");
-        dialog.querySelector(".human-check__text").textContent = texts.success;
-        setTimeout(done, CLOSE_DELAY);
-    }, CHECK_DURATION);
 }
+
+
 /*
- * Ouvre la fenêtre et renvoie une promesse : true quand le visiteur est validé,
- * false s'il a fermé la fenêtre facultative.
+ * Ouvre la fenêtre et renvoie une promesse résolue quand le visiteur est validé.
  * showModal rend le reste de la page inerte (ni clic ni Tab).
- * returnTo reçoit le focus à la fermeture : le visiteur reprend là où il s'était arrêté.
+ * Échap déclenche "cancel" : preventDefault garde la fenêtre ouverte ;
+ * si le navigateur la ferme malgré tout, "close" la rouvre.
  */
-function openDialog(texts, canClose, returnTo, onClosed) {
+function openDialog() {
+    const texts = TEXTS[document.documentElement.lang === "en" ? "en" : "fr"];
     return new Promise(resolve => {
-        const dialog = createDialog(texts, canClose);
+        const dialog = createDialog(texts);
         const checkbox = dialog.querySelector(".human-check__input");
         const gestures = watchGestures(dialog);
         let verified = false;
-        const finish = result => {
-            dialog.remove();
-            onClosed();
-            returnTo?.focus();
-            resolve(result);
-        };
-        /*
-         * Échap déclenche "cancel". Fenêtre obligatoire, ou « Merci » affiché : preventDefault la garde ouverte.
-         * Si le navigateur la ferme malgré tout, "close" la rouvre.
-         */
-        dialog.addEventListener("cancel", event => {
-            if (!canClose || verified) event.preventDefault();
-        });
-        dialog.querySelector(".human-check__close")?.addEventListener("click", () => dialog.close());
+
+        dialog.addEventListener("cancel", event => event.preventDefault());
         dialog.addEventListener("close", () => {
-            if (verified) return;
-            if (!canClose) {
-                dialog.showModal();
-                return;
-            }
-            finish(false);
+            if (!verified) dialog.showModal();
         });
         dialog.showModal();
-        checkbox.focus();
+        // showModal place le focus sur la case : on le déplace sur la fenêtre,
+        // pas de contour avant le premier Tab
+        dialog.focus();
         const openedAt = performance.now();
+
         checkbox.addEventListener("change", event => {
             if (!checkbox.checked) return;
             if (!looksHuman(event, openedAt, gestures)) {
                 checkbox.checked = false;
-                dialog.querySelector(".human-check__hint").textContent = texts.failure;
+                dialog.querySelector(".human-check__hint").textContent = texts.retry;
                 return;
             }
             verified = true;
             saveVerified();
-            showVerified(dialog, texts, () => {
+            showSuccess(dialog, texts);
+            setTimeout(() => {
                 dialog.close();
-                finish(true);
-            });
+                dialog.remove();
+                resolve(true);
+            }, CLOSE_DELAY);
         });
     });
 }
+
+
+// -------------------- POINT D'ENTRÉE --------------------
+
 /*
- * Point d'entrée du formulaire : renvoie les trois actions dont contact-form.js a besoin.
+ * Formulaire de contact : renvoie true tout de suite si le visiteur est déjà validé,
+ * sinon ouvre la fenêtre et attend la validation.
  * Navigateur sans <dialog> : aucune vérification possible, l'envoi reste permis.
  */
-export function createHumanCheck(texts) {
-    const supported = typeof HTMLDialogElement === "function";
-    let isOpen = false;
-    let closedAt = -Infinity;
-    const run = (canClose, returnTo) => {
-        isOpen = true;
-        return openDialog(texts, canClose, returnTo, () => {
-            isOpen = false;
-            closedAt = performance.now();
-        });
-    };
-    return {
-        // Vrai tant que la fenêtre est ouverte : le formulaire ne vérifie pas ses champs pendant ce temps
-        isOpen: () => isOpen,
-        /*
-         * Premier clic dans un champ : fenêtre facultative, seulement si le visiteur n'est pas encore validé.
-         * Le garde-fou évite que le retour du focus sur le champ rouvre aussitôt la fenêtre.
-         */
-        askOnFocus(field) {
-            if (!supported || isOpen || readVerified()) return;
-            if (performance.now() - closedAt < REOPEN_GUARD) return;
-            run(true, field);
-        },
-        /*
-         * Envoi du formulaire : renvoie true tout de suite si le visiteur est validé,
-         * sinon ouvre la fenêtre obligatoire et attend la validation.
-         */
-        require() {
-            if (!supported || readVerified()) return Promise.resolve(true);
-            return run(false, null);
-        }
-    };
+export function requireHuman() {
+    if (isHumanVerified() || typeof HTMLDialogElement !== "function") return Promise.resolve(true);
+    return openDialog();
 }

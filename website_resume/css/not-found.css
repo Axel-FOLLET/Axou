@@ -1,7 +1,8 @@
 /*
- * Page 404 : même mise en page que celle du portfolio, aux couleurs du CV.
- * BEM : bloc__element désigne une partie du bloc ; bloc--modificateur désigne une variante.
- */
+    Page 404 : même mise en page que celle du portfolio, aux couleurs du CV.
+*/
+
+
 /* -------------------- PAGE 404 -------------------- */
 
 /* Contenu centré sur toute la hauteur de l'écran : la page n'a ni en-tête ni pied de page */
@@ -13,19 +14,21 @@
     align-items: center;
     justify-content: center;
 
-    padding: var(--section-space) var(--gutter);
+    padding: var(--space-section) var(--gutter);
 
     text-align: center;
 }
 
 
-/* Très gros chiffres resserrés, comme le titre de l'accueil */
+/* Très gros chiffres en serif, comme le nom de l'accueil */
 .not-found__code {
     margin: 0 0 20px;
 
-    font-size: clamp(6rem, 22vw, 14rem);
-    line-height: 0.9;
-    letter-spacing: -0.04em;
+    font-family: var(--font-display);
+    font-size: calc(clamp(6rem, 22vw, 14rem) * 1.15);
+    font-weight: 400;
+    line-height: 0.95;
+    letter-spacing: -0.01em;
 }
 
 

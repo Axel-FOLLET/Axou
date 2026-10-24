@@ -1,127 +1,212 @@
 /*
- * Base commune : jetons de design, gabarit des sections, police et fond.
- * BEM : bloc__element désigne une partie du bloc ; bloc--modificateur désigne une variante.
- */
-/* -------------------- JETONS DE DESIGN -------------------- */
+    Convention d'écriture : BEM
+    bloc            .project-card
+    élément         .project-card__title
+    modificateur    .project-card--featured
+*/
+
+
+/* -------------------- POLICE -------------------- */
 
 /*
- * Variables réutilisées par toutes les feuilles : changer une valeur ici l'applique partout.
- * Couleurs du site (bleu, rouge, blanc) et surfaces dérivées du bleu, un peu plus claires.
- * Le rouge sur le bleu n'atteint que 2,75:1 : il reste décoratif, jamais pour du texte ou un état.
- */
+    Manrope, police variable (graisses 400 à 800), hébergée avec le site : aucune requête vers un service tiers.
+    Deux fichiers : latin (français, anglais) et latin étendu, chargé seulement si la page en a besoin.
+    swap : le texte s'affiche tout de suite dans la police de secours, puis passe à Manrope.
+    Licence : assets/fonts/OFL-Manrope.txt (SIL Open Font License 1.1).
+*/
+@font-face {
+    font-family: "Manrope";
+    font-style: normal;
+    font-weight: 400 800;
+    font-display: swap;
+    src: url("../assets/fonts/manrope-latin.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+
+@font-face {
+    font-family: "Manrope";
+    font-style: normal;
+    font-weight: 400 800;
+    font-display: swap;
+    src: url("../assets/fonts/manrope-latin-ext.woff2") format("woff2");
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+
+/*
+    Instrument Serif, serif d'affichage pour les grands titres (nom, sections, dernier appel) : romain et italique.
+    Le latin seul suffit au français et à l'anglais. Manrope reste la police du texte.
+    Licence : assets/fonts/OFL-InstrumentSerif.txt (SIL Open Font License 1.1).
+*/
+@font-face {
+    font-family: "Instrument Serif";
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url("../assets/fonts/instrument-serif-latin.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+
+@font-face {
+    font-family: "Instrument Serif";
+    font-style: italic;
+    font-weight: 400;
+    font-display: swap;
+    src: url("../assets/fonts/instrument-serif-italic-latin.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+
+/* -------------------- COULEURS, TAILLES ET ESPACEMENTS -------------------- */
+
+/*
+    Bleu en geste, noir en respiration : les couleurs du portfolio, le bleu à la place du rouge.
+    Accueil et contact sur bleu profond ; formation, expériences, reconversion et projets sur quasi-noir,
+    où le bleu ne sert plus qu'aux accents et aux cartes.
+    Contrastes WCAG mesurés avec le blanc cassé (--white) : 12,3 sur --blue, 9,4 sur --blue-card, 17,7 sur --ink.
+*/
 :root {
-    color-scheme: dark;
+    --blue: #0D0A9B;
+    --blue-card: #1F1BC4;
+    /* Bleu lisible sur le quasi-noir (contraste 5,6) : sur-titres et accents des sections sombres */
+    --blue-accent: #6E7BFF;
+    /* Lueur derrière le grand cube de l'accueil (motion.css) : --blue-accent voilé, le portfolio y met son rouge */
+    --glow: rgba(110, 123, 255, 0.35);
+    --ink: #0B0B0F;
+    --ink-raised: #16161C;
+    /* Texte secondaire sur le quasi-noir (contraste 7,7) ; à ne pas poser sur --blue-card (4,1) */
+    --muted: #A1A1AA;
+    /* Blanc cassé, un peu chaud : moins dur que le blanc pur sur le quasi-noir */
+    --white: #F5F3EE;
 
-    --color-bg: #0D0A9B;
-    --color-surface: #19169F;
-    --color-surface-raised: #2522A7;
+    /* Serif des grands titres ; polices de secours à empattements le temps du chargement */
+    --font-display: "Instrument Serif", Georgia, "Times New Roman", serif;
 
-    --color-red: #E1001A;
+    /* Voiles et filets blancs, valables sur le bleu comme sur le noir */
+    --veil: rgba(255, 255, 255, 0.07);
+    --veil-strong: rgba(255, 255, 255, 0.13);
+    --line: rgba(255, 255, 255, 0.1);
+    --line-strong: rgba(255, 255, 255, 0.5);
+    /* Contour des champs : contraste 7,0 sur le bleu, 5,7 sur le bleu des cartes (seuil des éléments d'interface : 3) */
+    --line-field: rgba(255, 255, 255, 0.7);
 
-    --color-text: #FFFFFF;
-    --color-text-muted: #D4D5F4;
-    --color-on-light: #0D0A9B;
-
-    /* Contour des champs et boutons secondaires : 3,8:1 sur les surfaces, lisible comme indicateur. */
-    --border-control: #9290D3;
-    --border-subtle: rgb(255 255 255 / 12%);
+    /* Trois arrondis pour tout le site : petits éléments (étiquettes, champs), cartes et pastilles, boutons */
+    --radius-s: 10px;
+    --radius-m: 16px;
+    --radius-l: 20px;
 
     /*
-     * Arrondis à peine perceptibles : angles presque droits, boutons compris.
-     * Seuls les vrais cercles (photo, pastilles de la frise) restent ronds (border-radius: 50%).
-     */
-    --radius-xs: 2px;
-    --radius-sm: 2px;
-    --radius-field: 3px;
-    --radius-control: 3px;
-    --radius-card: 4px;
-    --radius-feature: 4px;
-    --radius-pill: 3px;
+        Quatre tailles de texte pour tout le site, plus l'étiquette :
+        affiche (nom), titre (sections), chapeau (introductions, accroche), courant.
+    */
+    --text-display: clamp(3.5rem, 10vw, 7.5rem);
+    --text-title: clamp(2.5rem, 6vw, 4.5rem);
+    --text-lead: clamp(1.125rem, 1.6vw, 1.375rem);
+    --text-body: 1rem;
+    --text-label: 0.8125rem;
 
-    /* Pas d'ombre sous les cartes : sur ce bleu, elles donnaient un effet de panneaux flottants. */
-    --shadow-card: none;
-    --shadow-feature: none;
-
-    --container: 1200px;
-    --gutter: clamp(20px, 4vw, 56px);
-    --section-space: clamp(72px, 9vw, 128px);
-    --card-padding: clamp(24px, 3vw, 40px);
-    --header-height: 76px;
-
-    /* Même police que le portfolio : Avenir lorsqu'elle est installée, sinon Arial. */
-    --font-sans: Avenir, "Avenir Next", Arial, sans-serif;
-
-    --text-body: clamp(1rem, 0.96rem + 0.2vw, 1.125rem);
-    --text-card: clamp(1.5rem, 1.2rem + 1vw, 2rem);
-    --text-section: clamp(2.125rem, 1.4rem + 2.5vw, 3.5rem);
-
-    --duration-fast: 160ms;
-    --duration-ui: 240ms;
-    --duration-reveal: 560ms;
-    --ease-ui: cubic-bezier(0.2, 0, 0, 1);
-    --ease-reveal: cubic-bezier(0.22, 1, 0.36, 1);
+    /*
+        Même rythme sur toutes les sections : chaque partie, l'accueil et le pied de page
+        utilisent ces deux valeurs.
+        --gutter : marge de 20 à 56 px selon l'écran, et au-delà de 1200 px de contenu,
+        la marge grandit pour centrer une colonne de 1200 px. Le % se calcule sur la largeur de la partie.
+    */
+    /* Espace vertical d'une partie : 88px sur téléphone, 160px sur grand écran */
+    --space-section: clamp(88px, 12vw, 160px);
+    --gutter: max(clamp(20px, 4vw, 56px), (100% - 1200px) / 2);
 }
 
 
 /* -------------------- BASE -------------------- */
 
 * {
-    /*
-     * border-box inclut padding et bordures dans les dimensions annoncées.
-     */
     box-sizing: border-box;
 }
 
 
-/*
- * scroll-padding-top : un lien vers une section s'arrête sous l'en-tête collant, pas dessous.
- */
 html {
     scroll-behavior: smooth;
-    scroll-padding-top: var(--header-height);
+    /* Les ancres du menu (#projects…) s'arrêtent sous l'en-tête collant au lieu de passer dessous */
+    scroll-padding-top: 76px;
 }
 
 
+/*
+    Changement de page (langue) : fondu enchaîné au lieu d'un rechargement sec.
+    Les navigateurs qui ne connaissent pas cette règle changent simplement de page.
+    Un fondu reste acceptable en mouvement réduit : rien ne se déplace.
+*/
+@view-transition {
+    navigation: auto;
+}
+
+
+/* L'en-tête porte un nom : il reste en place pendant que le contenu change. */
+.header {
+    view-transition-name: site-header;
+}
+
+
+/*
+    Contenu de la page : l'ancien s'efface vite, le nouveau apparaît en fondu, sans aucun déplacement.
+    Les deux ne se superposent presque pas : pas d'image double.
+    L'en-tête, lui, se fond sur place : l'onglet actif change de couleur sans bouger.
+*/
+::view-transition-old(root) {
+    animation: 0.15s ease-in both page-fade-out;
+}
+
+
+::view-transition-new(root) {
+    animation: 0.3s ease-out 0.08s both page-fade-in;
+}
+
+
+@keyframes page-fade-out {
+    to {
+        opacity: 0;
+    }
+}
+
+
+@keyframes page-fade-in {
+    from {
+        opacity: 0;
+    }
+}
+
+
+/* Polices de secours proches de Manrope, le temps qu'elle se charge */
 body {
     margin: 0;
 
-    background-color: var(--color-bg);
-    color: var(--color-text);
+    background-color: var(--blue);
+    color: var(--white);
 
-    font-family: var(--font-sans);
+    font-family: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
     font-size: var(--text-body);
     line-height: 1.6;
 
-    /* Lissage des polices sur Mac, comme les sites Apple */
     -webkit-font-smoothing: antialiased;
 
     overflow-x: hidden;
 }
 
 
-/*
- * Fond en relief, discret : un halo clair en haut à gauche et un bleu plus profond vers le bas.
- * position: fixed le garde immobile ; z-index: -1 le place sous le contenu.
- */
-body::before {
-    content: "";
-
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-
-    background:
-        radial-gradient(60vw 40vw at 25% 0%, rgb(90 110 255 / 12%), transparent 70%),
-        linear-gradient(180deg, transparent 50%, rgb(9 7 107 / 40%));
-
-    pointer-events: none;
+img {
+    max-width: 100%;
 }
 
 
 h1,
 h2,
-h3 {
-    line-height: 1.08;
+h3,
+h4 {
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
 }
 
 
@@ -134,174 +219,40 @@ select {
 }
 
 
-/* -------------------- GABARIT DES SECTIONS -------------------- */
+a {
+    color: var(--white);
+}
+
 
 /*
- * Toutes les sections partagent la même colonne centrée de 1200 px au plus.
- * max() choisit la plus grande marge : la gouttière, ou ce qu'il reste autour des 1200 px.
- */
-.home,
-.education,
-.experience,
-.career,
-.projects,
-.contact {
-    position: relative;
+    Étiquette : un seul style de petites capitales pour tout le site
+    (sur-titres, libellé de l'objectif, titres du pied de page).
+*/
+.section__eyebrow,
+.career__goal-label,
+.footer__title {
+    font-size: var(--text-label);
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    line-height: 1.4;
 
-    padding-block: var(--section-space);
-    padding-inline: max(var(--gutter), (100% - var(--container)) / 2);
+    text-transform: uppercase;
 }
 
 
-/* -------------------- BARRES D'ACCENT -------------------- */
-
-/* Trois barres rouges fines, identiques aux barres bleues du portfolio */
-.bars {
-    display: flex;
-    flex-direction: column;
-
-    gap: 6px;
-
-    margin: 24px 0 28px;
-}
-
-
-.bars__bar {
-    display: block;
-
-    height: 4px;
-
-    background-color: var(--color-red);
-}
-
-
-.bars__bar:nth-child(1) {
-    width: 32%;
-}
-
-
-.bars__bar:nth-child(2) {
-    width: 52%;
-}
-
-
-.bars__bar:nth-child(3) {
-    width: 72%;
-}
-
-
-@media (max-width: 1024px) {
-
-    .bars__bar:nth-child(1) {
-        width: 40%;
-    }
-
-
-    .bars__bar:nth-child(2) {
-        width: 60%;
-    }
-
-
-    .bars__bar:nth-child(3) {
-        width: 80%;
-    }
-
-}
-
-
-/* -------------------- FOCUS CLAVIER -------------------- */
-
-/*
- * Contour blanc et épais pour tout élément atteint au clavier.
- * :focus-visible ne s'affiche qu'au clavier, pas au clic de souris.
- */
+/* Visible au clavier sur tous les éléments interactifs */
 a:focus-visible,
 button:focus-visible,
 select:focus-visible,
 input:focus-visible,
-textarea:focus-visible {
-    outline: 3px solid white;
-    outline-offset: 5px;
+textarea:focus-visible,
+summary:focus-visible {
+    outline: 3px solid var(--white);
+    outline-offset: 4px;
 }
 
 
-/* -------------------- SURTITRE, TITRE ET INTRODUCTION DE SECTION -------------------- */
-
-/* Petit texte au-dessus des titres (« 01 / FORMATION ») */
-.eyebrow {
-    margin: 0 0 16px;
-
-    color: white;
-
-    font-size: 0.8125rem;
-    font-weight: 600;
-    letter-spacing: 0.14em;
-}
-
-
-.section-title {
-    max-width: 30ch;
-
-    margin: 0;
-
-    font-size: var(--text-section);
-    font-weight: 700;
-    letter-spacing: -0.04em;
-}
-
-
-/* ch : largeur du caractère « 0 » ; 64ch garde des lignes faciles à suivre. */
-.section-intro {
-    max-width: 640px;
-
-    margin: 20px 0 0;
-
-    color: white;
-
-    font-size: 1.125rem;
-    line-height: 1.55;
-}
-
-
-/* Sur ordinateur, titres aux proportions du portfolio : moins massifs, plus nets. */
-@media (min-width: 1025px) {
-
-    .section-title {
-        font-size: 3rem;
-        line-height: 1.08;
-    }
-
-}
-
-
-/* -------------------- APPARITION AU DÉFILEMENT -------------------- */
-
-/*
- * Classes ajoutées par reveal.js : fondu et montée de 16 px, une seule fois.
- * translate: none à l'arrivée : la section ne garde pas de transformation.
- */
-.reveal {
-    opacity: 0;
-    translate: 0 16px;
-
-    transition:
-        opacity var(--duration-reveal) var(--ease-reveal),
-        translate var(--duration-reveal) var(--ease-reveal);
-}
-
-
-.reveal--visible {
-    opacity: 1;
-    translate: none;
-}
-
-
-/* -------------------- LIEN D'ÉVITEMENT -------------------- */
-
-/*
- * Caché au-dessus de l'écran, il descend au premier appui sur Tab.
- * Il permet d'aller au contenu sans parcourir toute la navigation.
- */
+/* Lien caché qui apparaît au premier appui sur Tab */
 .skip-link {
     position: absolute;
 
@@ -312,14 +263,12 @@ textarea:focus-visible {
 
     padding: 10px 16px;
 
-    border-radius: var(--radius-sm);
-
-    background-color: white;
-    color: var(--color-on-light);
+    background-color: var(--ink);
+    color: var(--white);
 
     text-decoration: none;
 
-    transition: top 0.2s ease;
+    transition: top 0.2s;
 }
 
 
@@ -328,35 +277,18 @@ textarea:focus-visible {
 }
 
 
-/* -------------------- FENÊTRE DES JEUX -------------------- */
-
-/*
- * Le jeu est réservé à l'ordinateur : game-modal.css n'est chargé qu'au-dessus de 1024 px
- * (attribut media du <link>), pour ne pas retarder l'affichage sur téléphone et tablette.
- * En dessous, la fenêtre reste masquée ici, dans un fichier toujours chargé.
- */
-@media (max-width: 1024px) {
-
-    .game-modal {
-        display: none;
-    }
-
-}
-
-
-/* -------------------- TEXTE POUR LECTEURS D'ÉCRAN -------------------- */
-
-/*
- * Masqué à l'écran mais lu par les lecteurs d'écran : display: none le cacherait aussi pour eux.
- */
+/* Texte lu par les lecteurs d'écran seulement (« nouvel onglet » des liens externes, par exemple) */
 .visually-hidden {
     position: absolute;
 
     width: 1px;
     height: 1px;
 
-    overflow: hidden;
+    margin: -1px;
+    padding: 0;
 
+    overflow: hidden;
     clip-path: inset(50%);
+
     white-space: nowrap;
 }

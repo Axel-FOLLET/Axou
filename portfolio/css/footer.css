@@ -10,6 +10,36 @@
 }
 
 
+/* Dernier appel, au format des titres de section, séparé des liens par un trait */
+.footer__cta {
+    margin-bottom: 64px;
+    padding-bottom: 64px;
+
+    border-bottom: 1px solid var(--line);
+}
+
+
+/* Même serif et même taille que .section__title, mot-clé en italique (em) */
+.footer__cta-title {
+    max-width: 18ch;
+
+    margin: 0;
+
+    font-family: var(--font-display);
+    font-size: calc(var(--text-title) * 1.15);
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: -0.01em;
+
+    text-wrap: balance;
+}
+
+
+.footer__cta .button-group {
+    margin-top: 32px;
+}
+
+
 .footer__row {
     display: flex;
     justify-content: space-between;
@@ -35,7 +65,10 @@
 }
 
 
-/* 32 px de haut : cible confortable au doigt, sans soulignement */
+/*
+    32 px de haut : cible confortable au doigt. Pas de soulignement au repos :
+    un trait fin (dégradé de 1 px sous le texte) s'étire de gauche à droite au survol et au focus.
+*/
 .footer__list a,
 .footer__top {
     display: inline-flex;
@@ -43,15 +76,19 @@
 
     min-height: 32px;
 
+    background: linear-gradient(currentColor, currentColor) no-repeat 0 calc(50% + 0.75em) / 0 1px;
+
     text-decoration: none;
 
-    transition: color 0.2s ease;
+    transition: background-size 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 
 .footer__list a:hover,
-.footer__top:hover {
-    color: var(--muted);
+.footer__list a:focus-visible,
+.footer__top:hover,
+.footer__top:focus-visible {
+    background-size: 100% 1px;
 }
 
 
@@ -66,9 +103,32 @@
 }
 
 
+/*
+    Liens dans le texte : soulignés au repos (le blanc seul ne suffit pas à les distinguer du gris).
+    Au survol et au focus, le trait se retire puis se redessine de gauche à droite.
+*/
 .footer__credits a,
 .footer__legal a {
     color: var(--white);
+
+    background: linear-gradient(currentColor, currentColor) no-repeat 0 100% / 100% 1px;
+
+    text-decoration: none;
+}
+
+
+.footer__credits a:hover,
+.footer__credits a:focus-visible,
+.footer__legal a:hover,
+.footer__legal a:focus-visible {
+    animation: footer-underline 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+
+@keyframes footer-underline {
+    from {
+        background-size: 0 1px;
+    }
 }
 
 
@@ -146,4 +206,34 @@
     margin: 8px 0 0;
 
     color: var(--muted);
+}
+
+
+/* Couleurs forcées (contraste élevé) : les fonds disparaissent, le vrai soulignement revient */
+@media (forced-colors: active) {
+
+    .footer__credits a,
+    .footer__legal a {
+        text-decoration: underline;
+    }
+
+}
+
+
+/* Mouvement réduit : le trait apparaît d'un coup, sans s'étirer */
+@media (prefers-reduced-motion: reduce) {
+
+    .footer__list a,
+    .footer__top {
+        transition: none;
+    }
+
+
+    .footer__credits a:hover,
+    .footer__credits a:focus-visible,
+    .footer__legal a:hover,
+    .footer__legal a:focus-visible {
+        animation: none;
+    }
+
 }

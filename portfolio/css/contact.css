@@ -167,6 +167,26 @@
 }
 
 
+/* Notice sous le bouton : champs obligatoires et lien vers l'usage des données (mentions légales) */
+.form__notice {
+    max-width: 60ch;
+
+    margin: 16px 0 0;
+
+    color: var(--muted);
+
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+
+
+.form__notice a {
+    color: var(--white);
+
+    text-underline-offset: 3px;
+}
+
+
 .form__status {
     min-height: 1.6em;
 

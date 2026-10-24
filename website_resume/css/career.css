@@ -1,24 +1,21 @@
-/*
- * Reconversion IT : une seule surface rouge arrondie, le moment fort de la page.
- * Tous les textes posés sur le rouge sont blancs (contraste 4,98:1).
- * BEM : bloc__element désigne une partie du bloc ; bloc--modificateur désigne une variante.
- */
-/* -------------------- BANDEAU -------------------- */
+/* -------------------- RECONVERSION IT -------------------- */
 
+/*
+ * Une seule surface du bleu des cartes sur le quasi-noir, le moment fort de la page.
+ * Tous les textes posés sur ce bleu sont blancs (contraste 9,4).
+ */
 .career__banner {
     padding: clamp(28px, 4vw, 56px);
 
-    border-radius: var(--radius-feature);
+    border-radius: var(--radius-m);
 
-    background-color: var(--color-red);
-
-    box-shadow: var(--shadow-feature);
+    background-color: var(--blue-card);
 }
 
 
-/* Le surtitre reste blanc sur le rouge (la couleur secondaire bleutée y serait terne) */
-.career__number {
-    color: white;
+/* Le sur-titre reste blanc sur le bleu des cartes : le bleu des accents n'y atteindrait que 2,9 */
+.section--dark .career__number {
+    color: var(--white);
 }
 
 
@@ -35,14 +32,20 @@
 }
 
 
+/* Titre un palier sous ceux des sections : il partage le bandeau avec l'objectif */
 .career__intro h2 {
     max-width: 20ch;
 
     margin: 0 0 24px;
 
-    font-size: var(--text-section);
-    font-weight: 700;
-    letter-spacing: -0.04em;
+    /* Serif des titres, 15 % plus grand comme eux */
+    font-family: var(--font-display);
+    font-size: clamp(2.3rem, 1.61rem + 2.875vw, 3.45rem);
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: -0.01em;
+
+    text-wrap: balance;
 }
 
 
@@ -59,41 +62,34 @@
 .career__goal {
     padding-left: 32px;
 
-    border-left: 1px solid white;
+    border-left: 1px solid var(--white);
 }
 
 
-/* .career__intro en tête l'emporte sur la règle des paragraphes */
+/* .career__intro en tête l'emporte sur la règle des paragraphes ; style d'étiquette dans base.css */
 .career__intro .career__goal-label {
     margin: 0;
-
-    font-size: 0.8125rem;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
 }
 
 
 .career__intro .career__goal-text {
     margin: 12px 0 0;
 
-    font-size: 1.75rem;
+    font-size: var(--text-lead);
     font-weight: 600;
-    line-height: 1.3;
+    line-height: 1.35;
     letter-spacing: -0.02em;
 }
 
 
 /* -------------------- COMPÉTENCES -------------------- */
 
-/* Compétences sous un filet blanc atténué, sur toute la largeur du bandeau */
+/* Compétences sur toute la largeur du bandeau, sans filet : l'espace suffit à les séparer */
 .career__skills {
     position: relative;
 
     margin-top: 40px;
     padding-top: 32px;
-
-    border-top: 1px solid rgb(255 255 255 / 40%);
 }
 
 
@@ -106,7 +102,7 @@
 }
 
 
-/* Cube bleu, coin supérieur droit du bloc */
+/* Cube blanc, coin supérieur droit du bloc */
 .career__cube {
     position: absolute;
     top: 22px;
@@ -114,7 +110,7 @@
 }
 
 
-/* Étiquettes cerclées de blanc, comme dans la frise et les projets */
+/* Étiquettes cerclées de blanc, comme dans la frise et les projets ; blanc plein : le bleu des cartes est plus clair */
 .skills__list {
     display: flex;
     flex-wrap: wrap;
@@ -131,31 +127,11 @@
 .skills__list li {
     padding: 8px 16px;
 
-    border: 1px solid white;
-    border-radius: var(--radius-xs);
+    border: 1px solid var(--white);
+    border-radius: var(--radius-s);
 
     font-size: 0.9375rem;
     font-weight: 600;
-}
-
-
-/*
- * Sur ordinateur, titre à 48 px comme les autres sections (déclaré ici :
- * career.css, chargé après base.css, redonnait sinon la taille variable) et objectif un peu moins massif.
- */
-@media (min-width: 1025px) {
-
-    .career__intro h2 {
-        font-size: 3rem;
-        line-height: 1.08;
-    }
-
-
-    .career__intro .career__goal-text {
-        font-size: 1.5rem;
-        line-height: 1.35;
-    }
-
 }
 
 
@@ -165,11 +141,6 @@
         grid-template-columns: minmax(0, 1fr);
 
         gap: 28px;
-    }
-
-
-    .career__intro .career__goal-text {
-        font-size: 1.375rem;
     }
 
 }

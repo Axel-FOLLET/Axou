@@ -22,13 +22,22 @@
 .hero__title {
     margin: 0;
 
+    font-family: var(--font-display);
     font-size: var(--text-display);
-    font-weight: 800;
-    line-height: 0.88;
+    font-weight: 400;
+    line-height: 0.95;
     /* em suit la taille du titre : le resserrement reste proportionnel */
-    letter-spacing: -0.045em;
+    letter-spacing: -0.02em;
+}
 
-    text-transform: uppercase;
+
+/* Téléphone : le serif, étroit, paraît petit au plancher de --text-display ; 20 % de plus lui rendent sa présence */
+@media (max-width: 767px) {
+
+    .hero__title {
+        font-size: calc(var(--text-display) * 1.2);
+    }
+
 }
 
 

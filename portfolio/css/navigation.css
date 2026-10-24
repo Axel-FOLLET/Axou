@@ -245,36 +245,7 @@
 }
 
 
-/*
- * Sur ordinateur, un trait se déroule de gauche à droite sous le lien survolé.
- * La section affichée, déjà cerclée de blanc, n'en a pas besoin.
- */
-@media (min-width: 1025px) {
-
-    .header__link::after {
-        content: "";
-
-        position: absolute;
-        left: 16px;
-        right: 16px;
-        bottom: 9px;
-
-        height: 1px;
-
-        background-color: currentColor;
-
-        scale: 0 1;
-        transform-origin: left;
-
-        transition: scale 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-    }
-
-
-    .header__link:hover:not([aria-current="true"])::after {
-        scale: 1 1;
-    }
-
-}
+/* Sur ordinateur, le trait qui glisse sous les liens est dans motion.css (un seul trait pour tout le menu) */
 
 
 /*
@@ -493,8 +464,7 @@
 @media (prefers-reduced-motion: reduce) {
 
     .header__nav,
-    .header__avatar,
-    .header__link::after {
+    .header__avatar {
         transition: none;
     }
 

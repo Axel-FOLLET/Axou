@@ -1,21 +1,26 @@
 <!doctype html>
 <html lang="en">
 
-<head>    <!-- Repères : les id servent aux ancres et à ARIA ; les classes BEM servent au style. Les attributs data-* transmettent des paramètres aux modules JavaScript. -->
-
+<head>
+    <!-- Repères : les id servent aux ancres et à ARIA ; les classes BEM servent au style. Les attributs data-* transmettent des paramètres aux modules JavaScript. -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Axel FOLLET | Resume</title>
 
     <!-- Référencement : description, page canonique et version dans l'autre langue -->
     <meta name="description" content="Axel FOLLET’s resume: from HR project management to IT, experience, skills, projects and contact.">
     <meta name="author" content="Axel FOLLET">
-    <link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="assets/images/favicon.svg?v=6d7c05deb928" type="image/svg+xml">
     <link rel="canonical" href="https://axel-follet.github.io/website_resume/index-en.html">
     <link rel="alternate" hreflang="fr" href="https://axel-follet.github.io/website_resume/index.html">
     <link rel="alternate" hreflang="en" href="https://axel-follet.github.io/website_resume/index-en.html">
+    <link rel="alternate" hreflang="x-default" href="https://axel-follet.github.io/website_resume/index.html">
 
     <!-- Aperçu lors du partage du lien (Open Graph) -->
     <meta property="og:type" content="website">
+    <meta property="og:locale" content="en_GB">
+    <meta property="og:locale:alternate" content="fr_FR">
     <meta property="og:title" content="Axel FOLLET | Resume">
     <meta property="og:description" content="Axel FOLLET’s resume: from HR project management to IT, experience, skills, projects and contact.">
     <meta property="og:url" content="https://axel-follet.github.io/website_resume/index-en.html">
@@ -25,112 +30,138 @@
     <meta property="og:image:alt" content="Axel FOLLET's resume: From HR projects to IT projects: same rigour, new tools.">
     <meta name="twitter:card" content="summary_large_image">
 
-    <!-- Ordre de la cascade : base, composants, adaptations responsive, fenêtre des jeux, puis préférences d'accessibilité. -->
-    <link rel="stylesheet" href="css/base.css">
-    <link rel="stylesheet" href="css/buttons.css">
-    <link rel="stylesheet" href="css/navigation.css">
-    <link rel="stylesheet" href="css/home.css">
-    <link rel="stylesheet" href="css/cubes.css">
-    <link rel="stylesheet" href="css/education.css">
-    <link rel="stylesheet" href="css/experience.css">
-    <link rel="stylesheet" href="css/career.css">
-    <link rel="stylesheet" href="css/projects.css">
-    <link rel="stylesheet" href="css/contact.css">
-    <link rel="stylesheet" href="css/human-check.css">
-    <link rel="stylesheet" href="css/footer.css">
-    <link rel="stylesheet" href="css/responsive.css">
-    <link rel="stylesheet" href="css/game-modal.css" media="(min-width: 1025px)">
-    <link rel="stylesheet" href="css/preferences.css">
-    <!-- type=module active import/export et attend l'analyse du HTML ; main.js initialise les interactions des deux langues. -->
-    <script type="module" src="js/main.js"></script>
+    <!-- Police chargée dès le début : le texte s'affiche sans changer de police -->
+    <link rel="preload" href="assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <!-- Serif des grands titres, romain et italique : le nom de l'accueil s'affiche sans passer par Georgia -->
+    <link rel="preload" href="assets/fonts/instrument-serif-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="assets/fonts/instrument-serif-italic-latin.woff2" as="font" type="font/woff2" crossorigin>
 
-    <title>Axel FOLLET | Resume</title>
+    <!-- Ordre de la cascade : base, composants, adaptations responsive, puis fenêtre anti-robot. Versions CSS : recharge les styles modifiés après publication. -->
+    <link rel="stylesheet" href="css/base.css?v=060a965fc51d">
+    <link rel="stylesheet" href="css/navigation.css?v=a3a1d79845aa">
+    <link rel="stylesheet" href="css/sections.css?v=94835d787bd2">
+    <link rel="stylesheet" href="css/buttons.css?v=df6b468f8c01">
+    <link rel="stylesheet" href="css/home.css?v=8a3a45ffd605">
+    <link rel="stylesheet" href="css/cubes.css?v=9171b1c93665">
+    <link rel="stylesheet" href="css/education.css?v=690ccc5d9613">
+    <link rel="stylesheet" href="css/experience.css?v=3ac319ba0f55">
+    <link rel="stylesheet" href="css/career.css?v=88c89af69d79">
+    <link rel="stylesheet" href="css/projects.css?v=055566190630">
+    <link rel="stylesheet" href="css/contact.css?v=16f2e1a14134">
+    <link rel="stylesheet" href="css/footer.css?v=bb28efed03ab">
+    <link rel="stylesheet" href="css/responsive.css?v=fb9bdb3cc1be">
+    <link rel="stylesheet" href="css/human-check.css?v=2898f0bcbe1a">
+    <link rel="stylesheet" href="css/motion.css?v=497b42af2aa8">
+    <!-- Modules importés par main.js, demandés tous ensemble au lieu d'être découverts niveau par niveau -->
+    <link rel="modulepreload" href="js/modules/navigation.js">
+    <link rel="modulepreload" href="js/modules/navigation-menu.js">
+    <link rel="modulepreload" href="js/modules/reveal.js">
+    <link rel="modulepreload" href="js/modules/contact.js">
+    <link rel="modulepreload" href="js/modules/human-check.js">
+    <link rel="modulepreload" href="js/modules/cubes/init-cubes.js">
+    <link rel="modulepreload" href="js/modules/cubes/create-cube.js">
+    <link rel="modulepreload" href="js/modules/cubes/update-cube.js">
+    <link rel="modulepreload" href="js/modules/cubes/drag-cube.js">
+    <link rel="modulepreload" href="js/modules/timeline.js">
+    <link rel="modulepreload" href="js/modules/motion.js">
+    <!-- blocking="render" : la page ne s'affiche qu'une fois le script exécuté, cubes compris -->
+    <script type="module" src="js/main.js" blocking="render"></script>
 </head>
 
-<body class="page">
+<body class="page" id="top">
 
     <!-- Lien caché qui apparaît au premier appui sur Tab : saute la navigation -->
     <a class="skip-link" href="#main">Skip to content</a>
 
+
     <!-- -------------------- NAVIGATION -------------------- -->
 
-    <header class="site-header">
+    <header class="header">
 
-        <!-- Le bouton met à jour aria-expanded ; aria-controls désigne le conteneur des liens. navigation--open commande leur visibilité. -->
-        <nav class="navigation">
+        <!-- Le bouton met à jour aria-expanded ; aria-controls désigne la liste des liens (navigation-menu.js). -->
+        <nav class="header__nav" aria-label="Main navigation">
 
             <button
-                class="navigation__toggle"
+                class="header__toggle"
+                id="menu-toggle"
                 type="button"
                 aria-label="Open navigation menu"
                 aria-expanded="false"
-                aria-controls="navigation-links"
+                aria-controls="menu-links"
             >
-                <span class="navigation__toggle-icon" aria-hidden="true">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </span>
+                <span class="header__toggle-icon" aria-hidden="true"><span></span><span></span><span></span></span>
             </button>
 
-            <!-- Identity: picture + initials + language selection -->
-            <div class="navigation__identity">
+            <!-- Identité : photo + initiales + choix langue -->
+            <div class="header__identity">
 
-                <img
-                    src="assets/images/profile-small.png"
-                    alt="Profile photo of Axel FOLLET" width="80" height="80"
-                >
+                <span class="header__avatar">
+                    <img
+                        class="header__photo"
+                        src="assets/images/profile-small.png"
+                        alt="Profile photo of Axel FOLLET" width="80" height="80"
+                    >
+                </span>
 
-                <a href="#home">AF</a>
+                <a class="header__logo" href="#top">AF</a>
 
+                <!-- Le lien de langue garde la section affichée (navigation.js) -->
                 <div class="language-switch" role="group" aria-label="Choose language">
                     <a class="language-switch__option" href="index.html" hreflang="fr" lang="fr" aria-label="Français">FR</a>
                     <span class="language-switch__option language-switch__option--active" lang="en" aria-current="true">EN</span>
-
                 </div>
 
             </div>
 
 
-            <!-- Links to the different sections -->
-            <div class="navigation__links" id="navigation-links">
-
-                <a href="#formation">Education</a>
-                <a href="#experience">Experience</a>
-                <a href="#reconversion">IT Career Change</a>
-                <a href="#projects">Projects</a>
-                <a href="#contact">Contact</a>
-
-            </div>
+            <!-- Liens vers les sections de la page ; navigation.js marque la section affichée -->
+            <span class="header__current"></span>
+            <ul class="header__links" id="menu-links">
+                <li>
+                    <a class="header__link" href="#formation">Education</a>
+                </li>
+                <li>
+                    <a class="header__link" href="#experience">Experience</a>
+                </li>
+                <li>
+                    <a class="header__link" href="#reconversion">IT Career Change</a>
+                </li>
+                <li>
+                    <a class="header__link" href="#projects">Projects</a>
+                </li>
+                <li>
+                    <a class="header__link" href="#contact">Contact</a>
+                </li>
+            </ul>
 
         </nav>
 
     </header>
 
 
-    <!-- -------------------- MAIN CONTENT -------------------- -->
+    <!-- -------------------- CONTENU PRINCIPAL -------------------- -->
 
     <main id="main">
 
+        <!-- -------------------- ACCUEIL (bleu) -------------------- -->
 
-        <!-- -------------------- HOME -------------------- -->
+        <section class="hero" id="home">
 
-        <section id="home" class="home">
+            <div class="hero__text">
 
-            <!-- Main text section -->
-            <div class="home__text">
+                <p class="section__eyebrow">RESUME / 2026</p>
 
-                <p class="eyebrow">RESUME / 2026</p>
-
-                <h1>
+                <h1 class="hero__title">
                     Axel<br>
-                    FOLLET
+                    <em>FOLLET</em>
                 </h1>
 
-                <h2>
-                    IT Project Manager at QUANTEAM
-                </h2>
+                <p class="hero__role">IT Project Manager at QUANTEAM</p>
 
+                <!-- Phrase d'accroche -->
+                <p class="hero__catchphrase">
+                    From HR projects to IT projects: same rigour, new tools.
+                </p>
 
                 <div class="button-group">
                     <a class="button button--primary" href="#formation">Discover my journey</a>
@@ -139,56 +170,17 @@
             </div>
 
 
-            <!-- -------------------- 3D FIGURE HOME -------------------- -->
-
-            <!-- Les cubes combinent un bloc réutilisable, ses variantes de taille/couleur et son placement. data-speed fixe la vitesse et data-phase l'orientation initiale ; JavaScript crée les six faces. -->
-            <div class="home__cubes">
-
-                <!-- Main cube -->
-                <button
-                    class="cube cube--large cube--red home__cube--main home__cube"
-                    type="button"
-                    aria-label="Spin the main cube"
-                    data-speed="16"
-                    data-phase="0"
-                ></button>
-
-
-                <!-- Smaller cubes around the main cube -->
-                <span
-                    class="cube cube--small cube--red home__cube--satellite-1 home__cube"
-                    aria-hidden="true"
-                    data-speed="21"
-                    data-phase="70"
-                ></span>
-
-                <span
-                    class="cube cube--small cube--red home__cube--satellite-2 home__cube"
-                    aria-hidden="true"
-                    data-speed="18"
-                    data-phase="150"
-                ></span>
-
-                <span
-                    class="cube cube--tiny cube--red home__cube--satellite-3 home__cube"
-                    aria-hidden="true"
-                    data-speed="23"
-                    data-phase="220"
-                ></span>
-
-                <span
-                    class="cube cube--tiny cube--red home__cube--satellite-4 home__cube"
-                    aria-hidden="true"
-                    data-speed="19"
-                    data-phase="290"
-                ></span>
-
+            <!-- Cubes décoratifs : on peut les faire tourner à la souris ou au doigt, ils restent hors du parcours clavier. data-speed fixe la vitesse et data-phase l'orientation initiale ; JavaScript crée les six faces. -->
+            <div class="hero__visual" aria-hidden="true">
+                <span class="cube cube--huge cube--white cube--hero" data-speed="14" data-phase="60"></span>
+                <span class="cube cube--small cube--white cube--pos-1" data-speed="21" data-phase="70"></span>
+                <span class="cube cube--small cube--white cube--pos-2" data-speed="18" data-phase="150"></span>
             </div>
 
 
-            <!-- Transition cube, bottom left of the section -->
+            <!-- Cube de transition, en bas à gauche de la section -->
             <span
-                class="cube cube--tiny cube--red cube--transition"
+                class="cube cube--tiny cube--blue cube--transition"
                 aria-hidden="true"
                 data-speed="13"
                 data-phase="40"
@@ -199,13 +191,12 @@
 
         <!-- -------------------- EDUCATION -------------------- -->
 
-        <section id="formation" class="education">
+        <section class="section section--dark" id="formation" aria-labelledby="formation-title">
 
 
+            <p class="section__eyebrow">01 / EDUCATION</p>
 
-            <p class="eyebrow">01 / EDUCATION</p>
-
-            <h2 class="section-title">Academic background</h2>
+            <h2 class="section__title" id="formation-title">Academic <em>background</em></h2>
 
             <div class="education__list">
 
@@ -243,42 +234,32 @@
 
             </div>
 
-
-            <!-- Transition cube, bottom left of the section -->
-            <span
-                class="cube cube--tiny cube--red cube--transition"
-                aria-hidden="true"
-                data-speed="14"
-                data-phase="180"
-            ></span>
-
         </section>
 
 
         <!-- -------------------- EXPERIENCE -------------------- -->
 
-        <section id="experience" class="experience">
+        <section class="section section--dark" id="experience" aria-labelledby="experience-title">
 
 
+            <p class="section__eyebrow">02 / EXPERIENCE</p>
 
-            <p class="eyebrow">02 / EXPERIENCE</p>
+            <h2 class="section__title" id="experience-title">Professional <em>experience</em></h2>
 
-            <h2 class="section-title">Professional experience</h2>
-
-            <p class="section-intro">
-                From a first internship to change management, step by step. Open “Skills & tools” to see what each role had me practise.
+            <p class="section__intro">
+                From a first internship to change management, step by step, with the skills and tools each role had me practise.
             </p>
 
-            <!-- Frise chronologique, comme la progression du portfolio : la flèche descend au fil du défilement (timeline.js). Chaque carré porte l'année de début, et celle de fin si elle diffère. -->
+            <!-- Frise chronologique, comme la progression du portfolio : le trait bleu descend au fil du défilement (timeline.js). Chaque carré porte l'année de début, et celle de fin si elle diffère. -->
             <ol class="timeline">
 
                 <li class="timeline__step" id="experience-enedis">
 
-                    <span class="timeline__number" aria-hidden="true">2019</span>
+                    <span class="timeline__date" aria-hidden="true">2019</span>
 
                     <article class="timeline__content">
 
-                        <p class="timeline__date">December 2019</p>
+                        <p class="timeline__period">December 2019</p>
 
                         <h3 class="timeline__title">Enedis</h3>
 
@@ -288,12 +269,9 @@
                             First professional experience, within an HR team.
                         </p>
 
-                        <!-- Le bouton déplie la liste qu'il désigne (aria-controls) ; experience.js tient aria-expanded à jour. -->
-                        <button class="timeline__toggle" type="button" aria-expanded="false" aria-controls="skills-enedis">Skills & tools</button>
-
-                        <ul class="timeline__skills" id="skills-enedis" hidden>
-                            <li>First professional experience</li>
-                            <li>Introduction to the Human Resources field</li>
+                        <ul class="timeline__tags" aria-label="Skills & tools">
+                            <li class="tag">First professional experience</li>
+                            <li class="tag">Introduction to the Human Resources field</li>
                         </ul>
 
                     </article>
@@ -302,11 +280,11 @@
 
                 <li class="timeline__step" id="experience-natixis">
 
-                    <span class="timeline__number" aria-hidden="true">2020</span>
+                    <span class="timeline__date" aria-hidden="true">2020</span>
 
                     <article class="timeline__content">
 
-                        <p class="timeline__date">November 2020 - December 2020</p>
+                        <p class="timeline__period">November 2020 - December 2020</p>
 
                         <h3 class="timeline__title">Natixis</h3>
 
@@ -316,13 +294,10 @@
                             First project managed independently: testing phase of an HRIS tool, acting as the link between the HR and HRIS teams.
                         </p>
 
-                        <!-- Le bouton déplie la liste qu'il désigne (aria-controls) ; experience.js tient aria-expanded à jour. -->
-                        <button class="timeline__toggle" type="button" aria-expanded="false" aria-controls="skills-natixis">Skills & tools</button>
-
-                        <ul class="timeline__skills" id="skills-natixis" hidden>
-                            <li>First independently managed project</li>
-                            <li>Understanding the testing phase involved in developing a tool</li>
-                            <li>Coordination between the HR and HRIS teams</li>
+                        <ul class="timeline__tags" aria-label="Skills & tools">
+                            <li class="tag">First independently managed project</li>
+                            <li class="tag">Understanding the testing phase involved in developing a tool</li>
+                            <li class="tag">Coordination between the HR and HRIS teams</li>
                         </ul>
 
                     </article>
@@ -331,11 +306,11 @@
 
                 <li class="timeline__step" id="experience-ocp">
 
-                    <span class="timeline__number" aria-hidden="true"><span>2021</span><span>2022</span></span>
+                    <span class="timeline__date" aria-hidden="true"><span>2021</span><span>2022</span></span>
 
                     <article class="timeline__content">
 
-                        <p class="timeline__date">September 2021 - February 2022</p>
+                        <p class="timeline__period">September 2021 - February 2022</p>
 
                         <h3 class="timeline__title">OCP Répartition</h3>
 
@@ -349,19 +324,16 @@
                             Contributed to designing a recruitment preparation and tracking tool on SmartRecruiters, and trained managers.
                         </p>
 
-                        <!-- Le bouton déplie la liste qu'il désigne (aria-controls) ; experience.js tient aria-expanded à jour. -->
-                        <button class="timeline__toggle" type="button" aria-expanded="false" aria-controls="skills-ocp">Skills & tools</button>
-
-                        <ul class="timeline__skills" id="skills-ocp" hidden>
-                            <li>Candidate sourcing</li>
-                            <li>SmartRecruiters</li>
-                            <li>APEC</li>
-                            <li>Pôle Emploi</li>
-                            <li>Telephone interviews</li>
-                            <li>Microsoft Teams interviews</li>
-                            <li>Recruitment follow-up</li>
-                            <li>Administrative management</li>
-                            <li>Manager training</li>
+                        <ul class="timeline__tags" aria-label="Skills & tools">
+                            <li class="tag">Candidate sourcing</li>
+                            <li class="tag">SmartRecruiters</li>
+                            <li class="tag">APEC</li>
+                            <li class="tag">Pôle Emploi</li>
+                            <li class="tag">Telephone interviews</li>
+                            <li class="tag">Microsoft Teams interviews</li>
+                            <li class="tag">Recruitment follow-up</li>
+                            <li class="tag">Administrative management</li>
+                            <li class="tag">Manager training</li>
                         </ul>
 
                     </article>
@@ -370,11 +342,11 @@
 
                 <li class="timeline__step" id="experience-bpce">
 
-                    <span class="timeline__number" aria-hidden="true">2022</span>
+                    <span class="timeline__date" aria-hidden="true">2022</span>
 
                     <article class="timeline__content">
 
-                        <p class="timeline__date">March 2022 - July 2022</p>
+                        <p class="timeline__period">March 2022 - July 2022</p>
 
                         <h3 class="timeline__title">BPCE Infogérance et Technologies</h3>
 
@@ -388,19 +360,16 @@
                             Relations with schools, dashboards, reporting and communication on LinkedIn and at recruitment fairs.
                         </p>
 
-                        <!-- Le bouton déplie la liste qu'il désigne (aria-controls) ; experience.js tient aria-expanded à jour. -->
-                        <button class="timeline__toggle" type="button" aria-expanded="false" aria-controls="skills-bpce">Skills & tools</button>
-
-                        <ul class="timeline__skills" id="skills-bpce" hidden>
-                            <li>Apprenticeship recruitment campaign management</li>
-                            <li>IT recruitment</li>
-                            <li>Independent working</li>
-                            <li>LinkedIn communication</li>
-                            <li>Dashboards</li>
-                            <li>Reporting</li>
-                            <li>Coordination with educational institutions</li>
-                            <li>Administrative management</li>
-                            <li>Recruitment fairs</li>
+                        <ul class="timeline__tags" aria-label="Skills & tools">
+                            <li class="tag">Apprenticeship recruitment campaign management</li>
+                            <li class="tag">IT recruitment</li>
+                            <li class="tag">Independent working</li>
+                            <li class="tag">LinkedIn communication</li>
+                            <li class="tag">Dashboards</li>
+                            <li class="tag">Reporting</li>
+                            <li class="tag">Coordination with educational institutions</li>
+                            <li class="tag">Administrative management</li>
+                            <li class="tag">Recruitment fairs</li>
                         </ul>
 
                     </article>
@@ -409,11 +378,11 @@
 
                 <li class="timeline__step" id="experience-sfr">
 
-                    <span class="timeline__number" aria-hidden="true"><span>2022</span><span>2024</span></span>
+                    <span class="timeline__date" aria-hidden="true"><span>2022</span><span>2024</span></span>
 
                     <article class="timeline__content">
 
-                        <p class="timeline__date">September 2022 - October 2024</p>
+                        <p class="timeline__period">September 2022 - October 2024</p>
 
                         <h3 class="timeline__title">SFR Distribution</h3>
 
@@ -427,20 +396,17 @@
                             Training design, internal communication, KPI monitoring, reporting and workforce data analysis.
                         </p>
 
-                        <!-- Le bouton déplie la liste qu'il désigne (aria-controls) ; experience.js tient aria-expanded à jour. -->
-                        <button class="timeline__toggle" type="button" aria-expanded="false" aria-controls="skills-sfr">Skills & tools</button>
-
-                        <ul class="timeline__skills" id="skills-sfr" hidden>
-                            <li>Project management</li>
-                            <li>Change management</li>
-                            <li>Communication and diplomacy</li>
-                            <li>Training design</li>
-                            <li>CapCut</li>
-                            <li>Caption</li>
-                            <li>edit2Emotions</li>
-                            <li>Performance indicator monitoring</li>
-                            <li>Reporting</li>
-                            <li>Social data analysis</li>
+                        <ul class="timeline__tags" aria-label="Skills & tools">
+                            <li class="tag">Project management</li>
+                            <li class="tag">Change management</li>
+                            <li class="tag">Communication and diplomacy</li>
+                            <li class="tag">Training design</li>
+                            <li class="tag">CapCut</li>
+                            <li class="tag">Caption</li>
+                            <li class="tag">edit2Emotions</li>
+                            <li class="tag">Performance indicator monitoring</li>
+                            <li class="tag">Reporting</li>
+                            <li class="tag">Social data analysis</li>
                         </ul>
 
                     </article>
@@ -452,7 +418,7 @@
 
             <!-- Transition cube, bottom left of the section -->
             <span
-                class="cube cube--tiny cube--red cube--transition"
+                class="cube cube--tiny cube--blue cube--transition"
                 aria-hidden="true"
                 data-speed="13"
                 data-phase="310"
@@ -463,15 +429,13 @@
 
         <!-- -------------------- IT CAREER CHANGE -------------------- -->
 
-        <section id="reconversion" class="career">
+        <section class="section section--dark" id="reconversion" aria-labelledby="reconversion-title">
 
             <div class="career__banner">
 
-                <p class="career__number eyebrow">
+                <p class="section__eyebrow career__number">
                     03 / IT CAREER CHANGE
                 </p>
-
-
 
 
                 <!-- -------------------- INTRODUCTION -------------------- -->
@@ -481,9 +445,9 @@
 
                     <div class="career__story">
 
-                    <h2>
+                    <h2 id="reconversion-title">
                         From HR project management
-                        to the world of IT!
+                        to the world of <em>IT</em>!
                     </h2>
 
                     <p>
@@ -509,9 +473,9 @@
 
                 <div class="career__skills skills">
 
-                    <!-- Blue cube -->
+                    <!-- White cube -->
                     <span
-                        class="cube cube--medium cube--blue career__cube"
+                        class="cube cube--medium cube--white career__cube"
                         aria-hidden="true"
                         data-speed="16"
                         data-phase="90"
@@ -528,7 +492,9 @@
                         <li>HTML</li>
                         <li>CSS</li>
                         <li>JavaScript</li>
+                        <li>Java</li>
                         <li>Git</li>
+                        <li>AI</li>
                     </ul>
 
                 </div>
@@ -538,7 +504,7 @@
 
             <!-- Transition cube, bottom left of the section -->
             <span
-                class="cube cube--tiny cube--red cube--transition"
+                class="cube cube--tiny cube--blue cube--transition"
                 aria-hidden="true"
                 data-speed="14"
                 data-phase="200"
@@ -549,13 +515,11 @@
 
         <!-- -------------------- PROJECTS -------------------- -->
 
-        <section id="projects" class="projects">
+        <section class="section section--dark" id="projects" aria-labelledby="projects-title">
 
-            <p class="eyebrow">04 / PROJECTS</p>
+            <p class="section__eyebrow">04 / PROJECTS</p>
 
-            <h2 class="section-title">My technical projects</h2>
-
-
+            <h2 class="section__title" id="projects-title">My <em>technical</em> projects</h2>
 
 
             <!-- Projects grid: the portfolio as a large square card on the left, two stacked rectangular cards on the right. Each card keeps the skills used, the code on GitHub and a way to try it. -->
@@ -566,14 +530,17 @@
 
                 <!-- -------------------- PORTFOLIO -------------------- -->
 
-                <article class="project-card project-card--featured">
+                <article class="project-card project-card--featured" data-hover="cursor">
+
+                    <!-- Bande du haut de la carte, où passe le dessin du survol (motion.css) -->
+                    <span class="project-card__hover-zone" aria-hidden="true" data-hover-zone></span>
 
                     <span class="cube cube--white project-card__cube" aria-hidden="true" data-speed="16" data-phase="35"></span>
 
                     <h3>My portfolio</h3>
 
                     <p class="project-card__text">
-                        My showcase site, four bilingual pages: projects you can try live, skills tied to each project and the path from HR project management to IT.
+                        My showcase site, in French and English: projects you can try live, skills tied to each project and the path from HR project management to IT.
                     </p>
 
                     <ul class="project-card__tags" aria-label="Skills used">
@@ -605,9 +572,13 @@
 
                 <!-- -------------------- CHIFFREMENTS -------------------- -->
 
-                <article class="project-card">
+                <article class="project-card" data-hover="cipher">
 
-                    <h3>Caesar and Vigenère ciphers</h3>
+                    <h3><span data-cipher>Caesar</span> and Vigenère ciphers</h3>
+
+                    <p class="project-card__text">
+                        Python bootcamp exercise: encrypting and decrypting with Caesar (fixed shift) and Vigenère (shift given by a keyword), then <strong>recovering a Caesar key on its own</strong>.
+                    </p>
 
                     <ul class="project-card__tags" aria-label="Skills used">
                         <li>Python</li>
@@ -625,7 +596,7 @@
                         >View on GitHub<span class="visually-hidden"> : Caesar and Vigenère ciphers (new tab)</span></a>
                         <a
                             class="button button--primary project-card__action"
-                            href="https://axel-follet.github.io/portfolio/pages/projects-en.html#theme-algorithms"
+                            href="https://axel-follet.github.io/portfolio/index-en.html#projects/cesar-vigenere"
                             target="_blank"
                             rel="noopener noreferrer"
                             aria-label="Try the demo on the portfolio (new tab)"
@@ -637,9 +608,15 @@
 
                 <!-- -------------------- SNAKE -------------------- -->
 
-                <article class="project-card">
+                <article class="project-card" data-hover="snake">
+
+                    <span class="project-card__hover-zone" aria-hidden="true" data-hover-zone></span>
 
                     <h3>Snake</h3>
+
+                    <p class="project-card__text">
+                        <strong>A complete Snake, a personal project built after Hangman</strong>: keyboard movement, collisions, apples, score and visual effects.
+                    </p>
 
                     <ul class="project-card__tags" aria-label="Skills used">
                         <li>Python</li>
@@ -649,7 +626,6 @@
                         <li>Modular code</li>
                     </ul>
 
-                    <!-- The game opens in a window on desktop; on phones, the note replaces the button. -->
                     <div class="project-card__actions">
                         <a
                             class="button project-card__action project-card__link"
@@ -657,13 +633,13 @@
                             target="_blank"
                             rel="noopener noreferrer"
                         >View on GitHub<span class="visually-hidden"> : Snake (new tab)</span></a>
-                        <button
-                            class="button button--primary project-card__action project-card__play"
-                            type="button"
-                            data-game="snake"
-                            data-game-title="Snake"
-                        >Try it</button>
-                        <p class="project-card__note">Playable on desktop</p>
+                        <a
+                            class="button button--primary project-card__action"
+                            href="https://axel-follet.github.io/portfolio/index-en.html#projects/snake"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="Try the demo on the portfolio (new tab)"
+                        >Try it</a>
                     </div>
 
                 </article>
@@ -671,254 +647,129 @@
             </div>
             </div>
 
-
-            <!-- Transition cube, bottom left of the section -->
-            <span
-                class="cube cube--tiny cube--red cube--transition"
-                aria-hidden="true"
-                data-speed="13"
-                data-phase="260"
-            ></span>
-
         </section>
 
 
-        <!-- -------------------- CONTACT -------------------- -->
+        <!-- -------------------- CONTACT (bleu) -------------------- -->
 
-        <section id="contact" class="contact">
+        <section class="section" id="contact" aria-labelledby="contact-title">
 
-            <p class="eyebrow">05 / CONTACT</p>
+            <p class="section__eyebrow">05 / CONTACT</p>
 
-            <h2 class="section-title">Get in touch</h2>
+            <h2 class="section__title" id="contact-title">Get in <em>touch</em></h2>
 
-            <p class="contact__intro">
-                An opportunity, a project or a question about my background? The form below reaches me directly; LinkedIn and my portfolio are also one click away.
+            <p class="section__intro">
+                An opportunity, a project or a question about my background? The form below reaches me directly; LinkedIn and my GitHub are also one click away.
             </p>
 
-
-            <!-- -------------------- LINKEDIN -------------------- -->
-
-            <div class="contact__links">
-
-                <a
-                    href="https://www.linkedin.com/in/axel-follet/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="contact-link"
-                >
-
-                    <img
-                        class="contact-link__logo"
-                        src="assets/images/linkedin-logo.png"
-                        alt="" width="840" height="779" loading="lazy" decoding="async"
-                    >
-
-                    <span class="contact-link__label">LinkedIn</span>
-                    <span class="contact-link__hint">axel-follet</span>
-
-                </a>
-
-                <a
-                    href="https://axel-follet.github.io/portfolio/index-en.html"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="contact-link"
-                >
-
-                    <!-- Petit cube blanc animé à la place d'un logo -->
-                    <span
-                        class="cube cube--icon cube--white"
-                        aria-hidden="true"
-                        data-speed="40"
-                        data-phase="60"
-                    ></span>
-
-                    <span class="contact-link__label">My portfolio</span>
-                    <span class="contact-link__hint">axel-follet.github.io/portfolio</span>
-
-                </a>
-
-            </div>
+            <a class="button contact__resume" href="assets/CV_Axel_FOLLET_EN.pdf" download="CV_Axel_FOLLET_EN.pdf">
+                <!-- Pictogramme : flèche de téléchargement -->
+                <svg class="button__icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>
+                </svg>
+                Download my resume (PDF)
+            </a>
 
 
+            <!-- -------------------- LIENS -------------------- -->
+
+            <ul class="link-list">
+
+                <li>
+                    <a class="link-card" href="https://www.linkedin.com/in/axel-follet/" target="_blank" rel="noopener noreferrer">
+                        <img class="link-card__icon link-card__icon--linkedin" src="assets/images/linkedin-logo.png" alt="" aria-hidden="true" width="840" height="779" loading="lazy" decoding="async">
+                        <span class="link-card__label">LinkedIn</span>
+                        <span class="link-card__hint">axel-follet</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a class="link-card" href="https://github.com/Axel-FOLLET" target="_blank" rel="noopener noreferrer">
+                        <!-- Pictogramme : chevrons de code -->
+                        <svg class="link-card__icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/>
+                        </svg>
+                        <span class="link-card__label">All my code</span>
+                        <span class="link-card__hint">github.com/Axel-FOLLET</span>
+                    </a>
+                </li>
+
+            </ul>
 
 
-            <!-- Three accent bars, as on the portfolio -->
-            <div class="bars" aria-hidden="true">
-                <span class="bars__bar"></span>
-                <span class="bars__bar"></span>
-                <span class="bars__bar"></span>
-            </div>
+            <div class="contact">
 
+                <!-- -------------------- FORMULAIRE -------------------- -->
 
-            <!-- -------------------- CONTACT CONTENT -------------------- -->
-
-            <div class="contact__layout">
-
-
-                <!-- Left section -->
                 <div class="contact__main">
 
-                    <!-- -------------------- FORM -------------------- -->
-
+                    <!-- Les textes d'état et d'erreur viennent des attributs data-* : un seul script pour FR et EN (contact.js) -->
                     <form
-                        class="contact-form"
+                        class="form"
+                        id="contact-form"
                         action="https://formspree.io/f/xaenbdqw"
                         method="POST"
+                        data-sending="Sending…"
+                        data-success="Thank you, your message has been sent."
+                        data-sent="Sent"
+                        data-error="Sending failed. Check your connection and try again, or contact me on LinkedIn."
+                        data-invalid-required="This field is required."
+                        data-invalid-email="Invalid email address (example: name@domain.com)."
                     >
 
-                        <div class="contact-form__name-row">
-
-                            <!-- Last name -->
-                            <div class="contact-form__field">
-
-                                <label for="surname">
-                                    Last name
-                                </label>
-
-                                <input
-                                    class="contact-form__control"
-                                    type="text"
-                                    id="surname"
-                                    name="surname"
-                                    required
-                                >
-
+                        <div class="form__row">
+                            <div class="form__field">
+                                <label class="form__label" for="surname">Last name</label>
+                                <input class="form__input" type="text" id="surname" name="surname" autocomplete="family-name" required>
                             </div>
-
-
-                            <!-- First name -->
-                            <div class="contact-form__field">
-
-                                <label for="name">
-                                    First name
-                                </label>
-
-                                <input
-                                    class="contact-form__control"
-                                    type="text"
-                                    id="name"
-                                    name="name"
-                                    required
-                                >
-
+                            <div class="form__field">
+                                <label class="form__label" for="name">First name</label>
+                                <input class="form__input" type="text" id="name" name="name" autocomplete="given-name" required>
                             </div>
-
                         </div>
 
-
-                        <!-- Email -->
-                        <div class="contact-form__field">
-
-                            <label for="email">
-                                Email
-                            </label>
-
-                            <input
-                                class="contact-form__control"
-                                type="email"
-                                id="email"
-                                name="email"
-                                required
-                            >
-
+                        <div class="form__field">
+                            <label class="form__label" for="email">Email</label>
+                            <input class="form__input" type="email" id="email" name="email" autocomplete="email" required>
                         </div>
 
-
-                        <!-- Subject -->
-                        <div class="contact-form__field">
-
-                            <label for="subject">
-                                Subject
-                            </label>
-
-                            <input
-                                class="contact-form__control"
-                                type="text"
-                                id="subject"
-                                name="subject"
-                                required
-                            >
-
+                        <div class="form__field">
+                            <label class="form__label" for="subject">Subject (optional)</label>
+                            <input class="form__input" type="text" id="subject" name="subject">
                         </div>
 
-
-                        <!-- Message -->
-                        <div class="contact-form__field">
-
-                            <label for="message">
-                                Message
-                            </label>
-
-                            <textarea
-                                class="contact-form__control"
-                                id="message"
-                                name="message"
-                                rows="6"
-                                required
-                            ></textarea>
-
+                        <div class="form__field">
+                            <label class="form__label" for="message">Message</label>
+                            <textarea class="form__input form__input--area" id="message" name="message" rows="6" required></textarea>
                         </div>
-
 
                         <!-- Champ piège contre les robots : invisible pour les visiteurs, Formspree rejette l'envoi s'il est rempli -->
-                        <input class="contact-form__trap" type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true">
+                        <input class="form__trap" type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true">
 
+                        <button class="button button--primary" type="submit">Send</button>
 
-                        <button type="submit" class="button button--primary contact-form__submit">
-                            Send
-                        </button>
+                        <p class="form__notice">All fields are required except the subject.<a href="#donnees-formulaire">How your data is used</a></p>
 
-
-                        <!-- Message d'état rempli par contact-form.js : envoi, réussite ou erreur. -->
-                        <p class="contact-form__status" role="status"></p>
+                        <!-- Message de confirmation ou d'erreur, lu par les lecteurs d'écran -->
+                        <p class="form__status" id="form-status" role="status" aria-live="polite"></p>
 
                     </form>
 
                 </div>
 
 
-                <!-- -------------------- CONTACT 3D FIGURE -------------------- -->
-
-                <div class="contact__cubes">
-
-                    <button
-                        class="cube cube--large cube--red contact__cube--main contact__cube"
-                        type="button"
-                        aria-label="Spin the main cube"
-                        data-speed="15"
-                        data-phase="30"
-                    ></button>
-
-                    <span
-                        class="cube cube--small cube--red contact__cube--satellite-1 contact__cube"
-                        aria-hidden="true"
-                        data-speed="20"
-                        data-phase="110"
-                    ></span>
-
-                    <span
-                        class="cube cube--small cube--red contact__cube--satellite-2 contact__cube"
-                        aria-hidden="true"
-                        data-speed="18"
-                        data-phase="210"
-                    ></span>
-
-                    <span
-                        class="cube cube--tiny cube--red contact__cube--satellite-3 contact__cube"
-                        aria-hidden="true"
-                        data-speed="21"
-                        data-phase="300"
-                    ></span>
-
+                <!-- Cubes décoratifs, comme à l'accueil -->
+                <div class="contact__side" aria-hidden="true">
+                    <span class="cube cube--large cube--white cube--pos-main" data-speed="15" data-phase="30"></span>
+                    <span class="cube cube--small cube--white cube--pos-1" data-speed="20" data-phase="110"></span>
                 </div>
 
             </div>
 
 
-            <!-- Transition cube, bottom left of the section -->
+            <!-- Cube de transition, en bas à gauche de la section -->
             <span
-                class="cube cube--tiny cube--red cube--transition"
+                class="cube cube--tiny cube--blue cube--transition"
                 aria-hidden="true"
                 data-speed="13"
                 data-phase="330"
@@ -929,14 +780,23 @@
     </main>
 
 
-    <!-- -------------------- FOOTER -------------------- -->
+    <!-- -------------------- PIED DE PAGE -------------------- -->
 
     <footer class="footer">
+
+        <!-- Dernier appel : la page se referme sur une invitation, vers LinkedIn et le portfolio -->
+        <div class="footer__cta">
+            <p class="footer__cta-title">Let's work <em>together</em>.</p>
+            <div class="button-group">
+                <a class="button button--primary" href="https://www.linkedin.com/in/axel-follet/" target="_blank" rel="noopener noreferrer">Connect on LinkedIn<span class="visually-hidden"> (new tab)</span></a>
+                <a class="button" href="https://axel-follet.github.io/portfolio/index-en.html" target="_blank" rel="noopener noreferrer">View my portfolio<span class="visually-hidden"> (new tab)</span></a>
+            </div>
+        </div>
 
         <div class="footer__row">
 
             <div>
-                <h2 class="footer__title">Navigation</h2>
+                <p class="footer__title">Navigation</p>
                 <ul class="footer__list">
                     <li><a href="#home">Home</a></li>
                     <li><a href="#formation">Education</a></li>
@@ -948,25 +808,26 @@
             </div>
 
             <div>
-                <h2 class="footer__title">Links</h2>
+                <p class="footer__title">Links</p>
                 <ul class="footer__list">
-                    <li><a class="footer__external" href="https://axel-follet.github.io/portfolio/" target="_blank" rel="noopener noreferrer">My portfolio<span class="visually-hidden"> (new tab)</span></a></li>
-                    <li><a class="footer__external" href="https://www.linkedin.com/in/axel-follet/" target="_blank" rel="noopener noreferrer">LinkedIn<span class="visually-hidden"> (new tab)</span></a></li>
-                    <li><a class="footer__external" href="https://github.com/Axel-FOLLET" target="_blank" rel="noopener noreferrer">GitHub<span class="visually-hidden"> (new tab)</span></a></li>
+                    <li><a href="https://axel-follet.github.io/portfolio/index-en.html" target="_blank" rel="noopener noreferrer">My portfolio<span class="visually-hidden"> (new tab)</span></a></li>
+                    <li><a href="https://www.linkedin.com/in/axel-follet/" target="_blank" rel="noopener noreferrer">LinkedIn<span class="visually-hidden"> (new tab)</span></a></li>
+                    <li><a href="https://github.com/Axel-FOLLET" target="_blank" rel="noopener noreferrer">GitHub<span class="visually-hidden"> (new tab)</span></a></li>
                 </ul>
             </div>
 
             <div>
-                <h2 class="footer__title">Resources and credits</h2>
+                <p class="footer__title">Resources and credits</p>
                 <p class="footer__credits">
-                    Photo and texts: original work by Axel FOLLET. The 3D cubes and icons are made with HTML, CSS and JavaScript, except the LinkedIn logo. LinkedIn® and the [in]® logo are trademarks of LinkedIn Corporation and its affiliates. This personal website is neither affiliated with nor endorsed by LinkedIn. No third-party theme or downloaded font: text uses the fonts installed on the device.
+                    Photo and texts: original work by Axel FOLLET. The 3D cubes and icons are made with HTML, CSS and JavaScript, except the LinkedIn logo. LinkedIn® and the [in]® logo are trademarks of LinkedIn Corporation and its affiliates. This personal website is neither affiliated with nor endorsed by LinkedIn. Manrope typeface (The Manrope Project Authors), under the <a href="assets/fonts/OFL-Manrope.txt">SIL Open Font License 1.1</a>, hosted with the site.
                 </p>
                 <details class="footer__legal">
                     <summary class="footer__legal-toggle">Legal notice and data</summary>
-                    <p><strong>Publisher:</strong> Axel FOLLET, personal non-professional website. Contact: the site form or LinkedIn.</p>
-                    <p><strong>Host:</strong> GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, United States.</p>
-                    <p><strong>Contact form:</strong> your surname, first name, email, subject and message are used only to reply to you. They go through Formspree, a service based in the United States, and are deleted 12 months after our last exchange. You can ask to access, correct or delete them through the form or LinkedIn, and lodge a complaint with the <a href="https://www.cnil.fr/fr/plaintes" hreflang="fr" target="_blank" rel="noopener noreferrer">CNIL</a> (French data protection authority; complaint page in French).</p>
-                    <p><strong>Browser:</strong> no cookies and no audience tracking. The site only keeps your Snake and Hangman records on your device, along with your answer to the form's anti-robot check until the tab is closed.</p>
+                    <p><strong>Publisher and publication director:</strong> Axel FOLLET, private individual, personal non-professional website. Contact: the site form or LinkedIn.</p>
+                    <p><strong>Host:</strong> GitHub, Inc. (GitHub Pages), 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, United States, <a href="https://support.github.com/" target="_blank" rel="noopener noreferrer">support.github.com</a>. For security purposes, GitHub logs visitors' IP addresses.</p>
+                    <p id="donnees-formulaire"><strong>Contact form:</strong> data controller, Axel FOLLET. Last name, first name, email and message are required; the subject is optional. This data is used only to reply to you, on the basis of the legitimate interest in handling your request. It goes through Formspree, Inc., in the United States, which keeps it under its <a href="https://formspree.io/legal/privacy-policy" target="_blank" rel="noopener noreferrer">privacy policy</a>, and is deleted 12 months after our last exchange. You can ask to access, rectify or erase your data or to restrict its processing, or object to it, through the form or LinkedIn, and lodge a complaint with the <a href="https://www.cnil.fr/fr/plaintes" hreflang="fr" target="_blank" rel="noopener noreferrer">CNIL</a> (French data protection authority; complaint page in French).</p>
+                    <p><strong>Browser:</strong> no cookies and no audience tracking. The site only keeps your answer to the form's anti-robot check on your device until the tab is closed.</p>
+                    <p><strong>Intellectual property:</strong> texts, photo, layout and source code © 2026 Axel FOLLET, all rights reserved. The code is public on GitHub to be read; any reuse requires my permission. The Manrope typeface and the LinkedIn logo remain under their own licences and trademarks.</p>
                 </details>
             </div>
 
@@ -974,57 +835,11 @@
 
         <!-- Dernière ligne : droits à gauche, retour en haut à droite -->
         <div class="footer__bottom">
-            <p class="footer__copyright">&copy; 2026 Axel FOLLET</p>
-            <a class="footer__top" href="#home">Back to top ↑</a>
+            <p class="footer__copyright">&copy; 2026 Axel FOLLET, all rights reserved</p>
+            <a class="footer__top" href="#top">Back to top ↑</a>
         </div>
 
     </footer>
-
-
-    <!-- -------------------- DESKTOP GAME WINDOW -------------------- -->
-
-    <div
-        id="game-modal"
-        class="game-modal"
-        aria-hidden="true"
-    >
-        <button
-            class="game-modal__backdrop"
-            type="button"
-            data-game-close
-            aria-label="Close the game"
-        ></button>
-
-        <div
-            class="game-modal__dialog"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="game-modal-title"
-        >
-            <div class="game-modal__header">
-                <h2 id="game-modal-title">Game</h2>
-
-                <button
-                    id="game-modal-close"
-                    class="game-modal__close"
-                    type="button"
-                    data-game-close
-                    aria-label="Close the game"
-                >
-                    ×
-                </button>
-            </div>
-
-            <!-- L'iframe héberge son propre document et ses commandes clavier. Son adresse est choisie au clic ; about:blank décharge le jeu à la fermeture. -->
-            <div class="game-modal__content">
-                <iframe
-                    id="game-frame"
-                    title="Playable game"
-                    src="about:blank"
-                 class="game-modal__frame"></iframe>
-            </div>
-        </div>
-    </div>
 
 </body>
 

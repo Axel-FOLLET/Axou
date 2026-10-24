@@ -1,209 +1,76 @@
-/*
- * Accueil : grand nom sur deux lignes à gauche, figure de cubes à droite.
- * BEM : bloc__element désigne une partie du bloc ; bloc--modificateur désigne une variante.
- */
 /* -------------------- ACCUEIL -------------------- */
 
 /*
- * Deux colonnes (texte plus large que la figure) ; au moins la hauteur de l'écran sous l'en-tête.
- * svh : hauteur de l'écran barre d'adresse mobile affichée, l'accueil ne saute pas au défilement.
- */
-.home {
-    display: grid;
-    grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
-    align-items: center;
-
-    gap: 48px;
-
-    min-height: calc(100svh - var(--header-height));
-}
-
-
-/* Mêmes tailles que le portfolio : le nom suit la largeur de l'écran, entre 3.4rem et 6rem */
-.home h1 {
-    margin: 0;
-
-    font-size: clamp(3.4rem, 8vw, 6rem);
-    font-weight: 700;
-    line-height: 0.9;
-    letter-spacing: -0.035em;
-    text-transform: uppercase;
-}
-
-
-/* Poste actuel, sous le nom, à la taille de la phrase d'accroche du portfolio */
-.home h2 {
-    margin: 30px 0 0;
-
-    color: white;
-
-    font-size: 1.6rem;
-    font-weight: 400;
-}
-
-
-/* -------------------- FIGURE DE CUBES -------------------- */
-
-/*
- * Zone carrée de 440 px au plus : les cubes s'y placent en pourcentages.
- * Les sélecteurs passent par .home__cubes : plus précis que .cube--large (cubes.css, chargé après),
- * ils imposent leurs tailles.
- */
-.home__cubes {
+    Bleu profond éclairé d'une lueur derrière le nom ; svh : la barre d'adresse mobile n'est pas comptée.
+    position: relative sert de repère au cube de transition, placé en bas à gauche.
+*/
+.hero {
     position: relative;
 
-    width: 100%;
-    max-width: 440px;
-    aspect-ratio: 1;
+    min-height: calc(100svh - 76px);
 
-    justify-self: end;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 48px var(--gutter) var(--space-section);
+
+    background: radial-gradient(70vw 50vw at 15% 0%, rgba(110, 123, 255, 0.3), transparent 70%);
 }
 
 
-.home__cube {
-    position: absolute;
+.hero__text {
+    width: 58%;
 }
 
 
-.home__cubes .home__cube--main {
-    --cube-size: 200px;
-    --cube-half: 100px;
+.hero__title {
+    margin: 0;
 
-    top: 50%;
-    left: 50%;
-
-    transform: translate(-50%, -50%);
+    /* Serif d'affichage, le nom de famille en italique (em) */
+    font-family: var(--font-display);
+    font-size: var(--text-display);
+    font-weight: 400;
+    line-height: 0.9;
+    /* em suit la taille du titre : le resserrement reste proportionnel */
+    letter-spacing: -0.02em;
 }
 
 
-.home__cubes .home__cube--satellite-1 {
-    --cube-size: 64px;
-    --cube-half: 32px;
-
-    top: 0;
-    left: 0;
-}
-
-
-.home__cubes .home__cube--satellite-2 {
-    --cube-size: 80px;
-    --cube-half: 40px;
-
-    top: 2%;
-    right: 0;
-}
-
-
-.home__cubes .home__cube--satellite-3 {
-    --cube-size: 48px;
-    --cube-half: 24px;
-
-    bottom: 2%;
-    left: 4%;
-}
-
-
-.home__cubes .home__cube--satellite-4 {
-    --cube-size: 56px;
-    --cube-half: 28px;
-
-    right: 4%;
-    bottom: 0;
-}
-
-
-/* Sur ordinateur : cube principal plus présent, comme sur le portfolio */
-@media (min-width: 1025px) {
-
-    .home__cubes .home__cube--main {
-        --cube-size: 250px;
-        --cube-half: 125px;
-    }
-
-}
-
-
-/* -------------------- TABLETTE ET TÉLÉPHONE -------------------- */
-
-/* Une colonne : la figure passe sous le texte, plus basse. */
-@media (max-width: 1024px) {
-
-    .home {
-        grid-template-columns: minmax(0, 1fr);
-
-        min-height: auto;
-    }
-
-
-    .home__cubes {
-        max-width: 360px;
-
-        justify-self: center;
-    }
-
-
-    /* Cubes réduits : en tournant, ils ne se chevauchent plus */
-    .home__cubes .home__cube--main {
-        --cube-size: 150px;
-        --cube-half: 75px;
-    }
-
-
-    .home__cubes .home__cube--satellite-1 {
-        --cube-size: 52px;
-        --cube-half: 26px;
-    }
-
-
-    .home__cubes .home__cube--satellite-2 {
-        --cube-size: 60px;
-        --cube-half: 30px;
-    }
-
-}
-
-
+/* Téléphone : le serif, étroit, paraît petit au plancher de --text-display ; 20 % de plus lui rendent sa présence */
 @media (max-width: 767px) {
 
-    .home h2 {
-        font-size: 1.3rem;
+    .hero__title {
+        font-size: calc(var(--text-display) * 1.2);
     }
 
-
-    /* Figure réduite, plus proche du texte : cube principal et deux satellites */
-    .home {
-        gap: 24px;
-
-        padding-bottom: 32px;
-    }
+}
 
 
-    .home__cubes {
-        max-width: 240px;
-    }
+/* Fonction et formation, sous le nom */
+.hero__role {
+    margin: 28px 0 0;
+
+    font-weight: 500;
+}
 
 
-    .home__cubes .home__cube--main {
-        --cube-size: 100px;
-        --cube-half: 50px;
-    }
+.hero__catchphrase {
+    max-width: 26ch;
+
+    margin: 20px 0 0;
+
+    font-size: var(--text-lead);
+    font-weight: 500;
+    line-height: 1.4;
+
+    text-wrap: balance;
+}
 
 
-    .home__cubes .home__cube--satellite-1 {
-        --cube-size: 40px;
-        --cube-half: 20px;
-    }
+.hero__visual {
+    width: 38%;
+    height: 520px;
 
-
-    .home__cubes .home__cube--satellite-2 {
-        --cube-size: 46px;
-        --cube-half: 23px;
-    }
-
-
-    .home__cubes .home__cube--satellite-3,
-    .home__cubes .home__cube--satellite-4 {
-        display: none;
-    }
-
+    position: relative;
 }

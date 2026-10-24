@@ -1,72 +1,72 @@
-/*
- * Expériences en frise chronologique, comme la progression du portfolio : une flèche blanche
- * descend au fil du défilement, chaque poste (carré daté + carte) apparaît quand elle l'atteint.
- * BEM : bloc__element désigne une partie du bloc ; bloc--modificateur désigne une variante.
- */
-/* -------------------- FRISE -------------------- */
+/* -------------------- FRISE DES EXPÉRIENCES -------------------- */
 
 /*
- * --node : côté des carrés datés ; la flèche passe par leur centre.
- * --axis-top : départ de la flèche, au centre du premier carré (décalé de 40 px, voir .timeline__number).
- * --progress (de 0 à 1) est mis à jour par timeline.js ; sans JavaScript, il vaut 1 : flèche entière.
- * --arrow-length : longueur du corps de la flèche quand elle est entière.
+ * Expériences en frise chronologique, comme la progression du portfolio : un trait bleu parcourt
+ * un filet au fil du défilement, chaque poste (pastille datée + texte) apparaît quand il l'atteint.
+ * Pas de carte autour des postes : le texte se pose sur la page, comme dans le portfolio.
+ */
+
+/*
+ * --node : diamètre des pastilles datées ; le filet passe par leur centre.
+ * --axis-top : départ du filet, au centre de la première pastille.
+ * --progress (de 0 à 1) est mis à jour par timeline.js ; sans JavaScript, il vaut 1 : trait entier.
+ * --axis-length : longueur du filet, jusqu'au bas de la frise.
  */
 .timeline {
     --node: 56px;
-    --axis-top: calc(40px + var(--node) / 2);
-    --arrow-space: 20px;
+    --axis-top: calc(var(--node) / 2);
     --progress: 1;
-    --arrow-length: calc(100% - var(--axis-top) - var(--arrow-space));
+    --axis-length: calc(100% - var(--axis-top));
 
     position: relative;
 
     display: grid;
 
-    gap: 24px;
+    gap: 56px;
 
     max-width: 1040px;
 
-    margin: 40px 0 0;
-    padding: 0 0 var(--arrow-space);
+    /* L'introduction de la section (.section__intro) fournit déjà l'espace au-dessus */
+    margin: 0;
+    padding: 0;
 
     list-style: none;
 }
 
 
-/* Corps de la flèche : il s'allonge avec le défilement */
-.timeline::before {
+/* Filet de fond, puis trait de progression par-dessus */
+.timeline::before,
+.timeline::after {
     content: "";
 
     position: absolute;
     top: var(--axis-top);
     left: calc(var(--node) / 2);
 
-    width: 2px;
-    height: calc(var(--progress) * var(--arrow-length));
+    width: 1px;
+    height: var(--axis-length);
 
-    background-color: white;
+    background-color: var(--line);
 
     translate: -50% 0;
 }
 
 
-/* Pointe de la flèche, toujours au bout du corps */
 .timeline::after {
-    content: "";
+    width: 2px;
+    height: calc(var(--progress) * var(--axis-length));
 
-    position: absolute;
-    top: calc(var(--axis-top) + var(--progress) * var(--arrow-length));
-    left: calc(var(--node) / 2);
-
-    border-top: 16px solid white;
-    border-right: 9px solid transparent;
-    border-left: 9px solid transparent;
-
-    translate: -50% 0;
+    background-color: var(--blue-accent);
 }
 
 
-/* Deux colonnes : le carré daté, puis la carte du poste */
+/* Lueur au bout du trait : elle descend avec lui (--progress, timeline.js) */
+.timeline--animated {
+    background-image: radial-gradient(circle 18px at calc(var(--node) / 2) calc(var(--axis-top) + var(--progress) * var(--axis-length)), rgba(110, 123, 255, 0.55), transparent);
+}
+
+
+/* Deux colonnes : la pastille datée, puis le texte du poste */
 .timeline__step {
     position: relative;
 
@@ -74,16 +74,17 @@
     grid-template-columns: var(--node) minmax(0, 1fr);
     align-items: start;
 
-    gap: 24px;
+    gap: 28px;
 }
 
 
 /*
- * Carré daté : année de début, et de fin en dessous si elle diffère.
- * Creux, il se remplit de blanc quand la flèche l'atteint (timeline.js).
- * z-index le place au-dessus de la flèche ; tabular-nums aligne les chiffres.
+ * Pastille datée : année de début, et de fin en dessous si elle diffère.
+ * Quasi-noire, elle passe au bleu des cartes quand le trait l'atteint (timeline.js), comme les pastilles du portfolio.
+ * z-index la place au-dessus du filet ; tabular-nums aligne les chiffres.
+ * La couleur du texte (gris, puis blanc) vient de motion.css, commun aux deux sites.
  */
-.timeline__number {
+.timeline__date {
     position: relative;
     z-index: 1;
 
@@ -95,50 +96,43 @@
     width: var(--node);
     height: var(--node);
 
-    /* 40 px : le centre du carré tombe sur le nom de l'entreprise */
-    margin-top: 40px;
+    border: 1px solid var(--line-strong);
+    border-radius: 50%;
 
-    border: 2px solid white;
-    border-radius: var(--radius-xs);
+    background-color: var(--ink);
 
-    background-color: var(--color-bg);
-
-    font-size: 0.8125rem;
-    font-weight: 650;
+    font-size: var(--text-label);
+    font-weight: 700;
     line-height: 1.2;
     font-variant-numeric: tabular-nums;
 
     transition:
-        background-color var(--duration-ui) var(--ease-ui),
-        color var(--duration-ui) var(--ease-ui);
+        background-color 0.3s ease,
+        border-color 0.3s ease;
 }
 
 
-.timeline__step--visible .timeline__number,
-.timeline:not(.timeline--animated) .timeline__number {
-    background-color: white;
-    color: var(--color-on-light);
+.timeline__step--visible .timeline__date,
+.timeline:not(.timeline--animated) .timeline__date {
+    border-color: var(--blue-card);
+
+    background-color: var(--blue-card);
 }
 
 
-/* Carte du poste : surface un peu plus claire que la page, sans survol (ce n'est pas un lien) */
+/* Texte du poste, posé sur la page ; largeur limitée pour garder des lignes lisibles */
 .timeline__content {
-    padding: 32px;
-
-    border-radius: var(--radius-card);
-
-    background-color: var(--color-surface);
-
-    box-shadow: var(--shadow-card);
+    max-width: 760px;
 }
 
 
-.timeline__date {
-    margin: 0;
+/* Période du poste, en toutes lettres au-dessus du nom de l'entreprise ; 18 px la centre sur la pastille */
+.timeline__period {
+    margin: 18px 0 0;
 
-    color: white;
+    color: var(--blue-accent);
 
-    font-size: 0.8125rem;
+    font-size: var(--text-label);
     font-weight: 600;
     letter-spacing: 0.06em;
     text-transform: uppercase;
@@ -167,7 +161,7 @@
 
     margin: 12px 0 0;
 
-    color: white;
+    color: var(--muted);
 }
 
 
@@ -176,116 +170,40 @@
 }
 
 
-/* -------------------- COMPÉTENCES DÉPLIABLES -------------------- */
+/* -------------------- COMPÉTENCES & OUTILS -------------------- */
 
-/*
- * Bouton « Compétences & outils » en petit encadré blanc : discret, il ne concurrence pas le poste.
- * Le signe + devient − une fois la liste dépliée ; « / "" » le retire de la lecture vocale,
- * aria-expanded annonce déjà l'état. La cible garde 44 px de haut.
- */
-.timeline__toggle {
-    display: inline-flex;
-    align-items: center;
-
-    gap: 8px;
-
-    min-height: 44px;
-
-    margin-top: 16px;
-    padding: 8px 14px;
-
-    border: 1px solid white;
-    border-radius: var(--radius-xs);
-
-    background-color: transparent;
-    color: white;
-
-    font-size: 0.9375rem;
-    font-weight: 500;
-
-    cursor: pointer;
-
-    transition:
-        background-color var(--duration-fast) var(--ease-ui),
-        scale 0.1s ease-out;
-}
-
-
-.timeline__toggle::after {
-    content: "+";
-    content: "+" / "";
-
-    font-size: 1.1rem;
-    line-height: 1;
-}
-
-
-.timeline__toggle[aria-expanded="true"]::after {
-    content: "−";
-    content: "−" / "";
-}
-
-
-.timeline__toggle:hover {
-    background-color: rgb(255 255 255 / 13%);
-}
-
-
-.timeline__toggle:active {
-    scale: 0.97;
-}
-
-
-/* Étiquettes cerclées de blanc, comme les tags du portfolio */
-.timeline__skills {
+/* Compétences et outils de chaque poste, toujours visibles : des étiquettes comme celles des projets du portfolio */
+.timeline__tags {
     display: flex;
     flex-wrap: wrap;
 
-    gap: 8px;
+    gap: 6px;
 
-    margin: 16px 0 0;
+    margin: 20px 0 0;
     padding: 0;
 
     list-style: none;
 }
 
 
-/* [hidden] l'emporte sur display: flex : la liste repliée disparaît vraiment. */
-.timeline__skills[hidden] {
-    display: none;
-}
+/* Étiquette : pastille sur un voile léger, texte blanc */
+.tag {
+    padding: 4px 10px;
 
+    border-radius: var(--radius-s);
 
-/*
- * --index (posé par experience.js) décale chaque étiquette de 25 ms : elles arrivent l'une après l'autre.
- * both garde l'état de départ pendant le délai.
- */
-.timeline__skills li {
-    padding: 5px 9px;
+    background-color: var(--veil);
 
-    border: 1px solid white;
-    border-radius: var(--radius-sm);
-
-    font-size: 0.75rem;
-    line-height: 17px;
-
-    animation: skill-in var(--duration-ui) var(--ease-reveal) both;
-    animation-delay: calc(var(--index, 0) * 25ms);
-}
-
-
-@keyframes skill-in {
-    from {
-        opacity: 0;
-        translate: 0 6px;
-    }
+    font-size: 0.8125rem;
+    font-weight: 500;
+    line-height: 1.5;
 }
 
 
 /* -------------------- APPARITION DES POSTES -------------------- */
 
 /*
- * Classes ajoutées par timeline.js : chaque carte glisse depuis la droite, vers la flèche, en fondu.
+ * Classes ajoutées par timeline.js : chaque carte glisse depuis la droite, vers le trait, en fondu.
  * overflow-x: clip coupe le décalage de départ sans créer de zone de défilement
  * (sinon, sur téléphone, la page dépasserait et le navigateur dézoomerait).
  */
@@ -299,8 +217,8 @@
     translate: 24px 0;
 
     transition:
-        opacity var(--duration-reveal) var(--ease-reveal),
-        translate var(--duration-reveal) var(--ease-reveal);
+        opacity 0.8s ease,
+        translate 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 
@@ -316,28 +234,23 @@
 
     .timeline {
         --node: 48px;
-        --axis-top: calc(35px + var(--node) / 2);
 
-        gap: 16px;
-
-        margin-top: 28px;
+        gap: 40px;
     }
 
 
     .timeline__step {
-        gap: 12px;
+        gap: 16px;
     }
 
 
-    .timeline__number {
-        margin-top: 35px;
-
+    .timeline__date {
         font-size: 0.75rem;
     }
 
 
-    .timeline__content {
-        padding: 24px 20px;
+    .timeline__period {
+        margin-top: 14px;
     }
 
 

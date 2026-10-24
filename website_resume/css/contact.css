@@ -1,182 +1,67 @@
-/*
- * Contact : liens en cartes, formulaire à champs arrondis, figure de cubes à droite.
- * Les champs restent des éléments HTML natifs.
- * BEM : bloc__element désigne une partie du bloc ; bloc--modificateur désigne une variante.
- */
-/* -------------------- INTRODUCTION -------------------- */
+/* -------------------- CONTACT -------------------- */
 
-.contact__intro {
-    max-width: 800px;
-
-    margin: 20px 0 0;
-
-    color: var(--color-text-muted);
-
-    font-size: 1.25rem;
-    line-height: 1.5;
-
-    /* Évite un mot seul sur la dernière ligne */
-    text-wrap: pretty;
-}
-
-
-/* -------------------- LIENS LINKEDIN ET PORTFOLIO -------------------- */
-
-.contact__links {
-    display: grid;
-
-    gap: 12px;
-
-    max-width: 800px;
-
-    margin: 32px 0 0;
-}
-
-
-/*
- * Carte de lien : icône, nom, identifiant poussé à droite (margin-left: auto), flèche finale.
- */
-.contact-link {
-    display: flex;
+/* Téléchargement du CV, sous l'introduction, comme sur le portfolio */
+.contact__resume {
+    display: inline-flex;
     align-items: center;
 
-    gap: 16px;
+    gap: 10px;
 
-    min-height: 64px;
+    min-height: 48px;
 
-    padding: 12px 24px;
-
-    border: 1px solid transparent;
-    border-radius: var(--radius-control);
-
-    background-color: var(--color-surface);
-
-    color: white;
-    text-decoration: none;
-
-    transition:
-        background-color var(--duration-fast) var(--ease-ui),
-        border-color var(--duration-fast) var(--ease-ui),
-        scale 0.1s ease-out;
+    margin: -24px 0 40px;
 }
 
 
-/* Flèche décorative : « / "" » la retire de la lecture vocale */
-.contact-link::after {
-    content: "→";
-    content: "→" / "";
 
-    font-size: 1.25rem;
-
-    transition: translate var(--duration-fast) var(--ease-ui);
-}
-
-
-@media (hover: hover) {
-
-    .contact-link:hover {
-        background-color: var(--color-surface-raised);
-    }
-
-
-    .contact-link:hover::after {
-        translate: 4px 0;
-    }
-
-}
-
-
-.contact-link:active {
-    scale: 0.99;
-}
-
-
-/*
-    Le logo officiel est noir avec le fond et le « in » transparents.
-    Sur le fond bleu, on le passe en blanc (version inversée autorisée).
-*/
-.contact-link__logo {
-    flex-shrink: 0;
-
-    width: 24px;
-    height: 24px;
-
-    object-fit: contain;
-
-    filter: brightness(0) invert(1);
-}
-
-
-.contact-link__label {
-    font-size: 1.0625rem;
-    font-weight: 600;
-}
-
-
-.contact-link__hint {
-    margin-left: auto;
-
-    color: var(--color-text-muted);
-
-    font-size: 0.875rem;
-
-    /* Une longue adresse peut passer à la ligne n'importe où plutôt que déborder. */
-    overflow-wrap: anywhere;
-}
-
-
-/* Petit cube blanc à la place d'un logo, dans le lien vers le portfolio */
-.cube--icon {
-    --cube-size: 18px;
-    --cube-half: 9px;
-
-    flex-shrink: 0;
-
-    margin: 3px;
-
-    perspective: 300px;
-}
-
-
-.cube--icon .cube__face {
-    border-width: 1.5px;
-
-    box-shadow: 0 0 6px var(--cube-glow);
-}
-
-
-/* -------------------- MISE EN PAGE DU FORMULAIRE -------------------- */
-
-.contact__layout {
-    display: grid;
-    grid-template-columns: minmax(0, 800px) minmax(0, 1fr);
-    align-items: start;
+/* Liens et formulaire sur une même colonne de 800 px au plus, comme sur le portfolio */
+.contact {
+    display: flex;
+    align-items: flex-start;
 
     gap: 48px;
-
-    margin-top: 32px;
 }
 
 
-/* -------------------- FORMULAIRE -------------------- */
+.contact__main {
+    flex: 0 1 800px;
 
-.contact-form__name-row {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-
-    gap: 24px;
+    width: 800px;
+    max-width: 800px;
+    min-width: 0;
 }
 
 
-.contact-form__field {
+.contact__side {
+    flex: 1;
+
+    position: relative;
+
+    min-height: 520px;
+}
+
+
+.form__row {
+    display: flex;
+
+    gap: 20px;
+}
+
+
+.form__row .form__field {
+    flex: 1;
+}
+
+
+.form__field {
     display: flex;
     flex-direction: column;
 
-    margin-bottom: 24px;
+    margin-bottom: 25px;
 }
 
 
-.contact-form__field label {
+.form__label {
     margin-bottom: 8px;
 
     font-size: 0.875rem;
@@ -184,66 +69,65 @@
 }
 
 
-/*
- * Champ : surface bleue, contour fonctionnel (3,8:1), coins arrondis.
- * Au focus : contour blanc commun (base.css) et surface éclaircie.
- */
-.contact-form__control {
+.form__input {
     width: 100%;
+
     min-height: 56px;
 
     padding: 14px 16px;
 
-    border: 1px solid var(--border-control);
-    border-radius: var(--radius-field);
+    border: 1px solid var(--line-field);
+    border-radius: var(--radius-s);
 
-    background-color: var(--color-surface);
+    background-color: var(--veil);
+    color: var(--white);
 
-    color: white;
-
+    font-family: inherit;
     font-size: 1rem;
 
     transition:
-        border-color var(--duration-fast) var(--ease-ui),
-        background-color var(--duration-fast) var(--ease-ui);
+        background-color 0.3s ease,
+        border-color 0.3s ease;
 }
 
 
-.contact-form__control:hover {
-    border-color: white;
+.form__input:hover {
+    border-color: var(--white);
 }
 
 
-.contact-form__control:focus {
-    border-color: white;
+.form__input:focus {
+    border-color: var(--white);
 
-    background-color: var(--color-surface-raised);
-}
-
-
-textarea.contact-form__control {
-    min-height: 180px;
-
-    /*
-     * Limite les directions dans lesquelles le visiteur peut redimensionner le champ.
-     */
-    resize: vertical;
+    background-color: var(--veil-strong);
 }
 
 
 /*
- * Champ en erreur : bordure blanche de 2 px, repérable sans dépendre de la couleur.
- */
-.contact-form__control[aria-invalid="true"] {
-    border: 2px solid white;
+    Champ en erreur : bordure gauche épaisse, repérable sans dépendre de la couleur.
+    Le padding compense les 5 px ajoutés pour que le texte ne bouge pas.
+*/
+.form__input[aria-invalid="true"] {
+    border-left-width: 6px;
+
+    padding-left: 11px;
+}
+
+
+/* Message créé par contact.js sous le champ concerné */
+.form__error {
+    margin: 8px 0 0;
+
+    font-size: 0.9rem;
+    font-weight: bold;
 }
 
 
 /*
- * Champ correctement rempli (contact-form.js) : coche blanche dessinée en SVG à droite.
- * L'image est intégrée à la feuille (data:) : aucun fichier de plus à charger.
- */
-.contact-form__control--valid {
+    Champ correct et rempli : une coche blanche à droite (image SVG écrite dans l'URL).
+    Le padding droit empêche le texte de passer sous la coche.
+*/
+.form__input--valid {
     padding-right: 44px;
 
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M2 8.5l4 4 8-9' fill='none' stroke='white' stroke-width='2'/%3E%3C/svg%3E");
@@ -253,147 +137,75 @@ textarea.contact-form__control {
 }
 
 
-/* Dans la zone de message, la coche reste en haut à droite plutôt qu'au milieu. */
-textarea.contact-form__control--valid {
+.form__input--area {
+    resize: vertical;
+}
+
+
+/* Zone de message : la coche reste en haut, près de la première ligne */
+.form__input--area.form__input--valid {
     background-position: right 16px top 18px;
 }
 
 
-/* Message créé par contact-form.js sous le champ concerné */
-.contact-form__error {
-    margin: 8px 0 0;
+/* Champ anti-spam : invisible pour les humains */
+.form__trap {
+    position: absolute;
+
+    left: -9999px;
+}
+
+
+/* Notice sous le bouton : champs obligatoires et lien vers l'usage des données (mentions légales) */
+.form__notice {
+    max-width: 60ch;
+
+    margin: 16px 0 0;
+
+    color: var(--muted);
 
     font-size: 0.875rem;
-    font-weight: 600;
+    line-height: 1.5;
 }
 
 
-/* -------------------- BOUTON ENVOYER -------------------- */
+.form__notice a {
+    color: var(--white);
 
-/* Apparence commune .button (buttons.css) ; seul le cercle de chargement est propre au formulaire. */
-
-/*
- * Pendant l'envoi : petit cercle ouvert qui tourne à droite du texte.
- * currentColor reprend la couleur du texte du bouton.
- */
-.contact-form__submit--loading::after {
-    content: "";
-
-    display: inline-block;
-
-    width: 14px;
-    height: 14px;
-
-    border: 2px solid currentColor;
-    border-right-color: transparent;
-    border-radius: 50%;
-
-    animation: spin 0.8s linear infinite;
+    text-underline-offset: 3px;
 }
 
 
-@keyframes spin {
-    to {
-        rotate: 360deg;
-    }
-}
-
-
-/* Réussite : le bouton rebondit une fois et une coche apparaît après « Envoyé » */
-.contact-form__submit--sent {
-    animation: submit-pop 0.45s var(--ease-reveal);
-}
-
-
-.contact-form__submit--sent::after {
-    content: "";
-
-    display: inline-block;
-
-    /* Les bordures comptent dans la taille (box-sizing de base.css) : 15 × 10 donne la même coche que le portfolio */
-    width: 15px;
-    height: 10px;
-
-    border-bottom: 3px solid currentColor;
-    border-left: 3px solid currentColor;
-
-    rotate: -45deg;
-    translate: 0 -2px;
-
-    animation: submit-tick 0.35s var(--ease-reveal);
-}
-
-
-/* Échec : une secousse horizontale qui s'amortit */
-.contact-form__submit--shake {
-    animation: submit-shake 0.45s ease-in-out;
-}
-
-
-@keyframes submit-pop {
-    40% {
-        scale: 1.05;
-    }
-}
-
-
-@keyframes submit-tick {
-    from {
-        opacity: 0;
-        scale: 0;
-    }
-}
-
-
-@keyframes submit-shake {
-    20%, 60% {
-        translate: -7px 0;
-    }
-
-    40%, 80% {
-        translate: 7px 0;
-    }
-}
-
-
-/* -------------------- ÉTAT DE L'ENVOI -------------------- */
-
-/*
- * role="status" fait lire le message par les lecteurs d'écran sans déplacer le focus.
- */
-.contact-form__status {
+.form__status {
     min-height: 1.6em;
 
     margin: 20px 0 0;
 
-    font-weight: 600;
-    line-height: 1.6;
+    font-weight: bold;
 }
 
 
-/*
- * Réussite ou échec : encadré qui glisse en place, précédé d'une pastille ✓ ou !.
- * Le symbole distingue les deux cas sans dépendre de la couleur.
- */
-.contact-form__status--success,
-.contact-form__status--error {
+/* Résultat de l'envoi : un encadré qui apparaît en remontant, avec ✓ ou ! devant le texte */
+.form__status--success,
+.form__status--error {
     display: flex;
     align-items: center;
 
     gap: 14px;
 
-    padding: 16px;
+    padding: 14px 18px;
 
-    border-radius: var(--radius-field);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-s);
 
-    background-color: var(--color-surface-raised);
+    background-color: var(--veil-strong);
 
-    animation: status-in var(--duration-ui) var(--ease-reveal);
+    animation: status-in 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 
-.contact-form__status--success::before,
-.contact-form__status--error::before {
+.form__status--success::before,
+.form__status--error::before {
     flex: 0 0 auto;
 
     display: grid;
@@ -404,22 +216,19 @@ textarea.contact-form__control--valid {
 
     border-radius: 50%;
 
-    background-color: white;
-    color: var(--color-on-light);
+    background-color: var(--white);
+    color: var(--blue);
 }
 
 
-/*
- * La seconde déclaration « / "" » donne un texte alternatif vide : le lecteur d'écran lit
- * le message sans annoncer le symbole. La première sert aux navigateurs qui l'ignorent.
- */
-.contact-form__status--success::before {
+/* Après « / », le texte lu par les lecteurs d'écran : vide, le symbole est décoratif */
+.form__status--success::before {
     content: "✓";
     content: "✓" / "";
 }
 
 
-.contact-form__status--error::before {
+.form__status--error::before {
     content: "!";
     content: "!" / "";
 }
@@ -433,151 +242,225 @@ textarea.contact-form__control--valid {
 }
 
 
-/* Champ piège anti-robots : placé hors de l'écran, jamais vu par les visiteurs */
-.contact-form__trap {
-    position: absolute;
+/* Roue affichée dans le bouton pendant l'envoi */
+.button--loading::after {
+    content: "";
 
-    left: -9999px;
+    display: inline-block;
+
+    width: 14px;
+    height: 14px;
+
+    margin-left: 10px;
+
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+
+    vertical-align: -2px;
+
+    animation: spin 0.8s linear infinite;
 }
 
 
-/* -------------------- CUBES CONTACT -------------------- */
+@keyframes spin {
+    to {
+        rotate: 360deg;
+    }
+}
 
-/* Figure compacte, à droite du formulaire, loin des champs */
-.contact__cubes {
-    position: relative;
+
+/* Réussite : le bouton rebondit une fois et une coche apparaît après « Envoyé » */
+.button--sent {
+    animation: button-pop 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+
+.button--sent::after {
+    content: "";
+
+    display: inline-block;
+
+    width: 12px;
+    height: 7px;
+
+    margin-left: 10px;
+
+    border-bottom: 3px solid currentColor;
+    border-left: 3px solid currentColor;
+
+    rotate: -45deg;
+    translate: 0 -2px;
+
+    animation: button-tick 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+
+/* Échec : une secousse horizontale qui s'amortit */
+.button--shake {
+    animation: button-shake 0.45s ease-in-out;
+}
+
+
+@keyframes button-pop {
+    40% {
+        scale: 1.05;
+    }
+}
+
+
+@keyframes button-tick {
+    from {
+        opacity: 0;
+        scale: 0;
+    }
+}
+
+
+@keyframes button-shake {
+    20%, 60% {
+        translate: -7px 0;
+    }
+
+    40%, 80% {
+        translate: 7px 0;
+    }
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+
+    .form__status--success,
+    .form__status--error,
+    .button--loading::after,
+    .button--sent,
+    .button--sent::after,
+    .button--shake {
+        animation: none;
+    }
+
+}
+
+
+/* Liens (LinkedIn, portfolio), au-dessus du formulaire */
+.link-list {
+    display: flex;
+    flex-direction: column;
+
+    gap: 12px;
+
+    max-width: 800px;
+    margin: 0 0 56px;
+    padding: 0;
+
+    list-style: none;
+}
+
+
+/*
+ * Carte de lien : pictogramme, nom, adresse alignée à droite.
+ * Les cartes partagent la même grille et la même hauteur.
+ */
+.link-card {
+    display: grid;
+    grid-template-columns: 24px minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
+
+    gap: 16px;
 
     width: 100%;
-    max-width: 320px;
-    aspect-ratio: 1;
+    min-height: 64px;
 
-    justify-self: center;
+    padding: 12px 24px;
 
-    margin-top: 40px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-m);
+
+    background-color: var(--veil);
+
+    text-decoration: none;
+
+    transition:
+        background-color 0.3s ease,
+        border-color 0.3s ease,
+        scale 0.1s ease-out;
 }
 
 
-.contact__cube {
-    position: absolute;
+.link-card:active {
+    scale: 0.99;
 }
 
 
-.contact__cubes .contact__cube--main {
-    --cube-size: 150px;
-    --cube-half: 75px;
+/* Survol : la surface s'éclaircit et le contour s'affirme, sans glisser */
+.link-card:hover,
+.link-card:focus-visible {
+    border-color: var(--line-strong);
 
-    top: 50%;
-    left: 50%;
-
-    transform: translate(-50%, -50%);
+    background-color: var(--veil-strong);
 }
 
 
-.contact__cubes .contact__cube--satellite-1 {
-    --cube-size: 56px;
-    --cube-half: 28px;
-
-    top: 4%;
-    left: 6%;
+.link-card__label {
+    font-weight: 700;
 }
 
 
-.contact__cubes .contact__cube--satellite-2 {
-    --cube-size: 64px;
-    --cube-half: 32px;
-
-    top: 10%;
-    right: 2%;
+/* Logo LinkedIn passé en blanc, ou petit cube blanc pour le portfolio */
+.link-card__icon {
+    width: 24px;
+    height: 24px;
 }
 
 
-.contact__cubes .contact__cube--satellite-3 {
-    --cube-size: 44px;
-    --cube-half: 22px;
-
-    right: 14%;
-    bottom: 4%;
+svg.link-card__icon {
+    fill: none;
+    stroke: var(--white);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
 }
 
 
-/* -------------------- TABLETTE ET TÉLÉPHONE -------------------- */
-
-/* La figure de cubes passe sous le formulaire, plus petite. */
-@media (max-width: 1024px) {
-
-    .contact__layout {
-        grid-template-columns: minmax(0, 1fr);
-    }
-
-
-    .contact__cubes {
-        max-width: 260px;
-
-        margin-top: 0;
-    }
-
-
-    /* Cubes réduits : en tournant, ils ne se chevauchent plus */
-    .contact__cubes .contact__cube--main {
-        --cube-size: 110px;
-        --cube-half: 55px;
-    }
-
-
-    .contact__cubes .contact__cube--satellite-1 {
-        --cube-size: 40px;
-        --cube-half: 20px;
-    }
-
-
-    .contact__cubes .contact__cube--satellite-2 {
-        --cube-size: 46px;
-        --cube-half: 23px;
-    }
-
-
-    .contact__cubes .contact__cube--satellite-3 {
-        --cube-size: 32px;
-        --cube-half: 16px;
-    }
-
+.link-card__icon--linkedin {
+    object-fit: contain;
+    filter: brightness(0) invert(1);
 }
 
 
-@media (max-width: 600px) {
-
-    .contact-form__name-row {
-        grid-template-columns: minmax(0, 1fr);
-
-        gap: 0;
-    }
+.link-card__label,
+.link-card__hint {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
 
 
-    /* Identifiant sous le nom, aligné à gauche */
-    .contact-link {
-        display: grid;
-        grid-template-columns: 24px minmax(0, 1fr) auto;
+.link-card__hint {
+    font-size: 0.9rem;
+    text-align: right;
+}
+
+
+@media (max-width: 767px) {
+
+    .link-card {
+        grid-template-columns: 24px minmax(0, 1fr);
 
         gap: 2px 16px;
+
+        min-height: 72px;
     }
 
 
-    .contact-link__logo,
-    .contact-link .cube--icon {
+    .link-card__icon {
         grid-row: 1 / 3;
     }
 
 
-    .contact-link__hint {
+    .link-card__hint {
         grid-column: 2;
 
-        margin-left: 0;
-    }
-
-
-    .contact-link::after {
-        grid-column: 3;
-        grid-row: 1 / 3;
+        text-align: left;
     }
 
 }

@@ -10,9 +10,11 @@ import { initProjectShowcase } from "./modules/project-showcase.js";
 import { initTimeline } from "./modules/timeline.js";
 import { initProjectDemos } from "./modules/project-demos.js";
 import { initReveal } from "./modules/reveal.js";
+import { initMotion } from "./modules/motion.js";
 
 initNavigation();
 initReveal();
+initMotion();
 initContact();
 initCubes();
 initCat();

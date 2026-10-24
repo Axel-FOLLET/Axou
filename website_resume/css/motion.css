@@ -1,0 +1,638 @@
+/* -------------------- FINITIONS DE MOUVEMENT -------------------- */
+
+/*
+ * Finitions communes au portfolio et au site CV : grain de fond, apparition en cascade,
+ * trait glissant du menu, boutons magnétiques, entrée en scène et lueur de l'accueil,
+ * détails de la frise et survols des cartes (data-hover).
+ * Aucune couleur de marque ici : le grain est gris, le trait prend la couleur du texte (currentColor),
+ * la lueur lit --glow, défini par chaque site dans base.css.
+ * Le fichier se copie donc tel quel d'un site à l'autre.
+ */
+
+
+/* -------------------- GRAIN DE FOND -------------------- */
+
+/*
+ * Bruit très léger posé sur toute la page : les aplats (rouge, bleu, quasi-noir) paraissent moins numériques.
+ * Le bruit est dessiné par le navigateur (SVG feTurbulence, sans image à télécharger), en gris : il reste neutre sur toutes les couleurs.
+ * position: fixed : la texture ne se redessine pas au défilement ; pointer-events: none : clics et sélection passent au travers.
+ * Placé au-dessus du contenu, sinon les fonds des sections le cacheraient ; 3,5 % d'opacité ne change pas la lisibilité.
+ */
+body::after {
+    content: "";
+
+    position: fixed;
+    inset: 0;
+
+    z-index: 3000;
+
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 160px 160px;
+
+    opacity: 0.035;
+
+    pointer-events: none;
+}
+
+
+/* Ni grain à l'impression, ni en mode de contraste forcé : il n'y apporterait que du bruit */
+@media print, (forced-colors: active) {
+
+    body::after {
+        display: none;
+    }
+
+}
+
+
+/* -------------------- APPARITION EN CASCADE -------------------- */
+
+/*
+ * Éléments d'un ensemble répété (étapes, items, cartes, étiquettes) : motion.js leur donne la classe
+ * motion-stagger et leur rang --i parmi leurs frères. Ils montent l'un après l'autre quand leur bloc apparaît (reveal.js).
+ * Une animation plutôt qu'une transition : elle ne remplace pas les transitions propres à l'élément,
+ * et motion.js retire la classe à la fin, l'élément redevient ordinaire.
+ * Décalage de 70 ms par rang, plafonné à 400 ms : un long ensemble ne fait pas attendre.
+ * backwards : l'élément reste caché pendant son délai, puis garde ses propres styles.
+ */
+.reveal--visible .motion-stagger {
+    animation: motion-rise 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+    animation-delay: min(calc(var(--i, 0) * 70ms), 400ms);
+}
+
+
+@keyframes motion-rise {
+    from {
+        opacity: 0;
+        translate: 0 16px;
+    }
+}
+
+
+/* -------------------- TRAIT GLISSANT DU MENU -------------------- */
+
+/*
+ * Un seul trait pour tout le menu, ajouté par motion.js dans la liste des liens :
+ * il glisse sous le lien survolé ou atteint au clavier, puis s'efface en quittant le menu.
+ * La section affichée, déjà cerclée de blanc, n'en a pas besoin.
+ * motion.js le place avec translate et width ; la liste devient le repère de cette position.
+ * Sous 1025 px, les liens sont dans le menu déroulant : le trait disparaît.
+ */
+.header__indicator {
+    display: none;
+}
+
+
+@media (min-width: 1025px) {
+
+    .header__links {
+        position: relative;
+    }
+
+
+    /* Trait de 1 px à la couleur du texte du menu : aucune couleur de marque en dur */
+    .header__indicator {
+        display: block;
+
+        position: absolute;
+        top: 0;
+        left: 0;
+
+        width: 0;
+        height: 1px;
+
+        background-color: currentColor;
+
+        opacity: 0;
+
+        pointer-events: none;
+    }
+
+
+    .header__indicator--visible {
+        opacity: 1;
+    }
+
+
+    /*
+     * Transition activée seulement après la première mise en place :
+     * à l'ouverture, le trait apparaît directement sous la section affichée, sans traverser le menu.
+     */
+    .header__indicator--ready {
+        transition:
+            translate 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
+            width 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
+            opacity 0.2s ease;
+    }
+
+}
+
+
+/* -------------------- ENTRÉE EN SCÈNE DE L'ACCUEIL -------------------- */
+
+/*
+ * motion.js enveloppe chaque mot du titre de l'accueil dans un masque (motion-intro__mask),
+ * puis donne à chaque masque le rang de sa ligne à l'écran (--line, mesuré) et le nombre de lignes à .hero (--lines).
+ * Le texte reste le même nœud par nœud : lecteurs d'écran et textContent ne voient aucune différence.
+ * Les styles n'existent que sous .motion-intro, retirée à la fin : les masques redeviennent de simples span en ligne.
+ * Sans JavaScript ou en mouvement réduit, la classe n'est jamais posée : tout est affiché d'emblée.
+ */
+.motion-intro .motion-intro__mask {
+    display: inline-block;
+
+    /*
+     * Masque : seul le bas est coupé, d'où le mot remonte. Les autres côtés débordent largement,
+     * pour ne pas rogner les accents ni les lettres qui dépassent d'un titre à interligne serré.
+     * clip-path plutôt qu'overflow: clip : la ligne de base du bloc en ligne ne bouge pas, la mise en page non plus.
+     */
+    clip-path: inset(-0.5em -0.5em 0 -0.5em);
+}
+
+
+/*
+ * Chaque mot part de sous son masque ; tous les mots d'une même ligne partent ensemble.
+ * 100 ms d'écart entre deux lignes, plafonné à 300 ms : un nom sur quatre lignes (téléphone) ne fait pas attendre.
+ * backwards : le mot reste caché pendant son délai.
+ */
+.motion-intro .motion-intro__word {
+    display: inline-block;
+
+    animation: motion-intro-line 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+    animation-delay: min(calc(var(--line, 0) * 100ms), 300ms);
+}
+
+
+@keyframes motion-intro-line {
+    from {
+        translate: 0 120%;
+    }
+}
+
+
+/*
+ * Poste, phrase et bouton (les éléments qui suivent le titre) arrivent ensuite en fondu, à 110 ms d'écart.
+ * Leur départ suit la dernière ligne du titre (--lines, plafonné à 3) : au plus 0,4 s + 0,22 s + 0,5 s, sous 1,2 s.
+ */
+.motion-intro .motion-intro__follow {
+    animation: motion-intro-fade 0.5s ease-out backwards;
+    animation-delay: calc(min(var(--lines, 1), 3) * 100ms + 100ms + var(--i, 0) * 110ms);
+}
+
+
+@keyframes motion-intro-fade {
+    from {
+        opacity: 0;
+        translate: 0 8px;
+    }
+}
+
+
+/* -------------------- APPARITION DES TITRES -------------------- */
+
+/*
+ * Même masque que le nom de l'accueil pour les grands titres (titres de section, de la reconversion ou de la méthode, du pied de page).
+ * motion.js pose motion-title avant la première image : les mots attendent sous leur masque.
+ * Quand le titre entre à l'écran, motion-title--play les fait monter ligne par ligne, puis les deux classes sont retirées.
+ * Le bas du masque descend un peu (0,2em) : les jambages de l'italique (g, p) ne sont pas rognés pendant la montée,
+ * et 130 % de la hauteur du mot suffit à le cacher dessous.
+ */
+.motion-title .motion-intro__mask {
+    display: inline-block;
+
+    clip-path: inset(-0.5em -0.5em -0.2em -0.5em);
+}
+
+
+.motion-title .motion-intro__word {
+    display: inline-block;
+
+    translate: 0 130%;
+
+    transition: translate 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+
+.motion-title--play .motion-intro__word {
+    translate: none;
+
+    transition-delay: min(calc(var(--line, 0) * 100ms), 300ms);
+}
+
+
+/* À l'impression, les titres jamais atteints à l'écran s'impriment quand même */
+@media print {
+
+    .motion-title .motion-intro__word {
+        translate: none;
+    }
+
+}
+
+
+/* -------------------- LUEUR DE L'ACCUEIL -------------------- */
+
+/*
+ * Halo doux derrière le grand cube, centré comme lui dans la figure de l'accueil.
+ * Sa couleur vient de --glow (base.css de chaque site) : rouge sur le portfolio, bleu sur le CV.
+ * Un cercle aussi haut que la figure, au plus 520 px : il ne déborde pas sur le texte placé au-dessus sur téléphone.
+ * closest-side : le dégradé s'éteint au bord du cercle, sans arête visible.
+ * Premier dans la figure, il passe sous les cubes ; pointer-events: none laisse les cubes s'attraper.
+ */
+.hero__visual::before {
+    content: "";
+
+    position: absolute;
+    top: 50%;
+    left: 50%;
+
+    height: min(100%, 520px);
+    aspect-ratio: 1;
+
+    background: radial-gradient(closest-side, var(--glow, transparent), transparent);
+
+    translate: -50% -50%;
+
+    pointer-events: none;
+}
+
+
+/* -------------------- DÉTAILS DE LA FRISE -------------------- */
+
+/*
+ * Frise animée (timeline--animated, posée par le timeline.js de chaque site) : quand une étape s'allume
+ * (timeline__step--visible), ses éléments (titre, texte, défi, ou poste et lieu sur le CV) se posent l'un après l'autre.
+ * motion.js leur donne la classe timeline__detail et leur rang --i dans l'étape.
+ */
+.timeline--animated .timeline__detail {
+    opacity: 0;
+    translate: 0 10px;
+
+    transition:
+        opacity 0.6s ease,
+        translate 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+
+.timeline--animated .timeline__step--visible .timeline__detail {
+    opacity: 1;
+    translate: none;
+
+    transition-delay: calc(150ms + var(--i, 0) * 120ms);
+}
+
+
+/*
+ * Numéro (portfolio) ou date (CV) de l'étape : gris tant que l'étape attend, blanc quand elle s'allume.
+ * La liste reprend les transitions de fond et de bordure de la pastille du portfolio : sans elles,
+ * cette règle plus précise les remplacerait et la pastille changerait de couleur d'un coup.
+ */
+.timeline--animated :is(.timeline__number, .timeline__date) {
+    color: var(--muted);
+
+    transition:
+        color 0.6s ease,
+        background-color 0.6s ease,
+        border-color 0.6s ease;
+}
+
+
+.timeline--animated .timeline__step--visible :is(.timeline__number, .timeline__date) {
+    color: var(--white, #FFFFFF);
+}
+
+
+/* -------------------- SURVOLS DES CARTES -------------------- */
+
+/*
+ * Survols choisis carte par carte avec data-hover (serpent, bonhomme, chat, flèche, chiffrement, langue), seulement à la souris ou au pavé tactile :
+ * au doigt, un survol ne se termine jamais vraiment.
+ * Ils ne touchent ni transform ni filter de la carte, réservés à la roue des projets (project-showcase.js).
+ */
+@media (hover: hover) and (pointer: fine) {
+
+    /*
+     * data-hover="snake" : un petit serpent de cinq cases traverse le haut du bandeau décoratif de la carte
+     * (project-card__media, ou tout élément marqué data-hover-zone).
+     * La zone devient le repère du serpent et le coupe à ses bords ; ses coins hauts suivent l'arrondi de la carte.
+     */
+    [data-hover="snake"] :is(.project-card__media, [data-hover-zone]) {
+        position: relative;
+
+        border-radius: var(--radius-m, 16px) var(--radius-m, 16px) 0 0;
+
+        overflow: clip;
+    }
+
+
+    /*
+     * Serpent dessiné par cinq dégradés de 5 px (sans image) à la couleur du texte, tête à droite.
+     * La boîte fait toute la largeur de la zone : translate de -40px à 100 % la fait entrer par la gauche
+     * et sortir entièrement à droite. Au repos, elle attend hors de la zone, à gauche.
+     */
+    [data-hover="snake"] :is(.project-card__media, [data-hover-zone])::before {
+        content: "";
+
+        position: absolute;
+        top: 6px;
+        left: 0;
+
+        width: 100%;
+        height: 5px;
+
+        background:
+            linear-gradient(currentColor, currentColor) 0 0 / 5px 5px no-repeat,
+            linear-gradient(currentColor, currentColor) 7px 0 / 5px 5px no-repeat,
+            linear-gradient(currentColor, currentColor) 14px 0 / 5px 5px no-repeat,
+            linear-gradient(currentColor, currentColor) 21px 0 / 5px 5px no-repeat,
+            linear-gradient(currentColor, currentColor) 28px 0 / 5px 5px no-repeat;
+
+        opacity: 0.8;
+
+        translate: -40px 0;
+
+        pointer-events: none;
+    }
+
+
+    /*
+     * Une traversée par survol, à pas réguliers comme dans le jeu (steps) ; forwards :
+     * le serpent reste sorti à droite au lieu de réapparaître à gauche.
+     */
+    [data-hover="snake"]:hover :is(.project-card__media, [data-hover-zone])::before {
+        animation: motion-snake 1.6s steps(28) forwards;
+    }
+
+
+    /*
+     * data-hover="hangman", "cat" et "cursor" : un personnage traverse le haut de la même zone, une fois par survol, comme le serpent.
+     * Ces bandeaux contiennent un cube ou un chat qu'on fait tourner : couper la zone à ses bords (overflow: clip) rognerait leurs coins.
+     * Le personnage reste donc à l'intérieur de la zone : la flèche glisse dans une bande de toute la largeur (background-position),
+     * le bonhomme et le chat vont d'un bord à l'autre en apparaissant et disparaissant en fondu. La zone ne devient que leur repère.
+     */
+    :is([data-hover="hangman"], [data-hover="cat"], [data-hover="cursor"]) :is(.project-card__media, [data-hover-zone]) {
+        position: relative;
+    }
+
+
+    /*
+     * Repère commun : en haut de la zone, toute sa largeur (le bonhomme et le chat la réduisent à celle d'une image).
+     * pointer-events: none : le cube et le chat s'attrapent toujours à travers lui.
+     */
+    :is([data-hover="hangman"], [data-hover="cat"], [data-hover="cursor"]) :is(.project-card__media, [data-hover-zone])::before {
+        content: "";
+
+        position: absolute;
+        left: 0;
+
+        width: 100%;
+
+        pointer-events: none;
+    }
+
+
+    /*
+     * Pendu et chat : le dessin est une image de fond blanche (SVG en data:, sans image à télécharger), comme la flèche.
+     * Un masque rempli à la couleur du texte ne se repeignait pas pendant le survol dans Chrome : le dessin restait invisible.
+     * Chaque fichier empile ses images l'une sous l'autre : l'élément, large d'une image, n'en montre qu'une à la fois.
+     * motion-sprite-frames les fait défiler (background-position) pendant que motion-sprite-cross fait avancer l'élément (left).
+     * --sprite-width : largeur d'une image ; --sprite-sheet : hauteur de toutes les images empilées.
+     * Au repos, le dessin attend à gauche, invisible.
+     */
+    :is([data-hover="hangman"], [data-hover="cat"]) :is(.project-card__media, [data-hover-zone])::before {
+        width: var(--sprite-width);
+
+        background-repeat: no-repeat;
+        background-position: 0 0;
+        background-size: var(--sprite-width) var(--sprite-sheet);
+
+        opacity: 0;
+    }
+
+
+    /* Bonhomme bâton : tête ronde, corps, bras et jambes en quatre positions de course, images de 14 × 16 px */
+    [data-hover="hangman"] :is(.project-card__media, [data-hover-zone])::before {
+        --sprite-width: 14px;
+        --sprite-sheet: 64px;
+
+        top: 4px;
+
+        height: 16px;
+
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='64' fill='white' stroke='white'%3E%3Cg transform='translate(0 0)'%3E%3Ccircle cx='9' cy='3' r='2' stroke='none'/%3E%3Cpath d='M8.5 5L7 10M8 7L11.5 8.5M8 7L4.5 9M7 10L10.5 15M7 10L3.5 14.5' fill='none' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/g%3E%3Cg transform='translate(0 16)'%3E%3Ccircle cx='9' cy='3' r='2' stroke='none'/%3E%3Cpath d='M8.5 5L7 10M8 7L10 9.5M8 7L6 9.5M7 10L8.5 12.5L8 15.5M7 10L5.5 12.5L3.5 12' fill='none' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/g%3E%3Cg transform='translate(0 32)'%3E%3Ccircle cx='9' cy='3' r='2' stroke='none'/%3E%3Cpath d='M8.5 5L7 10M8 7L5 9.5M8 7L11 7.5M7 10L10 14L11.5 14.5M7 10L4 15' fill='none' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/g%3E%3Cg transform='translate(0 48)'%3E%3Ccircle cx='9' cy='3' r='2' stroke='none'/%3E%3Cpath d='M8.5 5L7 10M8 7L9.5 9.5M8 7L6.5 9.5M7 10L6 13L7.5 15.5M7 10L9 12.5L7.5 13.5' fill='none' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/g%3E%3C/svg%3E");
+    }
+
+
+    /*
+     * Chat en pixel art, tourné vers la droite, queue dressée : 13 × 8 cases de 2 px, deux positions de pattes.
+     * shape-rendering: crispEdges garde des cases nettes, sans bord flou.
+     */
+    [data-hover="cat"] :is(.project-card__media, [data-hover-zone])::before {
+        --sprite-width: 26px;
+        --sprite-sheet: 32px;
+
+        top: 6px;
+
+        height: 16px;
+
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='32' viewBox='0 0 13 16' shape-rendering='crispEdges'%3E%3Cpath fill='white' d='M0 0h1v1h-1zM10 0h1v1h-1zM12 0h1v1h-1zM0 1h1v1h-1zM10 1h3v1h-3zM1 2h1v1h-1zM9 2h2v1h-2zM12 2h1v1h-1zM1 3h12v1h-12zM2 4h10v1h-10zM2 5h9v1h-9zM2 6h1v1h-1zM4 6h1v1h-1zM8 6h1v1h-1zM10 6h1v1h-1zM2 7h1v1h-1zM4 7h1v1h-1zM8 7h1v1h-1zM10 7h1v1h-1zM0 8h1v1h-1zM10 8h1v1h-1zM12 8h1v1h-1zM0 9h1v1h-1zM10 9h3v1h-3zM1 10h1v1h-1zM9 10h2v1h-2zM12 10h1v1h-1zM1 11h12v1h-12zM2 12h10v1h-10zM2 13h9v1h-9zM3 14h1v1h-1zM5 14h1v1h-1zM7 14h1v1h-1zM9 14h1v1h-1zM3 15h1v1h-1zM5 15h1v1h-1zM7 15h1v1h-1zM9 15h1v1h-1z'/%3E%3C/svg%3E");
+    }
+
+
+    /*
+     * Une traversée par survol, à pas réguliers comme le serpent ; forwards : le dessin reste effacé à droite.
+     * Les pattes changent de position pendant toute la traversée (même durée au total), puis s'arrêtent.
+     */
+    [data-hover="hangman"]:hover :is(.project-card__media, [data-hover-zone])::before {
+        animation:
+            motion-sprite-cross 1.6s steps(32) forwards,
+            motion-sprite-frames 0.2s steps(4) 8;
+    }
+
+
+    [data-hover="cat"]:hover :is(.project-card__media, [data-hover-zone])::before {
+        animation:
+            motion-sprite-cross 2.1s steps(30) forwards,
+            motion-sprite-frames 0.3s steps(2) 7;
+    }
+
+
+    /*
+     * Flèche de souris blanche au contour sombre, pointe en haut à gauche (1 px du bord de l'image) :
+     * deux couleurs, donc une image de fond. Aucune couleur de marque : le blanc et le noir vont sur les deux sites.
+     */
+    [data-hover="cursor"] :is(.project-card__media, [data-hover-zone])::before {
+        top: 6px;
+
+        height: 20px;
+
+        background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='20'%3E%3Cpath d='M1 1V15.5L4.6 12L7.2 17.8L9.6 16.8L7 11.2H11.8Z' fill='white' stroke='black' stroke-opacity='0.8' stroke-width='1.2' stroke-linejoin='round'/%3E%3C/svg%3E") -14px 0 / 14px 20px no-repeat;
+    }
+
+
+    /* La flèche traverse la bande d'un seul trait, une fois par survol, comme le serpent ; forwards : elle reste sortie à droite. */
+    [data-hover="cursor"]:hover :is(.project-card__media, [data-hover-zone])::before {
+        animation: motion-cursor 1.2s ease-in-out forwards;
+    }
+
+
+    /*
+     * data-hover="cipher" : motion.js chiffre lettre par lettre le mot marqué data-cipher, puis le rend en quittant la carte.
+     * data-hover="language" : motion.js fait passer le mot marqué data-language d'une langue à l'autre, puis le rend en quittant la carte.
+     * Le mot affiché est un ::after (data-cipher-shown ou data-language-shown) posé sur le mot d'origine, rendu transparent ;
+     * son texte de remplacement vide (/ "") le cache aux lecteurs d'écran, qui gardent le mot d'origine.
+     * Le texte reste dans la page : textContent et sélection ne changent pas.
+     * inline-block : la boîte du mot prend la hauteur de sa ligne, le mot affiché s'y pose exactement sur l'original
+     * (dans une boîte en ligne, il remontait de quelques pixels). Un seul mot ne se coupe pas : la mise en page ne bouge pas.
+     */
+    [data-cipher-shown],
+    [data-language-shown] {
+        display: inline-block;
+
+        position: relative;
+
+        -webkit-text-fill-color: transparent;
+    }
+
+
+    [data-cipher-shown]::after,
+    [data-language-shown]::after {
+        position: absolute;
+        inset: 0 auto auto 0;
+
+        -webkit-text-fill-color: currentColor;
+
+        white-space: nowrap;
+    }
+
+
+    [data-cipher-shown]::after {
+        content: attr(data-cipher-shown) / "";
+    }
+
+
+    [data-language-shown]::after {
+        content: attr(data-language-shown) / "";
+    }
+
+}
+
+
+@keyframes motion-snake {
+    to {
+        translate: 100% 0;
+    }
+}
+
+
+/* Le dessin apparaît au bord gauche de la zone, la traverse et s'efface au bord droit (100 % moins sa largeur) */
+@keyframes motion-sprite-cross {
+    from {
+        left: 0;
+
+        opacity: 0;
+    }
+
+    10%,
+    90% {
+        opacity: 0.8;
+    }
+
+    to {
+        left: calc(100% - var(--sprite-width));
+
+        opacity: 0;
+    }
+}
+
+
+/* Image suivante de la pile : un décalage vers le haut d'une image, steps() saute de l'une à l'autre */
+@keyframes motion-sprite-frames {
+    from {
+        background-position: 0 0;
+    }
+
+    to {
+        background-position: 0 calc(-1 * var(--sprite-sheet));
+    }
+}
+
+
+/* La flèche entre par la gauche et sort entièrement à droite de la bande (100 % plus sa largeur) */
+@keyframes motion-cursor {
+    from {
+        background-position-x: -14px;
+    }
+
+    to {
+        background-position-x: calc(100% + 14px);
+    }
+}
+
+
+/* -------------------- HALO DES CARTES -------------------- */
+
+/*
+ * Lueur blanche très faible (5 %) qui suit la souris sur les cartes de projet et de contact.
+ * motion.js pose motion-halo et règle --halo-x et --halo-y (en %, depuis le coin haut gauche de la carte).
+ * ::before : le ::after des cartes du portfolio est déjà pris par le voile de la roue.
+ * Positionné, il passe au-dessus du contenu ; pointer-events: none laisse cliquer au travers.
+ */
+@media (hover: hover) and (pointer: fine) {
+
+    .motion-halo {
+        position: relative;
+    }
+
+
+    .motion-halo::before {
+        content: "";
+
+        position: absolute;
+        inset: 0;
+
+        border-radius: inherit;
+
+        background: radial-gradient(circle 260px at var(--halo-x, 50%) var(--halo-y, 50%), rgb(255 255 255 / 5%), transparent 70%);
+
+        opacity: 0;
+
+        pointer-events: none;
+
+        transition: opacity 0.4s ease;
+    }
+
+
+    .motion-halo:hover::before {
+        opacity: 1;
+    }
+
+}
+
+
+/* -------------------- MOUVEMENT RÉDUIT -------------------- */
+
+/*
+ * Pas de cascade (reveal.js n'ajoute déjà aucune classe), pas de magnétisme ni d'entrée en scène, ni d'apparition des titres,
+ * ni de halo ni de chiffrement ni de changement de langue (motion.js s'arrête), pas de serpent, de bonhomme, de chat ni de flèche
+ * (ils restent cachés), et un trait qui change de lien d'un coup.
+ * Les détails de la frise s'affichent d'emblée : timeline.js ne pose pas timeline--animated.
+ * Le grain et la lueur, immobiles, restent.
+ */
+@media (prefers-reduced-motion: reduce) {
+
+    .reveal--visible .motion-stagger {
+        animation: none;
+    }
+
+
+    .header__indicator--ready {
+        transition: none;
+    }
+
+
+    [data-hover="snake"]:hover :is(.project-card__media, [data-hover-zone])::before,
+    :is([data-hover="hangman"], [data-hover="cat"], [data-hover="cursor"]):hover :is(.project-card__media, [data-hover-zone])::before {
+        animation: none;
+    }
+
+}

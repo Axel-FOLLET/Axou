@@ -6,6 +6,7 @@
  * Une réponse validée est gardée pour l'onglet (sessionStorage) : la question revient quand l'onglet est fermé.
  * Les textes suivent la langue de la page (attribut lang de <html>).
  */
+import { catFacets, placeFacets } from "./cat.js";
 
 
 // -------------------- RÉGLAGES --------------------
@@ -13,16 +14,15 @@
 const STORAGE_KEY = "portfolio-human-check";
 const MIN_DELAY = 800;          // ms minimum entre l'ouverture et le clic
 const CLOSE_DELAY = 1500;       // ms pendant lesquels « Hi human! » reste affiché
+const TURN_DURATION = 450;      // ms pour que le chat se tourne vers le visiteur
 
-// Chemins calculés depuis ce fichier : valables quel que soit l'emplacement de la page
-const IMAGES = {
-    loving: new URL("../../assets/images/human-check/loving.jpg", import.meta.url).href,
-    suspicious: [1, 2, 3].map(number =>
-        new URL(`../../assets/images/human-check/suspicious-${number}.jpg`, import.meta.url).href
-    )
-};
+const SVG = "http://www.w3.org/2000/svg";
+const REDUCED_MOTION = window.matchMedia("(prefers-reduced-motion: reduce)");
 
-// Le titre « Are you human? » reste en anglais : c'est le clin d'œil des mèmes
+// Poses méfiantes du chat, de trois quarts : [rotateX, rotateY] en degrés, une tirée au hasard
+const SUSPICIOUS_POSES = [[-8, 38], [-8, -38], [10, 28]];
+
+// Le titre « Are you human? » reste en anglais : c'est le clin d'œil des mèmes de chats
 const TEXTS = {
     fr: { title: "Are you human?", box: "Je ne suis pas un robot", success: "Hi human!", retry: "Hmm… réessayez, doucement." },
     en: { title: "Are you human?", box: "I'm human", success: "Hi human!", retry: "Hmm… try again, slowly." }
@@ -90,15 +90,50 @@ function looksHuman(event, openedAt, gestures) {
 
 // -------------------- FENÊTRE --------------------
 
-function pickSuspiciousImage() {
-    const index = Math.floor(Math.random() * IMAGES.suspicious.length);
-    return IMAGES.suspicious[index];
+/*
+ * Dessine le chat en facettes de cat.js et renvoie une fonction qui le place selon deux angles.
+ * aria-hidden : le chat est décoratif, le titre suffit à comprendre la fenêtre.
+ */
+function createCat() {
+    const svg = document.createElementNS(SVG, "svg");
+    svg.setAttribute("class", "human-check__cat");
+    svg.setAttribute("viewBox", "0 0 400 534");
+    svg.setAttribute("aria-hidden", "true");
+    const facets = catFacets();
+    const shapes = new Map(facets.map(item => [item, document.createElementNS(SVG, "polygon")]));
+
+    function pose(rx, ry) {
+        for (const { item, points, light, away } of placeFacets(facets, rx, ry)) {
+            const shape = shapes.get(item);
+            shape.classList.toggle("human-check__away", away);
+            shape.setAttribute("points", points.map(point => point.map(value => value.toFixed(1)).join(",")).join(" "));
+            shape.style.setProperty("--light", light.toFixed(2));
+            svg.append(shape);
+        }
+    }
+    return { svg, pose };
 }
 
 
 /*
- * alt="" : l'image est décorative, le titre suffit à comprendre la fenêtre.
+ * Le chat se tourne de sa pose méfiante vers le visiteur (ralenti en fin de geste) ; d'un coup en mouvement réduit.
  */
+function turnToVisitor(cat, [rx, ry]) {
+    if (REDUCED_MOTION.matches) {
+        cat.pose(0, 0);
+        return;
+    }
+    const start = performance.now();
+    function frame(now) {
+        const progress = Math.min((now - start) / TURN_DURATION, 1);
+        const keep = (1 - progress) ** 3;
+        cat.pose(rx * keep, ry * keep);
+        if (progress < 1) requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+}
+
+
 function createDialog(texts) {
     const dialog = document.createElement("dialog");
     dialog.className = "human-check";
@@ -106,7 +141,6 @@ function createDialog(texts) {
     // tabIndex = -1 : la fenêtre peut recevoir le focus (voir openDialog)
     dialog.tabIndex = -1;
     dialog.innerHTML = `
-        <img class="human-check__image" src="${pickSuspiciousImage()}" alt="" width="240" height="240">
         <p class="human-check__title" id="human-check-title" lang="en">${texts.title}</p>
         <label class="human-check__box">
             <input class="human-check__input" type="checkbox">
@@ -114,6 +148,11 @@ function createDialog(texts) {
         </label>
         <p class="human-check__hint" role="status" aria-live="polite"></p>
     `;
+    const cat = createCat();
+    cat.suspicion = SUSPICIOUS_POSES[Math.floor(Math.random() * SUSPICIOUS_POSES.length)];
+    cat.pose(...cat.suspicion);
+    dialog.prepend(cat.svg);
+    dialog.cat = cat;
     document.body.append(dialog);
     return dialog;
 }
@@ -121,7 +160,7 @@ function createDialog(texts) {
 
 function showSuccess(dialog, texts) {
     dialog.classList.add("human-check--success");
-    dialog.querySelector(".human-check__image").src = IMAGES.loving;
+    turnToVisitor(dialog.cat, dialog.cat.suspicion);
     dialog.querySelector(".human-check__title").textContent = texts.success;
     dialog.querySelector(".human-check__hint").textContent = "";
     dialog.querySelector(".human-check__input").disabled = true;

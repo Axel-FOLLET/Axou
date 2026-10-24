@@ -8,7 +8,7 @@
     <title>Axel FOLLET — Chargé de projets IT | Portfolio</title>
     <meta name="description" content="Portfolio d'Axel FOLLET : parcours et progression, projets web, Python et IA, du pilotage de projets RH à l'informatique.">
     <meta name="author" content="Axel FOLLET">
-    <link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="assets/images/favicon.svg?v=dc02d7f3fc6c" type="image/svg+xml">
 
     <!-- Référencement : page canonique et version dans l'autre langue -->
     <link rel="canonical" href="https://axel-follet.github.io/portfolio/index.html">
@@ -31,20 +31,24 @@
 
     <!-- Police chargée dès le début : le texte s'affiche sans changer de police -->
     <link rel="preload" href="assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <!-- Serif des grands titres, romain et italique : le nom de l'accueil s'affiche sans passer par Georgia -->
+    <link rel="preload" href="assets/fonts/instrument-serif-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="assets/fonts/instrument-serif-italic-latin.woff2" as="font" type="font/woff2" crossorigin>
 
     <!-- Versions CSS : recharge les styles modifiés après publication. -->
-    <link rel="stylesheet" href="css/base.css?v=d128e4aae9d1">
-    <link rel="stylesheet" href="css/navigation.css?v=2cafec23310e">
-    <link rel="stylesheet" href="css/sections.css?v=56ab01a1de2c">
-    <link rel="stylesheet" href="css/buttons.css?v=48b832948220">
-    <link rel="stylesheet" href="css/home.css?v=95509b08fd6b">
+    <link rel="stylesheet" href="css/base.css?v=d1f69494ddc3">
+    <link rel="stylesheet" href="css/navigation.css?v=4f47cea82c11">
+    <link rel="stylesheet" href="css/sections.css?v=2d1322511799">
+    <link rel="stylesheet" href="css/buttons.css?v=2108940d7dfb">
+    <link rel="stylesheet" href="css/home.css?v=2f240020d128">
     <link rel="stylesheet" href="css/cubes.css?v=cde2ce89c339">
-    <link rel="stylesheet" href="css/projects.css?v=9bc44baaa8b8">
-    <link rel="stylesheet" href="css/career.css?v=3ec9e270a47f">
-    <link rel="stylesheet" href="css/contact.css?v=e16e9e6b606c">
-    <link rel="stylesheet" href="css/footer.css?v=cd8a787b00be">
-    <link rel="stylesheet" href="css/responsive.css?v=843c3a644ab2">
-    <link rel="stylesheet" href="css/human-check.css?v=ea8044b8f736">
+    <link rel="stylesheet" href="css/projects.css?v=fde3396de3ce">
+    <link rel="stylesheet" href="css/career.css?v=80c53986663f">
+    <link rel="stylesheet" href="css/contact.css?v=a82baebf779d">
+    <link rel="stylesheet" href="css/footer.css?v=bb28efed03ab">
+    <link rel="stylesheet" href="css/responsive.css?v=82742423eae5">
+    <link rel="stylesheet" href="css/human-check.css?v=85e4238a79c0">
+    <link rel="stylesheet" href="css/motion.css?v=497b42af2aa8">
     <!-- blocking="render" : la page ne s'affiche qu'une fois le script exécuté, cubes compris.
          Le fondu entre pages part ainsi d'une page complète au lieu de la voir se construire. -->
     <!-- Modules importés par main.js, demandés tous ensemble : sans cette liste, le navigateur les découvre
@@ -52,6 +56,7 @@
     <link rel="modulepreload" href="js/modules/navigation.js">
     <link rel="modulepreload" href="js/modules/navigation-menu.js">
     <link rel="modulepreload" href="js/modules/reveal.js">
+    <link rel="modulepreload" href="js/modules/motion.js">
     <link rel="modulepreload" href="js/modules/contact.js">
     <link rel="modulepreload" href="js/modules/human-check.js">
     <link rel="modulepreload" href="js/modules/cubes/init-cubes.js">
@@ -160,7 +165,7 @@
 
                 <h1 class="hero__title">
                     Axel<br>
-                    FOLLET
+                    <em>FOLLET</em>
                 </h1>
 
                 <p class="hero__role">Chargé de projets IT chez QUANTEAM · Étudiant Epitech 2026-2029</p>
@@ -193,7 +198,7 @@
 
             <p class="section__eyebrow">01 / Progression</p>
 
-            <h2 class="section__title" id="progression-title">De la gestion de projet au développement</h2>
+            <h2 class="section__title" id="progression-title">De la gestion de projet au <em>développement</em></h2>
 
             <p class="section__intro">
                 Après plusieurs années en ressources humaines, dont deux à piloter la conduite du changement chez SFR Distribution, <strong>j'ai rejoint Epitech en 2026 pour me former à un domaine qui m'a toujours attiré</strong>. Ce portfolio garde la trace de ma progression&nbsp;: ce que j'ai construit et ce que chaque projet m'a appris.
@@ -299,7 +304,7 @@
 
             <p class="section__eyebrow">02 / Projets</p>
 
-            <h2 class="section__title" id="projects-title">Mes projets techniques</h2>
+            <h2 class="section__title" id="projects-title">Mes projets <em>techniques</em></h2>
 
             <p class="section__intro">
                 Des exercices Python au travail en équipe&nbsp;: chaque projet marque une étape. Les jeux et les démos s'ouvrent directement dans la carte.
@@ -318,7 +323,7 @@
                 -->
                 <div class="showcase__track" role="region" aria-label="Projets">
 
-                    <article class="project-card" data-slug="yia-jobs" data-domain="web">
+                    <article class="project-card" data-slug="yia-jobs" data-domain="web" data-hover="cursor">
 
                         <div class="project-card__main">
 
@@ -360,7 +365,7 @@
 
                     </article>
 
-                    <article class="project-card" data-slug="site-cv" data-domain="web">
+                    <article class="project-card" data-slug="site-cv" data-domain="web" data-hover="cursor">
 
                         <div class="project-card__main">
 
@@ -397,7 +402,7 @@
 
                     </article>
 
-                    <article class="project-card" data-slug="snake" data-domain="games">
+                    <article class="project-card" data-slug="snake" data-domain="games" data-hover="snake">
 
                         <div class="project-card__main">
 
@@ -444,7 +449,7 @@
 
                     </article>
 
-                    <article class="project-card" data-slug="pendu" data-domain="games">
+                    <article class="project-card" data-slug="pendu" data-domain="games" data-hover="hangman">
 
                         <div class="project-card__main">
 
@@ -488,7 +493,7 @@
                     </article>
 
                     <!-- Prochain projet, en teasing : ni lien ni bouton avant sa publication. -->
-                    <article class="project-card" data-slug="cat-game" data-domain="games">
+                    <article class="project-card" data-slug="cat-game" data-domain="games" data-hover="cat">
 
                         <div class="project-card__main">
 
@@ -514,7 +519,7 @@
 
                     </article>
 
-                    <article class="project-card" data-slug="cesar-vigenere" data-domain="algorithms">
+                    <article class="project-card" data-slug="cesar-vigenere" data-domain="algorithms" data-hover="cipher">
 
                         <div class="project-card__main">
 
@@ -528,7 +533,7 @@
 
                             <div class="project-card__body">
 
-                                <h3 class="project-card__title">Chiffrements de César et de Vigenère</h3>
+                                <h3 class="project-card__title">Chiffrements de <span data-cipher>César</span> et de <span data-cipher data-cipher-vigenere="EPITECH" data-cipher-off>Vigenère</span></h3>
 
                                 <ul class="project-card__tags" aria-label="Compétences et technologies">
                                     <li class="tag">Python</li>
@@ -599,7 +604,7 @@
 
                     </article>
 
-                    <article class="project-card" data-slug="detecteur-langue" data-domain="algorithms">
+                    <article class="project-card" data-slug="detecteur-langue" data-domain="algorithms" data-hover="language">
 
                         <div class="project-card__main">
 
@@ -613,7 +618,7 @@
 
                             <div class="project-card__body">
 
-                                <h3 class="project-card__title">Détecteur de langue</h3>
+                                <h3 class="project-card__title">Détecteur de <span data-language="language idioma língua lingua Sprache taal språk język dil">langue</span></h3>
 
                                 <ul class="project-card__tags" aria-label="Compétences et technologies">
                                     <li class="tag">Python</li>
@@ -671,7 +676,7 @@
 
             <p class="section__eyebrow">03 / Contact</p>
 
-            <h2 class="section__title" id="contact-title">Me contacter</h2>
+            <h2 class="section__title" id="contact-title">Me <em>contacter</em></h2>
 
             <p class="section__intro">
                 Une opportunité, un projet ou une question sur mon parcours&nbsp;? Le formulaire ci-dessous m'arrive directement.
@@ -729,6 +734,7 @@
 
                 <div class="contact__main">
 
+                    <!-- Les textes d'état et d'erreur viennent des attributs data-* : un seul script pour FR et EN (contact.js) -->
                     <form
                         class="form"
                         id="contact-form"
@@ -737,9 +743,9 @@
                         data-sending="Envoi en cours…"
                         data-success="Merci, votre message a bien été envoyé."
                         data-sent="Envoyé"
-                        data-error="L'envoi a échoué. Vérifiez votre connexion puis réessayez, ou écrivez-moi sur LinkedIn."
+                        data-error="L'envoi a échoué. Vérifiez votre connexion puis réessayez, ou contactez-moi sur LinkedIn."
                         data-invalid-required="Ce champ est obligatoire."
-                        data-invalid-email="Adresse email invalide (exemple : nom@domaine.fr)."
+                        data-invalid-email="Adresse e-mail invalide (exemple&nbsp;: nom@domaine.fr)."
                     >
 
                         <div class="form__row">
@@ -754,13 +760,13 @@
                         </div>
 
                         <div class="form__field">
-                            <label class="form__label" for="email">Email</label>
+                            <label class="form__label" for="email">E-mail</label>
                             <input class="form__input" type="email" id="email" name="email" autocomplete="email" required>
                         </div>
 
                         <div class="form__field">
-                            <label class="form__label" for="subject">Sujet</label>
-                            <input class="form__input" type="text" id="subject" name="subject" required>
+                            <label class="form__label" for="subject">Sujet (facultatif)</label>
+                            <input class="form__input" type="text" id="subject" name="subject">
                         </div>
 
                         <div class="form__field">
@@ -768,10 +774,12 @@
                             <textarea class="form__input form__input--area" id="message" name="message" rows="6" required></textarea>
                         </div>
 
-                        <!-- Champ piège contre les robots : ne pas remplir -->
+                        <!-- Champ piège contre les robots : invisible pour les visiteurs, Formspree rejette l'envoi s'il est rempli -->
                         <input class="form__trap" type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true">
 
                         <button class="button button--primary" type="submit">Envoyer</button>
+
+                        <p class="form__notice">Tous les champs sont obligatoires, sauf le sujet.<a href="#donnees-formulaire">Utilisation de vos données</a></p>
 
                         <!-- Message de confirmation ou d'erreur, lu par les lecteurs d'écran -->
                         <p class="form__status" id="form-status" role="status" aria-live="polite"></p>
@@ -798,6 +806,15 @@
 
     <footer class="footer">
 
+        <!-- Dernier appel : la page se referme sur une invitation, vers LinkedIn et le site de CV -->
+        <div class="footer__cta">
+            <p class="footer__cta-title">Travaillons <em>ensemble</em>.</p>
+            <div class="button-group">
+                <a class="button button--primary" href="https://www.linkedin.com/in/axel-follet/" target="_blank" rel="noopener noreferrer">Échanger sur LinkedIn<span class="visually-hidden"> (nouvel onglet)</span></a>
+                <a class="button" href="https://axel-follet.github.io/website_resume/" target="_blank" rel="noopener noreferrer">Voir mon site de CV<span class="visually-hidden"> (nouvel onglet)</span></a>
+            </div>
+        </div>
+
         <div class="footer__row">
 
             <div>
@@ -822,21 +839,22 @@
             <div>
                 <p class="footer__title">Ressources et crédits</p>
                 <p class="footer__credits">
-                    Photo, dessins et textes&nbsp;: créations d'Axel FOLLET. Cubes 3D, chat en facettes et pictogrammes réalisés en HTML, CSS, SVG et JavaScript. Police Manrope (The Manrope Project Authors), sous <a href="assets/fonts/OFL-Manrope.txt">licence SIL Open Font License 1.1</a>, hébergée avec le site. Images de la fenêtre «&nbsp;<span lang="en">Are you human?</span>&nbsp;»&nbsp;: mèmes animaliers tiers, auteurs et licences non identifiés. LinkedIn® et le logo [in]® sont des marques de LinkedIn Corporation et de ses sociétés affiliées&nbsp;; ce site n’est ni affilié à LinkedIn ni approuvé par LinkedIn.
+                    Photo, dessins et textes&nbsp;: créations d'Axel FOLLET. Cubes 3D, chat en facettes et pictogrammes réalisés en HTML, CSS, SVG et JavaScript. Police Manrope (The Manrope Project Authors), sous <a href="assets/fonts/OFL-Manrope.txt">licence SIL Open Font License 1.1</a>, hébergée avec le site. LinkedIn® et le logo [in]® sont des marques de LinkedIn Corporation et de ses sociétés affiliées&nbsp;; ce site n’est ni affilié à LinkedIn ni approuvé par LinkedIn.
                 </p>
                 <details class="footer__legal">
                     <summary class="footer__legal-toggle">Mentions légales et données</summary>
-                    <p><strong>Éditeur&nbsp;:</strong> Axel FOLLET, site personnel non professionnel. Contact&nbsp;: formulaire du site ou LinkedIn.</p>
-                    <p><strong>Hébergeur&nbsp;:</strong> GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, États-Unis.</p>
-                    <p><strong>Formulaire de contact&nbsp;:</strong> vos nom, prénom, e-mail, sujet et message servent uniquement à vous répondre. Ils transitent par Formspree, service situé aux États-Unis, et sont supprimés 12 mois après notre dernier échange. Vous pouvez demander à y accéder, à les corriger ou à les supprimer par le formulaire ou LinkedIn, et adresser une réclamation à la <a href="https://www.cnil.fr/fr/plaintes" target="_blank" rel="noopener noreferrer">CNIL</a>.</p>
-                    <p><strong>Navigateur&nbsp;:</strong> aucun cookie ni mesure d'audience. Le site garde seulement sur votre appareil la réponse à «&nbsp;<span lang="en">Are you human?</span>&nbsp;», posée à l'envoi du formulaire, jusqu'à la fermeture de l'onglet, ainsi que vos records de Snake et du Pendu.</p>
+                    <p><strong>Éditeur et directeur de la publication&nbsp;:</strong> Axel FOLLET, particulier, site personnel non professionnel. Contact&nbsp;: formulaire du site ou LinkedIn.</p>
+                    <p><strong>Hébergeur&nbsp;:</strong> GitHub, Inc. (GitHub Pages), 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, États-Unis, <a href="https://support.github.com/" target="_blank" rel="noopener noreferrer" hreflang="en">support.github.com</a>. Pour la sécurité, GitHub enregistre l'adresse IP des visiteurs.</p>
+                    <p id="donnees-formulaire"><strong>Formulaire de contact&nbsp;:</strong> responsable du traitement, Axel FOLLET. Nom, prénom, e-mail et message sont obligatoires&nbsp;; le sujet est facultatif. Ces données servent uniquement à vous répondre, sur la base de l'intérêt légitime à traiter votre demande. Elles transitent par Formspree, Inc., aux États-Unis, qui les conserve selon sa <a href="https://formspree.io/legal/privacy-policy" target="_blank" rel="noopener noreferrer" hreflang="en">politique de confidentialité</a>, et sont supprimées 12 mois après notre dernier échange. Vous pouvez demander l'accès à vos données, leur rectification, leur effacement ou la limitation de leur traitement, ou vous y opposer, par le formulaire ou LinkedIn, et adresser une réclamation à la <a href="https://www.cnil.fr/fr/plaintes" target="_blank" rel="noopener noreferrer">CNIL</a>.</p>
+                    <p><strong>Navigateur&nbsp;:</strong> aucun cookie ni mesure d'audience. Le site garde seulement sur votre appareil la réponse à «&nbsp;<span lang="en">Are you human?</span>&nbsp;», posée à l'envoi du formulaire, jusqu'à la fermeture de l'onglet, et vos records de Snake et du Pendu, jusqu'à ce que vous effaciez les données du site dans votre navigateur.</p>
+                    <p><strong>Propriété intellectuelle&nbsp;:</strong> textes, photo, dessins, mise en page et code source © 2026 Axel FOLLET, tous droits réservés. Le code est public sur GitHub pour être lu&nbsp;; toute réutilisation demande mon accord. La police Manrope et le logo LinkedIn restent sous leurs propres licences et marques.</p>
                 </details>
             </div>
 
         </div>
 
         <div class="footer__bottom">
-            <p class="footer__copyright">&copy; 2026 Axel FOLLET</p>
+            <p class="footer__copyright">&copy; 2026 Axel FOLLET, tous droits réservés</p>
             <a class="footer__top" href="#top">Retour en haut ↑</a>
         </div>
 

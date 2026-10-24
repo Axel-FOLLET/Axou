@@ -1,32 +1,27 @@
-/*
- * Formations : deux blocs côte à côte, voile blanc très léger, sans bordure.
- * BEM : bloc__element désigne une partie du bloc ; bloc--modificateur désigne une variante.
- */
 /* -------------------- FORMATION -------------------- */
 
 /*
- * Deux colonnes égales ; minmax(0, 1fr) laisse une colonne rétrécir sous la largeur de son contenu.
- */
+    Formations : deux colonnes ouvertes côte à côte, en mise en page éditoriale.
+    minmax(0, 1fr) laisse une colonne rétrécir sous la largeur de son contenu.
+*/
 .education__list {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
 
-    gap: 24px;
+    gap: clamp(32px, 5vw, 72px);
 
-    margin-top: 40px;
+    margin-top: 48px;
 }
 
 
 /*
- * Voile blanc à 4 % : il détache chaque formation sans l'enfermer dans un cadre.
- * Pas de survol : ce ne sont pas des liens.
- */
+    Sans encadré ni fond : un filet en haut de chaque colonne suffit à les séparer.
+    Pas de survol : ce ne sont pas des liens.
+*/
 .education__card {
-    padding: var(--card-padding);
+    padding-top: 28px;
 
-    border-radius: var(--radius-card);
-
-    background-color: rgb(255 255 255 / 4%);
+    border-top: 1px solid var(--line-strong);
 }
 
 
@@ -34,9 +29,9 @@
 .education__date {
     margin: 0;
 
-    color: white;
+    color: var(--blue-accent);
 
-    font-size: 1rem;
+    font-size: var(--text-body);
     font-weight: 700;
     letter-spacing: 0.04em;
     font-variant-numeric: tabular-nums;
@@ -46,7 +41,7 @@
 .education__school {
     margin: 16px 0 0;
 
-    font-size: var(--text-card);
+    font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem);
     line-height: 1.15;
     letter-spacing: -0.025em;
 }
@@ -66,7 +61,7 @@
 
     margin: 12px 0 0;
 
-    color: white;
+    color: var(--muted);
 
     line-height: 1.65;
 }
@@ -74,21 +69,6 @@
 
 .education__degree + .education__text {
     margin-top: 20px;
-}
-
-
-/* Formation et Expériences s'enchaînent : 128 px entre les deux au lieu de 256 */
-@media (min-width: 768px) {
-
-    .education {
-        padding-bottom: 64px;
-    }
-
-
-    .experience {
-        padding-top: 64px;
-    }
-
 }
 
 
@@ -107,9 +87,9 @@
     .education__list {
         grid-template-columns: minmax(0, 1fr);
 
-        gap: 16px;
+        gap: 40px;
 
-        margin-top: 28px;
+        margin-top: 32px;
     }
 
 }

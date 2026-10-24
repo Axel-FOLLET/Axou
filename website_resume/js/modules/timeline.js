@@ -1,12 +1,12 @@
 /*
- * Frise des expériences, comme la chronologie du portfolio : la flèche descend au fil du défilement
- * et chaque poste apparaît quand la flèche l'atteint ; son carré daté se remplit.
+ * Frise des expériences, comme la chronologie du portfolio : le trait bleu descend au fil du défilement
+ * et chaque poste apparaît quand le trait l'atteint ; son carré daté se remplit.
  * Sans JavaScript ou en mouvement réduit, tout reste affiché d'emblée.
  */
 
 
 /*
- * Ligne de lecture placée à 80 % de la hauteur de l'écran : la pointe de la flèche
+ * Ligne de lecture placée à 80 % de la hauteur de l'écran : le bout du trait
  * et l'apparition des postes se calent sur elle.
  */
 const READING_LINE = 0.8;
@@ -29,7 +29,7 @@ function revealSteps(timeline) {
 
 
 /*
- * Place la pointe de la flèche sur la ligne de lecture : --progress vaut 0 avant la frise,
+ * Place le bout du trait sur la ligne de lecture : --progress vaut 0 avant la frise,
  * 1 une fois celle-ci dépassée. requestAnimationFrame limite le calcul à une fois par image.
  */
 function followScroll(timeline) {

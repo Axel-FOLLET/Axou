@@ -45,20 +45,38 @@
 }
 
 
-/* Image carrée : object-fit recadre les images plus hautes ou plus larges */
-.human-check__image {
+/* -------------------- CHAT EN FACETTES -------------------- */
+
+/* Le chat de la carte Cat Game (cat.js), dessiné par human-check.js : de trois quarts, méfiant, puis de face */
+.human-check__cat {
     display: block;
 
-    width: 100%;
-    max-width: 240px;
-    aspect-ratio: 1;
+    width: auto;
+    height: 200px;
+    aspect-ratio: 400 / 534;
 
     margin: 0 auto;
 
-    border-radius: var(--radius-s);
+    overflow: visible;
+}
 
-    object-fit: cover;
-    object-position: center 30%;
+
+/* Mêmes facettes que sur la carte Cat Game, posées sur le fond de la fenêtre */
+.human-check__cat polygon {
+    fill: color-mix(in srgb, var(--white) calc(6% + var(--light) * 30%), var(--ink-raised));
+
+    stroke: var(--white);
+    stroke-opacity: 0.45;
+    stroke-width: 1px;
+    stroke-linejoin: round;
+
+    vector-effect: non-scaling-stroke;
+}
+
+
+/* Facette tournée à l'opposé de nous : cachée derrière le volume */
+.human-check__cat .human-check__away {
+    visibility: hidden;
 }
 
 
@@ -152,16 +170,9 @@
 }
 
 
-/* Réussite : le chat amoureux apparaît en douceur */
-.human-check--success .human-check__image {
-    animation: human-check-in 0.3s ease-out;
-}
-
-
 @media (prefers-reduced-motion: reduce) {
 
-    .human-check,
-    .human-check--success .human-check__image {
+    .human-check {
         animation: none;
     }
 

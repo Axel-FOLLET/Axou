@@ -9,22 +9,27 @@
     <meta name="author" content="Axel FOLLET">
     <!-- Page d'erreur : elle ne doit pas apparaître dans les moteurs de recherche -->
     <meta name="robots" content="noindex">
-    <link rel="icon" href="/website_resume/assets/images/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/website_resume/assets/images/favicon.svg?v=6d7c05deb928" type="image/svg+xml">
 
     <!--
         GitHub Pages affiche ce fichier pour toute adresse inexistante du site, quel que soit le dossier :
         les chemins sont donc absolus (/website_resume/...) au lieu d'être relatifs.
+        Versions CSS : recharge les styles modifiés après publication.
     -->
-    <link rel="stylesheet" href="/website_resume/css/base.css">
-    <link rel="stylesheet" href="/website_resume/css/buttons.css">
-    <link rel="stylesheet" href="/website_resume/css/not-found.css">
+    <!-- Serif des grands chiffres, chargé dès le début : « 404 » s'affiche sans passer par Georgia -->
+    <link rel="preload" href="/website_resume/assets/fonts/instrument-serif-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="/website_resume/css/base.css?v=060a965fc51d">
+    <link rel="stylesheet" href="/website_resume/css/sections.css?v=94835d787bd2">
+    <link rel="stylesheet" href="/website_resume/css/buttons.css?v=df6b468f8c01">
+    <link rel="stylesheet" href="/website_resume/css/not-found.css?v=209de321dbe5">
+    <link rel="stylesheet" href="/website_resume/css/motion.css?v=497b42af2aa8">
 </head>
 
 <body class="page">
 
     <main class="not-found">
 
-        <p class="eyebrow">ERREUR 404</p>
+        <p class="section__eyebrow">ERREUR 404</p>
 
         <h1 class="not-found__code">404</h1>
 

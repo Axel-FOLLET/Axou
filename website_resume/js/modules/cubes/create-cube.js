@@ -3,6 +3,17 @@
  * export rend une valeur utilisable ailleurs ; import récupère uniquement les noms nécessaires.
  */
 const FACES = ["front", "back", "right", "left", "top", "bottom"];
+
+
+function appendFaces(parent) {
+    for (const name of FACES) {
+        const face = document.createElement("span");
+        face.classList.add("cube__face", "cube__face--" + name);
+        parent.append(face);
+    }
+}
+
+
 /*
  * trigger est l'élément HTML porteur du cube ; index distingue sa position dans la liste.
  * Crée ses six faces et renvoie son état initial, utilisé ensuite par l'animation.
@@ -10,11 +21,7 @@ const FACES = ["front", "back", "right", "left", "top", "bottom"];
 export function createCube(trigger, index) {
     const object = document.createElement("span");
     object.className = "cube__object";
-    for (const name of FACES) {
-        const face = document.createElement("span");
-        face.classList.add("cube__face", "cube__face--" + name);
-        object.append(face);
-    }
+    appendFaces(object);
     trigger.append(object);
     /*
      * dataset contient du texte : Number le convertit ; || utilise le repli si la valeur vaut 0 ou NaN.

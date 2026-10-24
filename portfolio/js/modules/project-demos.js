@@ -167,8 +167,23 @@ function initCipherDemo(demo, texts, language) {
      */
     method.addEventListener("input", () => {
         key.value = method.value === "caesar" ? "3" : "EPITECH";
+        markTitle();
         update();
     });
+
+    /*
+     * Le mot du titre chiffré au survol suit la méthode choisie : César ou Vigenère (marqué data-cipher-vigenere).
+     * motion.js en est prévenu par l'évènement cipherchange.
+     */
+    function markTitle() {
+        const card = demo.closest('[data-hover="cipher"]');
+        if (!card) return;
+        card.querySelectorAll("[data-cipher]").forEach(word => {
+            const isVigenere = word.hasAttribute("data-cipher-vigenere");
+            word.toggleAttribute("data-cipher-off", isVigenere !== (method.value === "vigenere"));
+        });
+        card.dispatchEvent(new Event("cipherchange"));
+    }
 
     /*
      * Reprend le résultat comme nouveau texte et inverse l'opération : pratique pour vérifier l'aller-retour.
@@ -192,6 +207,7 @@ function initCipherDemo(demo, texts, language) {
         update();
         message.textContent = texts.foundKey(key.value);
     });
+    markTitle();
     update();
 }
 

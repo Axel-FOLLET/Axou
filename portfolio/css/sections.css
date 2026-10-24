@@ -33,19 +33,27 @@
 }
 
 
-/* Gros titre resserré : les lettres se rapprochent quand la taille augmente */
+/* Gros titre en serif d'affichage, un peu agrandi : ce serif est plus étroit que Manrope */
 .section__title {
     max-width: 18ch;
 
     margin: 0 0 28px;
 
-    font-size: var(--text-title);
-    font-weight: 800;
-    line-height: 1.02;
-    letter-spacing: -0.04em;
+    font-family: var(--font-display);
+    font-size: calc(var(--text-title) * 1.15);
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: -0.01em;
 
     /* Lignes de longueur proche : pas de mot seul sur la dernière */
     text-wrap: balance;
+}
+
+
+/* Un mot clé par grand titre, dans l'italique du serif (nom de famille à l'accueil) */
+.hero__title em,
+.section__title em {
+    font-style: italic;
 }
 
 

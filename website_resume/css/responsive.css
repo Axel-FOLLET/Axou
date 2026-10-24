@@ -1,24 +1,166 @@
 /*
- * Adaptations communes à plusieurs composants. Chaque composant garde ses propres
- * points de rupture dans sa feuille (navigation, accueil, formation, frise, projets, contact).
- * BEM : bloc__element désigne une partie du bloc ; bloc--modificateur désigne une variante.
- */
-/* -------------------- TÉLÉPHONE -------------------- */
+    Adaptations communes à plusieurs composants, reprises du portfolio.
+    La formation, la frise, la reconversion et les projets gardent leurs points de rupture dans leur feuille.
+*/
 
-/*
- * Cette condition se base sur la largeur de la fenêtre en pixels CSS, pas sur le type d'appareil.
- * Les cubes à taille générique (reconversion) rétrécissent.
- */
-@media (max-width: 767px) {
 
-    :root {
-        --header-height: 64px;
+/* -------------------- TABLETTE -------------------- */
+
+@media (max-width: 1024px) {
+
+    /* -------------------- ACCUEIL -------------------- */
+    /* Les cubes passent sous le texte */
+    .hero {
+        flex-direction: column;
+        align-items: flex-start;
+
+        padding-top: 56px;
     }
 
 
+    .hero__text,
+    .hero__visual {
+        width: 100%;
+    }
+
+
+    .hero__visual {
+        height: 420px;
+
+        margin-top: 40px;
+    }
+
+
+    /* -------------------- CONTACT -------------------- */
+    .contact {
+        flex-direction: column;
+
+        gap: 48px;
+    }
+
+
+    .contact__main {
+        width: 100%;
+        max-width: none;
+    }
+
+
+    .contact__side {
+        width: 100%;
+
+        min-height: 320px;
+    }
+
+}
+
+
+/* -------------------- TÉLÉPHONE -------------------- */
+@media (max-width: 767px) {
+
+    /* -------------------- ACCUEIL -------------------- */
+    /* Figure de cubes moins haute et plus proche du texte */
+    .hero {
+        min-height: auto;
+
+        padding-bottom: 48px;
+    }
+
+
+    .hero__visual {
+        height: 280px;
+
+        margin-top: 24px;
+    }
+
+
+    /* -------------------- SECTIONS -------------------- */
+    .section__intro {
+        margin-bottom: 40px;
+    }
+
+
+    .cube--huge {
+        --cube-size: 170px;
+    }
+
+
+    .cube--large {
+        --cube-size: 120px;
+    }
+
+
+    /* Cube des compétences de la reconversion, à l'échelle du bandeau sur téléphone */
     .cube--medium {
         --cube-size: 64px;
-        --cube-half: 32px;
+    }
+
+
+    /* Figure de l'accueil plus basse : son gros cube rétrécit dans la même proportion */
+    .hero__visual .cube--huge {
+        --cube-size: 120px;
+    }
+
+
+    /* Petits cubes réduits et posés en diagonale, loin du gros cube : en tournant, ils ne le chevauchent plus */
+    .hero__visual .cube--small {
+        --cube-size: 44px;
+    }
+
+
+    .hero__visual .cube--pos-1 {
+        top: 6%;
+        left: 4%;
+    }
+
+
+    .hero__visual .cube--pos-2 {
+        top: auto;
+        right: 6%;
+        bottom: 8%;
+    }
+
+
+    .form__row {
+        flex-direction: column;
+
+        gap: 0;
+    }
+
+}
+
+
+/* -------------------- PETIT TÉLÉPHONE -------------------- */
+
+/* Sous 360 px, les titres de section passent à une taille fixe pour tenir dans la largeur */
+@media (max-width: 359px) {
+
+    :root {
+        --text-title: 2.125rem;
+    }
+
+}
+
+
+/* -------------------- MOUVEMENT RÉDUIT -------------------- */
+
+/*
+    Si le visiteur a demandé moins d'animations dans son système,
+    le défilement doux est supprimé (JavaScript arrête aussi les cubes).
+    Les changements de couleur restent pour confirmer le survol et le clic.
+*/
+@media (prefers-reduced-motion: reduce) {
+
+    html {
+        scroll-behavior: auto;
+    }
+
+
+    /* Les effets d'appui rétrécissent l'élément : ils s'arrêtent aussi */
+    .button:active,
+    .cube:active,
+    .header__toggle:active,
+    .link-card:active {
+        scale: none;
     }
 
 }

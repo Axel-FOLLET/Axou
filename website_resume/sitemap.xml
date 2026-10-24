@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Liste des pages pour les moteurs de recherche ; xhtml:link relie chaque page à sa traduction. -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+    <url>
+        <loc>https://axel-follet.github.io/website_resume/index.html</loc>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://axel-follet.github.io/website_resume/index.html"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://axel-follet.github.io/website_resume/index-en.html"/>
+    </url>
+    <url>
+        <loc>https://axel-follet.github.io/website_resume/index-en.html</loc>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://axel-follet.github.io/website_resume/index.html"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://axel-follet.github.io/website_resume/index-en.html"/>
+    </url>
+</urlset>

@@ -9,7 +9,7 @@
     <meta name="author" content="Axel FOLLET">
     <!-- Page d'erreur : elle ne doit pas apparaître dans les moteurs de recherche -->
     <meta name="robots" content="noindex">
-    <link rel="icon" href="/portfolio/assets/images/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/portfolio/assets/images/favicon.svg?v=dc02d7f3fc6c" type="image/svg+xml">
 
     <!--
         Anciennes pages (pages/projects.html, pages/skills-en.html…) : le site tient sur une page par langue.
@@ -32,10 +32,13 @@
         les chemins sont donc absolus (/portfolio/...) au lieu d'être relatifs.
         Versions CSS : recharge les styles modifies apres publication.
     -->
-    <link rel="stylesheet" href="/portfolio/css/base.css?v=d128e4aae9d1">
-    <link rel="stylesheet" href="/portfolio/css/sections.css?v=56ab01a1de2c">
-    <link rel="stylesheet" href="/portfolio/css/buttons.css?v=48b832948220">
-    <link rel="stylesheet" href="/portfolio/css/not-found.css?v=338169144b4e">
+    <!-- Serif des grands chiffres, chargé dès le début : « 404 » s'affiche sans passer par Georgia -->
+    <link rel="preload" href="/portfolio/assets/fonts/instrument-serif-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="/portfolio/css/base.css?v=d1f69494ddc3">
+    <link rel="stylesheet" href="/portfolio/css/sections.css?v=2d1322511799">
+    <link rel="stylesheet" href="/portfolio/css/buttons.css?v=2108940d7dfb">
+    <link rel="stylesheet" href="/portfolio/css/not-found.css?v=fb3425db5fb9">
+    <link rel="stylesheet" href="/portfolio/css/motion.css?v=497b42af2aa8">
 </head>
 
 <body class="page">
