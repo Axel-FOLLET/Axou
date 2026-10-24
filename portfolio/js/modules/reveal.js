@@ -1,6 +1,7 @@
 /*
- * Apparition au défilement : chaque partie de page, sauf la première,
- * apparaît en fondu en remontant de quelques pixels quand elle entre à l'écran.
+ * Apparition au défilement : le contenu de chaque partie de page, sauf la première,
+ * apparaît en fondu en remontant de quelques pixels quand il entre à l'écran.
+ * Le fond de la section reste affiché : le rouge de la page ne transparaît pas sous un fond quasi-noir.
  * Sans JavaScript ou en mouvement réduit, tout reste affiché d'emblée.
  */
 
@@ -23,10 +24,11 @@ function revealOnScroll(parts) {
 
 /*
  * La première partie est déjà à l'écran à l'ouverture : elle n'est pas animée.
+ * Chaque bloc de section (titre, texte, frise, roue…) apparaît séparément.
  */
 export function initReveal() {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const parts = document.querySelectorAll("main > section:not(:first-of-type)");
+    const parts = document.querySelectorAll("main > section:not(:first-of-type) > *");
     parts.forEach(part => part.classList.add("reveal"));
     revealOnScroll(parts);
 }

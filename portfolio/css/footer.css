@@ -1,10 +1,12 @@
 /* -------------------- PIED DE PAGE -------------------- */
 
-/* Bleu assombri : le pied de page ferme la page sans concurrencer les bandeaux bleus */
+/* Quasi-noir : la page se referme sur la couleur de respiration */
 .footer {
-    padding: 64px var(--gutter) 32px;
+    padding: 72px var(--gutter) 32px;
 
-    background-color: color-mix(in srgb, var(--blue) 55%, black);
+    border-top: 1px solid var(--line);
+
+    background-color: var(--ink);
 }
 
 
@@ -17,15 +19,11 @@
 }
 
 
+/* Style d'étiquette dans base.css */
 .footer__title {
     margin: 0 0 14px;
 
-    font-size: 0.8rem;
-    letter-spacing: 0.2rem;
-
-    text-transform: uppercase;
-
-    opacity: 0.7;
+    color: var(--muted);
 }
 
 
@@ -46,12 +44,14 @@
     min-height: 32px;
 
     text-decoration: none;
+
+    transition: color 0.2s ease;
 }
 
 
 .footer__list a:hover,
 .footer__top:hover {
-    opacity: 0.75;
+    color: var(--muted);
 }
 
 
@@ -60,9 +60,15 @@
 
     margin: 0;
 
-    font-size: 0.85rem;
+    color: var(--muted);
 
-    opacity: 0.8;
+    font-size: 0.875rem;
+}
+
+
+.footer__credits a,
+.footer__legal a {
+    color: var(--white);
 }
 
 
@@ -74,22 +80,20 @@
 
     gap: 12px;
 
-    margin-top: 48px;
+    margin-top: 56px;
     padding-top: 20px;
 
-    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    border-top: 1px solid var(--line);
 
-    font-size: 0.85rem;
+    font-size: 0.875rem;
 }
 
 
 .footer__copyright {
     margin: 0;
 
-    opacity: 0.7;
+    color: var(--muted);
 }
-
-
 
 
 /* Mentions légales repliées : une ligne tant qu'on ne clique pas, le détail s'ouvre sous les crédits */
@@ -98,8 +102,7 @@
 
     margin-top: 10px;
 
-    font-size: 0.85rem;
-    line-height: 1.6;
+    font-size: 0.875rem;
 }
 
 
@@ -135,26 +138,12 @@
 
 
 .footer__legal-toggle:hover {
-    opacity: 0.75;
-}
-
-
-.footer__legal-toggle:focus-visible {
-    outline: 3px solid white;
-    outline-offset: 4px;
+    color: var(--muted);
 }
 
 
 .footer__legal p {
     margin: 8px 0 0;
 
-    opacity: 0.8;
-}
-
-
-.footer__legal a {
-    color: inherit;
-
-    font-weight: 600;
-    text-decoration: none;
+    color: var(--muted);
 }

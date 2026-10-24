@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Accueil | Axel FOLLET — Portfolio</title>
-    <meta name="description" content="Portfolio d'Axel FOLLET : projets web et Python, compétences reliées aux projets et progression, du pilotage de projets RH à l'informatique.">
+    <title>Axel FOLLET — Chargé de projets IT | Portfolio</title>
+    <meta name="description" content="Portfolio d'Axel FOLLET : parcours et progression, projets web, Python et IA, du pilotage de projets RH à l'informatique.">
     <meta name="author" content="Axel FOLLET">
     <link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml">
 
@@ -14,11 +14,14 @@
     <link rel="canonical" href="https://axel-follet.github.io/portfolio/index.html">
     <link rel="alternate" hreflang="fr" href="https://axel-follet.github.io/portfolio/index.html">
     <link rel="alternate" hreflang="en" href="https://axel-follet.github.io/portfolio/index-en.html">
+    <link rel="alternate" hreflang="x-default" href="https://axel-follet.github.io/portfolio/index.html">
 
     <!-- Aperçu lors du partage du lien -->
     <meta property="og:type" content="website">
-    <meta property="og:title" content="Accueil | Axel FOLLET — Portfolio">
-    <meta property="og:description" content="Portfolio d'Axel FOLLET : projets web et Python, compétences reliées aux projets et progression, du pilotage de projets RH à l'informatique.">
+    <meta property="og:locale" content="fr_FR">
+    <meta property="og:locale:alternate" content="en_GB">
+    <meta property="og:title" content="Axel FOLLET — Chargé de projets IT | Portfolio">
+    <meta property="og:description" content="Portfolio d'Axel FOLLET : parcours et progression, projets web, Python et IA, du pilotage de projets RH à l'informatique.">
     <meta property="og:url" content="https://axel-follet.github.io/portfolio/index.html">
     <meta property="og:image" content="https://axel-follet.github.io/portfolio/assets/images/share.png">
     <meta property="og:image:width" content="1200">
@@ -26,22 +29,43 @@
     <meta property="og:image:alt" content="Portfolio d'Axel FOLLET : J'ai piloté des projets. Aujourd'hui, je les construis.">
     <meta name="twitter:card" content="summary_large_image">
 
-    <!-- Versions CSS : recharge les styles modifies apres publication. -->
-    <link rel="stylesheet" href="css/base.css?v=7d1975f13cd5">
-    <link rel="stylesheet" href="css/navigation.css?v=89d089480aaf">
-    <link rel="stylesheet" href="css/sections.css?v=cd4522cf6582">
-    <link rel="stylesheet" href="css/buttons.css?v=467302261e2d">
-    <link rel="stylesheet" href="css/home.css?v=79b2a40ceb2a">
-    <link rel="stylesheet" href="css/cubes.css?v=7de0aa29a27e">
-    <link rel="stylesheet" href="css/projects.css?v=5b7f8018a0f4">
-    <link rel="stylesheet" href="css/career.css?v=d572d0c013d7">
-    <link rel="stylesheet" href="css/skills.css?v=633c6217dd40">
-    <link rel="stylesheet" href="css/contact.css?v=49f028298688">
-    <link rel="stylesheet" href="css/footer.css?v=d56c3e030fb0">
-    <link rel="stylesheet" href="css/responsive.css?v=566faafa8b04">
-    <link rel="stylesheet" href="css/human-check.css?v=b476be755147">
+    <!-- Police chargée dès le début : le texte s'affiche sans changer de police -->
+    <link rel="preload" href="assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
+
+    <!-- Versions CSS : recharge les styles modifiés après publication. -->
+    <link rel="stylesheet" href="css/base.css?v=d128e4aae9d1">
+    <link rel="stylesheet" href="css/navigation.css?v=2cafec23310e">
+    <link rel="stylesheet" href="css/sections.css?v=56ab01a1de2c">
+    <link rel="stylesheet" href="css/buttons.css?v=48b832948220">
+    <link rel="stylesheet" href="css/home.css?v=95509b08fd6b">
+    <link rel="stylesheet" href="css/cubes.css?v=cde2ce89c339">
+    <link rel="stylesheet" href="css/projects.css?v=9bc44baaa8b8">
+    <link rel="stylesheet" href="css/career.css?v=3ec9e270a47f">
+    <link rel="stylesheet" href="css/contact.css?v=e16e9e6b606c">
+    <link rel="stylesheet" href="css/footer.css?v=cd8a787b00be">
+    <link rel="stylesheet" href="css/responsive.css?v=843c3a644ab2">
+    <link rel="stylesheet" href="css/human-check.css?v=ea8044b8f736">
     <!-- blocking="render" : la page ne s'affiche qu'une fois le script exécuté, cubes compris.
          Le fondu entre pages part ainsi d'une page complète au lieu de la voir se construire. -->
+    <!-- Modules importés par main.js, demandés tous ensemble : sans cette liste, le navigateur les découvre
+         niveau par niveau (main.js, puis ses imports, puis les leurs) et l'affichage attend d'autant plus. -->
+    <link rel="modulepreload" href="js/modules/navigation.js">
+    <link rel="modulepreload" href="js/modules/navigation-menu.js">
+    <link rel="modulepreload" href="js/modules/reveal.js">
+    <link rel="modulepreload" href="js/modules/contact.js">
+    <link rel="modulepreload" href="js/modules/human-check.js">
+    <link rel="modulepreload" href="js/modules/cubes/init-cubes.js">
+    <link rel="modulepreload" href="js/modules/cubes/create-cube.js">
+    <link rel="modulepreload" href="js/modules/cubes/update-cube.js">
+    <link rel="modulepreload" href="js/modules/cubes/drag-cube.js">
+    <link rel="modulepreload" href="js/modules/cat.js">
+    <link rel="modulepreload" href="js/modules/timeline.js">
+    <link rel="modulepreload" href="js/modules/project-showcase.js">
+    <link rel="modulepreload" href="js/modules/project-filter.js">
+    <link rel="modulepreload" href="js/modules/project-demos.js">
+    <link rel="modulepreload" href="js/tools/language-detector.js">
+    <link rel="modulepreload" href="js/tools/ciphers.js">
+    <link rel="modulepreload" href="js/tools/letter-frequencies.js">
     <script type="module" src="js/main.js" blocking="render"></script>
     <script type="application/ld+json">
     {
@@ -49,13 +73,13 @@
         "@type": "Person",
         "name": "Axel FOLLET",
         "jobTitle": "Chargé de projets IT",
-        "url": "https://axel-follet.github.io/portfolio/",
+        "url": "https://axel-follet.github.io/portfolio/index.html",
         "sameAs": ["https://www.linkedin.com/in/axel-follet/", "https://github.com/Axel-FOLLET"]
     }
     </script>
 </head>
 
-<body class="page">
+<body class="page" id="top">
 
     <!-- Lien pour aller directement au contenu (clavier) -->
     <a class="skip-link" href="#main">Aller au contenu</a>
@@ -83,15 +107,15 @@
 
                 <span class="header__avatar">
                     <img
-                    class="header__photo"
-                    src="assets/images/profile-small.png"
-                    alt="Photo de profil d'Axel FOLLET" width="80" height="80"
-                >
+                        class="header__photo"
+                        src="assets/images/profile-small.png"
+                        alt="Photo de profil d'Axel FOLLET" width="80" height="80"
+                    >
                 </span>
 
-                <a class="header__logo" href="index.html">AF</a>
+                <a class="header__logo" href="#top">AF</a>
 
-                <!-- Chaque page renvoie vers sa page équivalente dans l'autre langue -->
+                <!-- Le lien de langue garde la section affichée (navigation.js) -->
                 <div class="language-switch" role="group" aria-label="Choisir la langue">
                     <span class="language-switch__option language-switch__option--active" lang="fr" aria-current="true">FR</span>
                     <a class="language-switch__option" href="index-en.html" hreflang="en" lang="en" aria-label="English">EN</a>
@@ -100,20 +124,20 @@
             </div>
 
 
-            <!-- Liens vers les différentes pages -->
+            <!-- Liens vers les sections de la page ; navigation.js marque la section affichée -->
             <span class="header__current">Accueil</span>
             <ul class="header__links" id="menu-links">
                 <li>
-                    <a class="header__link" href="index.html" aria-current="page">Accueil</a>
+                    <a class="header__link" href="#home" aria-current="true">Accueil</a>
                 </li>
                 <li>
-                    <a class="header__link" href="pages/projects.html">Projets</a>
+                    <a class="header__link" href="#progression">Progression</a>
                 </li>
                 <li>
-                    <a class="header__link" href="pages/skills.html">Compétences</a>
+                    <a class="header__link" href="#projects">Projets</a>
                 </li>
                 <li>
-                    <a class="header__link" href="pages/contact.html">Contact</a>
+                    <a class="header__link" href="#contact">Contact</a>
                 </li>
             </ul>
 
@@ -126,19 +150,20 @@
 
     <main id="main">
 
-        <!-- -------------------- ACCUEIL -------------------- -->
+        <!-- -------------------- ACCUEIL (rouge) -------------------- -->
 
         <section class="hero" id="home">
 
-            <!-- Partie texte principale -->
             <div class="hero__text">
 
-                <p class="section__eyebrow">PORTFOLIO / 2026</p>
+                <p class="section__eyebrow">Portfolio 2026</p>
 
                 <h1 class="hero__title">
                     Axel<br>
                     FOLLET
                 </h1>
+
+                <p class="hero__role">Chargé de projets IT chez QUANTEAM · Étudiant Epitech 2026-2029</p>
 
                 <!-- Phrase d'accroche -->
                 <p class="hero__catchphrase">
@@ -146,106 +171,627 @@
                 </p>
 
                 <div class="button-group">
-                    <a class="button button--primary" href="pages/projects.html">Voir mes projets</a>
-                    <a class="button" href="assets/CV_Axel_FOLLET_FR.pdf" download="CV_Axel_FOLLET_FR.pdf">Télécharger mon CV (PDF)</a>
+                    <a class="button button--primary" href="#projects">Voir mes projets</a>
                 </div>
 
             </div>
 
 
-            <!-- -------------------- PHOTO ET CUBES -------------------- -->
+            <!-- Cubes décoratifs : on peut les faire tourner à la souris ou au doigt, ils restent hors du parcours clavier -->
+            <div class="hero__visual" aria-hidden="true">
+                <span class="cube cube--huge cube--white cube--hero" data-speed="14" data-phase="60"></span>
+                <span class="cube cube--small cube--white cube--pos-1" data-speed="21" data-phase="70"></span>
+                <span class="cube cube--small cube--white cube--pos-2" data-speed="18" data-phase="150"></span>
+            </div>
 
-            <div class="hero__visual">
+        </section>
 
-                <button
-            class="cube cube--huge cube--blue cube--hero"
-            type="button"
-            aria-label="Faire tourner le cube principal"
-            data-speed="14"
-            data-phase="60"
-        ></button>
 
-                <button
-                    class="cube cube--small cube--blue cube--pos-1"
-                    type="button"
-                    aria-label="Faire tourner le cube"
-                    data-speed="21"
-                    data-phase="70"
-                ></button>
+        <!-- -------------------- PROGRESSION (quasi-noir) -------------------- -->
 
-                <button
-                    class="cube cube--small cube--white cube--pos-2"
-                    type="button"
-                    aria-label="Faire tourner le cube"
-                    data-speed="18"
-                    data-phase="150"
-                ></button>
+        <section class="section section--dark" id="progression" aria-labelledby="progression-title">
 
-                <button
-                    class="cube cube--tiny cube--white cube--pos-3"
-                    type="button"
-                    aria-label="Faire tourner le cube"
-                    data-speed="23"
-                    data-phase="220"
-                ></button>
+            <p class="section__eyebrow">01 / Progression</p>
 
-                <button
-                    class="cube cube--medium cube--blue cube--pos-4"
-                    type="button"
-                    aria-label="Faire tourner le cube"
-                    data-speed="19"
-                    data-phase="290"
-                ></button>
+            <h2 class="section__title" id="progression-title">De la gestion de projet au développement</h2>
+
+            <p class="section__intro">
+                Après plusieurs années en ressources humaines, dont deux à piloter la conduite du changement chez SFR Distribution, <strong>j'ai rejoint Epitech en 2026 pour me former à un domaine qui m'a toujours attiré</strong>. Ce portfolio garde la trace de ma progression&nbsp;: ce que j'ai construit et ce que chaque projet m'a appris.
+            </p>
+
+            <p class="career__goal">
+                Mon objectif&nbsp;: progresser dans les différents domaines de l'informatique, avec une appétence pour la gestion de projets IT et la data science.
+            </p>
+
+            <ol class="timeline">
+                <li class="timeline__step">
+                    <span class="timeline__number" aria-hidden="true">01</span>
+                    <div class="timeline__content">
+                        <h3 class="timeline__title">Le point de départ</h3>
+                        <p class="timeline__text">Recrutement (BPCE, OCP), SIRH (Natixis), puis chargé de projets RH et conduite du changement chez SFR Distribution, en parallèle d'un double master en management RH (2022-2024). Planifier, prioriser, accompagner les équipes&nbsp;: ces méthodes structurent aujourd'hui mes projets techniques.</p>
+                    </div>
+                </li>
+                <li class="timeline__step">
+                    <span class="timeline__number" aria-hidden="true">02</span>
+                    <div class="timeline__content">
+                        <h3 class="timeline__title">Les bases en Python</h3>
+                        <p class="timeline__text">Piscine Python&nbsp;: terminal Linux et Git, puis Python (conditions, boucles, fonctions, fichiers). Mise en pratique d'abord dans un détecteur de langue et des chiffrements de César et de Vigenère, fondés sur la fréquence des lettres, puis, en projets personnels, dans deux jeux complets&nbsp;: le Pendu et le Snake.</p>
+                    </div>
+                </li>
+                <li class="timeline__step">
+                    <span class="timeline__number" aria-hidden="true">03</span>
+                    <div class="timeline__content">
+                        <h3 class="timeline__title">Le web, de la page au site en ligne</h3>
+                        <p class="timeline__text">Piscine web&nbsp;: scripts Bash, pages HTML sémantiques, mises en page Flexbox et Grid pensées d'abord pour mobile, validation W3C. Puis le site CV, avec mes premières interactions en JavaScript, et ce portfolio&nbsp;: référencement, accessibilité et publication automatique avec GitHub Pages.</p>
+                        <p class="timeline__challenge"><strong>Défi relevé&nbsp;:</strong> des pages lisibles du grand écran au téléphone, utilisables entièrement au clavier.</p>
+                    </div>
+                </li>
+                <li class="timeline__step">
+                    <span class="timeline__number" aria-hidden="true">04</span>
+                    <div class="timeline__content">
+                        <h3 class="timeline__title">Chef de projet en équipe</h3>
+                        <p class="timeline__text">Y.I.A Jobs, job board réalisé à trois&nbsp;: je pilotais le projet et développais le front-end en React, mon premier framework. Planning, tâches quotidiennes estimées pour chaque membre, contrat d'API entre le front et le back, relecture avant chaque fusion, puis mise en ligne sur Render.</p>
+                        <p class="timeline__challenge"><strong>Défi relevé&nbsp;:</strong> intégrer un troisième membre en cours de projet en redistribuant le travail.</p>
+                    </div>
+                </li>
+            </ol>
+
+
+            <!-- Méthode de travail : ce qui a été mis en place avec les assistants IA -->
+            <div class="method">
+
+                <div class="method__head">
+
+                    <div class="method__lead">
+
+                        <h3 class="method__title">Travailler avec l'IA&nbsp;: <span class="method__accent">Claude et Codex</span></h3>
+
+                        <p class="section__intro">
+                            Depuis septembre 2026, je construis le cadre dans lequel travaillent mes agents IA, Claude et Codex. <strong>Trois objectifs, dans cet ordre&nbsp;: véracité des données, liberté contrôlée des agents, optimiser l'utilisation</strong>. Le dispositif est passé à un socle court et à des modules appelés selon le besoin.
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <!-- Chaque pratique est une brique : un petit cube blanc la signale, il se fait tourner comme les autres -->
+                <ul class="method__list">
+                    <li class="method__item">
+                        <span class="cube cube--tiny cube--white" aria-hidden="true" data-speed="10" data-phase="0"></span>
+                        <h4 class="method__name">Règles communes</h4>
+                        <p class="method__text">Une seule source pour les deux assistants&nbsp;: un socle lu à chaque conversation (véracité, communication, autorisations), puis onze modules, du guidage à la sécurité, chargés quand leur sujet arrive.</p>
+                    </li>
+                    <li class="method__item">
+                        <span class="cube cube--tiny cube--white" aria-hidden="true" data-speed="11" data-phase="40"></span>
+                        <h4 class="method__name">Niveaux de preuve</h4>
+                        <p class="method__text">Chaque affirmation déclare son niveau&nbsp;: observé, rapporté par moi, hypothèse ou proposition. Un chiffre cite sa source&nbsp;; un compte rendu sépare l'observé du déduit.</p>
+                    </li>
+                    <li class="method__item">
+                        <span class="cube cube--tiny cube--white" aria-hidden="true" data-speed="12" data-phase="80"></span>
+                        <h4 class="method__name">Skills</h4>
+                        <p class="method__text">Six méthodes communes à Claude et Codex&nbsp;: expliquer un code, retrouver la raison d'un choix, concevoir avant d'écrire, relire une modification, guider un test de régression, enseigner à mon rythme. À côté, des modules de règles, comme la rédaction&nbsp;: neuf règles et ma plume, tirée de mon mémoire.</p>
+                    </li>
+                    <li class="method__item">
+                        <span class="cube cube--tiny cube--white" aria-hidden="true" data-speed="10" data-phase="120"></span>
+                        <h4 class="method__name">Hooks</h4>
+                        <p class="method__text">Des contrôles automatiques à chaque étape&nbsp;: rappel des règles à chaque message, refus d'une écriture sans accord reconnu, puis signalement des caractères invisibles et des métadonnées d'images. Des tests automatisés les vérifient.</p>
+                    </li>
+                    <li class="method__item">
+                        <span class="cube cube--tiny cube--white" aria-hidden="true" data-speed="11" data-phase="160"></span>
+                        <h4 class="method__name">Équipe multi-agents</h4>
+                        <p class="method__text">Pour un travail délégué, quatre rôles séparés&nbsp;: le manager rédige avec moi l'ordre de mission, le chef de projet découpe et vérifie, les agents exécutent, un expert contrôle à l'aveugle. Sans verdict «&nbsp;conforme&nbsp;», rien n'est livré.</p>
+                    </li>
+                    <li class="method__item">
+                        <span class="cube cube--tiny cube--white" aria-hidden="true" data-speed="12" data-phase="320"></span>
+                        <h4 class="method__name">Suivi d'apprentissage</h4>
+                        <p class="method__text">Une trace écrite de chaque séance, des quiz corrigés sur le contenu et des révisions espacées&nbsp;: les difficultés reviennent plus tôt, les acquis s'espacent.</p>
+                    </li>
+                </ul>
 
             </div>
 
         </section>
 
 
-        <!-- -------------------- CE QUE CONTIENT LE PORTFOLIO -------------------- -->
+        <!-- -------------------- PROJETS (quasi-noir, cartes rouges) -------------------- -->
 
-        <section class="section" aria-labelledby="teaser-title">
+        <section class="section section--dark" id="projects" aria-labelledby="projects-title">
 
-            <p class="section__eyebrow">EXPLORER</p>
+            <p class="section__eyebrow">02 / Projets</p>
 
-            <h2 class="section__title" id="teaser-title">Ce que vous allez trouver</h2>
+            <h2 class="section__title" id="projects-title">Mes projets techniques</h2>
 
             <p class="section__intro">
-                Chargé de projets IT chez QUANTEAM et étudiant à Epitech (Architecte des Systèmes d'Information, 2026-2029). Je consacre mes premiers mois de formation à explorer les différents domaines de l'informatique. Ce portfolio en garde la trace : ce que j'ai construit, comment, et ce que chaque projet m'a appris.
+                Des exercices Python au travail en équipe&nbsp;: chaque projet marque une étape. Les jeux et les démos s'ouvrent directement dans la carte.
             </p>
 
-            <ul class="teaser-list">
+
+            <div class="showcase" data-label-prev="Projet précédent" data-label-next="Projet suivant" data-label-hint="Faites tourner la roue avec les flèches, en faisant glisser les cartes ou au clavier." data-label-hint-touch="Balayez pour faire tourner la roue des projets">
+
+                <!-- Flèches, consigne et filtres ajoutés par project-showcase.js ; sans script, les cartes restent dans une bande qui défile. -->
+
+                <!--
+                    POUR AJOUTER UN PROJET : copier un bloc <article class="project-card"> à sa place dans la roue.
+                    data-domain range la carte dans un ou plusieurs domaines (web, games, algorithms)&nbsp;:
+                    project-filter.js en tire les filtres. Le récit (project-card__story) s'affiche sur la carte du centre.
+                    data-slug, identique en français et en anglais, donne l'adresse de la carte : index.html#projects/snake.
+                -->
+                <div class="showcase__track" role="region" aria-label="Projets">
+
+                    <article class="project-card" data-slug="yia-jobs" data-domain="web">
+
+                        <div class="project-card__main">
+
+                            <div class="project-card__media">
+                                <!-- Pictogramme : mallette -->
+                                <svg class="project-card__icon" viewBox="0 0 48 48" aria-hidden="true">
+                                    <rect x="6" y="14" width="36" height="26" rx="4"/>
+                                    <path d="M18 14v-4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v4M6 25h36M21 25v4h6v-4"/>
+                                </svg>
+                            </div>
+
+                            <div class="project-card__body">
+
+                                <h3 class="project-card__title">Y.I.A Jobs</h3>
+
+                                <ul class="project-card__tags" aria-label="Compétences et technologies">
+                                    <li class="tag">Gestion de projet IT</li>
+                                    <li class="tag">React</li>
+                                    <li class="tag">Flask</li>
+                                    <li class="tag">API REST</li>
+                                </ul>
+
+                                <div class="project-card__story">
+                                    <p class="project-card__text"><strong>J'ai mené un groupe de 3 sur ce site d'offres d'emploi</strong> (espaces candidat, recruteur et administration)&nbsp;: priorités, répartition du travail, dépôt GitHub et contrat d'API. J'ai aussi développé le front-end en React, mon premier framework.</p>
+                                    <p class="project-card__label">Ce que j'en retiens</p>
+                                    <p class="project-card__text">Apprentissage bénéfique sur <strong>la gestion de l'imprévu, de la taille du groupe et des attendus en cours de route</strong>.</p>
+                                </div>
+
+                                <div class="project-card__actions">
+                                    <a class="button" href="https://yia-jobs.onrender.com/api/demo/login?role=candidat&amp;lang=fr" target="_blank" rel="noopener noreferrer">Démo candidat</a>
+                                    <a class="button" href="https://yia-jobs.onrender.com/api/demo/login?role=recruteur&amp;lang=fr" target="_blank" rel="noopener noreferrer">Démo recruteur</a>
+                                    <a class="button" href="https://yia-jobs.onrender.com/api/demo/login?role=admin&amp;lang=fr" target="_blank" rel="noopener noreferrer">Démo admin</a>
+                                    <a class="button" href="https://github.com/Axel-FOLLET/jobBoard" target="_blank" rel="noopener noreferrer">Code source</a>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </article>
+
+                    <article class="project-card" data-slug="site-cv" data-domain="web">
+
+                        <div class="project-card__main">
+
+                            <div class="project-card__media">
+                                <!-- Cube 3D, l'emblème du site CV : il tourne et s'attrape comme les autres -->
+                                <span class="cube cube--card cube--white" aria-hidden="true" data-speed="12" data-phase="30"></span>
+                            </div>
+
+                            <div class="project-card__body">
+
+                                <h3 class="project-card__title">Site web de mon CV</h3>
+
+                                <ul class="project-card__tags" aria-label="Compétences et technologies">
+                                    <li class="tag">HTML</li>
+                                    <li class="tag">CSS</li>
+                                    <li class="tag">JavaScript</li>
+                                    <li class="tag">GitHub Pages</li>
+                                </ul>
+
+                                <div class="project-card__story">
+                                    <p class="project-card__text">Projet de la piscine web Epitech, sans framework&nbsp;: <strong>présenter mon passage des RH à l'informatique</strong> sur un site responsive, interactif et bilingue, avec un formulaire de contact fonctionnel.</p>
+                                    <p class="project-card__label">Ce que j'en retiens</p>
+                                    <p class="project-card__text">Un fichier par responsabilité (menu, cubes, formulaire, jeux) m'a appris comment les parties échangent. Face à un bug, <strong>je corrige la cause plutôt que le symptôme</strong>, sans effet de bord sur le reste du site.</p>
+                                </div>
+
+                                <div class="project-card__actions">
+                                    <a class="button" href="https://axel-follet.github.io/website_resume/" target="_blank" rel="noopener noreferrer">Voir le site en ligne</a>
+                                    <a class="button" href="https://github.com/Axel-FOLLET/website_resume" target="_blank" rel="noopener noreferrer">Code source</a>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </article>
+
+                    <article class="project-card" data-slug="snake" data-domain="games">
+
+                        <div class="project-card__main">
+
+                            <div class="project-card__media">
+                                <!-- Pictogramme : serpent en cases et sa pomme -->
+                                <svg class="project-card__icon" viewBox="0 0 48 48" aria-hidden="true">
+                                    <path d="M5 29h24v-16h8v8"/>
+                                    <path d="M5 37h32v-8"/>
+                                    <path d="M5 29v8M13 29v8M21 29v8M29 21h8M29 13v16"/>
+                                    <path d="M33 16.5h.01"/>
+                                    <circle cx="14" cy="15" r="4"/>
+                                    <path d="M14 11c0-2 1-3 3-3.5"/>
+                                </svg>
+                            </div>
+
+                            <div class="project-card__body">
+
+                                <h3 class="project-card__title">Jeu du Snake</h3>
+
+                                <ul class="project-card__tags" aria-label="Compétences et technologies">
+                                    <li class="tag">Python</li>
+                                    <li class="tag">Pygame</li>
+                                    <li class="tag">Collisions</li>
+                                    <li class="tag">Organisation en modules</li>
+                                </ul>
+
+                                <div class="project-card__story">
+                                    <p class="project-card__text"><strong>Un Snake complet, en projet personnel après le Pendu</strong>&nbsp;: déplacements au clavier, collisions, pommes, score et effets visuels. La version jouable ici est adaptée en JavaScript.</p>
+                                    <p class="project-card__label">Ce que j'en retiens</p>
+                                    <p class="project-card__text"><strong>Le temps réel impose de séparer la boucle de jeu, l'affichage et les règles</strong>. Découpé en modules (serpent, pomme, collisions, score), le code se corrige règle par règle, sans toucher au reste.</p>
+                                </div>
+
+                                <div class="project-card__actions">
+                                    <a class="button" href="https://github.com/Axel-FOLLET/Axou/tree/main/jeux/jeu_du_snake" target="_blank" rel="noopener noreferrer">Code source</a>
+                                    <button class="button project-card__toggle project-card__toggle--game" type="button" aria-expanded="false" aria-controls="stage-snake" data-label-open="Jouer" data-label-close="Fermer le jeu">Jouer</button>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Jeu : project-showcase.js charge games/snake.html dans cet espace à l'ouverture et le décharge à la fermeture. -->
+                        <div class="project-card__stage project-card__stage--game" id="stage-snake" data-game="snake" data-game-title="Jeu du Snake jouable" hidden></div>
+
+                    </article>
+
+                    <article class="project-card" data-slug="pendu" data-domain="games">
+
+                        <div class="project-card__main">
+
+                            <div class="project-card__media">
+                                <!-- Pictogramme : potence et pendu -->
+                                <svg class="project-card__icon" viewBox="0 0 48 48" aria-hidden="true">
+                                    <path d="M6 43h22M13 43V5h20v6"/>
+                                    <circle cx="33" cy="15" r="4"/>
+                                    <path d="M33 19v11M33 22l-5 5M33 22l5 5M33 30l-4 8M33 30l4 8"/>
+                                </svg>
+                            </div>
+
+                            <div class="project-card__body">
+
+                                <h3 class="project-card__title">Jeu du Pendu</h3>
+
+                                <ul class="project-card__tags" aria-label="Compétences et technologies">
+                                    <li class="tag">Python</li>
+                                    <li class="tag">Pygame</li>
+                                    <li class="tag">Fonctions</li>
+                                    <li class="tag">Lecture de fichiers</li>
+                                </ul>
+
+                                <div class="project-card__story">
+                                    <p class="project-card__text"><strong>Mon premier projet personnel et mon premier programme complet</strong>&nbsp;: tirage d'un mot, saisie des lettres, gestion des erreurs et sauvegarde du meilleur score.</p>
+                                    <p class="project-card__label">Ce que j'en retiens</p>
+                                    <p class="project-card__text">Lire des mots dans un fichier et anticiper les saisies invalides. <strong>Je l'ai repris une fois Pygame maîtrisé</strong> pour en faire un jeu concret, avec une vraie interface graphique.</p>
+                                </div>
+
+                                <div class="project-card__actions">
+                                    <a class="button" href="https://github.com/Axel-FOLLET/Axou/tree/main/jeux/jeu_du_pendu" target="_blank" rel="noopener noreferrer">Code source</a>
+                                    <button class="button project-card__toggle project-card__toggle--game" type="button" aria-expanded="false" aria-controls="stage-pendu" data-label-open="Jouer" data-label-close="Fermer le jeu">Jouer</button>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="project-card__stage project-card__stage--game" id="stage-pendu" data-game="pendu" data-game-title="Jeu du Pendu jouable" hidden></div>
+
+                    </article>
+
+                    <!-- Prochain projet, en teasing : ni lien ni bouton avant sa publication. -->
+                    <article class="project-card" data-slug="cat-game" data-domain="games">
+
+                        <div class="project-card__main">
+
+                            <div class="project-card__media project-card__media--large">
+                                <span class="cat-figure" role="img" aria-label="Chat assis, dessiné en facettes"></span>
+                            </div>
+
+                            <div class="project-card__body">
+
+                                <h3 class="project-card__title">Cat Game</h3>
+
+                                <p class="project-card__badge">Prochainement</p>
+
+                                <div class="project-card__story">
+                                    <p class="project-card__text"><strong>Un jeu dans le navigateur, autour d'un chat</strong>.</p>
+                                    <p class="project-card__label">Où en est-il&nbsp;?</p>
+                                    <p class="project-card__text"><strong>En cours de développement</strong>. Le code source et la version jouable seront publiés à la sortie du jeu.</p>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </article>
+
+                    <article class="project-card" data-slug="cesar-vigenere" data-domain="algorithms">
+
+                        <div class="project-card__main">
+
+                            <div class="project-card__media">
+                                <!-- Pictogramme : clé -->
+                                <svg class="project-card__icon" viewBox="0 0 48 48" aria-hidden="true">
+                                    <circle cx="15" cy="24" r="8"/>
+                                    <path d="M23 24h19M36 24v6M41 24v5"/>
+                                </svg>
+                            </div>
+
+                            <div class="project-card__body">
+
+                                <h3 class="project-card__title">Chiffrements de César et de Vigenère</h3>
+
+                                <ul class="project-card__tags" aria-label="Compétences et technologies">
+                                    <li class="tag">Python</li>
+                                    <li class="tag">Algorithmique</li>
+                                    <li class="tag">Chaînes de caractères</li>
+                                    <li class="tag">Analyse de fréquences</li>
+                                </ul>
+
+                                <div class="project-card__story">
+                                    <p class="project-card__text">Exercice de la piscine Python&nbsp;: chiffrer et déchiffrer avec César (décalage fixe) et Vigenère (décalage donné par un mot-clé), puis <strong>retrouver seul la clé d'un César</strong>.</p>
+                                    <p class="project-card__label">Ce que j'en retiens</p>
+                                    <p class="project-card__text">Le modulo fait boucler l'alphabet et une seule fonction sert à chiffrer et à déchiffrer. Pour casser César, <strong>j'essaie les 26 clés et garde le texte le plus proche du français</strong>, comme dans le détecteur de langue.</p>
+                                </div>
+
+                                <div class="project-card__actions">
+                                    <a class="button" href="https://github.com/Axel-FOLLET/Axou/tree/main/piscine_python/chiffrement" target="_blank" rel="noopener noreferrer">Code source</a>
+                                    <button class="button project-card__toggle" type="button" aria-expanded="false" aria-controls="demo-cipher" data-label-open="Tester" data-label-close="Masquer la démo">Tester</button>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Démo : project-demos.js recalcule le résultat à chaque saisie -->
+                        <div class="project-card__stage demo demo--cipher" id="demo-cipher" hidden>
+
+                            <div class="form__row">
+                                <div class="form__field">
+                                    <label class="form__label" for="cipher-method">Méthode</label>
+                                    <select class="form__input demo__select" id="cipher-method" data-cipher-method>
+                                        <option value="caesar">César</option>
+                                        <option value="vigenere">Vigenère</option>
+                                    </select>
+                                </div>
+                                <div class="form__field">
+                                    <label class="form__label" for="cipher-direction">Opération</label>
+                                    <select class="form__input demo__select" id="cipher-direction" data-cipher-direction>
+                                        <option value="1">Chiffrer</option>
+                                        <option value="-1">Déchiffrer</option>
+                                    </select>
+                                </div>
+                                <div class="form__field">
+                                    <label class="form__label" for="cipher-key">Clé</label>
+                                    <input class="form__input" id="cipher-key" type="text" value="3" autocomplete="off" spellcheck="false" aria-describedby="cipher-key-hint cipher-key-error" data-cipher-key>
+                                    <p class="demo__hint" id="cipher-key-hint" data-cipher-hint></p>
+                                    <p class="form__error" id="cipher-key-error" aria-live="polite" data-cipher-error></p>
+                                </div>
+                            </div>
+
+                            <div class="form__field">
+                                <label class="form__label" for="cipher-text">Texte</label>
+                                <textarea class="form__input form__input--area demo__input" id="cipher-text" rows="3">Rendez-vous demain à la bibliothèque, près de la fenêtre.</textarea>
+                            </div>
+
+                            <div class="form__field">
+                                <label class="form__label" for="cipher-result">Résultat</label>
+                                <output class="demo__output" id="cipher-result" for="cipher-method cipher-direction cipher-key cipher-text"></output>
+                            </div>
+
+                            <p class="demo__note" id="cipher-message" aria-live="polite"></p>
+
+                            <div class="demo__actions">
+                                <button class="button" type="button" data-cipher-swap>Repartir du résultat</button>
+                                <button class="button" type="button" data-cipher-crack hidden>Trouver la clé</button>
+                            </div>
+
+                        </div>
+
+                    </article>
+
+                    <article class="project-card" data-slug="detecteur-langue" data-domain="algorithms">
+
+                        <div class="project-card__main">
+
+                            <div class="project-card__media">
+                                <!-- Pictogramme : bulle de dialogue -->
+                                <svg class="project-card__icon" viewBox="0 0 48 48" aria-hidden="true">
+                                    <path d="M9 9h30a4 4 0 0 1 4 4v16a4 4 0 0 1-4 4H22l-8 7v-7H9a4 4 0 0 1-4-4V13a4 4 0 0 1 4-4z"/>
+                                    <path d="M13 19h22M13 25h14"/>
+                                </svg>
+                            </div>
+
+                            <div class="project-card__body">
+
+                                <h3 class="project-card__title">Détecteur de langue</h3>
+
+                                <ul class="project-card__tags" aria-label="Compétences et technologies">
+                                    <li class="tag">Python</li>
+                                    <li class="tag">Dictionnaires</li>
+                                    <li class="tag">Statistiques</li>
+                                    <li class="tag">Unicode</li>
+                                </ul>
+
+                                <div class="project-card__story">
+                                    <p class="project-card__text">Exercice de la piscine Python&nbsp;: <strong>reconnaître la langue d'un texte parmi dix</strong> en comparant la fréquence de ses lettres à celle de chaque langue. La démo reprend le programme, porté en JavaScript.</p>
+                                    <p class="project-card__label">Ce que j'en retiens</p>
+                                    <p class="project-card__text"><strong>Une méthode statistique a besoin de volume</strong>&nbsp;: fiable dès deux phrases, elle hésite sur quelques mots. Les accents faussaient aussi le comptage&nbsp;; je les ramène à leur lettre de base avant l'analyse.</p>
+                                </div>
+
+                                <div class="project-card__actions">
+                                    <a class="button" href="https://github.com/Axel-FOLLET/Axou/tree/main/piscine_python/detecteur_de_langue" target="_blank" rel="noopener noreferrer">Code source</a>
+                                    <button class="button project-card__toggle" type="button" aria-expanded="false" aria-controls="demo-language" data-label-open="Tester" data-label-close="Masquer la démo">Tester</button>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Démo : project-demos.js recalcule le classement à chaque saisie -->
+                        <div class="project-card__stage demo demo--language" id="demo-language" hidden>
+
+                            <div class="form__field">
+                                <label class="form__label" for="language-text">Texte à analyser</label>
+                                <textarea class="form__input form__input--area demo__input" id="language-text" rows="4" placeholder="Quelques phrases en français, anglais, espagnol, portugais, italien, allemand, néerlandais, suédois, polonais ou turc."></textarea>
+                                <p class="demo__hint">Au moins 80 lettres pour un résultat fiable&nbsp;: la méthode repose sur des statistiques.</p>
+                            </div>
+
+                            <p class="demo__verdict" aria-live="polite"></p>
+                            <ol class="demo__ranking"></ol>
+                            <p class="demo__note"></p>
+
+                            <div class="demo__actions">
+                                <button class="button demo__example" type="button">Charger un exemple</button>
+                            </div>
+
+                        </div>
+
+                    </article>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- -------------------- CONTACT (rouge) -------------------- -->
+
+        <section class="section" id="contact" aria-labelledby="contact-title">
+
+            <p class="section__eyebrow">03 / Contact</p>
+
+            <h2 class="section__title" id="contact-title">Me contacter</h2>
+
+            <p class="section__intro">
+                Une opportunité, un projet ou une question sur mon parcours&nbsp;? Le formulaire ci-dessous m'arrive directement.
+            </p>
+
+            <a class="button contact__resume" href="assets/CV_Axel_FOLLET_FR.pdf" download="CV_Axel_FOLLET_FR.pdf">
+                <!-- Pictogramme : flèche de téléchargement -->
+                <svg class="contact__resume-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>
+                </svg>
+                Télécharger mon CV (PDF)
+            </a>
+
+            <!-- -------------------- LIENS -------------------- -->
+
+            <ul class="link-list">
 
                 <li>
-                    <a class="teaser" href="pages/projects.html">
-                        <p class="teaser__number">01</p>
-                        <h3 class="teaser__title">Projets</h3>
-                        <p class="teaser__text">Contexte, objectif, technologies et code de chaque réalisation, avec des démos jouables.</p>
+                    <a class="link-card" href="https://axel-follet.github.io/website_resume/" target="_blank" rel="noopener noreferrer">
+                        <!-- Pictogramme : globe -->
+                        <svg class="link-card__icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <circle cx="12" cy="12" r="9"/>
+                            <path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>
+                        </svg>
+                        <span class="link-card__label">Mon site web de CV</span>
+                        <span class="link-card__hint">axel-follet.github.io<wbr>/website_resume</span>
                     </a>
                 </li>
 
                 <li>
-                    <a class="teaser" href="pages/skills.html">
-                        <p class="teaser__number">02</p>
-                        <h3 class="teaser__title">Compétences</h3>
-                        <p class="teaser__text">Mes compétences, les projets qui les illustrent et ma progression.</p>
+                    <a class="link-card" href="https://www.linkedin.com/in/axel-follet/" target="_blank" rel="noopener noreferrer">
+                        <img class="link-card__icon link-card__icon--linkedin" src="assets/images/linkedin-logo.png" alt="" aria-hidden="true" width="840" height="779" loading="lazy" decoding="async">
+                        <span class="link-card__label">LinkedIn</span>
+                        <span class="link-card__hint">axel-follet</span>
                     </a>
                 </li>
 
                 <li>
-                    <a class="teaser" href="pages/contact.html">
-                        <p class="teaser__number">03</p>
-                        <h3 class="teaser__title">Contact</h3>
-                        <p class="teaser__text">N'hésitez pas à me contacter par e-mail, ou retrouvez mon LinkedIn, mes dépôts GitHub et mon site CV.</p>
+                    <a class="link-card" href="https://github.com/Axel-FOLLET" target="_blank" rel="noopener noreferrer">
+                        <!-- Pictogramme : chevrons de code -->
+                        <svg class="link-card__icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/>
+                        </svg>
+                        <span class="link-card__label">Tout mon code</span>
+                        <span class="link-card__hint">github.com/Axel-FOLLET</span>
                     </a>
                 </li>
 
             </ul>
 
+
+            <div class="contact">
+
+                <!-- -------------------- FORMULAIRE -------------------- -->
+
+                <div class="contact__main">
+
+                    <form
+                        class="form"
+                        id="contact-form"
+                        action="https://formspree.io/f/xaenbdqw"
+                        method="POST"
+                        data-sending="Envoi en cours…"
+                        data-success="Merci, votre message a bien été envoyé."
+                        data-sent="Envoyé"
+                        data-error="L'envoi a échoué. Vérifiez votre connexion puis réessayez, ou écrivez-moi sur LinkedIn."
+                        data-invalid-required="Ce champ est obligatoire."
+                        data-invalid-email="Adresse email invalide (exemple : nom@domaine.fr)."
+                    >
+
+                        <div class="form__row">
+                            <div class="form__field">
+                                <label class="form__label" for="surname">Nom</label>
+                                <input class="form__input" type="text" id="surname" name="surname" autocomplete="family-name" required>
+                            </div>
+                            <div class="form__field">
+                                <label class="form__label" for="name">Prénom</label>
+                                <input class="form__input" type="text" id="name" name="name" autocomplete="given-name" required>
+                            </div>
+                        </div>
+
+                        <div class="form__field">
+                            <label class="form__label" for="email">Email</label>
+                            <input class="form__input" type="email" id="email" name="email" autocomplete="email" required>
+                        </div>
+
+                        <div class="form__field">
+                            <label class="form__label" for="subject">Sujet</label>
+                            <input class="form__input" type="text" id="subject" name="subject" required>
+                        </div>
+
+                        <div class="form__field">
+                            <label class="form__label" for="message">Message</label>
+                            <textarea class="form__input form__input--area" id="message" name="message" rows="6" required></textarea>
+                        </div>
+
+                        <!-- Champ piège contre les robots : ne pas remplir -->
+                        <input class="form__trap" type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+                        <button class="button button--primary" type="submit">Envoyer</button>
+
+                        <!-- Message de confirmation ou d'erreur, lu par les lecteurs d'écran -->
+                        <p class="form__status" id="form-status" role="status" aria-live="polite"></p>
+
+                    </form>
+
+                </div>
+
+
+                <!-- Cubes décoratifs, comme à l'accueil -->
+                <div class="contact__side" aria-hidden="true">
+                    <span class="cube cube--large cube--white cube--pos-main" data-speed="15" data-phase="30"></span>
+                    <span class="cube cube--small cube--white cube--pos-1" data-speed="20" data-phase="110"></span>
+                </div>
+
+            </div>
+
         </section>
 
-
-        </main>
+    </main>
 
 
     <!-- -------------------- PIED DE PAGE -------------------- -->
@@ -255,19 +801,18 @@
         <div class="footer__row">
 
             <div>
-                <h2 class="footer__title">Navigation</h2>
+                <p class="footer__title">Navigation</p>
                 <ul class="footer__list">
-                    <li><a href="index.html">Accueil</a></li>
-                    <li><a href="pages/projects.html">Projets</a></li>
-                    <li><a href="pages/skills.html">Compétences</a></li>
-                    <li><a href="pages/contact.html">Contact</a></li>
+                    <li><a href="#home">Accueil</a></li>
+                    <li><a href="#progression">Progression</a></li>
+                    <li><a href="#projects">Projets</a></li>
+                    <li><a href="#contact">Contact</a></li>
                 </ul>
             </div>
 
             <div>
-                <h2 class="footer__title">Liens</h2>
+                <p class="footer__title">Liens</p>
                 <ul class="footer__list">
-                    <li><a href="assets/CV_Axel_FOLLET_FR.pdf" download="CV_Axel_FOLLET_FR.pdf">Télécharger mon CV</a></li>
                     <li><a href="https://axel-follet.github.io/website_resume/" target="_blank" rel="noopener noreferrer">Mon site web de CV</a></li>
                     <li><a href="https://www.linkedin.com/in/axel-follet/" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
                     <li><a href="https://github.com/Axel-FOLLET" target="_blank" rel="noopener noreferrer">GitHub</a></li>
@@ -275,16 +820,16 @@
             </div>
 
             <div>
-                <h2 class="footer__title">Ressources et crédits</h2>
+                <p class="footer__title">Ressources et crédits</p>
                 <p class="footer__credits">
-                    Photo, dessins et textes : créations d'Axel FOLLET. Cubes 3D réalisés en HTML, CSS et JavaScript ; pictogrammes dossier et globe : emojis Unicode du système ; polices installées sur l'appareil (Avenir si disponible), aucune police téléchargée. Images de la fenêtre « Are you human? » : mèmes animaliers tiers, auteurs et licences non identifiés. LinkedIn® et le logo [in]® sont des marques de LinkedIn Corporation et de ses sociétés affiliées ; ce site n’est ni affilié à LinkedIn ni approuvé par LinkedIn.
+                    Photo, dessins et textes&nbsp;: créations d'Axel FOLLET. Cubes 3D, chat en facettes et pictogrammes réalisés en HTML, CSS, SVG et JavaScript. Police Manrope (The Manrope Project Authors), sous <a href="assets/fonts/OFL-Manrope.txt">licence SIL Open Font License 1.1</a>, hébergée avec le site. Images de la fenêtre «&nbsp;<span lang="en">Are you human?</span>&nbsp;»&nbsp;: mèmes animaliers tiers, auteurs et licences non identifiés. LinkedIn® et le logo [in]® sont des marques de LinkedIn Corporation et de ses sociétés affiliées&nbsp;; ce site n’est ni affilié à LinkedIn ni approuvé par LinkedIn.
                 </p>
                 <details class="footer__legal">
                     <summary class="footer__legal-toggle">Mentions légales et données</summary>
-                    <p><strong>Éditeur :</strong> Axel FOLLET, site personnel non professionnel. Contact : formulaire du site ou LinkedIn.</p>
-                    <p><strong>Hébergeur :</strong> GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, États-Unis.</p>
-                    <p><strong>Formulaire de contact :</strong> vos nom, prénom, e-mail, sujet et message servent uniquement à vous répondre. Ils transitent par Formspree, service situé aux États-Unis, et sont supprimés 12 mois après notre dernier échange. Vous pouvez demander à y accéder, à les corriger ou à les supprimer par le formulaire ou LinkedIn, et adresser une réclamation à la <a href="https://www.cnil.fr/fr/plaintes" target="_blank" rel="noopener noreferrer">CNIL</a>.</p>
-                    <p><strong>Navigateur :</strong> aucun cookie ni mesure d'audience. Le site garde seulement sur votre appareil la réponse à « Are you human? » et les informations des dépôts GitHub jusqu'à la fermeture de l'onglet, ainsi que vos records de Snake et du Pendu. La page Projets charge ces informations depuis GitHub, qui reçoit alors votre adresse IP.</p>
+                    <p><strong>Éditeur&nbsp;:</strong> Axel FOLLET, site personnel non professionnel. Contact&nbsp;: formulaire du site ou LinkedIn.</p>
+                    <p><strong>Hébergeur&nbsp;:</strong> GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, États-Unis.</p>
+                    <p><strong>Formulaire de contact&nbsp;:</strong> vos nom, prénom, e-mail, sujet et message servent uniquement à vous répondre. Ils transitent par Formspree, service situé aux États-Unis, et sont supprimés 12 mois après notre dernier échange. Vous pouvez demander à y accéder, à les corriger ou à les supprimer par le formulaire ou LinkedIn, et adresser une réclamation à la <a href="https://www.cnil.fr/fr/plaintes" target="_blank" rel="noopener noreferrer">CNIL</a>.</p>
+                    <p><strong>Navigateur&nbsp;:</strong> aucun cookie ni mesure d'audience. Le site garde seulement sur votre appareil la réponse à «&nbsp;<span lang="en">Are you human?</span>&nbsp;», posée à l'envoi du formulaire, jusqu'à la fermeture de l'onglet, ainsi que vos records de Snake et du Pendu.</p>
                 </details>
             </div>
 

@@ -9,7 +9,7 @@ body {
     margin: 0;
     height: 100%;
     overflow: hidden;
-    background: #E1001A;
+    background: #C8001E;
 }
 
 
@@ -46,7 +46,7 @@ body {
 
     margin: 0 auto;
 
-    background-color: #E1001A;
+    background-color: #C8001E;
 
     outline: 1px solid rgba(255, 255, 255, 0.5);
     outline-offset: 0;

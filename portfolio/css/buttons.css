@@ -1,18 +1,21 @@
 /* -------------------- BOUTONS -------------------- */
 
+/* Bouton secondaire : contour fin, éclairé au survol, sans déplacement */
 .button {
     display: inline-block;
 
-    padding: 14px 24px;
+    padding: 13px 24px;
 
-    border: 1px solid var(--white);
-    border-radius: 3px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-l);
 
     background-color: transparent;
     color: var(--white);
 
     font-family: inherit;
-    font-size: 1rem;
+    font-size: var(--text-body);
+    font-weight: 600;
+    line-height: 1.4;
     text-align: center;
     text-decoration: none;
 
@@ -20,8 +23,8 @@
 
     transition:
         background-color 0.3s ease,
+        border-color 0.3s ease,
         color 0.3s ease,
-        transform 0.3s ease,
         scale 0.1s ease-out;
 }
 
@@ -39,44 +42,42 @@
 }
 
 
-.button:hover, .button:focus-visible {
-    background-color: #141422;
-    background-image: linear-gradient(rgba(13, 10, 155, 0.72),rgba(13, 10, 155, 0.72));
-    color: var(--white);
+.button:hover,
+.button:focus-visible {
+    border-color: var(--white);
 
-    transform: translateY(-3px);
+    background-color: var(--veil-strong);
 }
 
 
 /*
- * Bouton principal, comme sur le CV : plein blanc, texte rouge.
- * Le focus reprend le survol : sinon .button:focus-visible rétablirait le fond sombre.
+ * Bouton principal, comme sur le CV : plein blanc, texte rouge (contraste 7,1).
+ * Une seule action principale par partie.
  */
-.button--primary {
+.button--primary,
+.button--primary:hover,
+.button--primary:focus-visible {
     border-color: var(--white);
 
     background-color: var(--white);
     color: var(--red);
-
-    font-weight: 600;
 }
 
 
-.button--primary:hover,
-.button--primary:focus-visible {
-    background: rgb(255 255 255 / 88%);
-    color: var(--red);
+.button--primary:hover {
+    background-color: rgb(255 255 255 / 88%);
 }
 
 
-/* Boutons à la largeur de leur texte, côte à côte, comme sur le CV ; retour à la ligne si la place manque */
+/* Boutons à la largeur de leur texte, côte à côte ; retour à la ligne si la place manque */
 .button-group {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
 
-    gap: 12px;
+    gap: 12px 28px;
 
-    margin-top: 30px;
+    margin-top: 40px;
 }
 
 
@@ -85,9 +86,6 @@
     align-items: center;
     justify-content: center;
 
-    flex: 0 1 auto;
-
     min-height: 48px;
 }
-
 

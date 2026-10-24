@@ -7,34 +7,69 @@
 }
 
 
-/* Sur-titre : petit, espacé, légèrement atténué pour laisser la place au titre */
-.section__eyebrow {
-    margin: 0 0 16px;
+/* Section de respiration : quasi-noir, le rouge ne reste qu'aux accents et aux cartes */
+.section--dark {
+    background-color: var(--ink);
+}
 
-    font-size: 0.8125rem;
-    font-weight: 600;
-    letter-spacing: 0.14em;
+
+/*
+    Deux sections sombres qui se suivent (Progression puis Projets) : sans changement de fond,
+    leurs deux marges s'additionnaient (320 px sur ordinateur). La seconde commence plus près.
+*/
+.section--dark + .section--dark {
+    padding-top: calc(var(--space-section) / 2);
+}
+
+
+/* Sur-titre (style d'étiquette dans base.css) */
+.section__eyebrow {
+    margin: 0 0 20px;
+}
+
+
+.section--dark .section__eyebrow {
+    color: var(--red-accent);
 }
 
 
 /* Gros titre resserré : les lettres se rapprochent quand la taille augmente */
 .section__title {
-    margin: 0 0 30px;
+    max-width: 18ch;
 
-    /* Taille progressive entre 2.2rem (téléphone) et 3rem (ordinateur) */
-    font-size: clamp(2.2rem, 5vw, 3rem);
-    line-height: 1.08;
+    margin: 0 0 28px;
+
+    font-size: var(--text-title);
+    font-weight: 800;
+    line-height: 1.02;
     letter-spacing: -0.04em;
+
+    /* Lignes de longueur proche : pas de mot seul sur la dernière */
+    text-wrap: balance;
 }
 
 
-/* 65 caractères par ligne environ : la longueur de lecture la plus confortable */
+/* 60 caractères par ligne environ : une longueur de lecture confortable */
 .section__intro {
-    max-width: 65ch;
+    max-width: 60ch;
 
-    margin: 0 0 40px;
+    margin: 0 0 56px;
 
-    font-size: 1.1rem;
+    font-size: var(--text-lead);
+    line-height: 1.55;
+}
+
+
+.section--dark .section__intro {
+    color: var(--muted);
+}
+
+
+/* Mots clés de l'introduction : en blanc, ils ressortent du gris */
+.section--dark .section__intro strong {
+    color: var(--white);
+
+    font-weight: 700;
 }
 
 
@@ -49,8 +84,8 @@
     translate: 0 32px;
 
     transition:
-        opacity 0.8s ease,
-        translate 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        opacity 0.9s ease,
+        translate 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 
@@ -60,38 +95,12 @@
 }
 
 
-/* Les trois barres bleues d'accent, fines, identiques aux barres rouges du CV */
-.bars {
-    display: flex;
-    flex-direction: column;
+@media (prefers-reduced-motion: reduce) {
 
-    gap: 6px;
+    .reveal {
+        translate: none;
 
-    margin: 24px 0 28px;
+        transition: opacity 0.4s ease;
+    }
+
 }
-
-
-.bars__bar {
-    display: block;
-
-    height: 4px;
-
-    background-color: var(--blue);
-}
-
-
-.bars__bar:nth-child(1) {
-    width: 32%;
-}
-
-
-.bars__bar:nth-child(2) {
-    width: 52%;
-}
-
-
-.bars__bar:nth-child(3) {
-    width: 72%;
-}
-
-

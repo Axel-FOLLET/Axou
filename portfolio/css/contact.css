@@ -1,5 +1,30 @@
 /* -------------------- CONTACT -------------------- */
 
+/* Téléchargement du CV : bouton secondaire sous l'introduction, l'envoi du formulaire reste l'action principale */
+.contact__resume {
+    display: inline-flex;
+    align-items: center;
+
+    gap: 10px;
+
+    min-height: 48px;
+
+    margin: -24px 0 40px;
+}
+
+
+.contact__resume-icon {
+    width: 20px;
+    height: 20px;
+
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+
 /* Liens et formulaire sur une même colonne de 800 px au plus, comme sur le CV */
 .contact {
     display: flex;
@@ -62,8 +87,8 @@
 
     padding: 14px 16px;
 
-    border: 1px solid var(--white);
-    border-radius: 3px;
+    border: 1px solid var(--line-field);
+    border-radius: var(--radius-s);
 
     background-color: var(--veil);
     color: var(--white);
@@ -71,11 +96,20 @@
     font-family: inherit;
     font-size: 1rem;
 
-    transition: background-color 0.3s ease;
+    transition:
+        background-color 0.3s ease,
+        border-color 0.3s ease;
+}
+
+
+.form__input:hover {
+    border-color: var(--white);
 }
 
 
 .form__input:focus {
+    border-color: var(--white);
+
     background-color: var(--veil-strong);
 }
 
@@ -152,7 +186,8 @@
 
     padding: 14px 18px;
 
-    border: 1px solid var(--white);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-s);
 
     background-color: var(--veil-strong);
 
@@ -173,7 +208,7 @@
     border-radius: 50%;
 
     background-color: var(--white);
-    color: var(--blue);
+    color: var(--red);
 }
 
 
@@ -298,7 +333,7 @@
 }
 
 
-/* Liens (CV, site web, LinkedIn, GitHub) */
+/* Liens (site CV, LinkedIn, GitHub), au-dessus du formulaire */
 .link-list {
     display: flex;
     flex-direction: column;
@@ -306,7 +341,7 @@
     gap: 12px;
 
     max-width: 800px;
-    margin: 0;
+    margin: 0 0 56px;
     padding: 0;
 
     list-style: none;
@@ -314,30 +349,31 @@
 
 
 /*
- * Carte de lien : icône, nom, identifiant aligné à droite.
- * Les quatre cartes partagent la même grille et la même hauteur.
+ * Carte de lien : pictogramme, nom, adresse alignée à droite.
+ * Les trois cartes partagent la même grille et la même hauteur.
  */
 .link-card {
     display: grid;
-    grid-template-columns: 30px minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-columns: 24px minmax(0, 1fr) minmax(0, 1fr);
     align-items: center;
 
-    gap: 14px;
+    gap: 16px;
 
     width: 100%;
     min-height: 64px;
 
     padding: 12px 24px;
 
-    border: 1px solid transparent;
-    border-radius: 3px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-m);
 
-    background-color: var(--veil-strong);
+    background-color: var(--veil);
 
     text-decoration: none;
 
     transition:
         background-color 0.3s ease,
+        border-color 0.3s ease,
         scale 0.1s ease-out;
 }
 
@@ -347,24 +383,33 @@
 }
 
 
-/* Survol comme sur le CV : la surface s'éclaircit, sans glisser */
-.link-card:hover, .link-card:focus-within {
-    background-color: rgba(255, 255, 255, 0.2);
+/* Survol : la surface s'éclaircit et le contour s'affirme, sans glisser */
+.link-card:hover,
+.link-card:focus-visible {
+    border-color: var(--line-strong);
+
+    background-color: var(--veil-strong);
 }
 
 
 .link-card__label {
-    font-weight: bold;
+    font-weight: 700;
 }
 
 
+/* Pictogramme en traits (SVG dans le HTML) ou logo LinkedIn passé en blanc */
 .link-card__icon {
-    width: 30px;
-    height: 30px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 26px;
+    width: 24px;
+    height: 24px;
+}
+
+
+svg.link-card__icon {
+    fill: none;
+    stroke: var(--white);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
 }
 
 
@@ -387,40 +432,26 @@
 }
 
 
-.cube--icon {
-    --cube-size: 18px;
-    flex-shrink: 0;
-    perspective: 300px;
-}
-
-
-.cube--icon .cube__face {
-    border-width: 1.5px;
-    box-shadow: 0 0 6px var(--cube-glow);
-}
-
-
 @media (max-width: 767px) {
+
     .link-card {
-        grid-template-columns: 30px minmax(0, 1fr);
-        gap: 4px 14px;
-        min-height: 100px;
+        grid-template-columns: 24px minmax(0, 1fr);
+
+        gap: 2px 16px;
+
+        min-height: 72px;
     }
+
 
     .link-card__icon {
         grid-row: 1 / 3;
     }
 
+
     .link-card__hint {
         grid-column: 2;
+
         text-align: left;
     }
+
 }
-
-
-/* Les emojis couleur du systeme sont rendus en blanc. */
-.link-card__icon--emoji {
-    filter: brightness(0) invert(1);
-}
-
-

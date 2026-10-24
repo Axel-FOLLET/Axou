@@ -1,292 +1,416 @@
 /*
- * Bande des projets : une carte active à la fois, reliée à la bulle qui affiche
- * son objectif et ce que j'en retiens. « Jouer » et « Tester » agrandissent la carte
- * pour y afficher le jeu ou la démo, sans ouvrir de nouvelle fenêtre.
- * Sans ce module, la bande défile quand même et chaque carte garde tout son texte.
+ * Roue des projets : une roue posée à plat, vue en perspective, avec une carte collée sur son bord
+ * à chaque cran. Les cartes restent tournées vers nous : celle de devant est au centre, les suivantes
+ * rapetissent, montent et s'assombrissent en s'éloignant, jusqu'à celle du fond, derrière la carte du centre.
+ * Seule la carte du centre affiche son récit (projects.css). « Jouer » et « Tester » agrandissent
+ * la carte du centre et écartent les autres.
+ * Sans ce module, les cartes restent dans une bande qui défile et gardent tout leur texte.
  */
 import { initProjectFilter } from "./project-filter.js";
 
 /*
- * En dessous de 6 px, un appui à la souris reste un clic et ne fait pas glisser la bande.
+ * En dessous de 6 px, un appui reste un clic et ne fait pas tourner la roue.
  */
 const DRAG_THRESHOLD = 6;
-/*
- * Largeur visible minimale de la carte active, en pixels, pour que la flèche de la bulle la désigne.
- */
-const POINTER_MIN_WIDTH = 48;
-/*
- * Délai sans défilement après lequel la bande est considérée comme arrêtée.
- */
-const SETTLE_DELAY = 150;
 /*
  * Seuls ces jeux peuvent être chargés dans une carte.
  */
 const GAMES = ["pendu", "snake"];
+/*
+ * Forme de la roue, en largeurs de carte : rayon de gauche à droite (radius), rayon d'avant en arrière (depth)
+ * et distance de l'œil (perspective). La roue est plus large que profonde : les cartes de côté s'écartent
+ * au lieu de se cacher les unes derrière les autres.
+ * lift : hauteur dont monte la carte du fond, en hauteurs de carte (la roue est vue d'au-dessus).
+ * shade : assombrissement de la carte du fond.
+ * Sur téléphone, la roue est plus serrée : seule la carte du centre est entière, on devine le bord de ses voisines.
+ */
+const RINGS = {
+    wide: { radius: 1.5, depth: 1, perspective: 3, lift: 0.2, shade: 0.55 },
+    narrow: { radius: 1.1, depth: 1.1, perspective: 2.6, lift: 0.12, shade: 0.55 }
+};
+/*
+ * Largeur maximale d'une carte agrandie, en pixels.
+ */
+const EXPANDED_MAX = 1040;
+/*
+ * Élan au lâcher : la roue continue pendant ce temps (ms) à la vitesse du geste, puis s'arrête sur la carte la plus proche.
+ */
+const MOMENTUM_MS = 250;
+/*
+ * Défilement horizontal (trackpad, Maj + molette) : distance, en pixels, qui fait tourner la roue d'un cran.
+ */
+const WHEEL_STEP = 60;
+/*
+ * Flèches dessinées en SVG : la police du site n'a pas ces caractères.
+ */
+const ARROW_PATHS = { previous: "M19 12H5M11 6l-6 6 6 6", next: "M5 12h14M13 6l6 6-6 6" };
+/*
+ * Annonce de la carte du centre aux lecteurs d'écran, quand le visiteur fait tourner la roue.
+ */
+const ANNOUNCES = {
+    fr: (title, position, count) => `${title}, projet ${position} sur ${count}`,
+    en: (title, position, count) => `${title}, project ${position} of ${count}`
+};
 
 
 export function initProjectShowcase(language) {
     const showcase = document.querySelector(".showcase");
     const track = showcase?.querySelector(".showcase__track");
-    const bubble = showcase?.querySelector(".showcase__bubble");
-    if (!showcase || !track || !bubble) return;
-    const eyebrow = bubble.querySelector(".showcase__bubble-eyebrow");
-    const content = bubble.querySelector(".showcase__bubble-content");
-    /*
-     * La carte « Prochains projets » n'a ni objectif ni bulle : elle n'est jamais active.
-     */
-    const cards = [...track.querySelectorAll(".project-card:not(.project-card--upcoming)")];
+    if (!showcase || !track) return;
+    const cards = [...track.querySelectorAll(".project-card")];
     if (!cards.length) return;
 
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     /*
-     * Les flèches servent à la souris sur grand écran. Au doigt, on balaie : une consigne animée les remplace.
+     * Les flèches servent à la souris sur grand écran. Au doigt, on balaie : la consigne le dit.
      * Les jeux se jouent au clavier : ni sur petit écran, ni sur écran tactile (tablette en paysage comprise).
      */
     const arrowMode = window.matchMedia("(min-width: 1025px) and (hover: hover) and (pointer: fine)");
     const noGames = window.matchMedia("(max-width: 1024px), (hover: none) and (pointer: coarse)");
+    const narrow = window.matchMedia("(max-width: 767px)");
+    /*
+     * visible : cartes retenues par le filtre, dans l'ordre de la roue.
+     * dragShift : rotation pendant un glisser, en cartes.
+     */
+    let visible = cards;
     let active = null;
     let expanded = null;
+    let dragShift = 0;
     let drag = null;
     let suppressClick = false;
-    let settleTimer = null;
-    let pointerFrame = null;
-
-    function scrollBehavior() {
-        return reducedMotion.matches ? "auto" : "smooth";
-    }
+    let frameRequest = null;
 
 
     /* -------------------- FLÈCHES ET CONSIGNE -------------------- */
 
     const hint = document.createElement("p");
     hint.className = "showcase__hint";
-    const hintText = document.createElement("span");
-    /*
-     * Chevrons décoratifs animés par le CSS en mode tactile : ils montrent le sens du geste.
-     */
-    const hintIcon = document.createElement("span");
-    hintIcon.className = "showcase__hint-icon";
-    hintIcon.setAttribute("aria-hidden", "true");
-    hintIcon.textContent = "›››";
-    hint.append(hintText, hintIcon);
     showcase.prepend(hint);
 
     function updateMode() {
         const touch = !arrowMode.matches;
         showcase.classList.toggle("showcase--touch", touch);
-        hintText.textContent = (touch ? showcase.dataset.labelHintTouch : showcase.dataset.labelHint) || "";
+        hint.textContent = (touch ? showcase.dataset.labelHintTouch : showcase.dataset.labelHint) || "";
+        render();
     }
 
     /*
-     * Cadre autour de la bande : il sert de repère aux flèches, placées de part et d'autre.
+     * Cadre autour de la roue : il sert de repère aux flèches, placées de part et d'autre.
      */
     const frame = document.createElement("div");
     frame.className = "showcase__frame";
     track.before(frame);
-    const previousButton = createArrow("←", showcase.dataset.labelPrev, "previous");
-    const nextButton = createArrow("→", showcase.dataset.labelNext, "next");
+    const previousButton = createArrow(showcase.dataset.labelPrev, "previous");
+    const nextButton = createArrow(showcase.dataset.labelNext, "next");
     frame.append(previousButton, track, nextButton);
 
-    function createArrow(symbol, label, side) {
+    function createArrow(label, side) {
         const button = document.createElement("button");
         button.className = "showcase__arrow showcase__arrow--" + side;
         button.type = "button";
-        button.textContent = symbol;
+        button.innerHTML = `<svg class="showcase__arrow-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="${ARROW_PATHS[side]}"/></svg>`;
         button.setAttribute("aria-label", label || "");
         return button;
     }
 
-    function isAtEnd() {
-        return track.scrollLeft + track.clientWidth >= track.scrollWidth - 2;
+    /*
+     * La roue est circulaire : après la dernière carte, on retrouve la première.
+     * Seul le visiteur fait tourner la roue : la nouvelle carte est annoncée et son adresse notée.
+     */
+    function turn(steps) {
+        if (visible.length < 2) return;
+        const index = visible.indexOf(active);
+        setActive(visible[(index + steps + visible.length * 4) % visible.length], true);
     }
 
-    function updateArrows() {
-        const index = cards.indexOf(active);
-        previousButton.disabled = index <= 0;
-        nextButton.disabled = index === cards.length - 1 && isAtEnd();
+    previousButton.addEventListener("click", () => turn(-1));
+    nextButton.addEventListener("click", () => turn(1));
+
+    /*
+     * Premier élément affiché de la carte qui peut recevoir le focus ; offsetParent est nul pour un élément caché
+     * (bouton « Jouer » sur tablette, par exemple).
+     */
+    function focusInCard(card, preferred) {
+        const target = [preferred, ...card.querySelectorAll("a[href], button:not(:disabled)")]
+            .find(element => element && element.offsetParent !== null);
+        target?.focus({ preventScroll: true });
     }
 
-    previousButton.addEventListener("click", () => {
-        const index = cards.indexOf(active);
-        if (index > 0) setActive(cards[index - 1], true);
+    /*
+     * Flèches du clavier dans la roue ; les champs, les boutons et le jeu d'une carte agrandie gardent leur comportement.
+     */
+    track.addEventListener("keydown", event => {
+        if (event.target.closest("input, textarea, select, .project-card__stage")) return;
+        if (event.key === "ArrowLeft") turn(-1);
+        else if (event.key === "ArrowRight") turn(1);
+        else return;
+        event.preventDefault();
+        focusInCard(active);
     });
 
-    /*
-     * Après la dernière carte, la flèche amène encore jusqu'à « Prochains projets ».
-     */
-    nextButton.addEventListener("click", () => {
-        const index = cards.indexOf(active);
-        if (index < cards.length - 1) setActive(cards[index + 1], true);
-        else track.scrollTo({ left: track.scrollWidth, behavior: scrollBehavior() });
-    });
 
-
-    /* -------------------- CARTE ACTIVE ET BULLE -------------------- */
+    /* -------------------- CARTE DU CENTRE -------------------- */
 
     /*
-     * Flèche de la bulle : un petit carré tourné à 45°, posé sur le bord haut de la bulle (voir projects.css).
+     * Zone lue par les lecteurs d'écran, invisible à l'écran (base.css).
      */
-    const pointer = document.createElement("div");
-    pointer.className = "showcase__pointer showcase__pointer--hidden";
-    pointer.setAttribute("aria-hidden", "true");
-    showcase.append(pointer);
+    const announcer = document.createElement("p");
+    announcer.className = "visually-hidden";
+    announcer.setAttribute("aria-live", "polite");
+    showcase.append(announcer);
 
     /*
-     * Fait défiler la bande (et la page si besoin) pour caler la carte sur le bord gauche.
+     * La carte du centre passe devant et affiche son récit (projects.css).
+     * Choisie par le visiteur (byUser), elle est annoncée et l'adresse de la page la désigne : #projects/snake.
+     * replaceState change l'adresse sans ajouter d'étape à l'historique.
      */
-    function scrollToCard(card) {
-        card.scrollIntoView({ behavior: scrollBehavior(), block: "nearest", inline: "start" });
+    function setActive(card, byUser = false) {
+        if (card === active) return;
+        if (expanded && expanded !== card) collapse(expanded, false);
+        active?.classList.remove("project-card--active");
+        active = card;
+        card.classList.add("project-card--active");
+        render();
+        if (!byUser) return;
+        const title = card.querySelector(".project-card__title")?.textContent || "";
+        announcer.textContent = (ANNOUNCES[language] || ANNOUNCES.fr)(title, visible.indexOf(card) + 1, visible.length);
+        if (card.dataset.slug) history.replaceState(null, "", "#projects/" + card.dataset.slug);
     }
 
     /*
-     * Rend la carte active : elle passe au bleu et la bulle reprend son objectif et ce que j'en retiens.
-     * La copie de la bulle est masquée aux lecteurs d'écran, qui lisent déjà le texte dans la carte.
+     * Écart signé entre une carte et le centre, ramené entre -n/2 et n/2 : le chemin le plus court sur la roue.
      */
-    function setActive(card, scroll = false) {
-        if (card !== active) {
-            active?.classList.remove("project-card--active");
-            active = card;
-            card.classList.add("project-card--active");
-            const theme = card.closest(".showcase__theme")?.querySelector(".showcase__tab")?.textContent.trim();
-            const title = card.querySelector(".project-card__title")?.textContent.trim();
-            eyebrow.textContent = [theme, title].filter(Boolean).join(" · ");
-            const story = card.querySelector(".project-card__story");
-            content.replaceChildren(...(story ? [story.cloneNode(true)] : []));
-            if (!reducedMotion.matches) {
-                content.animate([{ opacity: 0, transform: "translateY(6px)" }, { opacity: 1, transform: "none" }], { duration: 220, easing: "ease-out" });
-            }
-            updateArrows();
-        }
-        if (scroll) scrollToCard(card);
-        placePointer();
+    function wrap(offset, count) {
+        const value = ((offset % count) + count) % count;
+        return value > count / 2 ? value - count : value;
     }
 
     /*
-     * Place la flèche sur le bord haut de la bulle, sous le milieu de la partie visible de la carte active.
-     * Les positions sont calculées dans le repère de .showcase (position: relative).
+     * Place d'une carte sur la roue selon son écart avec le centre (en crans, décimales comprises).
+     * angle 0 = devant ; depth = recul vers le fond, d'où sa taille vue de loin (scale).
+     * x en largeurs de carte, y en hauteurs de carte ; back vaut 0 devant et 1 au fond.
      */
-    function placePointer() {
-        if (!active) return;
-        const origin = showcase.getBoundingClientRect();
-        const view = track.getBoundingClientRect();
-        const card = active.getBoundingClientRect();
-        const target = bubble.getBoundingClientRect();
-        const left = Math.max(card.left, view.left);
-        const right = Math.min(card.right, view.right);
+    function ringPlace(offset, count, ring, radius) {
+        const angle = 2 * Math.PI * offset / count;
+        const back = (1 - Math.cos(angle)) / 2;
+        const scale = ring.perspective / (ring.perspective + ring.depth * 2 * back);
+        return {
+            x: radius * Math.sin(angle) * scale,
+            y: -ring.lift * back,
+            scale,
+            shade: ring.shade * back
+        };
+    }
+
+    /*
+     * Rayon réduit quand la place manque, pour que les cartes de côté restent dans le cadre.
+     */
+    function ringRadius(ring, width) {
+        const room = (track.clientWidth / 2 / width - 0.45) / 0.75;
+        return Math.min(ring.radius, Math.max(0.8, room));
+    }
+
+    /*
+     * Place laissée au-dessus de la roue pour la carte du fond, qui dépasse de la carte du centre.
+     */
+    let roomAbove = -1;
+    function updateRoomAbove(ring, height) {
+        const back = ringPlace(0.5, 1, ring, 0);
+        const room = Math.max(0, Math.round((ring.lift + back.scale / 2 - 0.5) * height)) + 10;
+        if (room === roomAbove) return;
+        roomAbove = room;
+        track.style.paddingTop = room + "px";
+    }
+
+    /*
+     * Largeur d'une carte normale, en pixels ; offsetWidth ignore les transform.
+     */
+    function cardWidth() {
+        return visible.find(card => card !== expanded)?.offsetWidth || active.offsetWidth;
+    }
+
+    /*
+     * Calcule la place de chaque carte. Les cartes sont superposées au centre (voir projects.css) :
+     * translate les écarte, scale les rapetisse, z-index met les plus proches devant.
+     */
+    function render() {
+        if (!active || !showcase.classList.contains("showcase--ready")) return;
+        const ring = narrow.matches ? RINGS.narrow : RINGS.wide;
+        const count = visible.length;
+        const width = cardWidth();
+        const height = active.offsetHeight;
+        const radius = ringRadius(ring, width);
+        updateRoomAbove(ring, height);
         /*
-         * Carte presque sortie de la bande : la flèche s'efface au lieu de pointer dans le vide.
+         * Carte agrandie : ses voisines s'écartent d'autant que la carte va grandir, pour rester sur les bords.
+         * La largeur visée est lue dans --expanded-width : la transition de la carte n'est pas encore finie.
          */
-        if (right - left < POINTER_MIN_WIDTH) {
-            pointer.classList.add("showcase__pointer--hidden");
-            return;
-        }
-        pointer.classList.remove("showcase__pointer--hidden");
-        pointer.style.left = (left + right) / 2 - origin.left + "px";
-        pointer.style.top = target.top - origin.top + "px";
-    }
+        const target = parseFloat(showcase.style.getPropertyValue("--expanded-width")) || width;
+        const extra = expanded ? (target - width) / 2 + 16 : 0;
+        const center = visible.indexOf(active);
 
-    /*
-     * Regroupe les recalculs demandés pendant une même image (défilement, redimensionnement).
-     */
-    function requestPointer() {
-        if (pointerFrame) return;
-        pointerFrame = requestAnimationFrame(() => {
-            pointerFrame = null;
-            placePointer();
-        });
-    }
-
-    /*
-     * Largeur visible d'une carte dans la bande, en pixels.
-     */
-    function visibleWidth(card) {
-        const view = track.getBoundingClientRect();
-        const box = card.getBoundingClientRect();
-        return Math.max(0, Math.min(box.right, view.right) - Math.max(box.left, view.left));
-    }
-
-    /*
-     * Bande arrêtée (doigt, pavé tactile, glisser) : si la carte active est presque sortie,
-     * la carte la plus visible prend le relais. Une carte agrandie reste active.
-     */
-    function settle() {
-        if (expanded) return;
-        if (visibleWidth(active) >= active.offsetWidth * 0.6) return;
-        let best = null;
-        let bestShare = 0.5;
-        cards.forEach(card => {
-            const share = visibleWidth(card) / card.offsetWidth;
-            if (share > bestShare + 0.01) {
-                best = card;
-                bestShare = share;
+        visible.forEach((card, index) => {
+            const offset = wrap(index - center + dragShift, count);
+            const distance = Math.abs(offset);
+            const place = ringPlace(offset, count, ring, radius);
+            const x = place.x * width + Math.sign(offset) * extra * Math.min(distance, 1);
+            /*
+             * Une carte qui passe d'un côté à l'autre par le fond de la roue saute sans animation :
+             * ses deux places se confondent au fond, et elle ne traverse pas le devant de la roue.
+             */
+            const jump = card.wheelOffset !== undefined && Math.abs(offset - card.wheelOffset) > count / 2;
+            card.wheelOffset = offset;
+            if (jump) card.style.transition = "none";
+            card.style.transform = `translate(${x}px, ${place.y * height}px) scale(${place.scale})`;
+            /*
+             * Assombrissement par un voile (::after dans projects.css) plutôt que par opacity :
+             * des cartes transparentes laisseraient voir celles de derrière, et aplatiraient leur cube.
+             */
+            const shade = expanded && card !== expanded ? Math.max(place.shade, 0.35) : place.shade;
+            card.style.setProperty("--shade", shade.toFixed(3));
+            card.style.zIndex = String(100 - Math.round(distance * 10));
+            if (jump) {
+                card.offsetWidth;
+                card.style.transition = "";
             }
         });
-        if (best) setActive(best);
+        previousButton.disabled = nextButton.disabled = count < 2;
     }
 
+    function requestRender() {
+        if (frameRequest) return;
+        frameRequest = requestAnimationFrame(() => {
+            frameRequest = null;
+            render();
+        });
+    }
+
+    /*
+     * Une carte de côté s'amène au centre au premier clic, sans ouvrir ses liens.
+     * Au clavier (focus visible), atteindre une carte de côté la fait aussi venir au centre ;
+     * le focus donné par un clic attend le clic lui-même.
+     */
     cards.forEach(card => {
-        /*
-         * Survol à la souris : la bulle suit. Pendant un jeu ou une démo, elle reste sur la carte agrandie.
-         */
-        card.addEventListener("pointerenter", event => {
-            if (event.pointerType === "mouse" && !drag && !expanded) setActive(card);
+        card.addEventListener("click", event => {
+            if (card === active) return;
+            event.preventDefault();
+            event.stopPropagation();
+            setActive(card, true);
+        }, true);
+        card.addEventListener("focusin", event => {
+            if (event.target.matches(":focus-visible")) setActive(card, true);
         });
-        card.addEventListener("focusin", () => setActive(card));
-        card.addEventListener("click", () => setActive(card));
     });
 
-    track.addEventListener("scroll", () => {
-        showcase.classList.add("showcase--scrolling");
-        requestPointer();
-        clearTimeout(settleTimer);
-        settleTimer = setTimeout(() => {
-            showcase.classList.remove("showcase--scrolling");
-            if (!drag) settle();
-            updateArrows();
-        }, SETTLE_DELAY);
-    }, { passive: true });
+
+    window.addEventListener("resize", requestRender);
 
 
-    /* -------------------- GLISSER À LA SOURIS -------------------- */
+    /* -------------------- GLISSER ET BALAYER -------------------- */
 
     /*
-     * Au doigt, la bande défile nativement. À la souris, on la fait glisser à la main.
-     * Les champs, les cubes et les jeux gardent leur propre comportement.
+     * À la souris comme au doigt, les cartes suivent le geste ; au lâcher, la roue s'arrête sur la plus proche.
+     * pan-y (projects.css) laisse le doigt faire défiler la page verticalement.
+     * Les champs, les cubes, le chat et les jeux gardent leur propre comportement.
      */
     track.addEventListener("pointerdown", event => {
-        if (event.pointerType !== "mouse" || event.button !== 0) return;
-        if (event.target.closest(".cube, input, textarea, select, output, .project-card__stage")) return;
-        drag = { id: event.pointerId, x: event.clientX, scrollLeft: track.scrollLeft, moved: false };
+        if (expanded || event.button !== 0 || visible.length < 2) return;
+        if (event.target.closest(".cube, .cat-figure, input, textarea, select, output, .project-card__stage")) return;
+        drag = { id: event.pointerId, x: event.clientX, y: event.clientY, moved: false, lastX: event.clientX, time: event.timeStamp, velocity: 0, step: 40 };
     });
 
     track.addEventListener("pointermove", event => {
         if (!drag || event.pointerId !== drag.id) return;
+        /*
+         * Bouton relâché hors de la fenêtre : le pointerup n'est jamais arrivé, le geste s'arrête ici.
+         */
+        if (!(event.buttons & 1)) {
+            endDrag(event);
+            return;
+        }
         const distance = event.clientX - drag.x;
         if (!drag.moved) {
             if (Math.abs(distance) < DRAG_THRESHOLD) return;
+            /*
+             * Geste surtout vertical : c'est un défilement de la page, pas un glisser.
+             */
+            if (Math.abs(event.clientY - drag.y) > Math.abs(distance)) {
+                drag = null;
+                return;
+            }
             drag.moved = true;
             track.setPointerCapture(event.pointerId);
             showcase.classList.add("showcase--dragging");
         }
-        track.scrollLeft = drag.scrollLeft - distance;
+        /*
+         * Un cran de la roue correspond à l'écart entre la carte du centre et sa voisine.
+         */
+        const ring = narrow.matches ? RINGS.narrow : RINGS.wide;
+        const width = cardWidth();
+        drag.step = Math.max(ringPlace(1, Math.max(visible.length, 2), ring, ringRadius(ring, width)).x * width, 40);
+        dragShift = distance / drag.step;
+        /*
+         * Vitesse du geste en px/ms, lissée sur les derniers mouvements : elle donne l'élan du lâcher.
+         */
+        const elapsed = event.timeStamp - drag.time;
+        if (elapsed > 0) drag.velocity = 0.8 * (event.clientX - drag.lastX) / elapsed + 0.2 * drag.velocity;
+        drag.lastX = event.clientX;
+        drag.time = event.timeStamp;
+        /*
+         * Une seule mise en place par image, même si le pointeur envoie plus de mouvements.
+         */
+        requestRender();
     });
 
     /*
-     * Au lâcher, l'accroche reprend et cale la carte la plus proche.
+     * Au lâcher, l'élan prolonge le geste ; un doigt arrêté avant de se lever (80 ms) n'en donne pas.
+     * Un geste vif d'au moins 40 px suffit à passer à la carte voisine ; un lancer fait au plus un demi-tour.
      * Le clic qui suit un glisser est ignoré : il n'ouvre pas un lien par erreur.
+     * Écouté sur la fenêtre : un bouton relâché hors de la roue termine aussi le geste.
      */
-    function endDrag() {
-        if (!drag) return;
+    function endDrag(event) {
+        if (!drag || event.pointerId !== drag.id) return;
         if (drag.moved) {
             suppressClick = true;
             setTimeout(() => { suppressClick = false; }, 0);
             showcase.classList.remove("showcase--dragging");
+            const coast = event.type === "pointerup" && event.timeStamp - drag.time < 80 ? drag.velocity * MOMENTUM_MS / drag.step : 0;
+            const limit = Math.floor(visible.length / 2);
+            let steps = Math.max(-limit, Math.min(limit, -Math.round(dragShift + coast)));
+            if (!steps && Math.abs(dragShift) * active.offsetWidth > 40) steps = dragShift < 0 ? 1 : -1;
+            dragShift = 0;
+            drag = null;
+            if (steps) turn(steps);
+            else render();
+            return;
         }
         drag = null;
     }
 
-    track.addEventListener("pointerup", endDrag);
-    track.addEventListener("pointercancel", endDrag);
+    window.addEventListener("pointerup", endDrag);
+    window.addEventListener("pointercancel", endDrag);
+
+    /*
+     * Défilement horizontal au trackpad (ou Maj + molette) : un cran par geste.
+     * Après un cran, la roue attend la fin du geste (200 ms sans défilement) : l'inertie du trackpad ne l'emballe pas.
+     * Le défilement vertical reste à la page ; preventDefault évite le retour arrière du navigateur.
+     */
+    let wheelSum = 0;
+    let wheelDone = false;
+    let wheelTimer = null;
+    track.addEventListener("wheel", event => {
+        if (expanded || visible.length < 2 || Math.abs(event.deltaX) <= Math.abs(event.deltaY)) return;
+        event.preventDefault();
+        clearTimeout(wheelTimer);
+        wheelTimer = setTimeout(() => {
+            wheelSum = 0;
+            wheelDone = false;
+        }, 200);
+        if (wheelDone) return;
+        wheelSum += event.deltaX * (event.deltaMode === 1 ? 16 : 1);
+        if (Math.abs(wheelSum) < WHEEL_STEP) return;
+        wheelDone = true;
+        turn(Math.sign(wheelSum));
+    }, { passive: false });
     track.addEventListener("click", event => {
         if (!suppressClick) return;
         event.preventDefault();
@@ -307,39 +431,43 @@ export function initProjectShowcase(language) {
     function loadGame(stage) {
         const game = stage.dataset.game;
         if (!GAMES.includes(game)) return;
-        const frame = document.createElement("iframe");
-        frame.className = "project-card__frame";
-        frame.title = stage.dataset.gameTitle || game;
-        frame.src = new URL("../../games/" + game + ".html?lang=" + language, import.meta.url).href;
+        const gameFrame = document.createElement("iframe");
+        gameFrame.className = "project-card__frame";
+        gameFrame.title = stage.dataset.gameTitle || game;
+        gameFrame.src = new URL("../../games/" + game + ".html?lang=" + language, import.meta.url).href;
         /*
          * Le clavier doit aller au jeu dès son chargement. ?. accepte un document inaccessible.
          */
-        frame.addEventListener("load", () => {
-            frame.focus({ preventScroll: true });
-            frame.contentDocument?.querySelector("canvas")?.focus({ preventScroll: true });
+        gameFrame.addEventListener("load", () => {
+            gameFrame.focus({ preventScroll: true });
+            gameFrame.contentDocument?.querySelector("canvas")?.focus({ preventScroll: true });
         }, { once: true });
-        stage.replaceChildren(frame);
+        stage.replaceChildren(gameFrame);
     }
 
+    /*
+     * La carte s'agrandit au centre de la roue ; ses voisines glissent vers les bords.
+     */
     function expand(card, button, stage) {
-        if (expanded && expanded !== card) collapse(expanded, false);
-        expanded = card;
         setActive(card);
+        expanded = card;
         button.setAttribute("aria-expanded", "true");
         button.textContent = button.dataset.labelClose;
         stage.hidden = false;
         card.classList.add("project-card--expanded");
         if (stage.dataset.game) loadGame(stage);
         else stage.querySelector("textarea")?.focus({ preventScroll: true });
-        scrollToCard(card);
+        render();
     }
 
     /*
      * Referme la carte ; changer de document décharge le jeu et arrête sa boucle d'animation.
+     * Si le focus était dans le jeu ou la démo, il revient dans la carte au lieu de se perdre avec elle.
      */
     function collapse(card, restoreFocus = true) {
         const button = card.querySelector(".project-card__toggle[aria-expanded='true']");
         const stage = button && document.getElementById(button.getAttribute("aria-controls"));
+        if (stage?.contains(document.activeElement)) restoreFocus = true;
         if (button) {
             button.setAttribute("aria-expanded", "false");
             button.textContent = button.dataset.labelOpen;
@@ -350,7 +478,8 @@ export function initProjectShowcase(language) {
         }
         card.classList.remove("project-card--expanded");
         if (expanded === card) expanded = null;
-        if (restoreFocus) button?.focus({ preventScroll: true });
+        if (restoreFocus) focusInCard(card, button);
+        requestRender();
     }
 
     document.querySelectorAll(".project-card__toggle").forEach(button => {
@@ -360,12 +489,6 @@ export function initProjectShowcase(language) {
         button.addEventListener("click", () => {
             if (button.getAttribute("aria-expanded") === "true") collapse(card);
             else expand(card, button, stage);
-        });
-        /*
-         * Une fois la carte à sa nouvelle largeur, on la recale : elle peut avoir débordé de la bande.
-         */
-        card.addEventListener("transitionend", event => {
-            if (event.target === card && event.propertyName === "flex-basis" && card === expanded) scrollToCard(card);
         });
     });
 
@@ -384,60 +507,127 @@ export function initProjectShowcase(language) {
         if (noGames.matches && expanded?.querySelector(".project-card__stage--game:not([hidden])")) collapse(expanded, false);
     });
     arrowMode.addEventListener("change", updateMode);
-
-
-    /* -------------------- INVITATION À BALAYER -------------------- */
-
-    /*
-     * Au doigt, rien ne dit que la bande défile : la première fois qu'elle apparaît à l'écran,
-     * les cartes glissent un peu vers la gauche puis reviennent, deux fois.
-     * translate déplace l'affichage sans toucher au défilement, que l'accroche viendrait corriger.
-     */
-    function nudge() {
-        if (reducedMotion.matches || !showcase.classList.contains("showcase--touch") || track.scrollLeft > 4) return;
-        const keyframes = [
-            { translate: "0" },
-            { translate: "-56px 0", offset: 0.25 },
-            { translate: "0", offset: 0.5 },
-            { translate: "-28px 0", offset: 0.7 },
-            { translate: "0" }
-        ];
-        [...track.children].forEach(element => {
-            element.animate(keyframes, { duration: 1400, easing: "ease-in-out" });
-        });
-        /*
-         * La flèche est posée sur la bulle, qui ne bouge pas : elle s'efface le temps du mouvement.
-         */
-        pointer.animate([{ opacity: 1 }, { opacity: 0, offset: 0.1 }, { opacity: 0, offset: 0.9 }, { opacity: 1 }], { duration: 1400 });
-    }
-
-    const nudgeObserver = new IntersectionObserver(entries => {
-        if (!entries[0].isIntersecting) return;
-        nudgeObserver.disconnect();
-        setTimeout(nudge, 400);
-    }, { threshold: 0.6 });
-    nudgeObserver.observe(track);
+    narrow.addEventListener("change", render);
 
 
     /* -------------------- DÉMARRAGE -------------------- */
 
     /*
-     * --showcase-width donne sa largeur maximale à une carte agrandie.
-     * Tout changement de taille (fenêtre, carte qui s'agrandit, bulle) replace la flèche.
+     * --expanded-width donne sa largeur à une carte agrandie.
      */
     const resizeObserver = new ResizeObserver(() => {
-        showcase.style.setProperty("--showcase-width", track.clientWidth + "px");
-        requestPointer();
-        updateArrows();
+        if (!active) return;
+        const width = Math.min(EXPANDED_MAX, track.clientWidth - (narrow.matches ? 0 : cardWidth() / 2));
+        showcase.style.setProperty("--expanded-width", width + "px");
+        requestRender();
     });
     resizeObserver.observe(track);
-    resizeObserver.observe(bubble);
-    cards.forEach(card => resizeObserver.observe(card));
-    window.addEventListener("resize", requestPointer);
 
+    /*
+     * Le filtre retire des cartes : la carte du centre reste si elle est retenue, sinon la première prend sa place.
+     * L'adresse ne désigne plus la carte écartée (au démarrage, active est encore vide : l'adresse est gardée).
+     */
+    function showCards(cardsLeft) {
+        if (!cardsLeft.length) return;
+        visible = cardsLeft;
+        if (expanded && !visible.includes(expanded)) collapse(expanded, false);
+        cards.forEach(card => { card.wheelOffset = undefined; });
+        if (!visible.includes(active)) {
+            if (active && location.hash.startsWith("#projects/")) history.replaceState(null, "", "#projects");
+            setActive(visible[0]);
+        }
+        else render();
+    }
+
+    /*
+     * Hauteur de défilement qui pose la roue sous l'en-tête : scroll-padding-top (base.css),
+     * ou la hauteur de l'en-tête sur téléphone, où il est plus haut.
+     * offsetTop ignore le glissement d'apparition (reveal.js) : la cible est la place finale de la roue.
+     */
+    function wheelTop() {
+        let top = 0;
+        for (let element = showcase; element; element = element.offsetParent) top += element.offsetTop;
+        const headerRoom = Math.max(
+            parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop),
+            document.querySelector(".header").offsetHeight
+        );
+        return top - headerRoom;
+    }
+
+    /*
+     * Depuis le haut de page, l'en-tête rétrécit pendant le trajet et fait remonter la page :
+     * une fois le défilement et ce rétrécissement finis, la position est corrigée si besoin.
+     * Le défilement suit scroll-behavior (base.css), donc le réglage « mouvement réduit ».
+     * Le visiteur garde la main : molette, doigt, clavier ou clic pendant le trajet annulent la correction.
+     * AbortController retire d'un coup tous les écouteurs d'un trajet ; un nouveau trajet annule le précédent.
+     * Sans scrollend (anciens Safari), la correction attend 900 ms ; au-delà de 3 s, elle est abandonnée.
+     */
+    let placing = null;
+    function placeWheel() {
+        placing?.abort();
+        if (Math.abs(window.scrollY - wheelTop()) <= 1) return;
+        const controller = new AbortController();
+        placing = controller;
+        const { signal } = controller;
+        ["wheel", "touchstart", "keydown", "pointerdown"].forEach(type => {
+            window.addEventListener(type, () => controller.abort(), { once: true, passive: true, signal });
+        });
+        async function settle() {
+            await Promise.all(document.querySelector(".header").getAnimations({ subtree: true }).map(animation => animation.finished));
+            if (signal.aborted) return;
+            controller.abort();
+            if (Math.abs(window.scrollY - wheelTop()) > 1) window.scrollTo({ top: wheelTop() });
+        }
+        if ("onscrollend" in window) window.addEventListener("scrollend", settle, { once: true, signal });
+        else setTimeout(settle, 900);
+        setTimeout(() => controller.abort(), 3000);
+        window.scrollTo({ top: wheelTop() });
+    }
+
+    /*
+     * Adresse d'une carte (#projects/snake) : la carte passe au centre et la roue vient sous l'en-tête.
+     * Une carte écartée par le filtre fait revenir le filtre sur « Tous ».
+     */
+    function showCardFromAddress() {
+        if (!location.hash.startsWith("#projects/")) return;
+        const slug = decodeURIComponent(location.hash.slice("#projects/".length));
+        const card = cards.find(item => item.dataset.slug === slug);
+        if (!card) return;
+        if (!visible.includes(card)) showcase.querySelector('.showcase__filter[data-value=""]')?.click();
+        setActive(card);
+        placeWheel();
+    }
+
+    /*
+     * Première mise en place sans animation : les cartes ne partent pas toutes du centre.
+     */
+    showcase.classList.add("showcase--ready", "showcase--instant");
+    initProjectFilter(showcase, cards, language, showCards);
+    /*
+     * La consigne rejoint la ligne des filtres : une ligne de moins au-dessus de la roue.
+     */
+    showcase.querySelector(".showcase__filters").append(hint);
+
+    /*
+     * Les liens « Projets » (menu, accueil, pied de page) et les filtres amènent la roue juste sous l'en-tête,
+     * pas le titre de la section : les cartes tiennent à l'écran.
+     * Ctrl, Cmd, Maj ou le clic du milieu gardent leur rôle (nouvel onglet, nouvelle fenêtre).
+     * Le focus passe à la section, comme avec une ancre : la touche Tab continue dans les projets.
+     */
+    const section = document.getElementById("projects");
+    if (section && !section.hasAttribute("tabindex")) section.setAttribute("tabindex", "-1");
+    document.querySelectorAll('a[href="#projects"]').forEach(link => link.addEventListener("click", event => {
+        if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+        event.preventDefault();
+        if (location.hash !== "#projects") history.pushState(null, "", "#projects");
+        section?.focus({ preventScroll: true });
+        placeWheel();
+    }));
+    showcase.querySelector(".showcase__filters").addEventListener("click", event => {
+        if (event.target.closest(".showcase__filter")) placeWheel();
+    });
     updateMode();
-    initProjectFilter(showcase, cards, language, card => setActive(card, true));
-    showcase.classList.add("showcase--ready");
-    bubble.hidden = false;
-    setActive(cards[0]);
+    showCardFromAddress();
+    window.addEventListener("hashchange", showCardFromAddress);
+    requestAnimationFrame(() => requestAnimationFrame(() => showcase.classList.remove("showcase--instant")));
 }

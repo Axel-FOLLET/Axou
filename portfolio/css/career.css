@@ -1,97 +1,66 @@
-/* -------------------- PAGE PARCOURS : BANDEAU BLEU -------------------- */
+/* -------------------- PARCOURS -------------------- */
 
-/*
- * Bandeau bleu d'un bord à l'autre de l'écran ; son texte reste aligné sur la colonne des sections.
- * Une fine bande rouge le sépare du pied de page.
- */
-.banner {
-    margin-bottom: 24px;
-    padding: 56px var(--gutter);
+/* Objectif mis en avant sous l'introduction, en blanc sur le quasi-noir */
+.career__goal {
+    max-width: 60ch;
 
-    background-color: var(--blue);
-}
+    margin: -24px 0 0;
 
-
-.banner__line {
-    width: 100%;
-    height: 3px;
-
-    margin-bottom: 30px;
-
-    background-color: var(--white);
-}
-
-
-.banner__title {
-    margin: 0 0 24px;
-
-    /* Taille progressive entre 1.9rem (téléphone) et 2.6rem (ordinateur) */
-    font-size: clamp(1.9rem, 4.5vw, 2.6rem);
-}
-
-
-.banner__text {
-    margin: 16px 0;
-}
-
-
-.banner__highlight {
-    font-weight: bold;
-    font-size: 1.1em;
+    font-size: var(--text-lead);
+    font-weight: 600;
+    line-height: 1.5;
 }
 
 
 /* -------------------- CHRONOLOGIE -------------------- */
 
 /*
-    Une flèche verticale descend le long des étapes au fil du défilement.
+    Un filet vertical relie les étapes ; un trait rouge le parcourt au fil du défilement.
     --progress (de 0 à 1) est mis à jour par timeline.js ; sans JavaScript,
-    il vaut 1 : la flèche est entière et toutes les étapes sont affichées.
+    il vaut 1 : le trait est entier et toutes les étapes sont affichées.
 */
 .timeline {
     --progress: 1;
-    --node-size: 56px;
-    --arrow-space: 20px;
+    --node-size: 48px;
 
     position: relative;
 
-    margin: 50px 0 0;
-    padding: 0 0 var(--arrow-space);
+    margin: 72px 0 0;
+    padding: 0;
 
     list-style: none;
 }
 
 
-/* Corps de la flèche : il s'allonge avec le défilement */
-.timeline::before {
+/* Filet de fond, puis trait de progression par-dessus */
+.timeline::before,
+.timeline::after {
     content: "";
 
     position: absolute;
     top: 0;
     left: calc(var(--node-size) / 2);
 
-    width: 3px;
-    height: calc(var(--progress) * (100% - var(--arrow-space)));
+    width: 1px;
+    height: 100%;
 
-    background-color: var(--white);
+    background-color: var(--line);
 
     translate: -50% 0;
 }
 
 
-/* Pointe de la flèche, toujours au bout du corps */
 .timeline::after {
-    content: "";
+    width: 2px;
+    height: calc(var(--progress) * 100%);
 
-    position: absolute;
-    top: calc(var(--progress) * (100% - var(--arrow-space)));
-    left: calc(var(--node-size) / 2);
+    background-color: var(--red-accent);
+}
 
-    border-top: 18px solid var(--white);
-    border-right: 10px solid transparent;
-    border-left: 10px solid transparent;
 
-    translate: -50% 0;
+/* Lueur au bout du trait : elle descend avec lui (--progress, timeline.js) */
+.timeline--animated {
+    background-image: radial-gradient(circle 18px at calc(var(--node-size) / 2) calc(var(--progress) * 100%), rgba(255, 59, 78, 0.55), transparent);
 }
 
 
@@ -100,13 +69,18 @@
     grid-template-columns: var(--node-size) minmax(0, 1fr);
     align-items: start;
 
-    gap: 24px;
+    gap: 28px;
 
-    padding-bottom: 32px;
+    padding-bottom: 48px;
 }
 
 
-/* Pastille numérotée : son fond bleu masque la ligne qui passe derrière */
+.timeline__step:last-child {
+    padding-bottom: 0;
+}
+
+
+/* Pastille numérotée : son fond masque le filet qui passe derrière */
 .timeline__number {
     position: relative;
     z-index: 1;
@@ -118,63 +92,66 @@
     width: var(--node-size);
     height: var(--node-size);
 
-    border: 3px solid var(--white);
+    border: 1px solid var(--line-strong);
     border-radius: 50%;
 
-    background-color: var(--blue);
+    background-color: var(--ink);
 
-    font-size: 1.2rem;
-    font-weight: bold;
-    line-height: 1;
+    font-size: var(--text-label);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    /* Chiffres de même largeur : 01 et 04 occupent la même place dans les pastilles */
+    font-variant-numeric: tabular-nums;
 
     transition:
-        background-color 0.3s ease,
-        color 0.3s ease;
+        background-color 0.6s ease,
+        border-color 0.6s ease;
 }
 
 
-/* Étape atteinte par la flèche : la pastille se remplit */
+/* Étape atteinte par le trait : la pastille passe au rouge des cartes */
 .timeline__step--visible .timeline__number,
 .timeline:not(.timeline--animated) .timeline__number {
-    background-color: var(--white);
-    color: var(--blue);
-}
+    border-color: var(--red-card);
 
-
-.timeline__content {
-    padding: 20px 26px;
-
-    background-color: var(--veil-strong);
+    background-color: var(--red-card);
 }
 
 
 .timeline__title {
-    margin: 0 0 8px;
+    margin: 10px 0 10px;
 
-    font-size: 1.4rem;
+    font-size: var(--text-lead);
+
+    text-wrap: balance;
 }
 
 
 .timeline__text {
-    max-width: 800px;
+    max-width: 62ch;
 
     margin: 0;
+
+    color: var(--muted);
 }
 
 
-/* Défi relevé à cette étape : une ligne courte sous le texte */
+/* Décision prise à cette étape : une ligne courte sous le texte */
 .timeline__challenge {
-    max-width: 800px;
+    max-width: 62ch;
 
-    margin: 10px 0 0;
+    margin: 12px 0 0;
+}
 
-    font-size: 0.875rem;
+
+.timeline__challenge strong {
+    color: var(--red-accent);
 }
 
 
 /*
     Révélation : timeline.js ajoute timeline--animated, puis timeline__step--visible
-    à chaque étape que la flèche atteint. Le texte glisse depuis la droite, vers la flèche.
+    à chaque étape que le trait atteint. Le texte apparaît en fondu, en glissant légèrement.
     overflow-x: clip coupe le décalage de départ : sans lui, les blocs pas encore révélés
     dépassaient du bord sur téléphone et le navigateur dézoomait toute la page.
     Contrairement à hidden, clip ne crée pas de zone de défilement.
@@ -186,15 +163,100 @@
 
 .timeline--animated .timeline__content {
     opacity: 0;
-    translate: 24px 0;
+    translate: 16px 0;
 
     transition:
-        opacity 0.5s ease,
-        translate 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+        opacity 0.8s ease,
+        translate 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 
 .timeline--animated .timeline__step--visible .timeline__content {
     opacity: 1;
-    translate: 0 0;
+    translate: none;
+}
+
+
+/* -------------------- MÉTHODE DE TRAVAIL -------------------- */
+
+/* Bloc qui clôt le parcours : comment je travaille avec l'IA ; le filet partage l'espace en deux moitiés */
+.method {
+    margin-top: calc(var(--space-section) / 2);
+    padding-top: calc(var(--space-section) / 2);
+
+    border-top: 1px solid var(--line);
+}
+
+
+/* Titre de niveau 3 : un palier sous les titres de section, même dessin */
+.method__title {
+    max-width: 20ch;
+
+    margin: 0 0 28px;
+
+    font-size: clamp(1.75rem, 4.5vw, 3.25rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.035em;
+
+    text-wrap: balance;
+}
+
+
+/* Noms des deux agents en rouge clair : contraste 5,6 sur le quasi-noir (seuil des gros titres : 3) */
+.method__accent {
+    color: var(--red-accent);
+}
+
+
+/* Six pratiques en grille : trois colonnes sur ordinateur, une sur téléphone */
+.method__list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+
+    gap: 40px 48px;
+
+    margin: 0;
+    padding: 0;
+
+    list-style: none;
+}
+
+
+/* Le petit cube à gauche, le nom et le texte à sa droite */
+.method__item {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    /* La hauteur du cube va à la ligne du texte, pas à celle du nom */
+    grid-template-rows: auto 1fr;
+    align-items: start;
+
+    column-gap: 18px;
+
+    padding-top: 20px;
+
+    border-top: 1px solid var(--line);
+}
+
+
+.method__item .cube {
+    grid-row: span 2;
+
+    margin-top: 2px;
+}
+
+
+.method__name {
+    margin: 0 0 8px;
+
+    font-size: var(--text-body);
+    font-weight: 700;
+    letter-spacing: 0;
+}
+
+
+.method__text {
+    margin: 0;
+
+    color: var(--muted);
 }

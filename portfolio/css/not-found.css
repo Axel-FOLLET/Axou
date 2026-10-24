@@ -20,6 +20,7 @@
     margin: 0 0 20px;
 
     font-size: clamp(6rem, 22vw, 14rem);
+    font-weight: 800;
     line-height: 0.9;
     letter-spacing: -0.04em;
 }

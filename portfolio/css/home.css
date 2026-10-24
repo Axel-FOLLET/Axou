@@ -1,121 +1,61 @@
 /* -------------------- ACCUEIL -------------------- */
 
+/* Rouge profond éclairé d'une lueur derrière le nom ; svh : la barre d'adresse mobile n'est pas comptée */
 .hero {
-    min-height: calc(100vh - 80px);
+    min-height: calc(100svh - 76px);
 
     display: flex;
     align-items: center;
     justify-content: space-between;
 
-    padding: 60px var(--gutter) var(--space-section);
+    padding: 48px var(--gutter) var(--space-section);
+
+    background: radial-gradient(70vw 50vw at 15% 0%, rgba(255, 60, 80, 0.3), transparent 70%);
 }
 
 
 .hero__text {
-    width: 52%;
+    width: 58%;
 }
 
 
 .hero__title {
-    margin: 10px 0;
+    margin: 0;
 
-    /*
-     * clamp(minimum, idéal, maximum) : la taille suit la largeur de la fenêtre (8vw)
-     * sans descendre sous 3.4rem ni dépasser 6rem. Remplace les paliers fixes du responsive.
-     */
-    font-size: clamp(3.4rem, 8vw, 6rem);
-    line-height: 0.9;
+    font-size: var(--text-display);
+    font-weight: 800;
+    line-height: 0.88;
     /* em suit la taille du titre : le resserrement reste proportionnel */
-    letter-spacing: -0.035em;
+    letter-spacing: -0.045em;
 
     text-transform: uppercase;
 }
 
 
-.hero__catchphrase {
-    margin: 30px 0 20px;
+/* Fonction et formation, sous le nom */
+.hero__role {
+    margin: 28px 0 0;
 
-    font-size: 1.6rem;
-    font-weight: normal;
+    font-weight: 500;
+}
+
+
+.hero__catchphrase {
+    max-width: 26ch;
+
+    margin: 20px 0 0;
+
+    font-size: var(--text-lead);
+    font-weight: 500;
+    line-height: 1.4;
+
+    text-wrap: balance;
 }
 
 
 .hero__visual {
-    width: 40%;
+    width: 38%;
     height: 520px;
 
     position: relative;
 }
-
-
-/* -------------------- CARTES DE NAVIGATION (ACCUEIL) -------------------- */
-
-.teaser-list {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-
-    gap: 25px;
-
-    margin: 0;
-    padding: 0;
-
-    list-style: none;
-}
-
-
-.teaser {
-    display: block;
-
-    height: 100%;
-
-    padding: 30px;
-
-    border: 1px solid var(--white);
-
-    background-color: var(--veil-strong);
-
-    text-decoration: none;
-
-    transition:
-        transform 0.3s ease,
-        background-color 0.3s ease,
-        scale 0.1s ease-out;
-}
-
-
-.teaser:active {
-    scale: 0.99;
-}
-
-
-.teaser:hover, .teaser:focus-within {
-    transform: translateY(-8px);
-
-
-    /* Neutral base prevents red from tinting the translucent blue. */
-    background-color: #141422;
-    background-image: linear-gradient(rgba(13, 10, 155, 0.72),rgba(13, 10, 155, 0.72));
-}
-
-
-.teaser__number {
-    margin: 0 0 10px;
-
-    font-size: 0.9rem;
-    letter-spacing: 0.1rem;
-}
-
-
-.teaser__title {
-    margin: 0 0 14px;
-
-    font-size: 1.8rem;
-}
-
-
-.teaser__text {
-    margin: 0;
-}
-
-
-

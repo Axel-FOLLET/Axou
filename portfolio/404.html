@@ -12,14 +12,30 @@
     <link rel="icon" href="/portfolio/assets/images/favicon.svg" type="image/svg+xml">
 
     <!--
+        Anciennes pages (pages/projects.html, pages/skills-en.html…) : le site tient sur une page par langue.
+        Le lien est renvoyé vers la section correspondante. Les anciennes ancres de thème (#theme-algorithms…)
+        n'existent plus : elles mènent à la section Projets ; les compétences sont devenues la section Progression.
+    -->
+    <script>
+        {
+            const oldPage = location.pathname.match(/\/pages\/(projects|skills|contact)(-en)?\.html$/);
+            if (oldPage) {
+                const hash = location.hash.startsWith("#theme-") ? "#projects" : location.hash;
+                const section = oldPage[1] === "skills" ? "progression" : oldPage[1];
+                location.replace("/portfolio/index" + (oldPage[2] || "") + ".html" + (hash || "#" + section));
+            }
+        }
+    </script>
+
+    <!--
         GitHub Pages affiche ce fichier pour toute adresse inexistante du site, quel que soit le dossier :
         les chemins sont donc absolus (/portfolio/...) au lieu d'être relatifs.
         Versions CSS : recharge les styles modifies apres publication.
     -->
-    <link rel="stylesheet" href="/portfolio/css/base.css?v=7d1975f13cd5">
-    <link rel="stylesheet" href="/portfolio/css/sections.css?v=cd4522cf6582">
-    <link rel="stylesheet" href="/portfolio/css/buttons.css?v=467302261e2d">
-    <link rel="stylesheet" href="/portfolio/css/not-found.css?v=ffed09fd78cf">
+    <link rel="stylesheet" href="/portfolio/css/base.css?v=d128e4aae9d1">
+    <link rel="stylesheet" href="/portfolio/css/sections.css?v=56ab01a1de2c">
+    <link rel="stylesheet" href="/portfolio/css/buttons.css?v=48b832948220">
+    <link rel="stylesheet" href="/portfolio/css/not-found.css?v=338169144b4e">
 </head>
 
 <body class="page">

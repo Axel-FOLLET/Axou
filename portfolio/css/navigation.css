@@ -3,6 +3,7 @@
 /*
  * En-tête commun aux pages, aux proportions du CV : identité à gauche (photo, AF, langue),
  * liens simples à droite ; la page en cours est éclairée et cerclée de blanc.
+ * Quasi-noir translucide sur toutes les sections : le rouge reste aux sections et aux accents.
  * Sous 1024 px, les liens passent dans un menu déroulant ouvert par le bouton burger.
  */
 .header {
@@ -13,13 +14,13 @@
 
     z-index: 1000;
 
-    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    border-bottom: 1px solid var(--line);
 
     /*
-     * Rouge semi-transparent : le contenu défile dessous, flouté par backdrop-filter.
+     * Quasi-noir semi-transparent : le contenu défile dessous, flouté par backdrop-filter.
      * Le préfixe -webkit- couvre Safari.
      */
-    background-color: rgba(225, 0, 26, 0.78);
+    background-color: rgba(11, 11, 15, 0.72);
 
     -webkit-backdrop-filter: blur(20px) saturate(160%);
     backdrop-filter: blur(20px) saturate(160%);
@@ -32,14 +33,14 @@
  */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
     .header {
-        background-color: var(--red);
+        background-color: var(--ink);
     }
 }
 
 
 @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
     .header {
-        background-color: var(--red);
+        background-color: var(--ink);
 
         -webkit-backdrop-filter: none;
         backdrop-filter: none;
@@ -147,8 +148,8 @@
 
     padding: 3px;
 
-    border: 1px solid var(--white);
-    border-radius: 3px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-m);
 }
 
 
@@ -162,7 +163,8 @@
 
     padding: 0 10px;
 
-    border-radius: 2px;
+    /* Arrondi du cadre moins son retrait de 3 px : les deux courbes restent parallèles */
+    border-radius: calc(var(--radius-m) - 3px);
 
     color: var(--white);
 
@@ -186,10 +188,10 @@
 }
 
 
-/* Langue en cours : pastille blanche, texte rouge */
+/* Langue en cours : pastille blanche, texte quasi-noir */
 .language-switch .language-switch__option--active {
     background-color: var(--white);
-    color: var(--red);
+    color: var(--ink);
 }
 
 
@@ -213,8 +215,10 @@
 }
 
 
-/* Liens simples sans soulignement, en blanc pur (contraste 4,98 sur le rouge) ; cible de 44 px de haut */
+/* Liens simples sans soulignement, en blanc pur sur le quasi-noir ; cible de 44 px de haut */
 .header__link {
+    position: relative;
+
     display: inline-flex;
     align-items: center;
 
@@ -222,7 +226,7 @@
 
     padding: 10px 16px;
 
-    border-radius: 3px;
+    border-radius: var(--radius-m);
 
     color: var(--white);
 
@@ -242,9 +246,41 @@
 
 
 /*
- * Page en cours, repérable sans dépendre de la couleur : fond éclairé et contour blanc.
+ * Sur ordinateur, un trait se déroule de gauche à droite sous le lien survolé.
+ * La section affichée, déjà cerclée de blanc, n'en a pas besoin.
  */
-.header__link[aria-current="page"] {
+@media (min-width: 1025px) {
+
+    .header__link::after {
+        content: "";
+
+        position: absolute;
+        left: 16px;
+        right: 16px;
+        bottom: 9px;
+
+        height: 1px;
+
+        background-color: currentColor;
+
+        scale: 0 1;
+        transform-origin: left;
+
+        transition: scale 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+
+    .header__link:hover:not([aria-current="true"])::after {
+        scale: 1 1;
+    }
+
+}
+
+
+/*
+ * Section affichée, repérable sans dépendre de la couleur : fond éclairé et contour blanc.
+ */
+.header__link[aria-current="true"] {
     background-color: var(--veil-strong);
     color: var(--white);
 
@@ -267,7 +303,8 @@
 
     padding: 0;
 
-    border: 1px solid rgba(255, 255, 255, 0.4);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-m);
 
     background: transparent;
     color: var(--white);
@@ -301,13 +338,9 @@
 }
 
 
-/* Contour blanc, comme tous les autres focus du site : visible sur le rouge */
-.header__toggle:hover,
-.header__toggle:focus-visible {
+/* Survol : le cadre passe au blanc ; le focus clavier garde le contour commun du site (base.css) */
+.header__toggle:hover {
     border-color: var(--white);
-
-    outline: 2px solid var(--white);
-    outline-offset: 3px;
 }
 
 
@@ -361,7 +394,6 @@
         top: 100%;
         left: 0;
         right: 0;
-        z-index: 1001;
 
         flex-direction: column;
 
@@ -373,9 +405,9 @@
 
         overflow-y: auto;
 
-        background-color: var(--red);
+        background-color: var(--ink);
 
-        box-shadow: 0 12px 18px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 12px 18px rgba(0, 0, 0, 0.35);
 
         visibility: hidden;
         opacity: 0;
@@ -407,13 +439,41 @@
 
         padding: 13px 0;
 
-        border-top: 1px solid rgba(255, 255, 255, 0.2);
+        border-top: 1px solid var(--line);
         border-radius: 0;
     }
 
 
-    .header__link[aria-current="page"] {
+    .header__link[aria-current="true"] {
         padding-left: 14px;
+    }
+
+}
+
+
+/*
+ * Dès 375 px, le nom de la page tient entre le bouton menu et l'identité : l'en-tête garde une seule ligne
+ * et laisse plus de hauteur au contenu. En dessous, « Progression » ne tiendrait pas : il garde sa ligne.
+ */
+@media (min-width: 375px) and (max-width: 1024px) {
+
+    .header__nav {
+        flex-wrap: nowrap;
+
+        column-gap: 12px;
+    }
+
+
+    .header__current {
+        order: 1;
+        flex: 1 1 auto;
+
+        white-space: nowrap;
+    }
+
+
+    .header__identity {
+        order: 2;
     }
 
 }
@@ -433,7 +493,8 @@
 @media (prefers-reduced-motion: reduce) {
 
     .header__nav,
-    .header__avatar {
+    .header__avatar,
+    .header__link::after {
         transition: none;
     }
 

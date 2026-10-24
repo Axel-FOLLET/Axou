@@ -2,24 +2,79 @@
     Convention d'écriture : BEM
     bloc            .project-card
     élément         .project-card__title
-    modificateur    .project-card--upcoming
+    modificateur    .project-card--active
 */
 
 
-/* -------------------- COULEURS ET ESPACEMENTS -------------------- */
+/* -------------------- POLICE -------------------- */
 
 /*
-    Mêmes couleurs que le site CV, mais inversées :
-    le rouge devient dominant et le bleu devient secondaire.
+    Manrope, police variable (graisses 400 à 800), hébergée avec le site : aucune requête vers un service tiers.
+    Deux fichiers : latin (français, anglais) et latin étendu, chargé seulement si la page en a besoin.
+    swap : le texte s'affiche tout de suite dans la police de secours, puis passe à Manrope.
+    Licence : assets/fonts/OFL-Manrope.txt (SIL Open Font License 1.1).
+*/
+@font-face {
+    font-family: "Manrope";
+    font-style: normal;
+    font-weight: 400 800;
+    font-display: swap;
+    src: url("../assets/fonts/manrope-latin.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+
+@font-face {
+    font-family: "Manrope";
+    font-style: normal;
+    font-weight: 400 800;
+    font-display: swap;
+    src: url("../assets/fonts/manrope-latin-ext.woff2") format("woff2");
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+
+/* -------------------- COULEURS, TAILLES ET ESPACEMENTS -------------------- */
+
+/*
+    Rouge en geste, noir en respiration : les couleurs du site CV inversées.
+    Le CV est dominé par le bleu, le portfolio par le rouge : accueil et contact sur rouge profond,
+    parcours et projets sur quasi-noir, où le rouge ne sert plus qu'aux accents et aux cartes.
+    Contrastes WCAG mesurés avec le blanc : 7,1 sur --red, 6,0 sur --red-card, 19,6 sur --ink.
 */
 :root {
-    --red: #E1001A;
-    --blue: #0D0A9B;
+    --red: #B4001A;
+    --red-card: #C8001E;
+    /* Rouge lisible sur le quasi-noir (contraste 5,6) : sur-titres et accents des sections sombres */
+    --red-accent: #FF3B4E;
+    --ink: #0B0B0F;
+    --ink-raised: #16161C;
+    /* Texte secondaire sur le quasi-noir (contraste 7,7) */
+    --muted: #A1A1AA;
     --white: #FFFFFF;
 
-    /* Voile blanc léger pour les cartes posées sur le rouge */
+    /* Voiles et filets blancs, valables sur le rouge comme sur le noir */
     --veil: rgba(255, 255, 255, 0.07);
     --veil-strong: rgba(255, 255, 255, 0.13);
+    --line: rgba(255, 255, 255, 0.14);
+    --line-strong: rgba(255, 255, 255, 0.5);
+    /* Contour des champs : contraste 3,8 sur le rouge, 3,3 sur le rouge des cartes (seuil des éléments d'interface : 3) */
+    --line-field: rgba(255, 255, 255, 0.7);
+
+    /* Trois arrondis pour tout le site : petits éléments (étiquettes, champs), cartes et pastilles, boutons */
+    --radius-s: 10px;
+    --radius-m: 16px;
+    --radius-l: 20px;
+
+    /*
+        Quatre tailles de texte pour tout le site, plus l'étiquette :
+        affiche (nom), titre (sections), chapeau (introductions, accroche), courant.
+    */
+    --text-display: clamp(3.5rem, 10vw, 7.5rem);
+    --text-title: clamp(2.5rem, 6vw, 4.5rem);
+    --text-lead: clamp(1.125rem, 1.6vw, 1.375rem);
+    --text-body: 1rem;
+    --text-label: 0.8125rem;
 
     /*
         Même rythme sur toutes les pages : chaque partie, l'accueil et le pied de page
@@ -27,8 +82,8 @@
         --gutter, comme sur le CV : marge de 20 à 56 px selon l'écran, et au-delà de 1200 px de contenu,
         la marge grandit pour centrer une colonne de 1200 px. Le % se calcule sur la largeur de la partie.
     */
-    /* Espace vertical d'une partie : 72px sur téléphone, 120px sur grand écran */
-    --space-section: clamp(72px, 10vw, 120px);
+    /* Espace vertical d'une partie : 88px sur téléphone, 160px sur grand écran */
+    --space-section: clamp(88px, 12vw, 160px);
     --gutter: max(clamp(20px, 4vw, 56px), (100% - 1200px) / 2);
 }
 
@@ -42,11 +97,13 @@
 
 html {
     scroll-behavior: smooth;
+    /* Les ancres du menu (#projects…) s'arrêtent sous l'en-tête collant au lieu de passer dessous */
+    scroll-padding-top: 76px;
 }
 
 
 /*
-    Changement de page (onglets, langue) : fondu enchaîné au lieu d'un rechargement sec.
+    Changement de page (langue) : fondu enchaîné au lieu d'un rechargement sec.
     Les navigateurs qui ne connaissent pas cette règle changent simplement de page.
     Un fondu reste acceptable en mouvement réduit : rien ne se déplace.
 */
@@ -90,36 +147,20 @@ html {
 }
 
 
+/* Polices de secours proches de Manrope, le temps qu'elle se charge */
 body {
     margin: 0;
 
     background-color: var(--red);
     color: var(--white);
 
-    font-family: Avenir, "Avenir Next", Arial, sans-serif;
+    font-family: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    font-size: var(--text-body);
     line-height: 1.6;
 
+    -webkit-font-smoothing: antialiased;
+
     overflow-x: hidden;
-}
-
-
-/*
-    Fond de toutes les pages : le rouge adouci par la lumière.
-    Une lueur plus claire derrière le titre, puis un rouge qui s'approfondit vers le bas.
-    fixed : le fond reste en place pendant que la page défile.
-*/
-body::before {
-    content: "";
-
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-
-    background:
-        radial-gradient(70vw 45vw at 30% 0%, rgba(255, 70, 80, 0.45), transparent 70%),
-        linear-gradient(180deg, transparent 30%, rgba(80, 0, 10, 0.35));
-
-    pointer-events: none;
 }
 
 
@@ -130,8 +171,11 @@ img {
 
 h1,
 h2,
-h3 {
+h3,
+h4 {
+    font-weight: 700;
     line-height: 1.1;
+    letter-spacing: -0.02em;
 }
 
 
@@ -140,12 +184,30 @@ a {
 }
 
 
+/*
+    Étiquette : un seul style de petites capitales pour tout le site
+    (sur-titres, libellés et badges des cartes, titres du pied de page).
+*/
+.section__eyebrow,
+.project-card__label,
+.project-card__badge,
+.footer__title {
+    font-size: var(--text-label);
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    line-height: 1.4;
+
+    text-transform: uppercase;
+}
+
+
 /* Visible au clavier sur tous les éléments interactifs */
 a:focus-visible,
 button:focus-visible,
 select:focus-visible,
 input:focus-visible,
-textarea:focus-visible {
+textarea:focus-visible,
+summary:focus-visible {
     outline: 3px solid var(--white);
     outline-offset: 4px;
 }
@@ -162,7 +224,7 @@ textarea:focus-visible {
 
     padding: 10px 16px;
 
-    background-color: var(--blue);
+    background-color: var(--ink);
     color: var(--white);
 
     text-decoration: none;
@@ -176,3 +238,18 @@ textarea:focus-visible {
 }
 
 
+/* Texte lu par les lecteurs d'écran seulement (annonce de la carte du centre, par exemple) */
+.visually-hidden {
+    position: absolute;
+
+    width: 1px;
+    height: 1px;
+
+    margin: -1px;
+    padding: 0;
+
+    overflow: hidden;
+    clip-path: inset(50%);
+
+    white-space: nowrap;
+}

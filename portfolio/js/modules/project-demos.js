@@ -4,22 +4,24 @@
  */
 import { RELIABLE_LENGTH, rankLanguages } from "../tools/language-detector.js";
 import { caesar, findCaesarKey, isValidVigenereKey, vigenere } from "../tools/ciphers.js";
+import { normalize } from "../tools/letter-frequencies.js";
 
 
+// \u00A0 : espace insécable avant les deux-points, comme dans les pages françaises
 const TEXTS = {
     fr: {
         languages: { fr: "Français", en: "Anglais", es: "Espagnol", pt: "Portugais", it: "Italien", de: "Allemand", nl: "Néerlandais", sv: "Suédois", pl: "Polonais", tr: "Turc" },
         locale: "fr-FR",
         waiting: "Le résultat s'affiche pendant la saisie.",
         noLetter: "Aucune lettre à analyser.",
-        verdict: "Langue probable :",
+        verdict: "Langue probable\u00A0:",
         gap: "écart",
-        shortText: count => `Texte court (${count} lettres) : ajoutez une ou deux phrases pour un résultat plus sûr.`,
-        caesarKeyHint: "César : chiffres uniquement (ex. : 3).",
-        vigenereKeyHint: "Vigenère : lettres uniquement, sans accents (ex. : EPITECH).",
-        caesarKeyError: "Clé invalide : la clé de César ne contient que des chiffres.",
-        vigenereKeyError: "Clé invalide : la clé de Vigenère ne contient que des lettres, sans accents, espaces ni chiffres.",
-        foundKey: key => `Clé trouvée : ${key}, celle qui donne le texte le plus proche du français.`
+        shortText: count => `Texte court (${count} lettres)\u00A0: ajoutez une ou deux phrases pour un résultat plus sûr.`,
+        caesarKeyHint: "César\u00A0: chiffres uniquement (ex.\u00A0: 3).",
+        vigenereKeyHint: "Vigenère\u00A0: lettres uniquement, sans accents (ex.\u00A0: EPITECH).",
+        caesarKeyError: "Clé invalide\u00A0: la clé de César ne contient que des chiffres.",
+        vigenereKeyError: "Clé invalide\u00A0: la clé de Vigenère ne contient que des lettres, sans accents, espaces ni chiffres.",
+        foundKey: key => `Clé trouvée\u00A0: ${key}, celle qui donne le texte le plus proche du français.`
     },
     en: {
         languages: { fr: "French", en: "English", es: "Spanish", pt: "Portuguese", it: "Italian", de: "German", nl: "Dutch", sv: "Swedish", pl: "Polish", tr: "Turkish" },
@@ -62,6 +64,15 @@ function createElement(tag, className, text) {
     element.className = className;
     element.textContent = text;
     return element;
+}
+
+
+/*
+ * Décalage de César réduit à 0-25, calculé chiffre par chiffre : une clé de 400 chiffres resterait sinon
+ * un nombre trop grand pour JavaScript (Infinity), et le texte chiffré deviendrait illisible.
+ */
+function caesarShift(digits) {
+    return [...digits].reduce((shift, digit) => (shift * 10 + Number(digit)) % 26, 0);
 }
 
 
@@ -145,7 +156,7 @@ function initCipherDemo(demo, texts, language) {
             return;
         }
         const cipher = method.value === "caesar" ? caesar : vigenere;
-        const cipherKey = method.value === "caesar" ? Number(key.value) : key.value.trim();
+        const cipherKey = method.value === "caesar" ? caesarShift(key.value.trim()) : key.value.trim();
         output.value = cipher(input.value, cipherKey, Number(direction.value));
     }
 
@@ -169,7 +180,14 @@ function initCipherDemo(demo, texts, language) {
         update();
     });
 
+    /*
+     * Sans lettre dans le texte, aucune clé ne peut être retrouvée : la clé saisie reste en place.
+     */
     crackButton.addEventListener("click", () => {
+        if (!normalize(input.value)) {
+            message.textContent = texts.noLetter;
+            return;
+        }
         key.value = String(findCaesarKey(input.value, language));
         update();
         message.textContent = texts.foundKey(key.value);

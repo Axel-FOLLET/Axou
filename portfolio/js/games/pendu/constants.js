@@ -13,11 +13,11 @@ export const ACCENT = "rgb(255,255,255)";
 export const BARRE_MOYENNE = "rgba(255,255,255,0.6)";
 export const TOUCHE_TROUVEE = "rgba(255,255,255,0.35)";
 export const TOUCHE_RATEE = "rgba(13,10,155,0.75)";
-export const FOND_MESSAGE = "#E1001A";
-export const FOND = "#E1001A";
+export const FOND_MESSAGE = "#C8001E";
+export const FOND = "#C8001E";
 export const FOND_CLAIR = "rgba(255,255,255,0.10)";
-export const FOND_VICTOIRE = "#E1001A";
-export const FOND_DEFAITE = "#E1001A";
+export const FOND_VICTOIRE = "#C8001E";
+export const FOND_DEFAITE = "#C8001E";
 
 export const MAX_PENALITES = 12;
 export const LIGNES_CLAVIER = ["AZERTYUIOP", "QSDFGHJKLM", "WXCVBN"];

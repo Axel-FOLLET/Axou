@@ -1,5 +1,5 @@
 /*
- * Chronologie de la page Compétences : la flèche descend au fil du défilement
+ * Chronologie de la section Progression : la flèche descend au fil du défilement
  * et chaque étape apparaît quand la flèche l'atteint.
  * Sans JavaScript ou en mouvement réduit, tout reste affiché d'emblée.
  */
@@ -53,7 +53,7 @@ function followScroll(timeline) {
 
 
 /*
- * La chronologie n'existe que sur la page Compétences : ailleurs, la fonction s'arrête.
+ * La chronologie n'existe que sur la section Progression : ailleurs, la fonction s'arrête.
  */
 export function initTimeline() {
     const timeline = document.querySelector(".timeline");

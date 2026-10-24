@@ -98,12 +98,17 @@ const SENT_DURATION = 2600;
 /*
  * Réussite : le bouton affiche « Envoyé » avec une coche qui se dessine (contact.css), puis redevient normal.
  */
+/*
+ * Le texte d'origine est gardé au premier envoi : un second envoi pendant « Envoyé » ne le remplace pas.
+ * Le minuteur précédent est annulé : le bouton reprend son texte 2,6 s après le dernier envoi.
+ */
 function flashSent(button, label) {
-    const original = button.textContent;
+    button.dataset.label ??= button.textContent;
+    clearTimeout(button.sentTimer);
     button.textContent = label;
     button.classList.add("button--sent");
-    setTimeout(() => {
-        button.textContent = original;
+    button.sentTimer = setTimeout(() => {
+        button.textContent = button.dataset.label;
         button.classList.remove("button--sent");
     }, SENT_DURATION);
 }

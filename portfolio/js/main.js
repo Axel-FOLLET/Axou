@@ -3,23 +3,19 @@
  * si les éléments dont il a besoin existent sur la page, sinon il ne fait rien.
  */
 import { initNavigation } from "./modules/navigation.js";
-import { initSkills } from "./modules/skills.js";
 import { initContact } from "./modules/contact.js";
 import { initCubes } from "./modules/cubes/init-cubes.js";
+import { initCat } from "./modules/cat.js";
 import { initProjectShowcase } from "./modules/project-showcase.js";
-import { initRepos } from "./modules/repos.js";
 import { initTimeline } from "./modules/timeline.js";
 import { initProjectDemos } from "./modules/project-demos.js";
 import { initReveal } from "./modules/reveal.js";
-import { initHumanCheck } from "./modules/human-check.js";
 
-initHumanCheck();
 initNavigation();
 initReveal();
-initSkills();
 initContact();
 initCubes();
-initRepos();
+initCat();
 initTimeline();
 const language = document.documentElement.lang === "en" ? "en" : "fr";
 initProjectShowcase(language);

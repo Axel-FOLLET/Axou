@@ -4,24 +4,19 @@
     Tous les cubes utilisent le même système.
     JavaScript gère directement leur rotation.
 
-    Le cube s'attrape et se lance (drag-cube.js).
+    Les cubes sont décoratifs (aria-hidden) : ils ne prennent pas le focus du clavier.
+    À la souris ou au doigt, un cube s'attrape et se lance (drag-cube.js).
     pan-y : sur écran tactile, glisser verticalement fait toujours défiler la page ;
     glisser horizontalement fait tourner le cube.
 */
 .cube {
+    display: block;
+
     width: var(--cube-size);
     height: var(--cube-size);
 
-    padding: 0;
-
-    border: none;
-
-    appearance: none;
-    -webkit-appearance: none;
-
-    background-color: transparent;
-
     touch-action: pan-y;
+    user-select: none;
 
     cursor: grab;
 
@@ -42,12 +37,6 @@
 }
 
 
-/* Cube décoratif placé dans un lien : il garde le curseur du lien. */
-a .cube {
-    cursor: inherit;
-}
-
-
 /* Tailles des cubes */
 .cube--huge {
     --cube-size: 240px;
@@ -59,32 +48,38 @@ a .cube {
 }
 
 
-.cube--medium {
-    --cube-size: 90px;
-}
-
-
 .cube--small {
     --cube-size: 65px;
 }
 
 
+/* Petit cube qui signale chaque pratique de la partie IA : arêtes et halo affinés à sa taille */
 .cube--tiny {
-    --cube-size: 45px;
+    --cube-size: 26px;
 }
 
 
-/* Cube bleu : bien visible sur le fond rouge */
-.cube--blue {
-    --cube-border: var(--blue);
-    /* Aucun remplissage : seules les arêtes et leur halo sont visibles. */
-    --cube-fill: transparent;
-    --cube-hover: transparent;
-    --cube-glow: rgba(13, 10, 155, 0.7);
+/* Cube de la carte du site CV, à la place d'un pictogramme */
+.cube--card {
+    --cube-size: 33px;
 }
 
 
-/* Cube blanc : plus discret */
+.cube--tiny .cube__face,
+.cube--card .cube__face {
+    border-width: 1.5px;
+
+    box-shadow: 0 0 8px var(--cube-glow);
+}
+
+
+.cube--tiny:hover .cube__face,
+.cube--card:hover .cube__face {
+    box-shadow: 0 0 14px var(--cube-glow);
+}
+
+
+/* Cube blanc : arêtes blanches et léger voile, sur le rouge comme sur le quasi-noir */
 .cube--white {
     --cube-border: var(--white);
 
@@ -184,7 +179,7 @@ a .cube {
 
 /* -------------------- POSITION DES CUBES -------------------- */
 
-/* Cubes placés autour de la photo (accueil) et du formulaire (contact) */
+/* Petits cubes autour du cube principal (accueil et contact) */
 .cube--pos-1 {
     position: absolute;
 
@@ -201,23 +196,7 @@ a .cube {
 }
 
 
-.cube--pos-3 {
-    position: absolute;
-
-    bottom: 8%;
-    left: 10%;
-}
-
-
-.cube--pos-4 {
-    position: absolute;
-
-    right: 8%;
-    bottom: 4%;
-}
-
-
-/* Cube principal, au centre de la zone (page Contact) */
+/* Cube principal de la partie Contact */
 .cube--pos-main {
     position: absolute;
 
@@ -237,14 +216,3 @@ a .cube {
 
     transform: translate(-50%, -50%);
 }
-
-
-/* Petit cube décoratif en haut à droite d'une section */
-.cube--corner {
-    position: absolute;
-
-    top: 100px;
-    right: 8%;
-}
-
-

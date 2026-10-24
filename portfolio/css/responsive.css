@@ -3,11 +3,12 @@
 @media (max-width: 1024px) {
 
     /* -------------------- ACCUEIL -------------------- */
+    /* Les cubes passent sous le texte */
     .hero {
         flex-direction: column;
         align-items: flex-start;
 
-        padding-top: 50px;
+        padding-top: 56px;
     }
 
 
@@ -18,37 +19,9 @@
 
 
     .hero__visual {
-        height: 460px;
+        height: 420px;
 
         margin-top: 40px;
-    }
-
-
-    .teaser-list {
-        grid-template-columns: 1fr;
-    }
-
-
-    /* -------------------- SECTIONS -------------------- */
-    /*
-        Sur tablette, les cubes de coin quittent leur position
-        absolue pour éviter de recouvrir le texte.
-    */
-    .cube--corner {
-        position: relative;
-
-        top: auto;
-        right: auto;
-
-        display: block;
-
-        margin: 0 0 28px auto;
-    }
-
-
-    /* -------------------- PARCOURS -------------------- */
-    .banner {
-        padding-block: 40px;
     }
 
 
@@ -56,7 +29,7 @@
     .contact {
         flex-direction: column;
 
-        gap: 50px;
+        gap: 48px;
     }
 
 
@@ -69,22 +42,7 @@
     .contact__side {
         width: 100%;
 
-        min-height: 360px;
-    }
-
-
-    .bars__bar:nth-child(1) {
-        width: 40%;
-    }
-
-
-    .bars__bar:nth-child(2) {
-        width: 60%;
-    }
-
-
-    .bars__bar:nth-child(3) {
-        width: 80%;
+        min-height: 320px;
     }
 
 }
@@ -98,36 +56,20 @@
     .hero {
         min-height: auto;
 
-        padding-bottom: 40px;
-    }
-
-
-    .hero__catchphrase {
-        font-size: 1.3rem;
+        padding-bottom: 48px;
     }
 
 
     .hero__visual {
-        height: 300px;
+        height: 280px;
 
         margin-top: 24px;
     }
 
 
     /* -------------------- SECTIONS -------------------- */
-    /* Moins de vide sous l'introduction : le cube de coin suit le texte de près */
-    .section {
-        padding-bottom: 40px;
-    }
-
-
     .section__intro {
-        margin-bottom: 24px;
-    }
-
-
-    .cube--corner {
-        margin-bottom: 0;
+        margin-bottom: 40px;
     }
 
 
@@ -141,31 +83,20 @@
     }
 
 
-    /* Figure de l'accueil plus basse : ses cubes rétrécissent dans la même proportion */
+    /* Figure de l'accueil plus basse : son gros cube rétrécit dans la même proportion */
     .hero__visual .cube--huge {
         --cube-size: 120px;
     }
 
 
-    .hero__visual .cube--large {
-        --cube-size: 85px;
-    }
-
-
-    /* -------------------- SECTIONS -------------------- */
     /* Pastilles plus petites sur téléphone : le texte garde la largeur */
     .timeline {
-        --node-size: 44px;
+        --node-size: 40px;
     }
 
 
     .timeline__step {
         gap: 16px;
-    }
-
-
-    .timeline__content {
-        padding: 16px 18px;
     }
 
 
@@ -178,13 +109,24 @@
 }
 
 
+/* -------------------- PETIT TÉLÉPHONE -------------------- */
+
+/* Sous 360 px, « développement » ne tiendrait plus sur une ligne au format des titres */
+@media (max-width: 359px) {
+
+    :root {
+        --text-title: 2.125rem;
+    }
+
+}
+
+
 /* -------------------- MOUVEMENT RÉDUIT -------------------- */
 
 /*
     Si le visiteur a demandé moins d'animations dans son système,
-    les déplacements sont supprimés (JavaScript arrête aussi les cubes).
-    Moins de mouvement ne veut pas dire aucun retour :
-    les changements de couleur restent pour confirmer le survol et le clic.
+    le défilement doux est supprimé (JavaScript arrête aussi les cubes).
+    Les changements de couleur restent pour confirmer le survol et le clic.
 */
 @media (prefers-reduced-motion: reduce) {
 
@@ -193,13 +135,13 @@
     }
 
 
-    .button:hover,
-    .button:focus-visible,
-    .teaser:hover,
-    .teaser:focus-within,
-    .skill:hover,
-    .skill[aria-pressed="true"] {
-        transform: none;
+    /* Les effets d'appui rétrécissent l'élément : ils s'arrêtent aussi */
+    .button:active,
+    .cube:active,
+    .header__toggle:active,
+    .showcase__arrow:active:not(:disabled),
+    .link-card:active {
+        scale: none;
     }
 
 }

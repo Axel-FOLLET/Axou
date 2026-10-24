@@ -1,7 +1,7 @@
 /* -------------------- FENÊTRE « ARE YOU HUMAN? » -------------------- */
 
 /*
-    Carte bleue centrée sur un fond rouge sombre flouté.
+    Carte quasi-noire centrée sur un fond sombre flouté.
     La fenêtre est un <dialog> ouvert avec showModal : le navigateur la place au-dessus de tout.
 */
 .human-check {
@@ -9,16 +9,16 @@
 
     padding: 28px 24px 16px;
 
-    border: none;
-    border-radius: 4px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-m);
 
-    background-color: var(--blue);
+    background-color: var(--ink-raised);
     color: var(--white);
 
     font-family: inherit;
     text-align: center;
 
-    box-shadow: 0 24px 60px rgba(40, 0, 5, 0.5);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
 
     animation: human-check-in 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
@@ -31,7 +31,8 @@
 
 
 .human-check::backdrop {
-    background-color: rgba(60, 0, 8, 0.75);
+    background-color: rgba(11, 11, 15, 0.75);
+    -webkit-backdrop-filter: blur(6px);
     backdrop-filter: blur(6px);
 }
 
@@ -44,46 +45,17 @@
 }
 
 
-/* Croix de fermeture (fenêtre facultative seulement) : zone de 44 px, facile à toucher */
-.human-check__close {
-    position: absolute;
-    top: 4px;
-    right: 4px;
-
-    width: 44px;
-    height: 44px;
-
-    border: none;
-    border-radius: 2px;
-
-    background: none;
-    color: var(--white);
-
-    font: inherit;
-    font-size: 1.8rem;
-    line-height: 1;
-
-    cursor: pointer;
-}
-
-
-.human-check__close:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-}
-
-
 /* Image carrée : object-fit recadre les images plus hautes ou plus larges */
 .human-check__image {
     display: block;
 
-    /* Marge de chaque côté pour que la croix ne recouvre jamais l'image sur petit écran */
     width: 100%;
-    max-width: min(240px, 100% - 56px);
+    max-width: 240px;
     aspect-ratio: 1;
 
     margin: 0 auto;
 
-    border-radius: 4px;
+    border-radius: var(--radius-s);
 
     object-fit: cover;
     object-position: center 30%;
@@ -110,9 +82,9 @@
 
     padding: 10px 18px;
 
-    border-radius: 4px;
+    border-radius: var(--radius-l);
 
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: var(--veil-strong);
 
     font-weight: 600;
 
@@ -133,7 +105,7 @@
     margin: 0;
 
     border: 2px solid var(--white);
-    border-radius: 2px;
+    border-radius: 3px;
 
     cursor: pointer;
 }
@@ -145,8 +117,8 @@
     width: 12px;
     height: 7px;
 
-    border-left: 3px solid var(--blue);
-    border-bottom: 3px solid var(--blue);
+    border-left: 3px solid var(--ink);
+    border-bottom: 3px solid var(--ink);
 
     transform: translateY(-2px) rotate(-45deg) scale(0);
     transition: transform 0.15s;
@@ -173,6 +145,8 @@
     min-height: 1.6em;
 
     margin: 12px 0 0;
+
+    color: var(--muted);
 
     font-size: 0.9rem;
 }

@@ -11,34 +11,4 @@
         <xhtml:link rel="alternate" hreflang="fr" href="https://axel-follet.github.io/portfolio/index.html"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://axel-follet.github.io/portfolio/index-en.html"/>
     </url>
-    <url>
-        <loc>https://axel-follet.github.io/portfolio/pages/projects.html</loc>
-        <xhtml:link rel="alternate" hreflang="fr" href="https://axel-follet.github.io/portfolio/pages/projects.html"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://axel-follet.github.io/portfolio/pages/projects-en.html"/>
-    </url>
-    <url>
-        <loc>https://axel-follet.github.io/portfolio/pages/projects-en.html</loc>
-        <xhtml:link rel="alternate" hreflang="fr" href="https://axel-follet.github.io/portfolio/pages/projects.html"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://axel-follet.github.io/portfolio/pages/projects-en.html"/>
-    </url>
-    <url>
-        <loc>https://axel-follet.github.io/portfolio/pages/skills.html</loc>
-        <xhtml:link rel="alternate" hreflang="fr" href="https://axel-follet.github.io/portfolio/pages/skills.html"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://axel-follet.github.io/portfolio/pages/skills-en.html"/>
-    </url>
-    <url>
-        <loc>https://axel-follet.github.io/portfolio/pages/skills-en.html</loc>
-        <xhtml:link rel="alternate" hreflang="fr" href="https://axel-follet.github.io/portfolio/pages/skills.html"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://axel-follet.github.io/portfolio/pages/skills-en.html"/>
-    </url>
-    <url>
-        <loc>https://axel-follet.github.io/portfolio/pages/contact.html</loc>
-        <xhtml:link rel="alternate" hreflang="fr" href="https://axel-follet.github.io/portfolio/pages/contact.html"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://axel-follet.github.io/portfolio/pages/contact-en.html"/>
-    </url>
-    <url>
-        <loc>https://axel-follet.github.io/portfolio/pages/contact-en.html</loc>
-        <xhtml:link rel="alternate" hreflang="fr" href="https://axel-follet.github.io/portfolio/pages/contact.html"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://axel-follet.github.io/portfolio/pages/contact-en.html"/>
-    </url>
 </urlset>

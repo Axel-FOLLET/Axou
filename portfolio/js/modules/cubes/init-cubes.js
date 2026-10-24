@@ -13,7 +13,7 @@ import { enableCubeDrag } from "./drag-cube.js";
 export function initCubes() {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     /*
-     * Map associe chaque bouton HTML à l'état de son cube : l'observateur ne reçoit que l'élément.
+     * Map associe chaque élément HTML à l'état de son cube : l'observateur ne reçoit que l'élément.
      */
     const cubesByTrigger = new Map();
     document.querySelectorAll(".cube").forEach((trigger, index) => {
@@ -21,19 +21,15 @@ export function initCubes() {
         cube.isVisible = false;
         cubesByTrigger.set(trigger, cube);
         /*
-         * Un cube placé dans un lien (icône) garde le comportement du lien : pas de glisser.
          * En mouvement réduit, on peut toujours tourner le cube au doigt, mais sans élan.
          */
-        if (!trigger.closest("a")) {
-            enableCubeDrag(trigger, cube, renderCube, () => !reducedMotion.matches);
-        }
+        enableCubeDrag(trigger, cube, renderCube, () => !reducedMotion.matches);
         /*
-         * click sert aussi pour Entrée et Espace au clavier.
+         * Les cubes sont décoratifs : ils ne réagissent qu'à la souris et au doigt.
          * Après un glisser, le clic qui suit le lâcher ne relance pas l'accélération.
-         * detail vaut 0 pour un clic au clavier : il fonctionne toujours.
          */
-        trigger.addEventListener("click", event => {
-            if (event.detail > 0 && cube.wasDragged) return;
+        trigger.addEventListener("click", () => {
+            if (cube.wasDragged) return;
             cube.clickTimeRemaining = CLICK_DURATION;
         });
     });
