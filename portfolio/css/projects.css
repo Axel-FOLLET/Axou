@@ -14,6 +14,15 @@
 
 
 /*
+    Fenêtre trop basse pour la carte du centre (petit écran, zoom) : project-showcase.js élargit les cartes sur ordinateur.
+    Leur texte tient sur moins de lignes : la carte s'allonge moins.
+*/
+.showcase--wide {
+    --card-width: 420px;
+}
+
+
+/*
     Halo rouge très léger derrière la roue.
     Les liens « Projets » donnent le focus à la section (project-showcase.js) : pas de cadre autour d'elle entière.
 */

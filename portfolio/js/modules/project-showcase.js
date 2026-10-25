@@ -90,6 +90,7 @@ export function initProjectShowcase(language) {
         const touch = !arrowMode.matches;
         showcase.classList.toggle("showcase--touch", touch);
         hint.textContent = (touch ? showcase.dataset.labelHintTouch : showcase.dataset.labelHint) || "";
+        updateWidth();
         render();
     }
 
@@ -229,6 +230,23 @@ export function initProjectShowcase(language) {
     }
 
     /*
+     * Sur ordinateur, si la carte du centre ne tient pas sous l'en-tête (petit écran, zoom),
+     * les cartes s'élargissent (showcase--wide, projects.css) : leur texte prend moins de lignes.
+     * La hauteur est mesurée à la largeur normale et sans transition : sinon la carte élargie,
+     * devenue assez basse, ferait retirer la classe à la mesure suivante.
+     */
+    function updateWidth() {
+        if (!active || expanded) return;
+        const instant = showcase.classList.contains("showcase--instant");
+        showcase.classList.add("showcase--instant");
+        showcase.classList.remove("showcase--wide");
+        const tooHigh = active.offsetHeight > window.innerHeight - headerRoom();
+        showcase.classList.toggle("showcase--wide", arrowMode.matches && tooHigh);
+        active.offsetWidth;
+        if (!instant) showcase.classList.remove("showcase--instant");
+    }
+
+    /*
      * Calcule la place de chaque carte. Les cartes sont superposées au centre (voir projects.css) :
      * translate les écarte, scale les rapetisse, z-index met les plus proches devant.
      */
@@ -302,7 +320,10 @@ export function initProjectShowcase(language) {
     });
 
 
-    window.addEventListener("resize", requestRender);
+    window.addEventListener("resize", () => {
+        updateWidth();
+        requestRender();
+    });
 
 
     /* -------------------- GLISSER ET BALAYER -------------------- */
@@ -536,7 +557,8 @@ export function initProjectShowcase(language) {
             if (active && location.hash.startsWith("#projects/")) history.replaceState(null, "", "#projects");
             setActive(visible[0]);
         }
-        else render();
+        updateWidth();
+        render();
     }
 
     /*
@@ -547,11 +569,14 @@ export function initProjectShowcase(language) {
     function wheelTop() {
         let top = 0;
         for (let element = showcase; element; element = element.offsetParent) top += element.offsetTop;
-        const headerRoom = Math.max(
+        return top - headerRoom();
+    }
+
+    function headerRoom() {
+        return Math.max(
             parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop),
             document.querySelector(".header").offsetHeight
         );
-        return top - headerRoom;
     }
 
     /*

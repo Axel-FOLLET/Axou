@@ -42,7 +42,7 @@
     <link rel="stylesheet" href="css/buttons.css?v=2108940d7dfb">
     <link rel="stylesheet" href="css/home.css?v=2f240020d128">
     <link rel="stylesheet" href="css/cubes.css?v=cde2ce89c339">
-    <link rel="stylesheet" href="css/projects.css?v=fde3396de3ce">
+    <link rel="stylesheet" href="css/projects.css?v=0acd8c2ef261">
     <link rel="stylesheet" href="css/career.css?v=80c53986663f">
     <link rel="stylesheet" href="css/contact.css?v=a82baebf779d">
     <link rel="stylesheet" href="css/footer.css?v=bb28efed03ab">
@@ -365,37 +365,85 @@
 
                     </article>
 
-                    <article class="project-card" data-slug="site-cv" data-domain="web" data-hover="cursor">
+                    <article class="project-card" data-slug="cesar-vigenere" data-domain="algorithms" data-hover="cipher">
 
                         <div class="project-card__main">
 
                             <div class="project-card__media">
-                                <!-- Cube 3D, l'emblème du site CV : il tourne et s'attrape comme les autres -->
-                                <span class="cube cube--card cube--white" aria-hidden="true" data-speed="12" data-phase="30"></span>
+                                <!-- Pictogramme : clé -->
+                                <svg class="project-card__icon" viewBox="0 0 48 48" aria-hidden="true">
+                                    <circle cx="15" cy="24" r="8"/>
+                                    <path d="M23 24h19M36 24v6M41 24v5"/>
+                                </svg>
                             </div>
 
                             <div class="project-card__body">
 
-                                <h3 class="project-card__title">My resume website</h3>
+                                <h3 class="project-card__title"><span data-cipher>Caesar</span> and <span data-cipher data-cipher-vigenere="EPITECH" data-cipher-off>Vigenère</span> ciphers</h3>
 
                                 <ul class="project-card__tags" aria-label="Skills and technologies">
-                                    <li class="tag">HTML</li>
-                                    <li class="tag">CSS</li>
-                                    <li class="tag">JavaScript</li>
-                                    <li class="tag">GitHub Pages</li>
+                                    <li class="tag">Python</li>
+                                    <li class="tag">Algorithms</li>
+                                    <li class="tag">Strings</li>
+                                    <li class="tag">Frequency analysis</li>
                                 </ul>
 
                                 <div class="project-card__story">
-                                    <p class="project-card__text">Epitech web bootcamp project, without any framework: <strong>presenting my move from HR to IT</strong> on a responsive, interactive and bilingual website, with a working contact form.</p>
+                                    <p class="project-card__text">Python bootcamp exercise: encrypting and decrypting with Caesar (fixed shift) and Vigenère (shift given by a keyword), then <strong>recovering a Caesar key on its own</strong>.</p>
                                     <p class="project-card__label">Key takeaway</p>
-                                    <p class="project-card__text">One file per responsibility (menu, cubes, form, games) taught me how the parts talk to each other. When a bug appears, <strong>I fix the cause rather than the symptom</strong>, without side effects on the rest of the site.</p>
+                                    <p class="project-card__text">The modulo wraps the alphabet and a single function handles both encrypting and decrypting. To break Caesar, <strong>I try all 26 keys and keep the text closest to French</strong>, as in the language detector.</p>
                                 </div>
 
                                 <div class="project-card__actions">
-                                    <a class="button" href="https://axel-follet.github.io/website_resume/" target="_blank" rel="noopener noreferrer">See the live website</a>
-                                    <a class="button" href="https://github.com/Axel-FOLLET/website_resume" target="_blank" rel="noopener noreferrer">Source code</a>
+                                    <a class="button" href="https://github.com/Axel-FOLLET/Axou/tree/main/piscine_python/chiffrement" target="_blank" rel="noopener noreferrer">Source code</a>
+                                    <button class="button project-card__toggle" type="button" aria-expanded="false" aria-controls="demo-cipher" data-label-open="Try it" data-label-close="Hide the demo">Try it</button>
                                 </div>
 
+                            </div>
+
+                        </div>
+
+                        <!-- Démo : project-demos.js recalcule le résultat à chaque saisie -->
+                        <div class="project-card__stage demo demo--cipher" id="demo-cipher" hidden>
+
+                            <div class="form__row">
+                                <div class="form__field">
+                                    <label class="form__label" for="cipher-method">Method</label>
+                                    <select class="form__input demo__select" id="cipher-method" data-cipher-method>
+                                        <option value="caesar">Caesar</option>
+                                        <option value="vigenere">Vigenère</option>
+                                    </select>
+                                </div>
+                                <div class="form__field">
+                                    <label class="form__label" for="cipher-direction">Operation</label>
+                                    <select class="form__input demo__select" id="cipher-direction" data-cipher-direction>
+                                        <option value="1">Encrypt</option>
+                                        <option value="-1">Decrypt</option>
+                                    </select>
+                                </div>
+                                <div class="form__field">
+                                    <label class="form__label" for="cipher-key">Key</label>
+                                    <input class="form__input" id="cipher-key" type="text" value="3" autocomplete="off" spellcheck="false" aria-describedby="cipher-key-hint cipher-key-error" data-cipher-key>
+                                    <p class="demo__hint" id="cipher-key-hint" data-cipher-hint></p>
+                                    <p class="form__error" id="cipher-key-error" aria-live="polite" data-cipher-error></p>
+                                </div>
+                            </div>
+
+                            <div class="form__field">
+                                <label class="form__label" for="cipher-text">Text</label>
+                                <textarea class="form__input form__input--area demo__input" id="cipher-text" rows="3">Meet me tomorrow at the library, near the window.</textarea>
+                            </div>
+
+                            <div class="form__field">
+                                <label class="form__label" for="cipher-result">Result</label>
+                                <output class="demo__output" id="cipher-result" for="cipher-method cipher-direction cipher-key cipher-text"></output>
+                            </div>
+
+                            <p class="demo__note" id="cipher-message" aria-live="polite"></p>
+
+                            <div class="demo__actions">
+                                <button class="button" type="button" data-cipher-swap>Start from the result</button>
+                                <button class="button" type="button" data-cipher-crack hidden>Find the key</button>
                             </div>
 
                         </div>
@@ -519,85 +567,37 @@
 
                     </article>
 
-                    <article class="project-card" data-slug="cesar-vigenere" data-domain="algorithms" data-hover="cipher">
+                    <article class="project-card" data-slug="site-cv" data-domain="web" data-hover="cursor">
 
                         <div class="project-card__main">
 
                             <div class="project-card__media">
-                                <!-- Pictogramme : clé -->
-                                <svg class="project-card__icon" viewBox="0 0 48 48" aria-hidden="true">
-                                    <circle cx="15" cy="24" r="8"/>
-                                    <path d="M23 24h19M36 24v6M41 24v5"/>
-                                </svg>
+                                <!-- Cube 3D, l'emblème du site CV : il tourne et s'attrape comme les autres -->
+                                <span class="cube cube--card cube--white" aria-hidden="true" data-speed="12" data-phase="30"></span>
                             </div>
 
                             <div class="project-card__body">
 
-                                <h3 class="project-card__title"><span data-cipher>Caesar</span> and <span data-cipher data-cipher-vigenere="EPITECH" data-cipher-off>Vigenère</span> ciphers</h3>
+                                <h3 class="project-card__title">My resume website</h3>
 
                                 <ul class="project-card__tags" aria-label="Skills and technologies">
-                                    <li class="tag">Python</li>
-                                    <li class="tag">Algorithms</li>
-                                    <li class="tag">Strings</li>
-                                    <li class="tag">Frequency analysis</li>
+                                    <li class="tag">HTML</li>
+                                    <li class="tag">CSS</li>
+                                    <li class="tag">JavaScript</li>
+                                    <li class="tag">GitHub Pages</li>
                                 </ul>
 
                                 <div class="project-card__story">
-                                    <p class="project-card__text">Python bootcamp exercise: encrypting and decrypting with Caesar (fixed shift) and Vigenère (shift given by a keyword), then <strong>recovering a Caesar key on its own</strong>.</p>
+                                    <p class="project-card__text">Epitech web bootcamp project, without any framework: <strong>presenting my move from HR to IT</strong> on a responsive, interactive and bilingual website, with a working contact form.</p>
                                     <p class="project-card__label">Key takeaway</p>
-                                    <p class="project-card__text">The modulo wraps the alphabet and a single function handles both encrypting and decrypting. To break Caesar, <strong>I try all 26 keys and keep the text closest to French</strong>, as in the language detector.</p>
+                                    <p class="project-card__text">One file per responsibility (menu, cubes, form, games) taught me how the parts talk to each other. When a bug appears, <strong>I fix the cause rather than the symptom</strong>, without side effects on the rest of the site.</p>
                                 </div>
 
                                 <div class="project-card__actions">
-                                    <a class="button" href="https://github.com/Axel-FOLLET/Axou/tree/main/piscine_python/chiffrement" target="_blank" rel="noopener noreferrer">Source code</a>
-                                    <button class="button project-card__toggle" type="button" aria-expanded="false" aria-controls="demo-cipher" data-label-open="Try it" data-label-close="Hide the demo">Try it</button>
+                                    <a class="button" href="https://axel-follet.github.io/website_resume/" target="_blank" rel="noopener noreferrer">See the live website</a>
+                                    <a class="button" href="https://github.com/Axel-FOLLET/website_resume" target="_blank" rel="noopener noreferrer">Source code</a>
                                 </div>
 
-                            </div>
-
-                        </div>
-
-                        <!-- Démo : project-demos.js recalcule le résultat à chaque saisie -->
-                        <div class="project-card__stage demo demo--cipher" id="demo-cipher" hidden>
-
-                            <div class="form__row">
-                                <div class="form__field">
-                                    <label class="form__label" for="cipher-method">Method</label>
-                                    <select class="form__input demo__select" id="cipher-method" data-cipher-method>
-                                        <option value="caesar">Caesar</option>
-                                        <option value="vigenere">Vigenère</option>
-                                    </select>
-                                </div>
-                                <div class="form__field">
-                                    <label class="form__label" for="cipher-direction">Operation</label>
-                                    <select class="form__input demo__select" id="cipher-direction" data-cipher-direction>
-                                        <option value="1">Encrypt</option>
-                                        <option value="-1">Decrypt</option>
-                                    </select>
-                                </div>
-                                <div class="form__field">
-                                    <label class="form__label" for="cipher-key">Key</label>
-                                    <input class="form__input" id="cipher-key" type="text" value="3" autocomplete="off" spellcheck="false" aria-describedby="cipher-key-hint cipher-key-error" data-cipher-key>
-                                    <p class="demo__hint" id="cipher-key-hint" data-cipher-hint></p>
-                                    <p class="form__error" id="cipher-key-error" aria-live="polite" data-cipher-error></p>
-                                </div>
-                            </div>
-
-                            <div class="form__field">
-                                <label class="form__label" for="cipher-text">Text</label>
-                                <textarea class="form__input form__input--area demo__input" id="cipher-text" rows="3">Meet me tomorrow at the library, near the window.</textarea>
-                            </div>
-
-                            <div class="form__field">
-                                <label class="form__label" for="cipher-result">Result</label>
-                                <output class="demo__output" id="cipher-result" for="cipher-method cipher-direction cipher-key cipher-text"></output>
-                            </div>
-
-                            <p class="demo__note" id="cipher-message" aria-live="polite"></p>
-
-                            <div class="demo__actions">
-                                <button class="button" type="button" data-cipher-swap>Start from the result</button>
-                                <button class="button" type="button" data-cipher-crack hidden>Find the key</button>
                             </div>
 
                         </div>
