@@ -1,33 +1,33 @@
 <!doctype html>
-<html lang="fr">
+<html lang="en">
 
 <head>
     <!-- Repères : les id servent aux ancres et à ARIA ; les classes BEM servent au style. Les attributs data-* transmettent des paramètres aux modules JavaScript. -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Axel FOLLET | Curriculum Vitae</title>
+    <title>Axel FOLLET | Resume</title>
 
     <!-- Référencement : description, page canonique et version dans l'autre langue -->
-    <meta name="description" content="CV d’Axel FOLLET : parcours de la gestion de projets RH vers l’informatique, expériences, compétences, projets et contact.">
+    <meta name="description" content="Axel FOLLET’s resume: from HR project management to IT, experience, skills, projects and contact.">
     <meta name="author" content="Axel FOLLET">
     <link rel="icon" href="assets/images/favicon.svg?v=6d7c05deb928" type="image/svg+xml">
-    <link rel="canonical" href="https://axel-follet.github.io/website_resume/index.html">
+    <link rel="canonical" href="https://axel-follet.github.io/website_resume/index-en.html">
     <link rel="alternate" hreflang="fr" href="https://axel-follet.github.io/website_resume/index.html">
     <link rel="alternate" hreflang="en" href="https://axel-follet.github.io/website_resume/index-en.html">
     <link rel="alternate" hreflang="x-default" href="https://axel-follet.github.io/website_resume/index.html">
 
     <!-- Aperçu lors du partage du lien (Open Graph) -->
     <meta property="og:type" content="website">
-    <meta property="og:locale" content="fr_FR">
-    <meta property="og:locale:alternate" content="en_GB">
-    <meta property="og:title" content="Axel FOLLET | Curriculum Vitae">
-    <meta property="og:description" content="CV d’Axel FOLLET : parcours de la gestion de projets RH vers l’informatique, expériences, compétences, projets et contact.">
-    <meta property="og:url" content="https://axel-follet.github.io/website_resume/index.html">
-    <meta property="og:image" content="https://axel-follet.github.io/website_resume/assets/images/share.png">
+    <meta property="og:locale" content="en_GB">
+    <meta property="og:locale:alternate" content="fr_FR">
+    <meta property="og:title" content="Axel FOLLET | Resume">
+    <meta property="og:description" content="Axel FOLLET’s resume: from HR project management to IT, experience, skills, projects and contact.">
+    <meta property="og:url" content="https://axel-follet.github.io/website_resume/index-en.html">
+    <meta property="og:image" content="https://axel-follet.github.io/website_resume/assets/images/share-en.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:image:alt" content="CV d'Axel FOLLET : Des projets RH aux projets IT : même rigueur, nouveaux outils.">
+    <meta property="og:image:alt" content="Axel FOLLET's resume: From HR projects to IT projects: same rigour, new tools.">
     <meta name="twitter:card" content="summary_large_image">
 
     <!-- Police chargée dès le début : le texte s'affiche sans changer de police -->
@@ -71,7 +71,7 @@
 <body class="page" id="top">
 
     <!-- Lien caché qui apparaît au premier appui sur Tab : saute la navigation -->
-    <a class="skip-link" href="#main">Aller au contenu</a>
+    <a class="skip-link" href="#main">Skip to content</a>
 
 
     <!-- -------------------- NAVIGATION -------------------- -->
@@ -79,13 +79,13 @@
     <header class="header">
 
         <!-- Le bouton met à jour aria-expanded ; aria-controls désigne la liste des liens (navigation-menu.js). -->
-        <nav class="header__nav" aria-label="Navigation principale">
+        <nav class="header__nav" aria-label="Main navigation">
 
             <button
                 class="header__toggle"
                 id="menu-toggle"
                 type="button"
-                aria-label="Ouvrir le menu de navigation"
+                aria-label="Open navigation menu"
                 aria-expanded="false"
                 aria-controls="menu-links"
             >
@@ -99,16 +99,16 @@
                     <img
                         class="header__photo"
                         src="assets/images/profile-small.png"
-                        alt="Photo de profil Axel FOLLET" width="80" height="80"
+                        alt="Profile photo of Axel FOLLET" width="80" height="80"
                     >
                 </span>
 
                 <a class="header__logo" href="#top">AF</a>
 
                 <!-- Le lien de langue garde la section affichée (navigation.js) -->
-                <div class="language-switch" role="group" aria-label="Choisir la langue">
-                    <span class="language-switch__option language-switch__option--active" lang="fr" aria-current="true">FR</span>
-                    <a class="language-switch__option" href="index-en.html" hreflang="en" lang="en" aria-label="English">EN</a>
+                <div class="language-switch" role="group" aria-label="Choose language">
+                    <a class="language-switch__option" href="index.html" hreflang="fr" lang="fr" aria-label="Français">FR</a>
+                    <span class="language-switch__option language-switch__option--active" lang="en" aria-current="true">EN</span>
                 </div>
 
             </div>
@@ -118,16 +118,16 @@
             <span class="header__current"></span>
             <ul class="header__links" id="menu-links">
                 <li>
-                    <a class="header__link" href="#formation">Formation</a>
+                    <a class="header__link" href="#formation">Education</a>
                 </li>
                 <li>
-                    <a class="header__link" href="#experience">Expériences</a>
+                    <a class="header__link" href="#experience">Experience</a>
                 </li>
                 <li>
-                    <a class="header__link" href="#reconversion">Reconversion IT</a>
+                    <a class="header__link" href="#reconversion">IT Career Change</a>
                 </li>
                 <li>
-                    <a class="header__link" href="#projects">Projets</a>
+                    <a class="header__link" href="#projects">Projects</a>
                 </li>
                 <li>
                     <a class="header__link" href="#contact">Contact</a>
@@ -149,22 +149,22 @@
 
             <div class="hero__text">
 
-                <p class="section__eyebrow">CURRICULUM VITAE / 2026</p>
+                <p class="section__eyebrow">RESUME / 2026</p>
 
                 <h1 class="hero__title">
                     Axel<br>
                     <em>FOLLET</em>
                 </h1>
 
-                <p class="hero__role">Chargé de projets IT chez QUANTEAM</p>
+                <p class="hero__role">IT Project Manager at QUANTEAM</p>
 
                 <!-- Phrase d'accroche -->
                 <p class="hero__catchphrase">
-                    Des projets RH aux projets IT&nbsp;: même rigueur, nouveaux outils.
+                    From HR projects to IT projects: same rigour, new tools.
                 </p>
 
                 <div class="button-group">
-                    <a class="button button--primary" href="#formation">Découvrir mon parcours</a>
+                    <a class="button button--primary" href="#formation">Discover my journey</a>
                 </div>
 
             </div>
@@ -189,14 +189,14 @@
         </section>
 
 
-        <!-- -------------------- FORMATION -------------------- -->
+        <!-- -------------------- EDUCATION -------------------- -->
 
         <section class="section section--dark" id="formation" aria-labelledby="formation-title">
 
 
-            <p class="section__eyebrow">01 / FORMATION</p>
+            <p class="section__eyebrow">01 / EDUCATION</p>
 
-            <h2 class="section__title" id="formation-title">Parcours <em>académique</em></h2>
+            <h2 class="section__title" id="formation-title">Academic <em>background</em></h2>
 
             <div class="education__list">
 
@@ -206,14 +206,14 @@
 
                     <h3 class="education__school">Epitech</h3>
 
-                    <p class="education__degree">Architecte des Systèmes d'Information</p>
+                    <p class="education__degree">Information Systems Architect</p>
 
                     <p class="education__text">
-                        Cursus orienté développement logiciel, systèmes et gestion de projets IT.
+                        Computer science program focused on software development, systems and IT project management.
                     </p>
 
                     <p class="education__text">
-                        La pédagogie par projets fait apprendre en construisant&nbsp;: chaque notion est mise en pratique dans un programme rendu et versionné avec Git. Premières étapes&nbsp;: la piscine Python, puis la piscine web.
+                        Project-based learning means learning by building: every concept is put into practice in a program that is submitted and versioned with Git. First steps: the Python bootcamp, then the web bootcamp.
                     </p>
 
                 </article>
@@ -224,10 +224,10 @@
 
                     <h3 class="education__school">Sup des RH & EDC Paris</h3>
 
-                    <p class="education__degree">Double Master - Management du développement RH & Conduite du changement</p>
+                    <p class="education__degree">Dual Master's Degree - Human Resources Development Management & Change Management</p>
 
                     <p class="education__text">
-                        Management des ressources humaines, gestion de projets et conduite du changement, en parallèle de deux années de projets RH chez SFR Distribution.
+                        Human resources management, project management and change management, alongside two years of HR projects at SFR Distribution.
                     </p>
 
                 </article>
@@ -237,17 +237,17 @@
         </section>
 
 
-        <!-- -------------------- EXPÉRIENCES -------------------- -->
+        <!-- -------------------- EXPERIENCE -------------------- -->
 
         <section class="section section--dark" id="experience" aria-labelledby="experience-title">
 
 
-            <p class="section__eyebrow">02 / EXPÉRIENCES</p>
+            <p class="section__eyebrow">02 / EXPERIENCE</p>
 
-            <h2 class="section__title" id="experience-title">Expériences <em>professionnelles</em></h2>
+            <h2 class="section__title" id="experience-title">Professional <em>experience</em></h2>
 
             <p class="section__intro">
-                Du premier stage à la conduite du changement, étape par étape, avec les compétences et outils que chaque poste m'a fait pratiquer.
+                From a first internship to change management, step by step, with the skills and tools each role had me practise.
             </p>
 
             <!-- Frise chronologique, comme la progression du portfolio : le trait bleu descend au fil du défilement (timeline.js). Chaque carré porte l'année de début, et celle de fin si elle diffère. -->
@@ -259,19 +259,19 @@
 
                     <article class="timeline__content">
 
-                        <p class="timeline__period">Décembre 2019</p>
+                        <p class="timeline__period">December 2019</p>
 
                         <h3 class="timeline__title">Enedis</h3>
 
-                        <p class="timeline__role">Assistant RH - Stage</p>
+                        <p class="timeline__role">HR Assistant - Internship</p>
 
                         <p class="timeline__text">
-                            Première expérience professionnelle, au sein d'une équipe RH.
+                            First professional experience, within an HR team.
                         </p>
 
-                        <ul class="timeline__tags" aria-label="Compétences & outils">
-                            <li class="tag">Première expérience professionnelle</li>
-                            <li class="tag">Insertion au domaine RH</li>
+                        <ul class="timeline__tags" aria-label="Skills & tools">
+                            <li class="tag">First professional experience</li>
+                            <li class="tag">Introduction to the Human Resources field</li>
                         </ul>
 
                     </article>
@@ -284,20 +284,20 @@
 
                     <article class="timeline__content">
 
-                        <p class="timeline__period">Novembre 2020 - Décembre 2020</p>
+                        <p class="timeline__period">November 2020 - December 2020</p>
 
                         <h3 class="timeline__title">Natixis</h3>
 
-                        <p class="timeline__role">Chargé SIRH - Stage</p>
+                        <p class="timeline__role">HRIS Officer - Internship</p>
 
                         <p class="timeline__text">
-                            Premier projet géré en autonomie&nbsp;: phase de test d'un outil SIRH, en lien entre les équipes RH et SIRH.
+                            First project managed independently: testing phase of an HRIS tool, acting as the link between the HR and HRIS teams.
                         </p>
 
-                        <ul class="timeline__tags" aria-label="Compétences & outils">
-                            <li class="tag">Premier projet géré en autonomie</li>
-                            <li class="tag">Compréhension d'une phase test dans la création d'un outil</li>
-                            <li class="tag">Lien entre l'équipe RH et SIRH</li>
+                        <ul class="timeline__tags" aria-label="Skills & tools">
+                            <li class="tag">First independently managed project</li>
+                            <li class="tag">Understanding the testing phase involved in developing a tool</li>
+                            <li class="tag">Coordination between the HR and HRIS teams</li>
                         </ul>
 
                     </article>
@@ -310,30 +310,30 @@
 
                     <article class="timeline__content">
 
-                        <p class="timeline__period">Septembre 2021 - Février 2022</p>
+                        <p class="timeline__period">September 2021 - February 2022</p>
 
                         <h3 class="timeline__title">OCP Répartition</h3>
 
-                        <p class="timeline__role">Chargé de recrutement</p>
+                        <p class="timeline__role">Recruitment Officer</p>
 
                         <p class="timeline__text">
-                            Sourcing, préqualifications téléphoniques, entretiens et suivi des recrutements.
+                            Candidate sourcing, phone screening, interviews and recruitment follow-up.
                         </p>
 
                         <p class="timeline__text">
-                            Participation à la conception d'un outil de préparation et de suivi des recrutements sous SmartRecruiters, et formation des managers.
+                            Contributed to designing a recruitment preparation and tracking tool on SmartRecruiters, and trained managers.
                         </p>
 
-                        <ul class="timeline__tags" aria-label="Compétences & outils">
-                            <li class="tag">Sourcing</li>
+                        <ul class="timeline__tags" aria-label="Skills & tools">
+                            <li class="tag">Candidate sourcing</li>
                             <li class="tag">SmartRecruiters</li>
                             <li class="tag">APEC</li>
                             <li class="tag">Pôle Emploi</li>
-                            <li class="tag">Entretiens téléphoniques</li>
-                            <li class="tag">Entretiens Microsoft Teams</li>
-                            <li class="tag">Suivi des recrutements</li>
-                            <li class="tag">Gestion administrative</li>
-                            <li class="tag">Formation des managers</li>
+                            <li class="tag">Telephone interviews</li>
+                            <li class="tag">Microsoft Teams interviews</li>
+                            <li class="tag">Recruitment follow-up</li>
+                            <li class="tag">Administrative management</li>
+                            <li class="tag">Manager training</li>
                         </ul>
 
                     </article>
@@ -346,30 +346,30 @@
 
                     <article class="timeline__content">
 
-                        <p class="timeline__period">Mars 2022 - Juillet 2022</p>
+                        <p class="timeline__period">March 2022 - July 2022</p>
 
                         <h3 class="timeline__title">BPCE Infogérance et Technologies</h3>
 
-                        <p class="timeline__role">Chargé de recrutement</p>
+                        <p class="timeline__role">Recruitment Officer</p>
 
                         <p class="timeline__text">
-                            Pilotage de la campagne d'alternance&nbsp;: 52 alternants recrutés sur des profils IT.
+                            Ran the apprenticeship campaign: 52 apprentices recruited for IT roles.
                         </p>
 
                         <p class="timeline__text">
-                            Relations avec les écoles, tableaux de bord, reporting et communication sur LinkedIn et en forums de recrutement.
+                            Relations with schools, dashboards, reporting and communication on LinkedIn and at recruitment fairs.
                         </p>
 
-                        <ul class="timeline__tags" aria-label="Compétences & outils">
-                            <li class="tag">Gestion de campagne d’alternance</li>
-                            <li class="tag">Recrutement IT</li>
-                            <li class="tag">Travail en autonomie</li>
-                            <li class="tag">Communication LinkedIn</li>
-                            <li class="tag">Tableaux de bord</li>
+                        <ul class="timeline__tags" aria-label="Skills & tools">
+                            <li class="tag">Apprenticeship recruitment campaign management</li>
+                            <li class="tag">IT recruitment</li>
+                            <li class="tag">Independent working</li>
+                            <li class="tag">LinkedIn communication</li>
+                            <li class="tag">Dashboards</li>
                             <li class="tag">Reporting</li>
-                            <li class="tag">Coordination avec les écoles</li>
-                            <li class="tag">Gestion administrative</li>
-                            <li class="tag">Forums recrutement</li>
+                            <li class="tag">Coordination with educational institutions</li>
+                            <li class="tag">Administrative management</li>
+                            <li class="tag">Recruitment fairs</li>
                         </ul>
 
                     </article>
@@ -382,31 +382,31 @@
 
                     <article class="timeline__content">
 
-                        <p class="timeline__period">Septembre 2022 - Octobre 2024</p>
+                        <p class="timeline__period">September 2022 - October 2024</p>
 
                         <h3 class="timeline__title">SFR Distribution</h3>
 
-                        <p class="timeline__role">Chargé de projets RH & Conduite du changement</p>
+                        <p class="timeline__role">HR Project Manager & Change Management</p>
 
                         <p class="timeline__text">
-                            Pilotage et accompagnement de projets RH et de conduite du changement, dont un projet touchant jusqu'à 3 000 collaborateurs.
+                            Led and supported HR and change management projects, including one affecting up to 3,000 employees.
                         </p>
 
                         <p class="timeline__text">
-                            Conception de formations, communication interne, suivi d'indicateurs, reporting et analyse de données sociales.
+                            Training design, internal communication, KPI monitoring, reporting and workforce data analysis.
                         </p>
 
-                        <ul class="timeline__tags" aria-label="Compétences & outils">
-                            <li class="tag">Gestion de projets</li>
-                            <li class="tag">Conduite du changement</li>
-                            <li class="tag">Communication et diplomatie</li>
-                            <li class="tag">Conception de formations</li>
+                        <ul class="timeline__tags" aria-label="Skills & tools">
+                            <li class="tag">Project management</li>
+                            <li class="tag">Change management</li>
+                            <li class="tag">Communication and diplomacy</li>
+                            <li class="tag">Training design</li>
                             <li class="tag">CapCut</li>
                             <li class="tag">Caption</li>
                             <li class="tag">edit2Emotions</li>
-                            <li class="tag">Suivi d'indicateurs</li>
+                            <li class="tag">Performance indicator monitoring</li>
                             <li class="tag">Reporting</li>
-                            <li class="tag">Analyse de données sociales</li>
+                            <li class="tag">Social data analysis</li>
                         </ul>
 
                     </article>
@@ -416,7 +416,7 @@
             </ol>
 
 
-            <!-- Cube de transition, en bas à gauche de la section -->
+            <!-- Transition cube, bottom left of the section -->
             <span
                 class="cube cube--tiny cube--blue cube--transition"
                 aria-hidden="true"
@@ -427,41 +427,41 @@
         </section>
 
 
-        <!-- -------------------- RECONVERSION IT -------------------- -->
+        <!-- -------------------- IT CAREER CHANGE -------------------- -->
 
         <section class="section section--dark" id="reconversion" aria-labelledby="reconversion-title">
 
             <div class="career__banner">
 
                 <p class="section__eyebrow career__number">
-                    03 / RECONVERSION IT
+                    03 / IT CAREER CHANGE
                 </p>
 
 
                 <!-- -------------------- INTRODUCTION -------------------- -->
 
-                <!-- Deux colonnes : le parcours à gauche, l'objectif à droite -->
+                <!-- Two columns: the path on the left, the goal on the right -->
                 <div class="career__intro">
 
                     <div class="career__story">
 
                     <h2 id="reconversion-title">
-                        Du pilotage de projets RH
-                        au monde de <em>l'informatique</em>&nbsp;!
+                        From HR project management
+                        to the world of <em>IT</em>!
                     </h2>
 
                     <p>
-                        Après plusieurs années en ressources humaines, dont deux à piloter des projets de conduite du changement chez SFR Distribution, j'ai rejoint Epitech en 2026 pour me former à un domaine qui m'a toujours attiré.
+                        After several years in human resources, including two managing change projects at SFR Distribution, I joined Epitech in 2026 to train in a field that has always appealed to me.
                     </p>
 
                     </div>
 
                     <div class="career__goal">
 
-                        <p class="career__goal-label">Mon objectif</p>
+                        <p class="career__goal-label">My goal</p>
 
                         <p class="career__goal-text">
-                            Progresser dans les différents domaines de l'informatique, avec une appétence pour la gestion de projets IT et la data science.
+                            Keep progressing across the different fields of IT, with a keen interest in IT project management and data science.
                         </p>
 
                     </div>
@@ -469,11 +469,11 @@
                 </div>
 
 
-                <!-- -------------------- COMPÉTENCES TECHNIQUES -------------------- -->
+                <!-- -------------------- TECHNICAL SKILLS -------------------- -->
 
                 <div class="career__skills skills">
 
-                    <!-- Cube blanc -->
+                    <!-- White cube -->
                     <span
                         class="cube cube--medium cube--white career__cube"
                         aria-hidden="true"
@@ -483,7 +483,7 @@
 
 
                     <h3>
-                        Compétences en cours d'acquisition
+                        Skills currently being developed
                     </h3>
 
 
@@ -494,7 +494,7 @@
                         <li>JavaScript</li>
                         <li>Java</li>
                         <li>Git</li>
-                        <li>IA</li>
+                        <li>AI</li>
                     </ul>
 
                 </div>
@@ -502,7 +502,7 @@
             </div>
 
 
-            <!-- Cube de transition, en bas à gauche de la section -->
+            <!-- Transition cube, bottom left of the section -->
             <span
                 class="cube cube--tiny cube--blue cube--transition"
                 aria-hidden="true"
@@ -513,16 +513,16 @@
         </section>
 
 
-        <!-- -------------------- PROJETS -------------------- -->
+        <!-- -------------------- PROJECTS -------------------- -->
 
         <section class="section section--dark" id="projects" aria-labelledby="projects-title">
 
-            <p class="section__eyebrow">04 / PROJETS</p>
+            <p class="section__eyebrow">04 / PROJECTS</p>
 
-            <h2 class="section__title" id="projects-title">Mes projets <em>techniques</em></h2>
+            <h2 class="section__title" id="projects-title">My <em>technical</em> projects</h2>
 
 
-            <!-- Grille des projets : le portfolio en grande carte carrée à gauche, deux cartes rectangulaires empilées à droite. Chaque carte garde les compétences utilisées, le code sur GitHub et un essai. -->
+            <!-- Projects grid: the portfolio as a large square card on the left, two stacked rectangular cards on the right. Each card keeps the skills used, the code on GitHub and a way to try it. -->
             <!-- Enveloppe : ses dimensions servent de repère aux unités cqw de la grille (projects.css). -->
             <div class="projects__layout">
             <div class="projects__grid">
@@ -537,18 +537,18 @@
 
                     <span class="cube cube--white project-card__cube" aria-hidden="true" data-speed="16" data-phase="35"></span>
 
-                    <h3>Mon portfolio</h3>
+                    <h3>My portfolio</h3>
 
                     <p class="project-card__text">
-                        Mon site vitrine, en français et en anglais&nbsp;: des projets à tester en direct, des compétences reliées à chaque projet et le chemin parcouru depuis la gestion de projets RH.
+                        My showcase site, in French and English: projects you can try live, skills tied to each project and the path from HR project management to IT.
                     </p>
 
-                    <ul class="project-card__tags" aria-label="Compétences utilisées">
+                    <ul class="project-card__tags" aria-label="Skills used">
                         <li>HTML</li>
                         <li>CSS</li>
                         <li>JavaScript</li>
-                        <li>Accessibilité</li>
-                        <li>Référencement</li>
+                        <li>Accessibility</li>
+                        <li>SEO</li>
                         <li>GitHub Pages</li>
                     </ul>
 
@@ -558,13 +558,13 @@
                             href="https://github.com/Axel-FOLLET/portfolio"
                             target="_blank"
                             rel="noopener noreferrer"
-                        >Voir sur GitHub<span class="visually-hidden"> : Mon portfolio (nouvel onglet)</span></a>
+                        >View on GitHub<span class="visually-hidden"> : My portfolio (new tab)</span></a>
                         <a
                             class="button button--primary project-card__action"
-                            href="https://axel-follet.github.io/portfolio/"
+                            href="https://axel-follet.github.io/portfolio/index-en.html"
                             target="_blank"
                             rel="noopener noreferrer"
-                        >Tester<span class="visually-hidden"> : Mon portfolio (nouvel onglet)</span></a>
+                        >Try it<span class="visually-hidden"> : My portfolio (new tab)</span></a>
                     </div>
 
                 </article>
@@ -574,33 +574,33 @@
 
                 <article class="project-card" data-hover="cipher">
 
-                    <h3>Chiffrements de <span data-cipher>César</span> et de Vigenère</h3>
+                    <h3><span data-cipher>Caesar</span> and Vigenère ciphers</h3>
 
                     <p class="project-card__text">
-                        Exercice de la piscine Python&nbsp;: chiffrer et déchiffrer avec César (décalage fixe) et Vigenère (décalage donné par un mot-clé), puis <strong>retrouver seul la clé d'un César</strong>.
+                        Python bootcamp exercise: encrypting and decrypting with Caesar (fixed shift) and Vigenère (shift given by a keyword), then <strong>recovering a Caesar key on its own</strong>.
                     </p>
 
-                    <ul class="project-card__tags" aria-label="Compétences utilisées">
+                    <ul class="project-card__tags" aria-label="Skills used">
                         <li>Python</li>
-                        <li>Algorithmique</li>
-                        <li>Chaînes de caractères</li>
-                        <li>Analyse de fréquences</li>
+                        <li>Algorithms</li>
+                        <li>Strings</li>
+                        <li>Frequency analysis</li>
                     </ul>
 
                     <div class="project-card__actions">
                         <a
                             class="button project-card__action project-card__link"
-                            href="https://github.com/Axel-FOLLET/Axou/tree/main/piscine_python/chiffrement"
+                            href="https://github.com/Axel-FOLLET/Axou/tree/main/03_algorithms/chiffrement"
                             target="_blank"
                             rel="noopener noreferrer"
-                        >Voir sur GitHub<span class="visually-hidden"> : Chiffrements de César et de Vigenère (nouvel onglet)</span></a>
+                        >View on GitHub<span class="visually-hidden"> : Caesar and Vigenère ciphers (new tab)</span></a>
                         <a
                             class="button button--primary project-card__action"
-                            href="https://axel-follet.github.io/portfolio/index.html#projects/cesar-vigenere"
+                            href="https://axel-follet.github.io/portfolio/index-en.html#projects/cesar-vigenere"
                             target="_blank"
                             rel="noopener noreferrer"
-                            aria-label="Tester la démo sur le portfolio (nouvel onglet)"
-                        >Tester</a>
+                            aria-label="Try the demo on the portfolio (new tab)"
+                        >Try it</a>
                     </div>
 
                 </article>
@@ -612,34 +612,34 @@
 
                     <span class="project-card__hover-zone" aria-hidden="true" data-hover-zone></span>
 
-                    <h3>Jeu du Snake</h3>
+                    <h3>Snake</h3>
 
                     <p class="project-card__text">
-                        <strong>Un Snake complet, en projet personnel après le Pendu</strong>&nbsp;: déplacements au clavier, collisions, pommes, score et effets visuels.
+                        <strong>A complete Snake, a personal project built after Hangman</strong>: keyboard movement, collisions, apples, score and visual effects.
                     </p>
 
-                    <ul class="project-card__tags" aria-label="Compétences utilisées">
+                    <ul class="project-card__tags" aria-label="Skills used">
                         <li>Python</li>
                         <li>Pygame</li>
-                        <li>Événements clavier</li>
+                        <li>Keyboard events</li>
                         <li>Collisions</li>
-                        <li>Organisation en modules</li>
+                        <li>Modular code</li>
                     </ul>
 
                     <div class="project-card__actions">
                         <a
                             class="button project-card__action project-card__link"
-                            href="https://github.com/Axel-FOLLET/Axou/tree/main/jeux/jeu_du_snake"
+                            href="https://github.com/Axel-FOLLET/Axou/tree/main/02_games/jeu_du_snake"
                             target="_blank"
                             rel="noopener noreferrer"
-                        >Voir sur GitHub<span class="visually-hidden"> : Jeu du Snake (nouvel onglet)</span></a>
+                        >View on GitHub<span class="visually-hidden"> : Snake (new tab)</span></a>
                         <a
                             class="button button--primary project-card__action"
-                            href="https://axel-follet.github.io/portfolio/index.html#projects/snake"
+                            href="https://axel-follet.github.io/portfolio/index-en.html#projects/snake"
                             target="_blank"
                             rel="noopener noreferrer"
-                            aria-label="Tester la démo sur le portfolio (nouvel onglet)"
-                        >Tester</a>
+                            aria-label="Try the demo on the portfolio (new tab)"
+                        >Try it</a>
                     </div>
 
                 </article>
@@ -656,18 +656,18 @@
 
             <p class="section__eyebrow">05 / CONTACT</p>
 
-            <h2 class="section__title" id="contact-title">Me <em>contacter</em></h2>
+            <h2 class="section__title" id="contact-title">Get in <em>touch</em></h2>
 
             <p class="section__intro">
-                Une opportunité, un projet ou une question sur mon parcours&nbsp;? Le formulaire ci-dessous m'arrive directement&nbsp;; LinkedIn et mon GitHub sont aussi à portée de clic.
+                An opportunity, a project or a question about my background? The form below reaches me directly; LinkedIn and my GitHub are also one click away.
             </p>
 
-            <a class="button contact__resume" href="assets/CV_Axel_FOLLET_FR.pdf" download="CV_Axel_FOLLET_FR.pdf">
+            <a class="button contact__resume" href="assets/CV_Axel_FOLLET_EN.pdf" download="CV_Axel_FOLLET_EN.pdf">
                 <!-- Pictogramme : flèche de téléchargement -->
                 <svg class="button__icon" viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>
                 </svg>
-                Télécharger mon CV (PDF)
+                Download my resume (PDF)
             </a>
 
 
@@ -689,7 +689,7 @@
                         <svg class="link-card__icon" viewBox="0 0 24 24" aria-hidden="true">
                             <path d="M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/>
                         </svg>
-                        <span class="link-card__label">Tout mon code</span>
+                        <span class="link-card__label">All my code</span>
                         <span class="link-card__hint">github.com/Axel-FOLLET</span>
                     </a>
                 </li>
@@ -709,32 +709,32 @@
                         id="contact-form"
                         action="https://formspree.io/f/xaenbdqw"
                         method="POST"
-                        data-sending="Envoi en cours…"
-                        data-success="Merci, votre message a bien été envoyé."
-                        data-sent="Envoyé"
-                        data-error="L'envoi a échoué. Vérifiez votre connexion puis réessayez, ou contactez-moi sur LinkedIn."
-                        data-invalid-required="Ce champ est obligatoire."
-                        data-invalid-email="Adresse e-mail invalide (exemple&nbsp;: nom@domaine.fr)."
+                        data-sending="Sending…"
+                        data-success="Thank you, your message has been sent."
+                        data-sent="Sent"
+                        data-error="Sending failed. Check your connection and try again, or contact me on LinkedIn."
+                        data-invalid-required="This field is required."
+                        data-invalid-email="Invalid email address (example: name@domain.com)."
                     >
 
                         <div class="form__row">
                             <div class="form__field">
-                                <label class="form__label" for="surname">Nom</label>
+                                <label class="form__label" for="surname">Last name</label>
                                 <input class="form__input" type="text" id="surname" name="surname" autocomplete="family-name" required>
                             </div>
                             <div class="form__field">
-                                <label class="form__label" for="name">Prénom</label>
+                                <label class="form__label" for="name">First name</label>
                                 <input class="form__input" type="text" id="name" name="name" autocomplete="given-name" required>
                             </div>
                         </div>
 
                         <div class="form__field">
-                            <label class="form__label" for="email">E-mail</label>
+                            <label class="form__label" for="email">Email</label>
                             <input class="form__input" type="email" id="email" name="email" autocomplete="email" required>
                         </div>
 
                         <div class="form__field">
-                            <label class="form__label" for="subject">Sujet (facultatif)</label>
+                            <label class="form__label" for="subject">Subject (optional)</label>
                             <input class="form__input" type="text" id="subject" name="subject">
                         </div>
 
@@ -746,9 +746,9 @@
                         <!-- Champ piège contre les robots : invisible pour les visiteurs, Formspree rejette l'envoi s'il est rempli -->
                         <input class="form__trap" type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true">
 
-                        <button class="button button--primary" type="submit">Envoyer</button>
+                        <button class="button button--primary" type="submit">Send</button>
 
-                        <p class="form__notice">Tous les champs sont obligatoires, sauf le sujet.<a href="#donnees-formulaire">Utilisation de vos données</a></p>
+                        <p class="form__notice">All fields are required except the subject.<a href="#donnees-formulaire">How your data is used</a></p>
 
                         <!-- Message de confirmation ou d'erreur, lu par les lecteurs d'écran -->
                         <p class="form__status" id="form-status" role="status" aria-live="polite"></p>
@@ -786,10 +786,10 @@
 
         <!-- Dernier appel : la page se referme sur une invitation, vers LinkedIn et le portfolio -->
         <div class="footer__cta">
-            <p class="footer__cta-title">Travaillons <em>ensemble</em>.</p>
+            <p class="footer__cta-title">Let's work <em>together</em>.</p>
             <div class="button-group">
-                <a class="button button--primary" href="https://www.linkedin.com/in/axel-follet/" target="_blank" rel="noopener noreferrer">Échanger sur LinkedIn<span class="visually-hidden"> (nouvel onglet)</span></a>
-                <a class="button" href="https://axel-follet.github.io/portfolio/" target="_blank" rel="noopener noreferrer">Voir mon portfolio<span class="visually-hidden"> (nouvel onglet)</span></a>
+                <a class="button button--primary" href="https://www.linkedin.com/in/axel-follet/" target="_blank" rel="noopener noreferrer">Connect on LinkedIn<span class="visually-hidden"> (new tab)</span></a>
+                <a class="button" href="https://axel-follet.github.io/portfolio/index-en.html" target="_blank" rel="noopener noreferrer">View my portfolio<span class="visually-hidden"> (new tab)</span></a>
             </div>
         </div>
 
@@ -798,36 +798,36 @@
             <div>
                 <p class="footer__title">Navigation</p>
                 <ul class="footer__list">
-                    <li><a href="#home">Accueil</a></li>
-                    <li><a href="#formation">Formation</a></li>
-                    <li><a href="#experience">Expériences</a></li>
-                    <li><a href="#reconversion">Reconversion IT</a></li>
-                    <li><a href="#projects">Projets</a></li>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#formation">Education</a></li>
+                    <li><a href="#experience">Experience</a></li>
+                    <li><a href="#reconversion">IT Career Change</a></li>
+                    <li><a href="#projects">Projects</a></li>
                     <li><a href="#contact">Contact</a></li>
                 </ul>
             </div>
 
             <div>
-                <p class="footer__title">Liens</p>
+                <p class="footer__title">Links</p>
                 <ul class="footer__list">
-                    <li><a href="https://axel-follet.github.io/portfolio/" target="_blank" rel="noopener noreferrer">Mon portfolio<span class="visually-hidden"> (nouvel onglet)</span></a></li>
-                    <li><a href="https://www.linkedin.com/in/axel-follet/" target="_blank" rel="noopener noreferrer">LinkedIn<span class="visually-hidden"> (nouvel onglet)</span></a></li>
-                    <li><a href="https://github.com/Axel-FOLLET" target="_blank" rel="noopener noreferrer">GitHub<span class="visually-hidden"> (nouvel onglet)</span></a></li>
+                    <li><a href="https://axel-follet.github.io/portfolio/index-en.html" target="_blank" rel="noopener noreferrer">My portfolio<span class="visually-hidden"> (new tab)</span></a></li>
+                    <li><a href="https://www.linkedin.com/in/axel-follet/" target="_blank" rel="noopener noreferrer">LinkedIn<span class="visually-hidden"> (new tab)</span></a></li>
+                    <li><a href="https://github.com/Axel-FOLLET" target="_blank" rel="noopener noreferrer">GitHub<span class="visually-hidden"> (new tab)</span></a></li>
                 </ul>
             </div>
 
             <div>
-                <p class="footer__title">Ressources et crédits</p>
+                <p class="footer__title">Resources and credits</p>
                 <p class="footer__credits">
-                    Photo et textes&nbsp;: créations personnelles d'Axel FOLLET. Les cubes 3D et les icônes sont réalisés en HTML, CSS et JavaScript, sauf le logo LinkedIn. LinkedIn® et le logo [in]® sont des marques de LinkedIn Corporation et de ses sociétés affiliées. Ce site personnel n’est ni affilié à LinkedIn ni approuvé par LinkedIn. Police Manrope (The Manrope Project Authors), sous <a href="assets/fonts/OFL-Manrope.txt">licence SIL Open Font License 1.1</a>, hébergée avec le site.
+                    Photo and texts: original work by Axel FOLLET. The 3D cubes and icons are made with HTML, CSS and JavaScript, except the LinkedIn logo. LinkedIn® and the [in]® logo are trademarks of LinkedIn Corporation and its affiliates. This personal website is neither affiliated with nor endorsed by LinkedIn. Manrope typeface (The Manrope Project Authors), under the <a href="assets/fonts/OFL-Manrope.txt">SIL Open Font License 1.1</a>, hosted with the site.
                 </p>
                 <details class="footer__legal">
-                    <summary class="footer__legal-toggle">Mentions légales et données</summary>
-                    <p><strong>Éditeur et directeur de la publication&nbsp;:</strong> Axel FOLLET, particulier, site personnel non professionnel. Contact&nbsp;: formulaire du site ou LinkedIn.</p>
-                    <p><strong>Hébergeur&nbsp;:</strong> GitHub, Inc. (GitHub Pages), 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, États-Unis, <a href="https://support.github.com/" target="_blank" rel="noopener noreferrer" hreflang="en">support.github.com</a>. Pour la sécurité, GitHub enregistre l'adresse IP des visiteurs.</p>
-                    <p id="donnees-formulaire"><strong>Formulaire de contact&nbsp;:</strong> responsable du traitement, Axel FOLLET. Nom, prénom, e-mail et message sont obligatoires&nbsp;; le sujet est facultatif. Ces données servent uniquement à vous répondre, sur la base de l'intérêt légitime à traiter votre demande. Elles transitent par Formspree, Inc., aux États-Unis, qui les conserve selon sa <a href="https://formspree.io/legal/privacy-policy" target="_blank" rel="noopener noreferrer" hreflang="en">politique de confidentialité</a>, et sont supprimées 12 mois après notre dernier échange. Vous pouvez demander l'accès à vos données, leur rectification, leur effacement ou la limitation de leur traitement, ou vous y opposer, par le formulaire ou LinkedIn, et adresser une réclamation à la <a href="https://www.cnil.fr/fr/plaintes" target="_blank" rel="noopener noreferrer">CNIL</a>.</p>
-                    <p><strong>Navigateur&nbsp;:</strong> aucun cookie ni mesure d'audience. Le site garde seulement sur votre appareil la réponse à la protection anti-robot du formulaire jusqu'à la fermeture de l'onglet.</p>
-                    <p><strong>Propriété intellectuelle&nbsp;:</strong> textes, photo, mise en page et code source © 2026 Axel FOLLET, tous droits réservés. Le code est public sur GitHub pour être lu&nbsp;; toute réutilisation demande mon accord. La police Manrope et le logo LinkedIn restent sous leurs propres licences et marques.</p>
+                    <summary class="footer__legal-toggle">Legal notice and data</summary>
+                    <p><strong>Publisher and publication director:</strong> Axel FOLLET, private individual, personal non-professional website. Contact: the site form or LinkedIn.</p>
+                    <p><strong>Host:</strong> GitHub, Inc. (GitHub Pages), 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, United States, <a href="https://support.github.com/" target="_blank" rel="noopener noreferrer">support.github.com</a>. For security purposes, GitHub logs visitors' IP addresses.</p>
+                    <p id="donnees-formulaire"><strong>Contact form:</strong> data controller, Axel FOLLET. Last name, first name, email and message are required; the subject is optional. This data is used only to reply to you, on the basis of the legitimate interest in handling your request. It goes through Formspree, Inc., in the United States, which keeps it under its <a href="https://formspree.io/legal/privacy-policy" target="_blank" rel="noopener noreferrer">privacy policy</a>, and is deleted 12 months after our last exchange. You can ask to access, rectify or erase your data or to restrict its processing, or object to it, through the form or LinkedIn, and lodge a complaint with the <a href="https://www.cnil.fr/fr/plaintes" hreflang="fr" target="_blank" rel="noopener noreferrer">CNIL</a> (French data protection authority; complaint page in French).</p>
+                    <p><strong>Browser:</strong> no cookies and no audience tracking. The site only keeps your answer to the form's anti-robot check on your device until the tab is closed.</p>
+                    <p><strong>Intellectual property:</strong> texts, photo, layout and source code © 2026 Axel FOLLET, all rights reserved. The code is public on GitHub to be read; any reuse requires my permission. The Manrope typeface and the LinkedIn logo remain under their own licences and trademarks.</p>
                 </details>
             </div>
 
@@ -835,8 +835,8 @@
 
         <!-- Dernière ligne : droits à gauche, retour en haut à droite -->
         <div class="footer__bottom">
-            <p class="footer__copyright">&copy; 2026 Axel FOLLET, tous droits réservés</p>
-            <a class="footer__top" href="#top">Retour en haut ↑</a>
+            <p class="footer__copyright">&copy; 2026 Axel FOLLET, all rights reserved</p>
+            <a class="footer__top" href="#top">Back to top ↑</a>
         </div>
 
     </footer>

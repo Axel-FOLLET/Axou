@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <!-- Toutes plateformes (mission catgame_monde, P) : `viewport-fit=cover` pour dessiner sous les
+       encoches (les zones de sécurité sont rendues par env(safe-area-inset-*) ci-dessous). Pas de
+       `maximum-scale` : le zoom de la page est bloqué par `touch-action: none` (et `gesturestart`
+       dans main.js pour Safari iOS), sans retirer le zoom d'accessibilité des autres pages. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#ffe9cc">
+  <title>catGame — prototype chat</title>
+  <style>
+    /* Style « dessin animé doux » (2026-10-25) : couleurs de src/style/palette.js (RENDER.background
+       et HUD), règles dans docs/recherche/style.md § 5 « Interface ». */
+    :root {
+      --hud-bg: rgba(255, 248, 236, 0.9);   /* palette.js HUD.background */
+      --hud-text: #5a4335;                   /* HUD.text */
+      --hud-border: #f2d6b8;                 /* HUD.border */
+      --hud-shadow: 0 4px 14px rgba(150, 100, 60, 0.18); /* HUD.shadow */
+      --btn-bg: #ffc9a8;                     /* pêche clair (texte brun : contraste ≈ 6:1) */
+      --btn-bg-hover: #ffb48c;
+      --btn-accent: #ff9f7a;                 /* HUD.accent */
+      --font: ui-rounded, "SF Pro Rounded", "Segoe UI Rounded", "Arial Rounded MT Bold", "Nunito", system-ui, sans-serif;
+      --gap: 12px;
+      --safe-t: max(var(--gap), env(safe-area-inset-top));
+      --safe-r: max(var(--gap), env(safe-area-inset-right));
+      --safe-b: max(var(--gap), env(safe-area-inset-bottom));
+      --safe-l: max(var(--gap), env(safe-area-inset-left));
+    }
+    /* Aucune page qui défile, rebondit ou zoome : tout geste va au jeu. */
+    html, body {
+      margin: 0; height: 100%; overflow: hidden; background: #ffe9cc;
+      overscroll-behavior: none; touch-action: none;
+      -webkit-user-select: none; user-select: none;
+      -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent;
+      -webkit-text-size-adjust: 100%; text-size-adjust: 100%;
+    }
+    #app { position: fixed; inset: 0; }
+    #app canvas { display: block; touch-action: none; }
+    [hidden] { display: none !important; }
+
+    /* HUD : pastille crème arrondie, texte brun chaud, en haut à gauche (le chat est au centre). */
+    #hud {
+      position: fixed; left: var(--safe-l); top: var(--safe-t); box-sizing: border-box;
+      max-width: min(380px, calc(100vw - var(--safe-l) - var(--safe-r)));
+      padding: 8px 8px 8px 14px;
+      font: 600 13px/1.45 var(--font);
+      color: var(--hud-text); background: var(--hud-bg);
+      border: 2px solid var(--hud-border); border-radius: 18px;
+      box-shadow: var(--hud-shadow);
+      overflow-wrap: anywhere; pointer-events: none;
+    }
+    #hud-row { display: flex; align-items: center; gap: 8px; }
+    #hud-state { flex: 1; min-width: 0; }
+    #hud-help { margin: 6px 6px 0 0; padding: 0; list-style: none; }
+    #hud-help li { padding: 1px 0; }
+    #hud-help b { font-weight: 800; }
+    #hud-fps { margin-top: 4px; font-size: 11px; opacity: 0.75; }
+    #hud.collapsed #hud-help, #hud.collapsed #hud-fps { display: none; }
+    /* Bouton « Aide » : seul élément du HUD qui reçoit les clics. */
+    #hud-toggle {
+      pointer-events: auto; flex: none; min-width: 44px; min-height: 44px; padding: 0 12px;
+      font: 700 13px/1 var(--font); color: var(--hud-text); background: var(--btn-bg);
+      border: 2px solid #ffffff; border-radius: 999px; cursor: pointer; touch-action: manipulation;
+    }
+
+    /* Boutons d'action, en bas à droite : pelote (gros) et visière. Cibles ≥ 48 px. */
+    #actions {
+      position: fixed; right: var(--safe-r); bottom: var(--safe-b); z-index: 10;
+      display: flex; flex-direction: column; align-items: flex-end; gap: 10px;
+    }
+    .action {
+      box-sizing: border-box; min-height: 48px; min-width: 48px; padding: 10px 18px;
+      font: 700 15px/1.2 var(--font); color: var(--hud-text); background: var(--btn-bg);
+      border: 2px solid #ffffff; border-radius: 999px; cursor: pointer;
+      box-shadow: 0 4px 14px rgba(150, 100, 60, 0.25); touch-action: manipulation;
+    }
+    .action kbd { font: inherit; opacity: 0.7; }
+    #btn-yarn { min-height: 60px; padding: 12px 22px; font-size: 17px; }
+    #btn-yarn .dot {
+      display: inline-block; width: 18px; height: 18px; margin-right: 8px; vertical-align: -3px;
+      border-radius: 50%; background: radial-gradient(circle at 35% 35%, #ffc4cf, #ff8fa6 60%, #e0687f);
+    }
+    #hud-toggle:hover, .action:hover { background: var(--btn-bg-hover); }
+    #hud-toggle:active, .action:active { background: var(--btn-accent); transform: scale(0.97); }
+    #hud-toggle:focus-visible, .action:focus-visible { outline: 3px solid #ffd27a; outline-offset: 2px; }
+    /* Raccourcis clavier affichés seulement en mode souris (classe posée par main.js). */
+    body.touch .action kbd { display: none; }
+
+    /* Petit écran (téléphone portrait ou paysage) : HUD plus compact. */
+    @media (max-width: 600px), (max-height: 500px) {
+      #hud { font-size: 12px; padding: 6px 6px 6px 12px; max-width: min(340px, calc(100vw - var(--safe-l) - var(--safe-r))); }
+      .action { font-size: 14px; }
+      #btn-yarn { min-height: 56px; font-size: 16px; }
+    }
+    /* Paysage très bas : boutons côte à côte pour ne pas monter dans la scène. */
+    @media (max-height: 500px) {
+      #actions { flex-direction: row-reverse; align-items: flex-end; }
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <div id="hud">
+    <div id="hud-row">
+      <span id="hud-state">Chargement du chat…</span>
+      <button id="hud-toggle" type="button" aria-controls="hud-help" aria-expanded="true" hidden>Aide</button>
+    </div>
+    <ul id="hud-help"></ul>
+    <div id="hud-fps"></div>
+  </div>
+  <div id="actions">
+    <button id="btn-visor" class="action" type="button" hidden>Visière <kbd>(V)</kbd></button>
+    <button id="btn-yarn" class="action" type="button" hidden><span class="dot"></span>Lancer la pelote <kbd>(P)</kbd></button>
+  </div>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
