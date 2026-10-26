@@ -1,6 +1,6 @@
 """Mesure des proportions du chat (maillage au repos) et comparaison aux rapports de recherche.
 
-Usage (Windows, Git Bash, depuis la racine de catGame ; ~20 s par lancement) :
+Usage (Windows, Git Bash, depuis la racine de Lost ; ~20 s par lancement) :
   B="/c/Program Files/Blender Foundation/Blender 4.5/blender.exe"
   "$B" -b assets/sources/cat.blend --python tools/measure_cat.py -- [--raw]
 
@@ -69,7 +69,7 @@ _saved = sys.argv
 sys.argv = [sys.argv[0], "--", "--raw"]
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(os.getcwd(), "tools"))
-import jeux.catGame.tools.anim_cat as A
+import anim_cat as A
 sys.argv = _saved
 
 arm, cat = A.arm, A.cat

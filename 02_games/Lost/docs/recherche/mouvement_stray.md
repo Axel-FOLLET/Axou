@@ -1,6 +1,6 @@
 # Mouvement du chat de *Stray* : mesures image par image
 
-Agent A4, mission `chat_recherche` (2026-10-22). Ce rapport complète les § 8.3 et 8.4 de `catGame/README.md` (lignes 194-220 de ce fichier) avec des mesures nouvelles : durées, cadences, ordre des appuis quand il est lisible, port de tête et de queue, angles estimés. Il ne refait pas les sources écrites du § 8.2.
+Agent A4, mission `chat_recherche` (2026-10-22). Ce rapport complète les § 8.3 et 8.4 de `Lost/README.md` (lignes 194-220 de ce fichier) avec des mesures nouvelles : durées, cadences, ordre des appuis quand il est lisible, port de tête et de queue, angles estimés. Il ne refait pas les sources écrites du § 8.2.
 
 ## 1. Méthode
 
@@ -251,5 +251,5 @@ Vidéos YouTube regardées (titres lus dans les métadonnées de yt-dlp) :
 
 Adresse de chaque vidéo : `https://www.youtube.com/watch?v=<identifiant>`.
 
-- Document interne : `catGame/README.md`, § 8.1-8.4 (lignes 164-220), lecture seule.
+- Document interne : `Lost/README.md`, § 8.1-8.4 (lignes 164-220), lecture seule.
 - Aucune source web écrite n'a été consultée pour ce rapport.

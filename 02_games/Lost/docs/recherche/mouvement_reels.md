@@ -157,4 +157,4 @@ Vidéos YouTube, consultées le 2026-10-22, pour observation seulement. Identifi
 - DoHi6k2omt8, IrrelevantOwl, 2013-06-07, « Sleepy Cute Cat Having a Yawn and Stretch ».
 - Téléchargées mais non analysées : M2ORiMUKUOc (Peter Falkingham), 6BSCDiGZTpc (Tom & Mimi Extras), 5no0VfXDj4s (Animation Reference, compilation), H_0CxD25pd4 (Harriet Murray).
 
-Code comparé : `catGame/tools/anim_cat.py` (lecture seule ; numéros de ligne de ce seul fichier).
+Code comparé : `Lost/tools/anim_cat.py` (lecture seule ; numéros de ligne de ce seul fichier).

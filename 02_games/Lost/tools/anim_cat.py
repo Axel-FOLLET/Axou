@@ -5,7 +5,7 @@ rig fait le reste. Un os `Root` ajouté au-dessus de tous les os racines porte l
 dos) et la translation globale. Chaque pose est remise au sol automatiquement (sommet le plus bas
 du maillage évalué). Les clips sont cuits os par os dans le GLB (tous les os, contrôleurs compris).
 
-Usage (Windows, Git Bash, depuis la racine de catGame ; ~20 s par lancement) :
+Usage (Windows, Git Bash, depuis la racine de Lost ; ~20 s par lancement) :
   B="/c/Program Files/Blender Foundation/Blender 4.5/blender.exe"
   "$B" -b assets/sources/cat.blend --python tools/anim_cat.py -- preview <action> <frame>... [--views side,front,top,persp]
   "$B" -b assets/sources/cat.blend --python tools/anim_cat.py -- export public/models/cat.glb

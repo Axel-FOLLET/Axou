@@ -1,7 +1,7 @@
-# catGame — carnet de conception
+# Lost — carnet de conception
 
-Projet : jeu dans le navigateur avec le chat et la prairie (dossier `catGame/`, nommé `portfolio2/` jusqu'au 2026-10-23). Il a commencé comme un nouveau portfolio destiné à remplacer `Axou/portfolio` (dépôt GitHub `Axel-FOLLET/portfolio`, v3.1) ; le 2026-10-23 l'utilisateur a changé l'objectif (§ 0) en gardant toute la progression sur le chat.
-Rôles : l'utilisateur pilote l'idée et les choix ; Claude conçoit et réalise. Les commits, push et serveurs restent à l'utilisateur. 2026-10-22 : « le portfolio est notre projet à deux, tu as tous les droits sur ce dossier » (l'utilisateur) ; le contrôle d'écriture demande toutefois que chaque accord nomme ses fichiers cibles, en chemins absolus pour un dossier (`/home/Axou/Axou/catGame`).
+Projet : jeu dans le navigateur avec le chat et la prairie (dossier `02_games/Lost/`, nommé `catGame/` jusqu'au 2026-10-26 et `portfolio2/` jusqu'au 2026-10-23). Il a commencé comme un nouveau portfolio destiné à remplacer `Axou/portfolio` (dépôt GitHub `Axel-FOLLET/portfolio`, v3.1) ; le 2026-10-23 l'utilisateur a changé l'objectif (§ 0) en gardant toute la progression sur le chat.
+Rôles : l'utilisateur pilote l'idée et les choix ; Claude conçoit et réalise. Les commits, push et serveurs restent à l'utilisateur. 2026-10-22 : « le portfolio est notre projet à deux, tu as tous les droits sur ce dossier » (l'utilisateur) ; le contrôle d'écriture demande toutefois que chaque accord nomme ses fichiers cibles, en chemins absolus pour un dossier (`/home/Axou/Axou/02_games/Lost`).
 Ce fichier est la mémoire du projet : pitch, faits vérifiés, décisions, questions ouvertes, outils. Mettre à jour à chaque décision.
 
 ## 0. Objectif actuel : un jeu de chat (décidé le 2026-10-23)
@@ -19,6 +19,8 @@ Idées retenues par l'utilisateur (réponses du 2026-10-23 à la liste proposée
 Écarté : cache-cache dans les hautes herbes (non).
 
 Non décidé : ordre de réalisation, forme du jeu (une prairie unique avec toutes les activités, ou des niveaux), score ou pas, et ce que devient la partie « portfolio » (abandonnée ou page à part). À trancher quand le chat sera fini.
+
+**2026-10-26 : le jeu s'appelle « Lost »**, et son but est de retrouver la maman chat (scénario, lieux et personnages : journal § 6). L'idée 2 change : le joueur ne lance plus la pelote, des lance-pelotes sont posés sur la carte.
 
 **Où on en est (2026-10-25, mission catgame_jeu)** : première version jouable des idées 1 et 2, et décor, dans le code. Rien n'a encore été vu dans un navigateur (serveur absent pendant la mission).
 - Prairie à herbe et fleurs hautes : le chat doit paraître petit (« un ado, un petit chat », l'utilisateur).
@@ -75,6 +77,7 @@ Conservé pour mémoire : ces faits concernaient le portfolio à remplacer. Depu
 - 2026-10-25 (mission catgame_style) : **direction artistique « dessin animé doux », cosy et mignon** (ordre de mission validé par l'utilisateur ; référence : `docs/recherche/style.md`). Aplats doux (`MeshToonMaterial` à 3 paliers, ombres jamais noires), formes rondes (objectif : aucune pointe dans le décor ; au premier contrôle, quelques feuilles effilées restaient au premier plan, élargies au tour de correction 1), lumière dorée de fin d'après-midi, peu de détail et grandes masses, pastel mais pas délavé, aucun post-traitement. Couleurs partagées dans `src/style/palette.js`. Écartés : brins en lame pointue et teintes paille/olive, `Sky` physique, `OutlineEffect` global, rendu pixelisé, toon sur la fourrure (le chat reste noir, seules ses couleurs de liseré et d'yeux changent).
 - 2026-10-25 (mission catgame_style) : **papouilles sur le flanc** et non plus sur le dos, tête relevée et visage visible, yeux mi-clos ; un clic au sol les interrompt aussitôt. Touche **P** : lancer immédiat de la pelote devant la caméra.
 - 2026-10-26 (mission catgame_monde, retour de l'utilisateur et ordre de mission validé) : **ambiance *Tiny Glade*** comme inspiration (palette, pierres moussues, douceur ; rien de copié) ; **relief doux** dans la prairie (environ 1 m au plus) ; **montagnes au loin** ; **ruines d'une église** plutôt que d'un château ; **casque de chevalier** avec visière qui se lève et se baisse ; **bouton de la pelote et commandes utilisables sur toutes les plateformes** (téléphone, tablette, ordinateur) ; **papouilles poursuivies sur le flanc** avec le chat actuel (« le mieux est de terminer ce qu'on a commencé ») ; le **dos trop bossu** est un retour distinct des papouilles ; **saut** pour monter sur les ruines basses.
+- 2026-10-26 : **nom « Lost »** ; but : **retrouver la maman chat**, avec un chat magicien dans les ruines, un chat artiste dans une forêt à gauche du point d'apparition et la maman couchée au pied de la montagne (journal § 6). **Plus de lancer de pelote par le joueur** : des lance-pelotes sur la carte. Écran de fin avec les crédits (journal § 6).
 
 ## 4. Questions ouvertes
 
@@ -90,7 +93,7 @@ Voir la conversation ; les réponses sont reportées en § 3.
 8. Esthétique du chat (point noir de l'utilisateur, décision du 2026-10-20) : fourrure en coques, proportions de chaton, robe unie ; par quoi commencer et jusqu'où aller ?
 9. Clignement des yeux : impossible avec ce maillage (aucune paupière, les yeux sont deux sphères séparées) ; accepter, ou modifier le modèle dans Blender ?
 10. Miaulement : le ronron est synthétisé, mais un miaulement crédible demande un fichier son CC0 choisi et validé par l'utilisateur. **2026-10-25 (mission catgame_jeu, fiche 06)** : trois candidats CC0, pages ouvertes, rien téléchargé : « Meow » d'IgnasD (https://opengameart.org/content/meow, OGG 9,8 Ko), « Kitten Mew » d'AntumDeluge (https://opengameart.org/content/kitten-mew, imitation humaine d'un chaton), « Small mewing of a cat » s0098 de Joseph SARDIN (https://bigsoundbank.com/small-mewing-of-a-cat-s0098.html, 5 s). Alternative : « Cat Purr & Meow » de Kerzoven (bruits de fond selon l'auteur). Choix à faire par l'utilisateur. Pelote : aucun son de laine CC0 trouvé (une seule requête Freesound) ; bruit d'herbe non cherché.
-11. Crédit BlendSwap : **auteur relevé le 2026-10-25 : JonasDichelle** (page https://blendswap.com/blend/18519, « CC-BY » sans version ; version 3.0 tirée du fichier local `86110 - LICENSE.html`). Non établi : que 86110 (fichier local, ancienne URL en 404) et 18519 (page actuelle) désignent le même blend (même titre, même auteur). Texte de crédit proposé dans la fiche 06 de la mission `2026-10-25_catgame_jeu` ; à placer dans le jeu après choix de l'utilisateur.
+11. Crédit BlendSwap : **auteur relevé le 2026-10-25 : JonasDichelle** (page https://blendswap.com/blend/18519, « CC-BY » sans version ; version 3.0 tirée du fichier local `86110 - LICENSE.html`). Non établi : que 86110 (fichier local, ancienne URL en 404) et 18519 (page actuelle) désignent le même blend (même titre, même auteur). Texte de crédit proposé dans la fiche 06 de la mission `2026-10-25_catgame_jeu` ; à placer dans le jeu après choix de l'utilisateur. **2026-10-26 : choix de l'utilisateur, un écran de fin** (journal, § 6).
 
 ## 5. Outils et stack
 
@@ -112,7 +115,7 @@ Recherches du 2026-10-15, second tour (pages ouvertes sauf mention contraire) :
 
 Environnement vérifié le 2026-10-15 : Windows 11 ; WSL Debian avec Python 3.13.5, 8 cœurs, 7,5 Go RAM. **Node v24.21.0 / npm 11.19.0 présents dans WSL via nvm** (`/home/Axou/.nvm/versions/node/v24.21.0/bin`, visibles avec `bash -ic`), rien côté Windows. Blender absent ; disponible par winget (`BlenderFoundation.Blender` 5.2.2, LTS 4.5.10, LTS 4.2.16).
 
-Décisions du 2026-10-15 (suite) : feu vert pour le chat BlendSwap (sous réserve d'absence de contenu suspect) ; accord pour l'installation guidée de Blender. Téléchargement BlendSwap : nécessite un compte (vérifié : `/blend/18519/download` renvoie la page de connexion sans session). Dossier de dépôt : `catGame/assets/sources/` (`portfolio2/` à l'époque).
+Décisions du 2026-10-15 (suite) : feu vert pour le chat BlendSwap (sous réserve d'absence de contenu suspect) ; accord pour l'installation guidée de Blender. Téléchargement BlendSwap : nécessite un compte (vérifié : `/blend/18519/download` renvoie la page de connexion sans session). Dossier de dépôt : `Lost/assets/sources/` (`portfolio2/` à l'époque).
 
 ## 5 bis. Assets reçus
 
@@ -209,7 +212,7 @@ Stack : three.js 0.186 + Vite 8, site statique. Installé le 2026-10-15 (`npm in
 - `tools/rest_bones.py` : affiche la pose de repos d'os choisis dans Blender (coordonnées armature) pour vérifier ce que voit three.js.
 - `tools/pose_preview.mjs` : rend un scénario hors navigateur (three.js + canvas Node) en PNG et imprime les mesures (état, clip courant et son instant, boîte, tête, sommet le plus bas, correction au sol, hauteur des pattes). `node tools/pose_preview.mjs <sortie.png> <idle|pet|walk|stretch|groom|sit|lie|sleep|wake|sitpet|liepet|bones> [t1,t2,...]` ; `wake` simule un clic au sol à 7 s (avec `Wake` à 6,25 s, prévoir des instants jusqu'à ~15 s pour voir la marche), `sitpet`/`liepet` un clic sur le chat à 3 s / 4 s.
 
-Lancement (par l'utilisateur, dans WSL) : `cd ~/Axou/02_games/catGame && npm run dev`, puis http://localhost:5173. Claude observe la page avec son navigateur Playwright (captures dans `.shots/`, ignoré par Git).
+Lancement (par l'utilisateur, dans WSL) : `cd ~/Axou/02_games/Lost && npm run dev`, puis http://localhost:5173. Claude observe la page avec son navigateur Playwright (captures dans `.shots/`, ignoré par Git).
 
 ### Pièges rencontrés
 
@@ -421,3 +424,16 @@ Rythme général : **transitions courtes (0,5 à 1,5 s), maintiens longs (4 à 6
   - **Non observé** : un vrai téléphone (`npm run dev -- --host`), le jeu à 60 i/s chez l'utilisateur, le ressenti de l'utilisateur. Casque jugé un peu gros (0,32 m) ; visière baissée laissant voir la moitié extérieure des yeux.
   **Clôture par le manager** : verdict de l'expert « conforme », 2 tours de correction (`controle_final.md`) ; ligne `| 2026-10-26 | catgame_monde | conforme | 2 |` ajoutée à l'index des missions. Vérifié par Claude : md5 de `cat.glb` identique à celui ci-dessus, `cat.glb` postérieur à `anim_cat.py` (04:36:26 contre 04:35:56) ; `npx vite build` → « ✓ built in 188ms » ; `tools/__pycache__` et `catGame/.playwright-mcp` absents ; `/home/Axou/Axou/.playwright-mcp` (journaux de console seulement) supprimé. Captures ouvertes par Claude : `_expert_pet_3s4` (chat couché sur le flanc, casque, tête et pattes avant visibles), `_apres_lointaine` (église, murets, herbe variée ; montagnes réduites à des collines douces au loin), `_P_390x844` (téléphone, boutons lisibles). Remarqué en plus : de très grandes tiges cachent parfois la vue de près. Les 37 autres captures et le journal de mission n'ont pas été relus par Claude.
   - **À juger par l'utilisateur** : papouilles (sixième essai ; le mode erreurs répétées reste actif jusqu'à son avis), taille du casque, chat assis encore bossu (`Sit` inchangé), caméra qui peut entrer dans le chat, essai sur un vrai téléphone.
+- 2026-10-26 : demande de l'utilisateur (recopiée) : « prévois dans le journal un écran de fin ». À faire, non commencé : **écran de fin** du jeu avec les crédits, dont le crédit obligatoire du chat (CC-BY, JonasDichelle, § 4 question 11 ; texte proposé dans la fiche 06 de la mission `2026-10-25_catgame_jeu`). Non décidé : ce qui déclenche la fin (le jeu n'en a pas encore, forme du jeu ouverte en § 0) et le reste du contenu. Jusque-là, le crédit n'apparaît que dans ce README.
+- 2026-10-26 : **nom et but du jeu** (demande de l'utilisateur). À faire, non commencé.
+  - **Nom** : « Lost ».
+  - **But** : retrouver la maman chat. Ce scénario donne un vrai but au jeu ; les autres idées prévues (§ 0) sont gardées.
+  - **Déroulé et lieux** :
+    1. **Début** : la maman chat dépose notre chat (le chat chevalier, avec son casque) ; il se réveille, puis part explorer.
+    2. **Ruines de l'église** : un **chat magicien**, assis, avec des lunettes et un chapeau de magicien ; il donne des conseils pour retrouver la maman.
+    3. **Forêt, à gauche du point d'apparition** : un **chat artiste**, assis en train de peindre ; il donne des indices en poèmes.
+    4. **Pied de la montagne** : la **maman chat**, couchée ; notre chat peut lui faire un câlin.
+  - **Pelote (idée 2 du § 0 modifiée)** : le joueur ne lance plus la pelote (bouton « Lancer la pelote » et touche P à retirer du code). Des **lance-pelotes** sont disposés sur la carte, et le chat peut interagir avec eux.
+  - **Non décidé** : si le câlin à la maman déclenche l'écran de fin (entrée précédente) ; les textes des conseils et des poèmes ; la forme des lance-pelotes et de l'interaction.
+  - **À produire (déduit par Claude)** : forêt, trois nouveaux chats (magicien, artiste, maman) avec leurs accessoires et poses, scène d'ouverture, lance-pelotes.
+- 2026-10-26 : **dossier renommé `02_games/catGame/` → `02_games/Lost/`** (demande de l'utilisateur, `git mv`). Mis à jour : titre de ce README et chemins actuels (en-tête, § 5 bis, § 7), `<title>` d'`index.html`, champ `name` de `package.json` et `package-lock.json` (`lost` : npm refuse les majuscules pour un nouveau paquet), en-têtes d'usage de `tools/anim_cat.py` et `tools/measure_cat.py`, chemins de `docs/recherche/` (`dos_chat.md`, `mouvement_reels.md`, `mouvement_stray.md`, `style.md`). Les mentions de `catGame` dans les entrées plus anciennes de ce journal sont historiques et gardées. Corrigé aussi : `tools/measure_cat.py` importait `jeux.catGame.tools.anim_cat` (réécriture introduite par le commit c234dd7 « Réorganisation ») ; remis à `import anim_cat as A`, comme au commit 77c0951.

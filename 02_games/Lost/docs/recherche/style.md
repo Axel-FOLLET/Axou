@@ -184,7 +184,7 @@ But : en s'inspirant de Tiny Glade (Pounce Light, sorti le 23/09/2024), guider l
 
 ### Sources
 
-Vidéos publiques regardées image par image dans Playwright. Les captures sont dans /home/Axou/Axou/02_games/catGame/.shots/refs_tinyglade/ (nom `tg_<source>_<mm>m<ss>.png`).
+Vidéos publiques regardées image par image dans Playwright. Les captures sont dans /home/Axou/Axou/02_games/Lost/.shots/refs_tinyglade/ (nom `tg_<source>_<mm>m<ss>.png`).
 
 | Code | Source | Lien |
 |---|---|---|

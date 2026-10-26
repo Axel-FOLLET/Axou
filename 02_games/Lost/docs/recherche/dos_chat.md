@@ -15,7 +15,7 @@ Les angles et les durées viennent de planches prises tous les 0,125 s à 1,5 s.
 
 ### 1.1 Vidéos observées image par image (Playwright, 2026-10-25 soir)
 
-Chaque planche est une mosaïque d'images de la vidéo. L'instant exact est écrit en jaune sur chaque vignette. Toutes les planches sont dans `catGame/.shots/recherche_dos/`.
+Chaque planche est une mosaïque d'images de la vidéo. L'instant exact est écrit en jaune sur chaque vignette. Toutes les planches sont dans `Lost/.shots/recherche_dos/`.
 
 | Code | Vidéo | Chat, cadrage | Planches |
 |---|---|---|---|
@@ -184,8 +184,8 @@ Non lus :
 
 Comparaison avec :
 
-- les aperçus Blender `catGame/.shots/blender/Pet_f056_persp.png`, `Pet_f063_persp.png`, `Pet_f068_front.png`, `Pet_f073_front.png`, `Pet_f073_persp.png` et `Pet_f097_persp.png` (ouverts) ;
-- les captures du navigateur `catGame/.shots/2026-10-25_pw_pet_2.55.png`, `_4.50.png` et `_7.60.png` (ouvertes).
+- les aperçus Blender `Lost/.shots/blender/Pet_f056_persp.png`, `Pet_f063_persp.png`, `Pet_f068_front.png`, `Pet_f073_front.png`, `Pet_f073_persp.png` et `Pet_f097_persp.png` (ouverts) ;
+- les captures du navigateur `Lost/.shots/2026-10-25_pw_pet_2.55.png`, `_4.50.png` et `_7.60.png` (ouvertes).
 
 Le code cité est celui de `tools/anim_cat.py`, lignes 483 à 557 et ligne 681.
 
