@@ -41,18 +41,10 @@
 }
 
 
-/* Fonction et formation, sous le nom */
-.hero__role {
-    margin: 28px 0 0;
-
-    font-weight: 500;
-}
-
-
 .hero__catchphrase {
     max-width: 26ch;
 
-    margin: 20px 0 0;
+    margin: 28px 0 0;
 
     font-size: var(--text-lead);
     font-weight: 500;

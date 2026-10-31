@@ -1,17 +1,3 @@
-/* -------------------- PARCOURS -------------------- */
-
-/* Objectif mis en avant sous l'introduction, en blanc sur le quasi-noir */
-.career__goal {
-    max-width: 60ch;
-
-    margin: -24px 0 0;
-
-    font-size: var(--text-lead);
-    font-weight: 600;
-    line-height: 1.5;
-}
-
-
 /* -------------------- CHRONOLOGIE -------------------- */
 
 /*
