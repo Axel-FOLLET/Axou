@@ -48,7 +48,9 @@ export function afficherJeu() {
     if (state.pause) {
         ctx.fillStyle = "rgba(13,10,155,0.75)";
         ctx.fillRect(0, HAUTEUR_BANDEAU, LARGEUR_FENETRE, LARGEUR_FENETRE);
-        texteCentre(t.pause, 290, 50, ACCENT);
+        /* Au-dessus de la ligne de départ du serpent (y 360 à 390) : le texte ne le recouvre pas en début de partie */
+        texteCentre(t.pause, 250, 50, ACCENT);
+        texteCentre(t.resume, 310, 24, BLANC);
     }
 }
 

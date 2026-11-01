@@ -173,7 +173,8 @@
 
     margin: 16px 0 0;
 
-    color: var(--muted);
+    /* --muted n'atteint que 2,8:1 sur le rouge de la section contact */
+    color: var(--white);
 
     font-size: 0.875rem;
     line-height: 1.5;

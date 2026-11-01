@@ -9,6 +9,7 @@ import { initContact } from "./modules/contact.js";
 import { initCubes } from "./modules/cubes/init-cubes.js";
 import { initTimeline } from "./modules/timeline.js";
 import { initMotion } from "./modules/motion.js";
+import { initScrollWords } from "./modules/scroll-motion.js";
 
 // Menu mobile, en-tête compact au défilement et section affichée marquée dans le menu
 initNavigation();
@@ -18,6 +19,9 @@ initReveal();
 
 // Finitions communes avec le portfolio : cascade, trait du menu, entrée de l'accueil, survols des cartes (après initReveal)
 initMotion();
+
+// Textes d'introduction qui s'allument mot par mot au fil du défilement (scroll.css)
+initScrollWords();
 
 // Formulaire de contact : validation, fenêtre anti-robot à l'envoi, envoi sans quitter la page
 initContact();

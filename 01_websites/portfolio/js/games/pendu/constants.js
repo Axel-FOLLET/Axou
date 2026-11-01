@@ -5,6 +5,8 @@
  */
 // -------------------- CONSTANTES --------------------
 
+import { language } from "./translations.js";
+
 export const TEXTE = "rgb(255,255,255)";
 export const TEXTE_DISCRET = "rgba(255,255,255,0.6)";
 export const COULEUR_POTENCE = "rgba(255,255,255,0.85)";
@@ -20,11 +22,15 @@ export const FOND_VICTOIRE = "#C8001E";
 export const FOND_DEFAITE = "#C8001E";
 
 export const MAX_PENALITES = 12;
-export const LIGNES_CLAVIER = ["AZERTYUIOP", "QSDFGHJKLM", "WXCVBN"];
+/* Le clavier dessiné suit la langue : AZERTY en français, QWERTY en anglais */
+export const LIGNES_CLAVIER = language === "en" ? ["QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"] : ["AZERTYUIOP", "QSDFGHJKLM", "WXCVBN"];
 export const TOUCHE_LARGEUR = 46;
 export const TOUCHE_HAUTEUR = 50;
 export const TOUCHE_ECART = 8;
 export const CLAVIER_X = 620;
 export const CLAVIER_LARGEUR = 532;
 export const CLAVIER_Y = 250;
-export const SCORE_KEY = "pendu_meilleur_score";
+/* Les listes de mots diffèrent : un record par langue (la clé française reste celle d'avant) */
+export const SCORE_KEY = language === "en" ? "pendu_meilleur_score_en" : "pendu_meilleur_score";
+/* Plus long mot des listes : 13 lettres ; au-delà, la saisie sortirait de sa boîte */
+export const SAISIE_MAX = 16;

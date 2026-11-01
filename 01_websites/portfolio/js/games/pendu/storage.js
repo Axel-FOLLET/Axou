@@ -5,7 +5,7 @@
  */
 import { SCORE_KEY } from "./constants.js";
 import { state } from "./state.js";
-import { t } from "./translations.js";
+import { language, t } from "./translations.js";
 
 /*
  * Lit le JSON enregistré dans localStorage et vérifie les champs attendus.
@@ -32,19 +32,37 @@ export function lireMeilleurScore() {
 }
 
 /*
- * Enregistre le nombre de tentatives et la date UTC au format AAAA-MM-JJ.
+ * Date du jour, à l'heure locale, au format AAAA-MM-JJ (toISOString donnerait la date UTC, parfois la veille).
+ */
+function dateDuJour() {
+    const maintenant = new Date();
+    return [maintenant.getFullYear(), maintenant.getMonth() + 1, maintenant.getDate()].map(n => String(n).padStart(2, "0")).join("-");
+}
+
+/*
+ * Affiche une date AAAA-MM-JJ dans la langue du jeu : « 1 novembre 2026 », « 1 November 2026 ».
+ */
+function dateLisible(date) {
+    const [annee, mois, jour] = date.split("-").map(Number);
+    const lue = new Date(annee, mois - 1, jour);
+    if (Number.isNaN(lue.getTime())) return date;
+    return lue.toLocaleDateString(language === "en" ? "en-GB" : "fr-FR", { day: "numeric", month: "long", year: "numeric" });
+}
+
+/*
+ * Enregistre le nombre de tentatives et la date locale au format AAAA-MM-JJ.
  * Si le stockage est refusé, renvoie quand même la date pour laisser le jeu fonctionner.
  */
 export function enregistrerScore() {
     try {
-        const date = new Date().toISOString().slice(0, 10);
+        const date = dateDuJour();
         localStorage.setItem(
             SCORE_KEY,
             JSON.stringify({ tentatives: state.nombreTentatives, date: date })
         );
         return date;
     } catch (error) {
-        return new Date().toISOString().slice(0, 10);
+        return dateDuJour();
     }
 }
 
@@ -64,5 +82,5 @@ export function texteMeilleurScore(gagne) {
         return t.noBest;
     }
 
-    return t.best(ancien.tentatives, ancien.date);
+    return t.best(ancien.tentatives, dateLisible(ancien.date));
 }

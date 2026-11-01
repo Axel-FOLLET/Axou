@@ -73,6 +73,10 @@ export function initControls() {
 
     canvas.addEventListener("click", function() {
         canvas.focus();
+        if (state.etat === "jeu" && state.pause) {
+            state.pause = false;
+            state.dernierPas = performance.now();
+        }
     });
 
     // -------------------- PAUSE AUTOMATIQUE --------------------

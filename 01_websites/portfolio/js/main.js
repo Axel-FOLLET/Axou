@@ -11,12 +11,15 @@ import { initTimeline } from "./modules/timeline.js";
 import { initProjectDemos } from "./modules/project-demos.js";
 import { initReveal } from "./modules/reveal.js";
 import { initMotion } from "./modules/motion.js";
+import { initScrollWords, initHeroParallax } from "./modules/scroll-motion.js";
 
 initNavigation();
 initReveal();
 initMotion();
+initScrollWords();
 initContact();
 initCubes();
+initHeroParallax();
 initCat();
 initTimeline();
 const language = document.documentElement.lang === "en" ? "en" : "fr";

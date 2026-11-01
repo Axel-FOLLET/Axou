@@ -40,15 +40,16 @@
     <link rel="stylesheet" href="css/navigation.css?v=4f47cea82c11">
     <link rel="stylesheet" href="css/sections.css?v=2d1322511799">
     <link rel="stylesheet" href="css/buttons.css?v=2108940d7dfb">
-    <link rel="stylesheet" href="css/home.css?v=2f240020d128">
+    <link rel="stylesheet" href="css/home.css?v=7c12b2112122">
     <link rel="stylesheet" href="css/cubes.css?v=cde2ce89c339">
     <link rel="stylesheet" href="css/projects.css?v=0acd8c2ef261">
-    <link rel="stylesheet" href="css/career.css?v=80c53986663f">
-    <link rel="stylesheet" href="css/contact.css?v=a82baebf779d">
+    <link rel="stylesheet" href="css/career.css?v=209ff55b0b99">
+    <link rel="stylesheet" href="css/contact.css?v=0973b22945d8">
     <link rel="stylesheet" href="css/footer.css?v=bb28efed03ab">
     <link rel="stylesheet" href="css/responsive.css?v=82742423eae5">
     <link rel="stylesheet" href="css/human-check.css?v=85e4238a79c0">
-    <link rel="stylesheet" href="css/motion.css?v=497b42af2aa8">
+    <link rel="stylesheet" href="css/motion.css?v=e09e3f2f2d51">
+    <link rel="stylesheet" href="css/scroll.css?v=8c33ddc0b5e7">
     <!-- blocking="render" : la page ne s'affiche qu'une fois le script exécuté, cubes compris.
          Le fondu entre pages part ainsi d'une page complète au lieu de la voir se construire. -->
     <!-- Modules importés par main.js, demandés tous ensemble : sans cette liste, le navigateur les découvre
@@ -65,6 +66,7 @@
     <link rel="modulepreload" href="js/modules/cubes/drag-cube.js">
     <link rel="modulepreload" href="js/modules/cat.js">
     <link rel="modulepreload" href="js/modules/timeline.js">
+    <link rel="modulepreload" href="js/modules/scroll-motion.js">
     <link rel="modulepreload" href="js/modules/project-showcase.js">
     <link rel="modulepreload" href="js/modules/project-filter.js">
     <link rel="modulepreload" href="js/modules/project-demos.js">
@@ -777,7 +779,7 @@
 
                         <button class="button button--primary" type="submit">Envoyer</button>
 
-                        <p class="form__notice">Tous les champs sont obligatoires, sauf le sujet.<a href="#donnees-formulaire">Utilisation de vos données</a></p>
+                        <p class="form__notice">Tous les champs sont obligatoires, sauf le sujet. <a href="#donnees-formulaire">Utilisation de vos données</a></p>
 
                         <!-- Message de confirmation ou d'erreur, lu par les lecteurs d'écran -->
                         <p class="form__status" id="form-status" role="status" aria-live="polite"></p>
@@ -837,7 +839,7 @@
             <div>
                 <p class="footer__title">Ressources et crédits</p>
                 <p class="footer__credits">
-                    Photo, dessins et textes&nbsp;: créations d'Axel FOLLET. Cubes 3D, chat en facettes et pictogrammes réalisés en HTML, CSS, SVG et JavaScript. Police Manrope (The Manrope Project Authors), sous <a href="assets/fonts/OFL-Manrope.txt">licence SIL Open Font License 1.1</a>, hébergée avec le site. LinkedIn® et le logo [in]® sont des marques de LinkedIn Corporation et de ses sociétés affiliées&nbsp;; ce site n’est ni affilié à LinkedIn ni approuvé par LinkedIn.
+                    Photo, dessins et textes&nbsp;: créations d'Axel FOLLET. Cubes 3D, chat en facettes et pictogrammes réalisés en HTML, CSS, SVG et JavaScript. Polices Manrope (The Manrope Project Authors) et Instrument Serif (The Instrument Serif Project Authors), sous licence SIL Open Font License 1.1 (<a href="assets/fonts/OFL-Manrope.txt">licence de Manrope</a>, <a href="assets/fonts/OFL-InstrumentSerif.txt">licence d’Instrument Serif</a>), hébergées avec le site. LinkedIn® et le logo [in]® sont des marques de LinkedIn Corporation et de ses sociétés affiliées&nbsp;; ce site n’est ni affilié à LinkedIn ni approuvé par LinkedIn.
                 </p>
                 <details class="footer__legal">
                     <summary class="footer__legal-toggle">Mentions légales et données</summary>
@@ -845,7 +847,7 @@
                     <p><strong>Hébergeur&nbsp;:</strong> GitHub, Inc. (GitHub Pages), 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, États-Unis, <a href="https://support.github.com/" target="_blank" rel="noopener noreferrer" hreflang="en">support.github.com</a>. Pour la sécurité, GitHub enregistre l'adresse IP des visiteurs.</p>
                     <p id="donnees-formulaire"><strong>Formulaire de contact&nbsp;:</strong> responsable du traitement, Axel FOLLET. Nom, prénom, e-mail et message sont obligatoires&nbsp;; le sujet est facultatif. Ces données servent uniquement à vous répondre, sur la base de l'intérêt légitime à traiter votre demande. Elles transitent par Formspree, Inc., aux États-Unis, qui les conserve selon sa <a href="https://formspree.io/legal/privacy-policy" target="_blank" rel="noopener noreferrer" hreflang="en">politique de confidentialité</a>, et sont supprimées 12 mois après notre dernier échange. Vous pouvez demander l'accès à vos données, leur rectification, leur effacement ou la limitation de leur traitement, ou vous y opposer, par le formulaire ou LinkedIn, et adresser une réclamation à la <a href="https://www.cnil.fr/fr/plaintes" target="_blank" rel="noopener noreferrer">CNIL</a>.</p>
                     <p><strong>Navigateur&nbsp;:</strong> aucun cookie ni mesure d'audience. Le site garde seulement sur votre appareil la réponse à «&nbsp;<span lang="en">Are you human?</span>&nbsp;», posée à l'envoi du formulaire, jusqu'à la fermeture de l'onglet, et vos records de Snake et du Pendu, jusqu'à ce que vous effaciez les données du site dans votre navigateur.</p>
-                    <p><strong>Propriété intellectuelle&nbsp;:</strong> textes, photo, dessins, mise en page et code source © 2026 Axel FOLLET, tous droits réservés. Le code est public sur GitHub pour être lu&nbsp;; toute réutilisation demande mon accord. La police Manrope et le logo LinkedIn restent sous leurs propres licences et marques.</p>
+                    <p><strong>Propriété intellectuelle&nbsp;:</strong> textes, photo, dessins, mise en page et code source © 2026 Axel FOLLET, tous droits réservés. Le code est public sur GitHub pour être lu&nbsp;; toute réutilisation demande mon accord. Les polices Manrope et Instrument Serif et le logo LinkedIn restent sous leurs propres licences et marques.</p>
                 </details>
             </div>
 
@@ -855,6 +857,8 @@
             <p class="footer__copyright">&copy; 2026 Axel FOLLET, tous droits réservés</p>
             <a class="footer__top" href="#top">Retour en haut ↑</a>
         </div>
+
+
 
     </footer>
 

@@ -1,0 +1,490 @@
+/* -------------------- DÉFILEMENT LIÉ -------------------- */
+
+/*
+ * Même principe que le portfolio, en plus retenu : un CV doit rester lisible avant tout.
+ * Les animations suivent la position du défilement (en remontant, elles reviennent en arrière) ;
+ * le navigateur les calcule seul (animation-timeline), sans JavaScript ni écouteur de défilement.
+ * Un navigateur qui ne connaît pas animation-timeline ignore ce bloc : la page reste celle d'avant.
+ * En mouvement réduit, rien ne bouge.
+ */
+
+
+@media (prefers-reduced-motion: no-preference) {
+
+    /* -------------------- POSTES QUI GLISSENT -------------------- */
+
+    /*
+     * Quand le trait atteint un poste (timeline.js), sa carte arrive de plus loin sur la droite
+     * qu'avant (64 px au lieu de 24, experience.css) : le geste se voit davantage, la durée ne change pas.
+     */
+    .timeline--animated .timeline__content {
+        translate: 64px 0;
+    }
+
+
+    .timeline--animated .timeline__step--visible .timeline__content {
+        translate: none;
+    }
+
+
+    @supports (animation-timeline: scroll()) {
+
+        /* -------------------- BARRE DE PROGRESSION -------------------- */
+
+        /*
+         * Trait bleu sous l'en-tête collant : il se remplit de gauche à droite, de 0 à 100 % de la page.
+         * scale plutôt que width : le navigateur ne recalcule pas la mise en page à chaque image.
+         */
+        .header::after {
+            content: "";
+
+            position: absolute;
+            left: 0;
+            bottom: -1px;
+
+            width: 100%;
+            height: 2px;
+
+            background: linear-gradient(90deg, var(--blue-accent), var(--white));
+
+            transform-origin: 0 50%;
+
+            animation: scroll-progress linear both;
+            animation-timeline: scroll(root);
+        }
+
+
+        @keyframes scroll-progress {
+            from {
+                scale: 0 1;
+            }
+        }
+
+
+        /* -------------------- SECTION EN COURS DANS LE MENU -------------------- */
+
+        /*
+         * Sous le lien de la section affichée, un trait bleu se remplit pendant qu'on la lit, par-dessus le trait
+         * blanc qui glisse d'un lien à l'autre (motion.css). Chaque section donne sa traversée (view-timeline) ;
+         * timeline-scope la rend visible depuis l'en-tête, qui n'est pas dans la section.
+         * contain : de l'arrivée du haut de la section en haut de l'écran à celle de son bas en bas de l'écran.
+         * Hors de cette traversée, l'animation ne s'applique pas (fill: none) : le trait reste à zéro.
+         * Sur ordinateur seulement : sous 1 025 px, les liens sont dans le menu déroulant.
+         */
+        body {
+            timeline-scope: --read-formation, --read-experience, --read-reconversion, --read-projects, --read-contact;
+        }
+
+
+        #formation { view-timeline: --read-formation; }
+        #experience { view-timeline: --read-experience; }
+        #reconversion { view-timeline: --read-reconversion; }
+        #projects { view-timeline: --read-projects; }
+        #contact { view-timeline: --read-contact; }
+
+
+        @media (min-width: 1025px) {
+
+            .header__link::after {
+                content: "";
+
+                position: absolute;
+                right: 16px;
+                bottom: 8px;
+                left: 16px;
+
+                height: 2px;
+
+                background-color: var(--blue-accent);
+
+                transform-origin: 0 50%;
+
+                scale: 0 1;
+
+                pointer-events: none;
+
+                animation: section-read linear none;
+                animation-range: contain 0% contain 100%;
+            }
+
+
+            .header__link[href="#formation"]::after { animation-timeline: --read-formation; }
+            .header__link[href="#experience"]::after { animation-timeline: --read-experience; }
+            .header__link[href="#reconversion"]::after { animation-timeline: --read-reconversion; }
+            .header__link[href="#projects"]::after { animation-timeline: --read-projects; }
+            .header__link[href="#contact"]::after { animation-timeline: --read-contact; }
+
+        }
+
+
+        @keyframes section-read {
+            from {
+                scale: 0 1;
+            }
+
+            to {
+                scale: 1 1;
+            }
+        }
+
+
+        /* -------------------- ACCUEIL EN PROFONDEUR -------------------- */
+
+        /*
+         * Le mouvement du portfolio, à moitié moins ample : le texte recule doucement,
+         * les cubes montent un peu plus vite que la page en tournant à peine, la lueur s'éteint.
+         * Sous 1 024 px, les cubes sont sous le texte : seul le texte monte un peu, les cubes tournent sur place.
+         * overflow-x: clip : la lueur agrandie dépasserait à droite et élargirait la page (défilement horizontal).
+         */
+        .hero {
+            overflow-x: clip;
+
+            --hero-text-shift: 11svh;
+            --hero-visual-shift: -9svh;
+        }
+
+
+        @media (max-width: 1024px) {
+
+            .hero {
+                --hero-text-shift: -4svh;
+                --hero-visual-shift: 0;
+            }
+
+        }
+
+
+        .hero__text {
+            transform-origin: 0 50%;
+
+            animation: hero-text-depth linear both;
+            animation-timeline: scroll(root);
+            animation-range: 0 90svh;
+        }
+
+
+        @keyframes hero-text-depth {
+            to {
+                opacity: 0.25;
+                translate: 0 var(--hero-text-shift);
+                scale: 0.96;
+            }
+        }
+
+
+        .hero__visual {
+            animation: hero-visual-depth linear both;
+            animation-timeline: scroll(root);
+            animation-range: 0 100svh;
+        }
+
+
+        @keyframes hero-visual-depth {
+            to {
+                translate: 0 var(--hero-visual-shift);
+                rotate: -5deg;
+                scale: 1.06;
+            }
+        }
+
+
+        .hero__visual::before {
+            animation: hero-glow-depth linear both;
+            animation-timeline: scroll(root);
+            animation-range: 0 80svh;
+        }
+
+
+        @keyframes hero-glow-depth {
+            to {
+                opacity: 0;
+                scale: 1.4;
+            }
+        }
+
+
+        /* -------------------- OUVERTURE DES SECTIONS -------------------- */
+
+        /*
+         * La première section sombre après le bleu s'ouvre jusqu'aux bords pendant que son haut monte
+         * du bas de l'écran à son cinquième supérieur (entry 0 % à 80 %) ; la dernière avant le contact
+         * se referme de la même façon en partant. Côtés et arrondis restent légers : le geste se voit, sans distraire.
+         * backwards et forwards seulement : hors de ces moments, clip-path redevient none ;
+         * un inset(0) gardé couperait pour toujours ce qui dépasse de la section.
+         * min(2.5vw, 32px) reste sous la marge des sections (--gutter, au moins 4vw) : le texte n'est jamais rogné.
+         */
+        :is(.hero, .section:not(.section--dark)) + .section--dark {
+            animation: section-open linear backwards;
+            animation-timeline: view();
+            animation-range: entry 0% entry 80%;
+        }
+
+
+        @keyframes section-open {
+            from {
+                clip-path: inset(0 min(2.5vw, 32px) round 32px 32px 0 0);
+            }
+
+            to {
+                clip-path: inset(0 round 0);
+            }
+        }
+
+
+        .section--dark:has(+ .section:not(.section--dark)) {
+            animation: section-close linear forwards;
+            animation-timeline: view();
+            animation-range: exit 0% exit 80%;
+        }
+
+
+        @keyframes section-close {
+            from {
+                clip-path: inset(0 round 0);
+            }
+
+            to {
+                clip-path: inset(0 min(2.5vw, 32px) round 0 0 32px 32px);
+            }
+        }
+
+
+        /* -------------------- TEXTE QUI S'ALLUME -------------------- */
+
+        /*
+         * Les mots des introductions (rangés par scroll-motion.js) passent du gris au plein éclat l'un après l'autre,
+         * pendant que le texte monte du bas de l'écran vers son milieu.
+         * --p (de 0 à 1) est la place du mot dans le texte ; la traversée est mesurée sur le paragraphe (--lit).
+         * Départ moins pâle que sur le portfolio : le texte reste lisible même avant d'être allumé.
+         */
+        .lit-text {
+            view-timeline: --lit;
+        }
+
+
+        .lit-word {
+            animation: word-lit linear both;
+            animation-timeline: --lit;
+            animation-range: cover calc(12% + var(--p, 0) * 30%) cover calc(18% + var(--p, 0) * 30%);
+        }
+
+
+        @keyframes word-lit {
+            from {
+                opacity: 0.3;
+            }
+        }
+
+
+        /* -------------------- FORMATION -------------------- */
+
+        /*
+         * Les deux cartes arrivent chacune de son côté, légèrement penchées, et se posent côte à côte
+         * pendant que la liste monte à l'écran. Sur téléphone, empilées, elles arrivent aussi de chaque côté.
+         * overflow-x: clip sur la section : les cartes encore dehors n'élargissent pas la page.
+         */
+        #formation {
+            overflow-x: clip;
+        }
+
+
+        .education__list {
+            view-timeline: --education;
+        }
+
+
+        .education__card {
+            animation: education-in cubic-bezier(0.3, 0.7, 0.3, 1) both;
+            animation-timeline: --education;
+            animation-range: entry 0% cover 40%;
+        }
+
+
+        .education__card:nth-child(odd) {
+            --from-x: -24vw;
+            --from-r: -4deg;
+        }
+
+
+        .education__card:nth-child(even) {
+            --from-x: 24vw;
+            --from-r: 4deg;
+        }
+
+
+        @keyframes education-in {
+            from {
+                opacity: 0;
+                translate: var(--from-x) 6vh;
+                rotate: var(--from-r);
+            }
+        }
+
+
+        /* -------------------- PROJETS -------------------- */
+
+        /*
+         * Les trois cartes montent l'une après l'autre et se rangent dans la grille :
+         * la grande carte d'abord, puis les deux de droite, chacune un peu plus tard (--rank).
+         */
+        .projects__grid {
+            view-timeline: --projects;
+        }
+
+
+        .projects__grid .project-card {
+            animation: project-in cubic-bezier(0.3, 0.7, 0.3, 1) both;
+            animation-timeline: --projects;
+            animation-range: entry calc(var(--rank, 0) * 15%) cover calc(30% + var(--rank, 0) * 6%);
+        }
+
+
+        .projects__grid .project-card:nth-child(2) { --rank: 1; }
+        .projects__grid .project-card:nth-child(3) { --rank: 2; }
+
+
+        @keyframes project-in {
+            from {
+                opacity: 0;
+                translate: 0 18vh;
+                scale: 0.92;
+            }
+        }
+
+
+        /* -------------------- TITRE DE LA RECONVERSION -------------------- */
+
+        /*
+         * Le titre se coupe en deux : « Du pilotage de projets RH » arrive par la gauche,
+         * « au monde de l'informatique ! » par la droite, et les deux moitiés se rejoignent pendant que le titre monte à l'écran.
+         * Les mots sont dans les masques de motion.js ; translate n'agit pas sur un span en ligne,
+         * d'où inline-block, qui ne change ni la coupure des lignes ni la mise en page.
+         * overflow-x: clip sur la section : les moitiés encore dehors n'élargissent pas la page.
+         */
+        #reconversion {
+            overflow-x: clip;
+        }
+
+
+        #reconversion-title {
+            view-timeline: --career-title;
+        }
+
+
+        .career__half .motion-intro__mask {
+            display: inline-block;
+
+            animation: half-join cubic-bezier(0.3, 0.7, 0.3, 1) both;
+            animation-timeline: --career-title;
+            animation-range: entry 0% cover 45%;
+        }
+
+
+        .career__half:first-child { --from-x: -20vw; }
+        .career__half:last-child { --from-x: 20vw; }
+
+
+        @keyframes half-join {
+            from {
+                opacity: 0;
+                translate: var(--from-x) 0;
+            }
+        }
+
+
+        /* -------------------- OBJECTIF TRACÉ -------------------- */
+
+        /*
+         * Le cadre de l'objectif se dessine trait par trait pendant qu'on lit le parcours : le filet descend,
+         * puis ses deux branches partent vers la droite ; l'étiquette et le texte s'allument ensuite.
+         * Le filet de career.css devient transparent : ::before le redessine à sa place, ::after porte les branches,
+         * plus courtes que la marge du texte pour ne jamais le toucher.
+         */
+        .career__goal {
+            position: relative;
+
+            border-left-color: transparent;
+
+            view-timeline: --goal;
+        }
+
+
+        .career__goal::before,
+        .career__goal::after {
+            content: "";
+
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: -1px;
+
+            pointer-events: none;
+        }
+
+
+        .career__goal::before {
+            width: 1px;
+
+            background-color: var(--white);
+
+            transform-origin: 50% 0;
+
+            animation: goal-line linear both;
+            animation-timeline: --goal;
+            animation-range: entry 60% cover 40%;
+        }
+
+
+        .career__goal::after {
+            width: 24px;
+
+            border-block: 1px solid var(--white);
+
+            transform-origin: 0 50%;
+
+            animation: goal-arms linear both;
+            animation-timeline: --goal;
+            animation-range: cover 40% cover 48%;
+        }
+
+
+        @media (max-width: 767px) {
+
+            .career__goal::after {
+                width: 12px;
+            }
+
+        }
+
+
+        @keyframes goal-line {
+            from {
+                scale: 1 0;
+            }
+        }
+
+
+        @keyframes goal-arms {
+            from {
+                scale: 0 1;
+            }
+        }
+
+
+        .career__goal-label,
+        .career__goal-text {
+            animation: goal-lit linear both;
+            animation-timeline: --goal;
+            animation-range: cover 44% cover 54%;
+        }
+
+
+        @keyframes goal-lit {
+            from {
+                opacity: 0.3;
+            }
+        }
+
+    }
+
+}

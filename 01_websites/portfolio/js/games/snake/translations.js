@@ -10,7 +10,7 @@ const textes = {
     fr: {
         welcome: "BIENVENUE AU JEU DU SNAKE",
         rules: [
-            "Guidez le serpent avec les flèches directionnelles.",
+            "Guidez le serpent avec les flèches ou ZQSD.",
             "Mangez les pommes bleues pour grandir.",
             "Chaque pomme mangée vous rapporte 1 point.",
             "Le serpent accélère au fil des pommes.",
@@ -18,23 +18,23 @@ const textes = {
             "Le demi-tour est impossible."
         ],
         start: "Appuyez sur ENTRÉE pour commencer.",
-        escapeMenu: "ÉCHAP pour le menu.",
+        escapeMenu: "ÉCHAP pour le menu, ESPACE pour la pause.",
         apples: (score) => `x ${score}`,
         best: (score) => `Meilleur score : ${score}`,
         pause: "PAUSE",
+        resume: "ESPACE ou clic pour reprendre.",
         victory: "VICTOIRE !",
         fullGrid: "La grille est entièrement remplie.",
         lost: "PERDU !",
         crashed: "Le serpent s'est écrasé.",
         applesEaten: (score) => `Pommes mangées : ${score}`,
         newBest: "NOUVEAU MEILLEUR SCORE !",
-        replay: "Appuyez sur ENTRÉE pour rejouer.",
-        controls: ""
+        replay: "Appuyez sur ENTRÉE pour rejouer."
     },
     en: {
         welcome: "WELCOME TO SNAKE",
         rules: [
-            "Guide the snake with the arrow keys.",
+            "Guide the snake with the arrow keys or WASD.",
             "Eat the blue apples to grow.",
             "Each apple earns you 1 point.",
             "The snake gets faster as you collect apples.",
@@ -42,18 +42,18 @@ const textes = {
             "Turning directly backwards is impossible."
         ],
         start: "Press ENTER to start.",
-        escapeMenu: "ESC for the menu.",
+        escapeMenu: "ESC for the menu, SPACE to pause.",
         apples: (score) => `x ${score}`,
         best: (score) => `Best score: ${score}`,
         pause: "PAUSE",
+        resume: "SPACE or click to resume.",
         victory: "VICTORY!",
         fullGrid: "The grid is completely filled.",
         lost: "GAME OVER!",
         crashed: "The snake crashed.",
         applesEaten: (score) => `Apples eaten: ${score}`,
         newBest: "NEW BEST SCORE!",
-        replay: "Press ENTER to play again.",
-        controls: ""
+        replay: "Press ENTER to play again."
     }
 };
 

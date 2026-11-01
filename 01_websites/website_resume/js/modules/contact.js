@@ -66,7 +66,7 @@ function watchFields(form) {
     form.addEventListener("invalid", event => {
         event.preventDefault();
         checkField(event.target, form);
-        form.querySelector("[aria-invalid='true']").focus();
+        form.querySelector("[aria-invalid='true']")?.focus();
     }, true);
 }
 

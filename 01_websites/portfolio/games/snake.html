@@ -1,13 +1,15 @@
 <!doctype html>
 <html lang="fr">
-<head>    <!-- Page chargée dans la fenêtre du CV : le module crée le canvas dans le conteneur du jeu. Le paramètre ?lang=en sélectionne les textes anglais. -->
-
+<head>
+    <!-- Page chargée dans l'iframe d'une carte du portfolio : le module crée le canvas dans le conteneur du jeu. Le paramètre ?lang=en sélectionne les textes anglais. -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Page affichée dans une carte du portfolio : elle ne doit pas apparaître seule dans les moteurs de recherche -->
     <meta name="robots" content="noindex">
     <title>Snake</title>
-    <link rel="stylesheet" href="../css/game-player.css">
+    <!-- Ouverte seule, la page demanderait sinon /favicon.ico, absent du site -->
+    <link rel="icon" href="../assets/images/favicon.svg?v=dc02d7f3fc6c" type="image/svg+xml">
+    <link rel="stylesheet" href="../css/game-player.css?v=6cb2f085a5f3">
 </head>
 <body class="game-player">
     <div id="jeu-snake" class="game-player__root"></div>

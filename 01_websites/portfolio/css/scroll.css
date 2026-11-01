@@ -1,0 +1,339 @@
+/* -------------------- DÉFILEMENT LIÉ -------------------- */
+
+/*
+ * Animations qui suivent la position du défilement au lieu de se déclencher une fois :
+ * en remontant, elles reviennent en arrière. Le navigateur les calcule seul (animation-timeline),
+ * sans JavaScript ni écouteur de défilement.
+ * scroll(root) : la progression dans toute la page ; view() : la traversée de l'écran par l'élément.
+ * Un navigateur qui ne connaît pas animation-timeline ignore ce bloc : la page reste celle d'avant.
+ * En mouvement réduit, rien ne bouge.
+ */
+
+
+@media (prefers-reduced-motion: no-preference) {
+
+    /* -------------------- CUBES QUI SUIVENT LA SOURIS -------------------- */
+
+    /*
+     * --mx et --my (de -1 à 1) sont posés par scroll-motion.js selon la place de la souris dans l'accueil.
+     * Chaque cube se déplace de --depth pixels au plus, dans un sens ou dans l'autre : le grand cube peu,
+     * les petits davantage et en sens contraires, comme des plans à des distances différentes.
+     * translate s'ajoute au placement transform des cubes sans le remplacer.
+     */
+    .hero__visual .cube {
+        translate: calc(var(--mx, 0) * var(--depth, 0) * 1px) calc(var(--my, 0) * var(--depth, 0) * 1px);
+    }
+
+
+    .hero__visual .cube--hero {
+        --depth: 18;
+    }
+
+
+    .hero__visual .cube--pos-1 {
+        --depth: -44;
+    }
+
+
+    .hero__visual .cube--pos-2 {
+        --depth: 56;
+    }
+
+
+    /* Un petit cube décalé de 56 px ne doit pas élargir la page, même sans animation-timeline (Firefox) */
+    .hero {
+        overflow-x: clip;
+    }
+
+
+    @supports (animation-timeline: scroll()) {
+
+        /* -------------------- BARRE DE PROGRESSION -------------------- */
+
+        /*
+         * Trait rouge sous l'en-tête collant : il se remplit de gauche à droite, de 0 à 100 % de la page.
+         * scale plutôt que width : le navigateur ne recalcule pas la mise en page à chaque image.
+         */
+        .header::after {
+            content: "";
+
+            position: absolute;
+            left: 0;
+            bottom: -1px;
+
+            width: 100%;
+            height: 2px;
+
+            background: linear-gradient(90deg, var(--red-accent), var(--white));
+
+            transform-origin: 0 50%;
+
+            animation: scroll-progress linear both;
+            animation-timeline: scroll(root);
+        }
+
+
+        @keyframes scroll-progress {
+            from {
+                scale: 0 1;
+            }
+        }
+
+
+        /* -------------------- ACCUEIL EN PROFONDEUR -------------------- */
+
+        /*
+         * Sur la première hauteur d'écran défilée, trois plans bougent à des vitesses différentes :
+         * le texte recule (il descend moins vite que la page, rétrécit et s'efface),
+         * les cubes montent plus vite que la page en tournant, la lueur s'élargit et s'éteint.
+         * Cette différence de vitesse donne la profondeur. Les animations d'entrée du titre (motion.css)
+         * touchent les mots, pas leur bloc : les deux se combinent.
+         * Sous 1 024 px, les cubes sont sous le texte : en se rapprochant, les deux plans se chevaucheraient.
+         * Le texte monte alors un peu plus vite que la page et les cubes la suivent, en tournant seulement.
+         * overflow-x: clip : la lueur agrandie dépasserait à droite et élargirait la page (défilement horizontal).
+         */
+        .hero {
+            overflow-x: clip;
+
+            --hero-text-shift: 22svh;
+            --hero-visual-shift: -18svh;
+        }
+
+
+        @media (max-width: 1024px) {
+
+            .hero {
+                --hero-text-shift: -8svh;
+                --hero-visual-shift: 0;
+            }
+
+        }
+
+
+        .hero__text {
+            transform-origin: 0 50%;
+
+            animation: hero-text-depth linear both;
+            animation-timeline: scroll(root);
+            animation-range: 0 90svh;
+        }
+
+
+        @keyframes hero-text-depth {
+            to {
+                opacity: 0;
+                translate: 0 var(--hero-text-shift);
+                scale: 0.92;
+            }
+        }
+
+
+        .hero__visual {
+            animation: hero-visual-depth linear both;
+            animation-timeline: scroll(root);
+            animation-range: 0 100svh;
+        }
+
+
+        @keyframes hero-visual-depth {
+            to {
+                translate: 0 var(--hero-visual-shift);
+                rotate: -10deg;
+                scale: 1.12;
+            }
+        }
+
+
+        .hero__visual::before {
+            animation: hero-glow-depth linear both;
+            animation-timeline: scroll(root);
+            animation-range: 0 80svh;
+        }
+
+
+        @keyframes hero-glow-depth {
+            to {
+                opacity: 0;
+                scale: 1.8;
+            }
+        }
+
+
+        /* -------------------- RIDEAU DES SECTIONS -------------------- */
+
+        /*
+         * Une section sombre qui suit un fond rouge monte comme une carte : ses côtés rentrés et ses coins
+         * du haut arrondis laissent voir le rouge, puis elle s'élargit jusqu'aux bords pendant que son haut
+         * monte du bas de l'écran à son cinquième supérieur (entry 0 % à 80 %) : le rideau s'ouvre
+         * pendant que l'accueil recule, les deux mouvements se répondent.
+         * backwards seulement : une fois le rideau ouvert, l'animation ne s'applique plus et clip-path
+         * redevient none ; un inset(0) gardé couperait pour toujours ce qui dépasse de la section.
+         * min(4vw, 72px) reste sous la marge des sections (--gutter, au moins 4vw) : le texte n'est jamais rogné.
+         */
+        :is(.hero, .section:not(.section--dark)) + .section--dark {
+            animation: section-curtain-in linear backwards;
+            animation-timeline: view();
+            animation-range: entry 0% entry 80%;
+        }
+
+
+        @keyframes section-curtain-in {
+            from {
+                clip-path: inset(0 min(4vw, 72px) round 64px 64px 0 0);
+            }
+
+            to {
+                clip-path: inset(0 round 0);
+            }
+        }
+
+
+        /*
+         * La dernière section sombre avant un fond rouge s'en va de la même façon : pendant que son bas monte
+         * du bas de l'écran à son cinquième supérieur (exit 0 % à 80 %), ses côtés rentrent et ses coins du bas s'arrondissent.
+         * forwards seulement, pour la même raison : avant la sortie, aucune découpe.
+         */
+        .section--dark:has(+ .section:not(.section--dark)) {
+            animation: section-curtain-out linear forwards;
+            animation-timeline: view();
+            animation-range: exit 0% exit 80%;
+        }
+
+
+        @keyframes section-curtain-out {
+            from {
+                clip-path: inset(0 round 0);
+            }
+
+            to {
+                clip-path: inset(0 min(4vw, 72px) round 0 0 64px 64px);
+            }
+        }
+
+
+        /* -------------------- TEXTE QUI S'ALLUME -------------------- */
+
+        /*
+         * Les mots des introductions (rangés par scroll-motion.js) passent du gris au plein éclat l'un après l'autre,
+         * pendant que le texte monte du bas de l'écran vers son milieu : la page se lit au rythme de la molette.
+         * --p (de 0 à 1) est la place du mot dans le texte : le premier s'allume à 12 % de la traversée, le dernier vers 45 %.
+         * La traversée est mesurée sur le paragraphe (--lit), pas sur chaque mot : les mots d'une même ligne
+         * s'allument quand même l'un après l'autre.
+         */
+        .lit-text {
+            view-timeline: --lit;
+        }
+
+
+        .lit-word {
+            animation: word-lit linear both;
+            animation-timeline: --lit;
+            animation-range: cover calc(12% + var(--p, 0) * 30%) cover calc(18% + var(--p, 0) * 30%);
+        }
+
+
+        @keyframes word-lit {
+            from {
+                opacity: 0.18;
+            }
+        }
+
+
+        /* -------------------- DISTRIBUTION DES CARTES -------------------- */
+
+        /*
+         * Les cartes de la roue arrivent éparpillées depuis le bas de l'écran, penchées, et se posent une à une
+         * à leur place pendant que la roue monte à l'écran ; en remontant, elles repartent.
+         * translate et rotate s'ajoutent au placement transform calculé par project-showcase.js sans le remplacer :
+         * la roue reste utilisable pendant la distribution, et rien ne change une fois les cartes posées.
+         * La traversée est mesurée sur la roue (--deal), immobile, et non sur les cartes qui bougent.
+         * Chaque carte a son départ (--deal-x en largeurs de carte, --deal-y, --deal-r) et son rang (--deal-order) ;
+         * la dernière est posée à 40 % de la traversée : la roue placée sous l'en-tête (lien « Projets ») est complète.
+         */
+        .showcase--ready .showcase__track {
+            view-timeline: --deal;
+        }
+
+
+        .showcase--ready .project-card {
+            animation: card-deal cubic-bezier(0.3, 0.7, 0.3, 1) both;
+            animation-timeline: --deal;
+            animation-range: cover calc(var(--deal-order, 0) * 3%) cover calc(22% + var(--deal-order, 0) * 3%);
+        }
+
+
+        @keyframes card-deal {
+            from {
+                translate: calc(var(--deal-x, 0) * var(--card-width)) var(--deal-y, 80vh);
+                rotate: var(--deal-r, 0deg);
+            }
+        }
+
+
+        .showcase--ready .project-card:nth-child(7n + 1) { --deal-x: -0.9; --deal-y: 55vh; --deal-r: -18deg; --deal-order: 3; }
+        .showcase--ready .project-card:nth-child(7n + 2) { --deal-x: 0.8; --deal-y: 75vh; --deal-r: 14deg; --deal-order: 1; }
+        .showcase--ready .project-card:nth-child(7n + 3) { --deal-x: -0.4; --deal-y: 95vh; --deal-r: 26deg; --deal-order: 5; }
+        .showcase--ready .project-card:nth-child(7n + 4) { --deal-x: 1; --deal-y: 60vh; --deal-r: -10deg; --deal-order: 0; }
+        .showcase--ready .project-card:nth-child(7n + 5) { --deal-x: -1.1; --deal-y: 85vh; --deal-r: 20deg; --deal-order: 4; }
+        .showcase--ready .project-card:nth-child(7n + 6) { --deal-x: 0.3; --deal-y: 110vh; --deal-r: -24deg; --deal-order: 2; }
+        .showcase--ready .project-card:nth-child(7n + 7) { --deal-x: 0.9; --deal-y: 100vh; --deal-r: 8deg; --deal-order: 6; }
+
+
+        /* -------------------- CONTACT -------------------- */
+
+        /*
+         * « Me contacter » grandit pendant qu'il monte vers le milieu de l'écran, puis le formulaire se pose :
+         * il arrive d'un peu plus bas, légèrement penché, et se redresse.
+         * Ces animations jouent aussi sur opacity et translate, comme l'apparition de reveal.js :
+         * le titre et le formulaire en sont dispensés, sinon les deux se contrediraient.
+         */
+        #contact .section__title.reveal,
+        #contact .contact.reveal {
+            opacity: 1;
+            translate: none;
+        }
+
+
+        #contact .section__title {
+            transform-origin: 0 100%;
+
+            animation: contact-title-grow linear both;
+            animation-timeline: view();
+            animation-range: entry 0% cover 45%;
+        }
+
+
+        @keyframes contact-title-grow {
+            from {
+                opacity: 0.3;
+                scale: 0.6;
+            }
+        }
+
+
+        /* Les coins du formulaire penché dépasseraient sur téléphone et élargiraient la page */
+        #contact {
+            overflow-x: clip;
+        }
+
+
+        #contact .contact {
+            transform-origin: 50% 0;
+
+            animation: contact-land cubic-bezier(0.3, 0.7, 0.3, 1) both;
+            animation-timeline: view();
+            animation-range: entry 0% entry 70%;
+        }
+
+
+        @keyframes contact-land {
+            from {
+                translate: 0 16vh;
+                rotate: -3deg;
+                scale: 0.94;
+            }
+        }
+
+    }
+
+}

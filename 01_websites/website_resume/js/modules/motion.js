@@ -1,10 +1,10 @@
 /*
  * Finitions de mouvement communes au portfolio et au site CV (styles dans motion.css) :
  * apparition en cascade, trait glissant sous les liens du menu, boutons magnétiques,
- * entrée en scène de l'accueil, apparition des grands titres, halo des cartes, détails de la frise,
+ * entrée en scène de l'accueil, apparition des grands titres, barres de la méthode, halo des cartes, détails de la frise,
  * chiffrement des cartes data-hover="cipher" et changement de langue des cartes data-hover="language".
  * Chaque partie vérifie que ses éléments existent : le fichier se copie tel quel d'un site à l'autre.
- * En mouvement réduit, ni cascade, ni magnétisme, ni entrée en scène, ni apparition des titres, ni halo,
+ * En mouvement réduit, ni cascade, ni magnétisme, ni entrée en scène, ni apparition des titres, ni barres, ni halo,
  * ni chiffrement, ni changement de langue ;
  * le trait change de lien sans glisser (motion.css).
  */
@@ -12,11 +12,11 @@
 const REDUCED_MOTION = window.matchMedia("(prefers-reduced-motion: reduce)");
 
 /*
- * Ensembles répétés qui apparaissent l'un après l'autre : étapes de frise, items de la méthode,
- * cartes de liens et étiquettes. Les cartes de la roue des projets n'y sont pas :
+ * Ensembles répétés qui apparaissent l'un après l'autre : étapes de frise, cartes de liens et étiquettes.
+ * Les pratiques de la méthode ont leur propre entrée (barres de la méthode). Les cartes de la roue des projets n'y sont pas :
  * project-showcase.js les place et les filtre déjà, une seconde animation les gênerait.
  */
-const STAGGER_ITEMS = ".timeline__step, .method__item, .link-list > li, .tag";
+const STAGGER_ITEMS = ".timeline__step, .link-list > li, .tag";
 
 /* Le trait n'existe que sur ordinateur, quand les liens sont alignés dans l'en-tête */
 const DESKTOP_MENU = window.matchMedia("(min-width: 1025px)");
@@ -40,6 +40,9 @@ const LANGUAGE_STEP_MS = 550;
 
 /* Grands titres qui montent ligne par ligne : sections, reconversion (CV), méthode (portfolio), pied de page */
 const TITLES = ".section__title, .career__intro h2, .method__title, .footer__cta-title";
+
+/* Pratiques de la méthode (portfolio) : leur filet se trace, puis leur texte en sort */
+const METHOD_ITEMS = ".method__item";
 
 /* Cartes éclairées par le halo : projets et liens de contact */
 const HALO_CARDS = ".project-card, .link-card";
@@ -197,7 +200,7 @@ function attachMagnet(button) {
  * au doigt, le bouton ne doit pas bouger sous le doigt.
  */
 function initMagnets() {
-    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+    if (!FINE_HOVER.matches) return;
     document.querySelectorAll(".button--primary").forEach(attachMagnet);
 }
 
@@ -334,6 +337,46 @@ function initTitles() {
         titles.set(title, wrapWords(title));
         title.classList.add("motion-title");
         observer.observe(title);
+    });
+}
+
+
+/* -------------------- BARRES DE LA MÉTHODE -------------------- */
+
+/*
+ * motion.js pose motion-bar sur chaque pratique avant la première image : le filet est replié, le texte attend au-dessus.
+ * --bar-h, la hauteur de la pratique, est la distance de la descente : cube, nom et texte descendent d'un seul bloc.
+ * ResizeObserver la tient à jour jusqu'au départ (polices chargées, fenêtre redimensionnée), avant chaque affichage.
+ * Quand la pratique entre à l'écran, motion-bar--play trace le filet de gauche à droite, puis cube, nom et texte
+ * sortent du filet vers le bas (motion.css). Les pratiques d'une même rangée arrivent ensemble :
+ * --bar-i, leur rang dans ce lot, les fait partir l'une après l'autre.
+ * À la fin de la descente du texte, ou si elle est interrompue, les classes sont retirées : la pratique redevient ordinaire.
+ */
+function initMethodBars() {
+    if (REDUCED_MOTION.matches || !("IntersectionObserver" in window) || !("ResizeObserver" in window)) return;
+    const sizes = new ResizeObserver(entries => {
+        entries.forEach(entry => entry.target.style.setProperty("--bar-h", `${entry.borderBoxSize[0].blockSize}px`));
+    });
+    const observer = new IntersectionObserver(entries => {
+        entries.filter(entry => entry.isIntersecting).forEach((entry, rank) => {
+            const item = entry.target;
+            observer.unobserve(item);
+            sizes.unobserve(item);
+            item.style.setProperty("--bar-i", rank);
+            item.classList.add("motion-bar--play");
+            function done(event) {
+                if (event.propertyName !== "translate" || !event.target.matches(".method__text")) return;
+                item.classList.remove("motion-bar", "motion-bar--play");
+                ["--bar-i", "--bar-h"].forEach(name => item.style.removeProperty(name));
+                ["transitionend", "transitioncancel"].forEach(type => item.removeEventListener(type, done));
+            }
+            ["transitionend", "transitioncancel"].forEach(type => item.addEventListener(type, done));
+        });
+    }, { rootMargin: "0px 0px -10% 0px" });
+    document.querySelectorAll(METHOD_ITEMS).forEach(item => {
+        item.classList.add("motion-bar");
+        sizes.observe(item);
+        observer.observe(item);
     });
 }
 
@@ -542,6 +585,7 @@ export function initMotion() {
     initMagnets();
     initIntro();
     initTitles();
+    initMethodBars();
     initHalos();
     initTimelineDetails();
     initCiphers();

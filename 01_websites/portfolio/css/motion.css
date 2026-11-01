@@ -569,6 +569,81 @@ body::after {
 }
 
 
+/* -------------------- BARRES DE LA MÉTHODE -------------------- */
+
+/*
+ * motion.js pose motion-bar sur chaque pratique avant la première image : le filet de career.css devient transparent
+ * et ::before le redessine, replié à gauche ; cube, nom et texte attendent au-dessus du filet, cachés par clip-path.
+ * motion-bar--play trace le filet en 0,6 s, puis les fait descendre d'un seul bloc de --bar-h, la hauteur de la pratique :
+ * une distance commune, sinon le nom, plus court, descendrait moins loin que le texte et le chevaucherait.
+ * clip-path ne coupe que le haut, au ras du filet : sur les autres côtés, le halo du cube déborde librement.
+ * .method__item.motion-bar > * : deux classes, pour l'emporter sur la transition propre au cube (cubes.css).
+ */
+.motion-bar {
+    position: relative;
+
+    border-top-color: transparent;
+
+    clip-path: inset(-1px -40px -40px -40px);
+}
+
+
+.motion-bar::before {
+    content: "";
+
+    position: absolute;
+    top: -1px;
+    right: 0;
+    left: 0;
+
+    height: 1px;
+
+    background-color: var(--line);
+
+    transform-origin: 0 50%;
+
+    scale: 0 1;
+
+    transition: scale 0.6s cubic-bezier(0.6, 0, 0.2, 1);
+    transition-delay: calc(var(--bar-i, 0) * 150ms);
+}
+
+
+.method__item.motion-bar > * {
+    translate: 0 calc(-1 * var(--bar-h, 100%) - 24px);
+
+    transition: translate 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+
+.motion-bar--play::before {
+    scale: 1 1;
+}
+
+
+.method__item.motion-bar--play > * {
+    translate: none;
+
+    transition-delay: calc(var(--bar-i, 0) * 150ms + 450ms);
+}
+
+
+
+/* À l'impression, les pratiques jamais atteintes à l'écran s'impriment quand même */
+@media print {
+
+    .motion-bar::before {
+        scale: 1 1;
+    }
+
+
+    .method__item.motion-bar > * {
+        translate: none;
+    }
+
+}
+
+
 /* -------------------- HALO DES CARTES -------------------- */
 
 /*
@@ -612,7 +687,7 @@ body::after {
 /* -------------------- MOUVEMENT RÉDUIT -------------------- */
 
 /*
- * Pas de cascade (reveal.js n'ajoute déjà aucune classe), pas de magnétisme ni d'entrée en scène, ni d'apparition des titres,
+ * Pas de cascade (reveal.js n'ajoute déjà aucune classe), pas de magnétisme ni d'entrée en scène, ni d'apparition des titres ni de barres,
  * ni de halo ni de chiffrement ni de changement de langue (motion.js s'arrête), pas de serpent, de bonhomme, de chat ni de flèche
  * (ils restent cachés), et un trait qui change de lien d'un coup.
  * Les détails de la frise s'affichent d'emblée : timeline.js ne pose pas timeline--animated.

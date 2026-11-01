@@ -40,15 +40,16 @@
     <link rel="stylesheet" href="css/navigation.css?v=4f47cea82c11">
     <link rel="stylesheet" href="css/sections.css?v=2d1322511799">
     <link rel="stylesheet" href="css/buttons.css?v=2108940d7dfb">
-    <link rel="stylesheet" href="css/home.css?v=2f240020d128">
+    <link rel="stylesheet" href="css/home.css?v=7c12b2112122">
     <link rel="stylesheet" href="css/cubes.css?v=cde2ce89c339">
     <link rel="stylesheet" href="css/projects.css?v=0acd8c2ef261">
-    <link rel="stylesheet" href="css/career.css?v=80c53986663f">
-    <link rel="stylesheet" href="css/contact.css?v=a82baebf779d">
+    <link rel="stylesheet" href="css/career.css?v=209ff55b0b99">
+    <link rel="stylesheet" href="css/contact.css?v=0973b22945d8">
     <link rel="stylesheet" href="css/footer.css?v=bb28efed03ab">
     <link rel="stylesheet" href="css/responsive.css?v=82742423eae5">
     <link rel="stylesheet" href="css/human-check.css?v=85e4238a79c0">
-    <link rel="stylesheet" href="css/motion.css?v=497b42af2aa8">
+    <link rel="stylesheet" href="css/motion.css?v=e09e3f2f2d51">
+    <link rel="stylesheet" href="css/scroll.css?v=8c33ddc0b5e7">
     <!-- blocking="render" : la page ne s'affiche qu'une fois le script exécuté, cubes compris.
          Le fondu entre pages part ainsi d'une page complète au lieu de la voir se construire. -->
     <!-- Modules importés par main.js, demandés tous ensemble : sans cette liste, le navigateur les découvre
@@ -65,6 +66,7 @@
     <link rel="modulepreload" href="js/modules/cubes/drag-cube.js">
     <link rel="modulepreload" href="js/modules/cat.js">
     <link rel="modulepreload" href="js/modules/timeline.js">
+    <link rel="modulepreload" href="js/modules/scroll-motion.js">
     <link rel="modulepreload" href="js/modules/project-showcase.js">
     <link rel="modulepreload" href="js/modules/project-filter.js">
     <link rel="modulepreload" href="js/modules/project-demos.js">
@@ -592,7 +594,7 @@
                                 </div>
 
                                 <div class="project-card__actions">
-                                    <a class="button" href="https://axel-follet.github.io/website_resume/" target="_blank" rel="noopener noreferrer">See the live website</a>
+                                    <a class="button" href="https://axel-follet.github.io/website_resume/index-en.html" target="_blank" rel="noopener noreferrer">See the live website</a>
                                     <a class="button" href="https://github.com/Axel-FOLLET/website_resume" target="_blank" rel="noopener noreferrer">Source code</a>
                                 </div>
 
@@ -693,7 +695,7 @@
             <ul class="link-list">
 
                 <li>
-                    <a class="link-card" href="https://axel-follet.github.io/website_resume/" target="_blank" rel="noopener noreferrer">
+                    <a class="link-card" href="https://axel-follet.github.io/website_resume/index-en.html" target="_blank" rel="noopener noreferrer">
                         <!-- Pictogramme : globe -->
                         <svg class="link-card__icon" viewBox="0 0 24 24" aria-hidden="true">
                             <circle cx="12" cy="12" r="9"/>
@@ -777,7 +779,7 @@
 
                         <button class="button button--primary" type="submit">Send</button>
 
-                        <p class="form__notice">All fields are required except the subject.<a href="#donnees-formulaire">How your data is used</a></p>
+                        <p class="form__notice">All fields are required except the subject. <a href="#donnees-formulaire">How your data is used</a></p>
 
                         <!-- Message de confirmation ou d'erreur, lu par les lecteurs d'écran -->
                         <p class="form__status" id="form-status" role="status" aria-live="polite"></p>
@@ -828,7 +830,7 @@
             <div>
                 <p class="footer__title">Links</p>
                 <ul class="footer__list">
-                    <li><a href="https://axel-follet.github.io/website_resume/" target="_blank" rel="noopener noreferrer">My resume website</a></li>
+                    <li><a href="https://axel-follet.github.io/website_resume/index-en.html" target="_blank" rel="noopener noreferrer">My resume website</a></li>
                     <li><a href="https://www.linkedin.com/in/axel-follet/" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
                     <li><a href="https://github.com/Axel-FOLLET" target="_blank" rel="noopener noreferrer">GitHub</a></li>
                 </ul>
@@ -837,7 +839,7 @@
             <div>
                 <p class="footer__title">Resources and credits</p>
                 <p class="footer__credits">
-                    Photo, drawings and texts: original work by Axel FOLLET. 3D cubes, faceted cat and symbols built with HTML, CSS, SVG and JavaScript. Manrope typeface (The Manrope Project Authors), under the <a href="assets/fonts/OFL-Manrope.txt">SIL Open Font License 1.1</a>, hosted with the site. LinkedIn® and the [in]® logo are trademarks of LinkedIn Corporation and its affiliates; this site is neither affiliated with nor endorsed by LinkedIn.
+                    Photo, drawings and texts: original work by Axel FOLLET. 3D cubes, faceted cat and symbols built with HTML, CSS, SVG and JavaScript. Manrope (The Manrope Project Authors) and Instrument Serif (The Instrument Serif Project Authors) typefaces, under the SIL Open Font License 1.1 (<a href="assets/fonts/OFL-Manrope.txt">Manrope licence</a>, <a href="assets/fonts/OFL-InstrumentSerif.txt">Instrument Serif licence</a>), hosted with the site. LinkedIn® and the [in]® logo are trademarks of LinkedIn Corporation and its affiliates; this site is neither affiliated with nor endorsed by LinkedIn.
                 </p>
                 <details class="footer__legal">
                     <summary class="footer__legal-toggle">Legal notice and data</summary>
@@ -845,7 +847,7 @@
                     <p><strong>Host:</strong> GitHub, Inc. (GitHub Pages), 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, United States, <a href="https://support.github.com/" target="_blank" rel="noopener noreferrer">support.github.com</a>. For security purposes, GitHub logs visitors' IP addresses.</p>
                     <p id="donnees-formulaire"><strong>Contact form:</strong> data controller, Axel FOLLET. Last name, first name, email and message are required; the subject is optional. This data is used only to reply to you, on the basis of the legitimate interest in handling your request. It goes through Formspree, Inc., in the United States, which keeps it under its <a href="https://formspree.io/legal/privacy-policy" target="_blank" rel="noopener noreferrer">privacy policy</a>, and is deleted 12 months after our last exchange. You can ask to access, rectify or erase your data or to restrict its processing, or object to it, through the form or LinkedIn, and lodge a complaint with the <a href="https://www.cnil.fr/fr/plaintes" hreflang="fr" target="_blank" rel="noopener noreferrer">CNIL</a> (French data protection authority; complaint page in French).</p>
                     <p><strong>Browser:</strong> no cookies and no audience tracking. The site only keeps on your device your answer to “Are you human?”, asked when you send the form, until the tab is closed, and your Snake and Hangman records, until you clear the site data in your browser.</p>
-                    <p><strong>Intellectual property:</strong> texts, photo, drawings, layout and source code © 2026 Axel FOLLET, all rights reserved. The code is public on GitHub to be read; any reuse requires my permission. The Manrope typeface and the LinkedIn logo remain under their own licences and trademarks.</p>
+                    <p><strong>Intellectual property:</strong> texts, photo, drawings, layout and source code © 2026 Axel FOLLET, all rights reserved. The code is public on GitHub to be read; any reuse requires my permission. The Manrope and Instrument Serif typefaces and the LinkedIn logo remain under their own licences and trademarks.</p>
                 </details>
             </div>
 
@@ -855,6 +857,8 @@
             <p class="footer__copyright">&copy; 2026 Axel FOLLET, all rights reserved</p>
             <a class="footer__top" href="#top">Back to top ↑</a>
         </div>
+
+
 
     </footer>
 

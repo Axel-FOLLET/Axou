@@ -3,6 +3,7 @@
  * export rend une valeur utilisable ailleurs ; import récupère uniquement les noms nécessaires.
  */
 import { canvas } from "./canvas.js";
+import { SAISIE_MAX } from "./constants.js";
 import { coordonneesSouris } from "./pointer.js";
 import { demarrerPartie, rejouer, retourAccueil, traiterTentative } from "./rules.js";
 import { state } from "./state.js";
@@ -98,7 +99,7 @@ export function initControls() {
 
         if (/^[A-Za-zÀ-ÖØ-öø-ÿ]$/u.test(event.key)) {
             event.preventDefault();
-            state.saisie += event.key;
+            if (state.saisie.length < SAISIE_MAX) state.saisie += event.key;
         }
     });
 

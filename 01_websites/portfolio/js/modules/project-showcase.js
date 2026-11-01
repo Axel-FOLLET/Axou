@@ -598,7 +598,9 @@ export function initProjectShowcase(language) {
             window.addEventListener(type, () => controller.abort(), { once: true, passive: true, signal });
         });
         async function settle() {
-            await Promise.all(document.querySelector(".header").getAnimations({ subtree: true }).map(animation => animation.finished));
+            /* La barre de lecture (scroll.css) suit le défilement : sa promesse finished n'arrive qu'en bas de page */
+            const animations = document.querySelector(".header").getAnimations({ subtree: true }).filter(animation => animation.timeline === document.timeline);
+            await Promise.all(animations.map(animation => animation.finished));
             if (signal.aborted) return;
             controller.abort();
             if (Math.abs(window.scrollY - wheelTop()) > 1) window.scrollTo({ top: wheelTop() });

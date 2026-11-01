@@ -55,3 +55,9 @@ body {
 }
 
 
+/* Le clavier n'agit que si le canvas a le focus : il doit se voir */
+.game-player__canvas:focus-visible {
+    outline: 3px solid #FFFFFF;
+}
+
+
