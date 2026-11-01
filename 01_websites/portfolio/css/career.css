@@ -247,3 +247,11 @@
 
     color: var(--muted);
 }
+
+
+/* Phrase clé de chaque pratique : en blanc, comme les mots clés de l'introduction */
+.method__text strong {
+    color: var(--white);
+
+    font-weight: 700;
+}
