@@ -48,6 +48,20 @@
 
     @supports (animation-timeline: scroll()) {
 
+        /* -------------------- DISPENSE DE reveal.js -------------------- */
+
+        /*
+         * Les entrées ci-dessous partent dès que leur bloc touche le bas de l'écran ; reveal.js ne l'affiche
+         * qu'à 10 % plus haut, puis en fondu : le début de l'entrée se jouerait sur un bloc encore invisible
+         * (jusqu'à 15 % de la distribution, mesuré). Ces blocs restent donc affichés et laissent l'entrée jouer seule.
+         * Le contact a sa propre dispense, plus bas.
+         */
+        .reveal:is(.lit-text, :has(.lit-text, .project-card)) {
+            opacity: 1;
+            translate: none;
+        }
+
+
         /* -------------------- BARRE DE PROGRESSION -------------------- */
 
         /*
