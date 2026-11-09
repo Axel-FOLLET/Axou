@@ -2,63 +2,55 @@ import * as THREE from 'three';
 import { Butterfly, ButterflyAssets, SPECIES } from './Butterfly.js';
 import { heightAt as groundAt } from '../world/Terrain.js';
 import { MEADOW_LIMIT } from '../world/field.js';
+import { rng } from '../world/random.js';
 
-/** Générateur pseudo-aléatoire reproductible (mulberry32), valeurs dans [0, 1). */
-export function mulberry32(seed) {
-  let a = seed >>> 0;
-  return () => {
-    a = (a + 0x6d2b79f5) >>> 0;
-    let t = a;
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
+/**
+ * Butterfly swarm, independent of the cat and the meadow. Created by main.js and given to Brain.js for the
+ * hunt. It creates the butterflies (Butterfly.js), reserves flowers for them and resolves pounces.
+ */
 
-const _h = new THREE.Vector3();
 const hdist = (a, b) => Math.hypot(a.x - b.x, a.z - b.z);
 
 /**
- * Essaim de papillons, indépendant du chat et de la prairie.
+ * Inputs: the scene, the flower tops (array of `THREE.Vector3`, kept **by reference**: a perched butterfly
+ * follows its flower if the meadow moves it), then `update(dt, catPosition, { pouncing })` every frame.
  *
- * Entrées : la scène, les sommets des corolles (tableau de `THREE.Vector3`, gardé **par
- * référence** : si la prairie déplace ces vecteurs, un papillon posé suit sa fleur), puis à chaque
- * image `update(dt, positionDuChat, { pouncing })`.
- *
- * Pour la chasse (agent D) : `nearestPerched`, `pick(raycaster)` / `pickables`, `target`,
- * `untarget`, `pounce` (résultat 'caught' ou 'missed' ; dans les deux cas le papillon repart sans
- * mal), `startle(point, rayon)` ; évènements par `onEvent(type, papillon)`.
+ * For the hunt: `pick(raycaster)` / `pickables`, `target`, `untarget`, `pounce` (result
+ * 'caught' or 'missed'; either way the butterfly leaves unharmed), `startle(point, radius)`; events through
+ * `onEvent(type, butterfly)`.
  */
 export class Butterflies {
   /**
    * @param {THREE.Object3D} scene
-   * @param {THREE.Vector3[]} flowers  sommets des corolles (m, repère monde)
+   * @param {THREE.Vector3[]} flowers  flower tops (m, world frame)
    * @param {object} [options]
-   * @param {number} [options.count=6]            nombre de papillons
-   * @param {number} [options.seed]               graine du hasard (essais reproductibles)
-   * @param {number} [options.startleRadius=1.0]  m, rayon d'envol quand le chat bondit
-   * @param {number} [options.walkFleeRadius=0.3] m, un papillon posé non visé s'envole si le chat passe à moins de ça
-   * @param {[number, number]} [options.rest=[8, 16]] s, temps passé loin après une fuite avant de revenir
-   * @param {number} [options.flowerMaxDist=8]    m, préférence pour les fleurs à moins de ça du chat
-   * @param {{center: THREE.Vector3, radius: number}} [options.bounds] enceinte de vol (sinon déduite des fleurs)
+   * @param {number} [options.count=6]            number of butterflies
+   * @param {number} [options.seed]               random seed (reproducible runs)
+   * @param {number} [options.startleRadius=1.0]  m, take-off radius when the cat pounces
+   * @param {number} [options.walkFleeRadius=0.3] m, a perched, untargeted butterfly leaves if the cat passes closer
+   * @param {[number, number]} [options.rest=[8, 16]] s, time away after fleeing before returning
+   * @param {number} [options.flowerMaxDist=8]    m, preference for flowers closer than this to the cat
+   * @param {{center: THREE.Vector3, radius: number}} [options.bounds] flight enclosure (default: derived from the flowers)
+   * @param {(f: THREE.Vector3) => boolean} [options.landable] whether a flower can be landed on (not one hidden behind the rampart)
    */
   constructor(scene, flowers = [], options = {}) {
     this.scene = scene;
     this.count = options.count ?? 6;
-    this.rng = mulberry32(options.seed ?? (Math.random() * 2 ** 32));
+    this.rng = rng(options.seed ?? (Math.random() * 2 ** 32));
     this.startleRadius = options.startleRadius ?? 1.0;
     this.walkFleeRadius = options.walkFleeRadius ?? 0.3;
     this.rest = options.rest ?? [8, 16];
     this.flowerMaxDist = options.flowerMaxDist ?? 8;
     this._fixedBounds = options.bounds ?? null;
+    this.landable = options.landable ?? (() => true);
     this.assets = new ButterflyAssets();
     /** @type {Butterfly[]} */
     this.list = [];
-    /** Sphères de clic invisibles (une par papillon), `userData.butterfly` = le papillon. */
+    /** Invisible click spheres (one per butterfly), `userData.butterfly` = the butterfly. */
     this.pickables = [];
-    /** Rappel facultatif : (type, papillon), type ∈ takeoff, land, flee, caught, missed, escape, return. */
+    /** Optional callback (type, butterfly); type is takeoff, land, flee, caught, missed, escape or return. */
     this.onEvent = null;
-    this._taken = new Map();     // Vector3 de fleur → papillon qui l'a réservée
+    this._taken = new Map();     // flower Vector3 → butterfly that reserved it
     this._cat = new THREE.Vector3();
     this._ctx = { cat: this._cat, swarm: this, bounds: null };
     this.setFlowers(flowers);
@@ -79,7 +71,7 @@ export class Butterflies {
     }
   }
 
-  /** Remplace la liste des fleurs (par référence). Les papillons posés sur une fleur disparue redécollent. */
+  /** Replaces the flower list (by reference). Butterflies perched on a removed flower take off. */
   setFlowers(points) {
     this.flowers = points ?? [];
     const keep = new Set(this.flowers);
@@ -90,7 +82,7 @@ export class Butterflies {
       if (b.state === 'perched') b.takeOff(null, 1);
     }
     const b = this._fixedBounds ?? this._boundsFromFlowers();
-    // Enceinte rabattue dans la prairie (mission catgame_monde) : centre + rayon ≤ MEADOW_LIMIT − 1.
+    // Enclosure pulled inside the meadow: centre + radius ≤ MEADOW_LIMIT − 1.
     const room = MEADOW_LIMIT - 1 - Math.hypot(b.center.x, b.center.z);
     this._ctx.bounds = { center: b.center, radius: Math.max(1, Math.min(b.radius, room)) };
   }
@@ -106,10 +98,10 @@ export class Butterflies {
   }
 
   /**
-   * À appeler à chaque image.
-   * @param {number} dt  secondes
-   * @param {THREE.Vector3} catPos  position du chat au sol
-   * @param {{pouncing?: boolean}} [opts]  `pouncing` : bond en cours (les papillons non visés à moins de `startleRadius` s'envolent)
+   * Call every frame.
+   * @param {number} dt  seconds
+   * @param {THREE.Vector3} catPos  cat's ground position
+   * @param {{pouncing?: boolean}} [opts]  `pouncing`: pounce in progress (untargeted butterflies within `startleRadius` take off)
    */
   update(dt, catPos, opts = {}) {
     if (catPos) this._cat.copy(catPos);
@@ -121,8 +113,8 @@ export class Butterflies {
   }
 
   /**
-   * Effraie les papillons à moins de `radius` (distance horizontale) de `point` : posés ou en vol,
-   * ils fuient. Le papillon visé (`target`) est épargné sauf `includeTargeted`. Renvoie le nombre d'envols.
+   * Scares butterflies within `radius` (horizontal) of `point`: perched or flying, they flee. The targeted
+   * one is spared unless `includeTargeted`. Returns the number of butterflies scared.
    */
   startle(point, radius, { includeTargeted = false } = {}) {
     let n = 0;
@@ -134,41 +126,29 @@ export class Butterflies {
     return n;
   }
 
-  /** Papillons posés. */
+  /** Perched butterflies. */
   perched() { return this.list.filter((b) => b.state === 'perched'); }
 
-  /** Papillon posé le plus proche de `point` (distance horizontale ≤ `maxDist`), ou null. */
-  nearestPerched(point, maxDist = Infinity) {
-    let best = null, bestD = maxDist;
-    for (const b of this.list) {
-      if (b.state !== 'perched') continue;
-      const d = hdist(b.position, point);
-      if (d <= bestD) { best = b; bestD = d; }
-    }
-    return best;
-  }
-
-  /** Papillon touché par un rayon (`THREE.Raycaster` déjà réglé), ou null. N'importe quel état. */
+  /** Butterfly hit by a ray (a set-up `THREE.Raycaster`), or null, in any state. */
   pick(raycaster) {
     const hit = raycaster.intersectObjects(this.pickables, false)[0];
     return hit ? hit.object.userData.butterfly : null;
   }
 
-  /** Marque `b` comme visé (seul visé de l'essaim) : il reste posé et ignore l'approche du chat. */
+  /** Marks `b` as targeted (the only one in the swarm): it stays perched and ignores the approaching cat. */
   target(b) {
     for (const o of this.list) o.targeted = false;
     if (b && b.state === 'perched') { b.targeted = true; return true; }
     return false;
   }
 
-  /** Plus aucun papillon visé (chasse abandonnée). */
+  /** No butterfly targeted any more (hunt abandoned). */
   untarget() { for (const b of this.list) b.targeted = false; }
 
   /**
-   * Résout le bond du chat sur `b`, à appeler à la réception (la patte touche `pawPoint`).
-   * Attrapé si `b` est encore posé, à moins de `reach` (distance horizontale) de la patte, et si
-   * le tirage passe sous `catchChance`. Attrapé : immobile `holdSecs` puis s'échappe sans mal ;
-   * raté : s'envole aussitôt. Les autres papillons à moins de `startleRadius` s'envolent aussi.
+   * Resolves the cat's pounce on `b`, called at landing (the paw touches `pawPoint`). Caught if `b` is still
+   * perched, within `reach` (horizontal) of the paw and the draw passes `catchChance`. Caught: held `holdSecs`,
+   * then escapes unharmed; missed: flies off at once. Others within `startleRadius` also take off.
    * @returns {'caught'|'missed'}
    */
   pounce(b, pawPoint, { catchChance = 0.3, reach = 0.25, holdSecs = 0.8 } = {}) {
@@ -196,15 +176,15 @@ export class Butterflies {
     this._emit('flee', b);
   }
 
-  /** Réserve une fleur libre pour `b` (autre que `exclude`), de préférence près de lui et pas sous le chat. */
+  /** Reserves a free flower for `b` (other than `exclude`), preferably close to it and not under the cat. */
   _reserveFlower(b, exclude) {
-    // Fleurs hors de la prairie (au-delà de MEADOW_LIMIT − 0,5 m) : jamais choisies.
-    const free = this.flowers.filter((f) => f !== exclude && !this._taken.has(f) && Math.hypot(f.x, f.z) <= MEADOW_LIMIT - 0.5);
+    // Flowers outside the meadow (beyond MEADOW_LIMIT − 0.5 m) are never chosen.
+    const free = this.flowers.filter((f) => f !== exclude && !this._taken.has(f) && Math.hypot(f.x, f.z) <= MEADOW_LIMIT - 0.5 && this.landable(f));
     if (!free.length) return null;
     const cat = this._cat;
     let pool = free.filter((f) => { const d = hdist(f, cat); return d >= 1.2 && d <= this.flowerMaxDist; });
     if (!pool.length) pool = free;
-    // Trois tirages, on garde le plus proche du papillon (trajets plausibles, pas toujours le même).
+    // Three draws, keep the closest to the butterfly (plausible trips, not always the same).
     let best = null, bestD = Infinity;
     for (let i = 0; i < 3; i++) {
       const f = pool[Math.floor(this.rng() * pool.length)];
@@ -221,7 +201,7 @@ export class Butterflies {
 
   _emit(type, b) { this.onEvent?.(type, b); }
 
-  /** Retire les papillons de la scène et libère géométries et matériaux. */
+  /** Removes the butterflies from the scene and frees geometries and materials. */
   dispose() {
     for (const b of this.list) b.remove();
     this.list = []; this.pickables = []; this._taken.clear();

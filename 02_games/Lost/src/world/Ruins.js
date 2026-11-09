@@ -1,84 +1,72 @@
+/**
+ * Meadow ruins: a small ruined church facing the starting point and four wall sections. Two low walls (0.42 m) can be
+ * walked on; two high walls are climbed by a chain of rubble steps, and one of them has an arch the cat can pass through.
+ * The four side windows of the church can be crossed (`crossable`); the other openings are obstacles. Created by
+ * World.js; Brain.js reads its obstacles and surfaces through World.js, and Picker.js uses its click targets.
+ *
+ * Stones are chamfered boxes (24 vertices, 44 triangles) with pillow normals for soft toon shading, recessed joints
+ * instead of mortar, stepped tops, moss on top, fallen stones and round boulders at the foot. No inverted-hull outline:
+ * pillow normals are not shared between faces, so a hull would split at the edges; the joints act as the outline.
+ * Each wall (with its steps and fallen stones), the roof and each boulder is one merged mesh with its own material, so
+ * only the piece hiding the cat fades out. An invisible mesh (`pickables`) carries the walkable tops for clicks.
+ *
+ * Each stone of an isolated wall rests on the lowest `heightAt` across the wall thickness, minus SINK, so the wall
+ * follows the ground. The church is level, on the lowest `heightAt` of its footprint minus SINK.
+ */
+
 import * as THREE from 'three';
 import { STONE, MOSS, color, jitter, toonMaterial } from '../style/palette.js';
 import { heightAt as terrainHeightAt } from './Terrain.js';
+import { rng } from './random.js';
+
+export const SINK = 0.08;          // m: stones are buried SINK below the lowest ground
+export const LOW_WALL_TOP = 0.42;  // m: height of the low walls above their local base (+SINK buried)
+const VD = 0.2;                    // m: radial depth of the arch voussoirs
+
+// ------------------------------------------------------------------ layout (metres, world space)
 
 /**
- * Ruines de la prairie (mission catgame_monde, 2026-10-26, agent R). Décision de l'utilisateur :
- * « des montagnes en arrière plan et des vestiges de mur, d'eglise ect pour un monde plus vivant » ;
- * murs : « si il peut grimper dessus ».
- *
- * Contenu : une petite église en ruine (nef sans toit avec un reste de toiture, pignon avec
- * clocher-mur et baie, porte en ogive, oculus, fenêtres en ogive cassées) face au point de départ,
- * et quatre pans de murs : deux murets BAS (≈ 0,42 m au-dessus du sol, le chat saute dessus et y
- * marche) et deux murs HAUTS (le chat les contourne ; l'un a une arche où il peut passer).
- *
- * Style (docs/recherche/style.md § 10, inspiration seulement) : pierres empilées aux arêtes
- * chanfreinées et normales « en coussin » (rendu doux en toon), joints en creux d'ombre sans
- * mortier, sommets en gradins, mousse sur le dessus, pierres tombées, rochers ronds au pied.
- * Couleurs : STONE et MOSS de palette.js (une teinte par bloc, `jitter`), matériau `toonMaterial`.
- * Pas de contour en coque inversée : les normales en coussin ne sont pas partagées entre faces,
- * la coque se fendrait aux arêtes ; les joints font office de trait.
- *
- * Coût : tout le décor est UNE géométrie fusionnée (un seul appel de dessin, plus la passe
- * d'ombre si `shadows`), 24 sommets et 44 triangles par pierre. Un maillage invisible
- * (`pickables`) porte le dessus des murets bas pour le clic ; il n'est jamais dessiné.
- *
- * Pose sur le relief : chaque pierre d'un mur isolé repose sur min(heightAt) à travers l'épaisseur
- * du mur à son abscisse, moins SINK (le mur suit le sol, comme dans les murets de référence) ;
- * l'église est de niveau, sa base est le minimum de heightAt sur toute son emprise moins SINK.
- *
- * Interface (détail dans la fiche 07_ruines de la mission) :
- * - `new Ruins(scene, { heightAt, shadows })` ; `ruins.mesh`, `ruins.pickables`, `ruins.obstacles`,
- *   `ruins.rubble`, `ruins.surfaces`, `ruins.stats`.
- * - `walkableAt(x, z, margin)`, `obstacleAt(x, z, margin)`, `resolve(x, z, radius, opts)`,
- *   `blockedSegment(ax, az, bx, bz, radius, opts)`, `detour(ax, az, bx, bz, radius, opts)`.
- */
-
-export const SINK = 0.08;          // m : la base des pierres est enterrée de SINK sous le sol le plus bas
-export const LOW_WALL_TOP = 0.42;  // m : hauteur des murets bas au-dessus de leur base locale (+SINK enterré)
-const VD = 0.2;                    // m : profondeur radiale des claveaux d'arche
-
-function rng(seed) {
-  return () => {
-    seed |= 0; seed = (seed + 0x6d2b79f5) | 0;
-    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-// ------------------------------------------------------------------ disposition (mètres, monde)
-
-/**
- * Église : centre, demi-dimensions, orientation calculée pour que la façade (porte) regarde
- * l'origine. Placée à 12,5 m, légèrement à gauche de l'axe de la caméra de départ
- * (caméra (1,45 ; 0,42 ; 2,05) → cible (0 ; 0,22 ; 0)), derrière le chat : elle ne le masque pas.
+ * Church: centre and dimensions (m), oriented so that the facade (door) faces the origin. Placed 12.5 m away, slightly
+ * left of the starting camera axis and behind the cat, so it never hides it.
  */
 export const CHURCH = { x: -3.65, z: -11.95, width: 4.6, length: 7.6, thick: 0.5, eave: 2.9, apex: 4.7, belfry: 6.0 };
 
 /**
- * Pans de murs isolés : extrémités p0 → p1 (x, z), épaisseur, hauteur (fonction de l'abscisse s),
- * `climbable` = muret bas praticable. Ouvertures : { c (abscisse du centre), w, sill, spring,
- * kind: 'pointed' | 'round' | 'circle', passable }.
+ * Isolated wall sections: endpoints p0 -> p1 (x, z), thickness, height (function of the position s along the wall),
+ * `climbable` = low walkable wall. Openings: { c (centre position along the wall), w, sill, spring,
+ * kind: 'pointed' | 'round' | 'circle', passable }. All in metres.
  */
 export const WALLS = [
-  { name: 'muret_est', climbable: true, p0: [-1.15, -4.55], p1: [1.95, -4.2], thick: 0.46, seed: 21 },
-  { name: 'muret_ouest', climbable: true, p0: [-4.45, 0.05], p1: [-5.3, -2.6], thick: 0.46, seed: 37 },
+  { name: 'low_wall_east', climbable: true, p0: [-1.15, -4.55], p1: [1.95, -4.2], thick: 0.46, seed: 21 },
+  { name: 'low_wall_west', climbable: true, p0: [-4.45, 0.05], p1: [-5.3, -2.6], thick: 0.46, seed: 37 },
   {
-    name: 'mur_haut_sud_est', climbable: false, p0: [3.0, -7.2], p1: [6.1, -8.9], thick: 0.48, seed: 53,
+    name: 'high_wall_south_east', climbable: false, p0: [3.0, -7.2], p1: [6.1, -8.9], thick: 0.48, seed: 53,
     top: (s) => (s < 0.7 ? 1.35 : s < 1.5 ? 1.95 : s < 2.3 ? 1.7 : s < 2.9 ? 1.25 : 0.95),
     openings: [{ c: 1.6, w: 0.6, sill: 0.85, spring: 1.35, kind: 'pointed' }],
+    perch: [2.9, 99], climbSide: 1,
   },
   {
-    name: 'mur_arche_nord_ouest', climbable: false, p0: [-8.6, 2.2], p1: [-5.4, 5.3], thick: 0.5, seed: 71,
+    name: 'arch_wall_north_west', climbable: false, p0: [-8.6, 2.2], p1: [-5.4, 5.3], thick: 0.5, seed: 71,
     top: (s) => (s < 0.5 ? 1.5 : s < 1.1 ? 2.0 : s < 3.4 ? 2.25 : s < 4.0 ? 1.7 : 1.1),
     openings: [{ c: 2.2, w: 1.0, sill: 0, spring: 0.95, kind: 'round', passable: true }],
+    // The low end (s > 4.2 m, about 1.13 m high) is only 0.26 m long, so the walkable top uses the next step up
+    // (about 1.56 m above the ground, s from 3.66 to 4.12 m).
+    perch: [3.66, 4.12], climbSide: -1,
   },
 ];
 
-// ------------------------------------------------------------------ pierre chanfreinée
+/**
+ * Stepped rubble. At the foot of each high wall with a `perch` (walkable top), a chain of round-stone steps climbs from
+ * the ground to that top on side `climbSide` (+1: wall normal side, -1: opposite side; chosen toward the origin, so it
+ * shows from the start). Each jump is at most STEP_RISE_MAX, about the height of the low walls (LOW_WALL_TOP, 0.42 m)
+ * that the `Jump` and `JumpDown` clips already clear (Brain.js).
+ */
+export const STEP_RISE_MAX = 0.4;   // m: maximum rise of a jump (ground to step, step to step, step to top)
+const STEP = { hx: 0.3, hz: 0.26, gap: 0.03, slab: 0.1 }; // half-sizes of a step's plate, gap between steps, half-thickness of the slab (m)
 
-/** Topologie d'une boîte chanfreinée : 24 sommets (8 coins × 3 faces), 44 triangles. */
+// ------------------------------------------------------------------ chamfered stone
+
+/** Topology of a chamfered box: 24 vertices (8 corners x 3 faces), 44 triangles. */
 const BOX = (() => {
   const corners = [];
   for (let i = 0; i < 8; i++) corners.push([(i & 1) ? 1 : -1, (i & 2) ? 1 : -1, (i & 4) ? 1 : -1]);
@@ -86,7 +74,7 @@ const BOX = (() => {
   const tris = [];
   const quad = (a, b, cc, d) => { tris.push([a, b, cc], [a, cc, d]); };
   const cornerOf = (sx, sy, sz) => corners.findIndex((s) => s[0] === sx && s[1] === sy && s[2] === sz);
-  // Faces : 4 coins de signe s sur l'axe k, parcourus en cycle dans le plan des deux autres axes.
+  // Faces: the 4 corners with sign s on axis k, walked in a cycle in the plane of the two other axes.
   for (let k = 0; k < 3; k++) {
     const i = (k + 1) % 3, j = (k + 2) % 3;
     for (const s of [-1, 1]) {
@@ -97,7 +85,7 @@ const BOX = (() => {
       quad(...ring);
     }
   }
-  // Arêtes : entre la face (i, si) et la face (j, sj), le long de l'axe k.
+  // Edges: between face (i, si) and face (j, sj), along axis k.
   for (let k = 0; k < 3; k++) {
     const i = (k + 1) % 3, j = (k + 2) % 3;
     for (const si of [-1, 1]) for (const sj of [-1, 1]) {
@@ -107,9 +95,9 @@ const BOX = (() => {
       quad(vid(c0, i), vid(c1, i), vid(c1, j), vid(c0, j));
     }
   }
-  // Coins.
+  // Corners.
   for (let c = 0; c < 8; c++) tris.push([vid(c, 0), vid(c, 1), vid(c, 2)]);
-  // Sens : normale sortante (boîte convexe centrée : produit scalaire avec le centre du triangle).
+  // Winding: outward normal (convex centred box: dot product with the triangle centre).
   const P = [];
   for (let c = 0; c < 8; c++) for (let k = 0; k < 3; k++) {
     const p = corners[c].map((s, a) => s * (a === k ? 1 : 0.7));
@@ -129,15 +117,16 @@ const BOX = (() => {
 const _v = new THREE.Vector3(), _n = new THREE.Vector3(), _m = new THREE.Matrix4();
 const _q = new THREE.Quaternion(), _q2 = new THREE.Quaternion(), _s1 = new THREE.Vector3(1, 1, 1);
 const _Y = new THREE.Vector3(0, 1, 0), _Z = new THREE.Vector3(0, 0, 1), _X = new THREE.Vector3(1, 0, 0);
-const PILLOW = 0.3; // inclinaison des normales vers le coin : aplat légèrement bombé en toon
+const _hit = { top: null }; // surfaceAt output for walkableAt
+const PILLOW = 0.3; // tilt of the normals toward the corner: a slightly domed flat in toon shading
 
-/** Accumulateur de géométrie fusionnée (positions, normales, couleurs, index). */
-class Builder {
+/** Accumulator for merged geometry (positions, normals, colours, indices). Reused by Rampart.js. */
+export class Builder {
   constructor() { this.pos = []; this.nrm = []; this.col = []; this.idx = []; this.count = 0; }
 
   /**
-   * Pierre : demi-tailles (hx, hy, hz), chanfrein r, position, quaternion, couleur (THREE.Color),
-   * mousse : { amount 0-1, color } posée sur les sommets dont la normale monde regarde vers le haut.
+   * Adds a stone: half-sizes (hx, hy, hz), chamfer r, position, quaternion, colour (THREE.Color), and
+   * moss { amount 0-1, color } applied to the vertices whose world normal points up.
    */
   stone(hx, hy, hz, r, pos, quat, col, moss = null) {
     r = Math.min(r, 0.45 * Math.min(hx, hy, hz));
@@ -175,22 +164,36 @@ class Builder {
   }
 }
 
-/** Teinte d'un bloc : crème majoritaire, terre cuite et rose rares, gris chaud plutôt en bas. */
-function stoneColor(rand, low = false) {
+/**
+ * One accumulator per scenery group: each wall, the roof and each boulder become a separate mesh with its own material,
+ * so each can fade out in front of the camera. `use(key)` selects the group of the next stones; `count` counts all stones.
+ */
+class Parts {
+  constructor() { this.map = new Map(); this.cur = null; this.count = 0; }
+  use(key) {
+    if (!this.map.has(key)) this.map.set(key, new Builder());
+    this.cur = this.map.get(key);
+    return this;
+  }
+  stone(...args) { this.cur.stone(...args); this.count++; }
+}
+
+/** Colour of a block: mostly cream, rare terracotta and pink, warm grey more likely at the bottom. */
+export function stoneColor(rand, low = false) {
   const w = [5, 3, 2, 0.6, 0.6, 2, low ? 2.5 : 0.8];
   let x = rand() * w.reduce((a, b) => a + b, 0), i = 0;
   while (x > w[i]) x -= w[i++];
   return jitter(STONE.blocks[Math.min(i, 6)], 0.045, rand);
 }
 
-function mossOf(rand, p) {
+export function mossOf(rand, p) {
   if (rand() > p) return null;
   return { amount: 0.55 + 0.45 * rand(), color: color(rand() < 0.6 ? MOSS.base : MOSS.light) };
 }
 
-// ------------------------------------------------------------------ ouvertures
+// ------------------------------------------------------------------ openings
 
-/** Demi-largeur intérieure d'une ouverture à la hauteur y (−1 si y est hors de l'ouverture). */
+/** Inner half-width of an opening at height y (-1 if y is outside the opening). */
 function halfIn(o, y) {
   if (o.kind === 'circle') {
     const R = o.w / 2, u = y - o.cy;
@@ -200,11 +203,11 @@ function halfIn(o, y) {
   if (y <= o.spring) return o.w / 2;
   const u = y - o.spring;
   if (o.kind === 'round') { const R = o.w / 2; return u <= R ? Math.sqrt(R * R - u * u) : -1; }
-  // ogive équilatérale : deux arcs de rayon w centrés aux naissances opposées
+  // equilateral pointed arch: two arcs of radius w centred on the opposite springing points
   return u <= 0.866 * o.w ? Math.sqrt(o.w * o.w - u * u) - o.w / 2 : -1;
 }
 
-/** Demi-largeur extérieure de l'anneau de claveaux à la hauteur y (−1 hors anneau). */
+/** Outer half-width of the voussoir ring at height y (-1 outside the ring). */
 function halfOut(o, y, vd) {
   if (o.kind === 'circle') {
     const R = o.w / 2 + vd, u = y - o.cy;
@@ -217,7 +220,7 @@ function halfOut(o, y, vd) {
   return v >= 0 && R * R - u * u >= 0 ? Math.sqrt(R * R - u * u) - o.w / 2 : -1;
 }
 
-/** Demi-largeur à retirer des assises dans la bande [y0, y1] (0 si l'ouverture ne la touche pas). */
+/** Half-width to remove from the courses in band [y0, y1] (0 if the opening does not touch it). */
 function cutHalf(o, y0, y1, vd) {
   let inMax = -1, outMin = Infinity, anyOut = false;
   for (let k = 0; k <= 8; k++) {
@@ -230,7 +233,7 @@ function cutHalf(o, y0, y1, vd) {
   return Math.max(inMax >= 0 ? inMax + 0.02 : 0, anyOut ? outMin : 0);
 }
 
-/** Claveaux le long d'un arc : centres (s, y), angle de la tangente, longueur tangentielle. */
+/** Voussoirs along an arc: centres (s, y), tangent angle, tangential length. */
 function voussoirs(o, vd) {
   const out = [];
   const arc = (cs, cy, R, a0, a1) => {
@@ -244,24 +247,25 @@ function voussoirs(o, vd) {
   else if (o.kind === 'round') arc(o.c, o.spring, o.w / 2 + vd / 2, 0, Math.PI);
   else {
     const R = o.w + vd / 2, a = Math.acos(o.w / (2 * R));
-    arc(o.c - o.w / 2, o.spring, R, 0, a);             // côté droit
-    arc(o.c + o.w / 2, o.spring, R, Math.PI - a, Math.PI); // côté gauche
+    arc(o.c - o.w / 2, o.spring, R, 0, a);             // right side
+    arc(o.c + o.w / 2, o.spring, R, Math.PI - a, Math.PI); // left side
   }
   return out;
 }
 
-// ------------------------------------------------------------------ mur
+// ------------------------------------------------------------------ wall
 
 /**
- * Construit un mur : assises de pierres le long de p0 → p1. Renvoie les données de collision :
- * tronçons (pour `obstacles`), pierres du dessus (pour `walkableAt`), base locale.
+ * Builds a wall as courses of stones along p0 -> p1.
+ * @returns {object} collision data: sections (for `obstacles`), top stones (for `walkableAt`), local base
  */
 function buildWall(B, spec, heightAt) {
+  B.use(spec.name);
   const rand = rng(spec.seed ?? 1);
   const [x0, z0] = spec.p0, [x1, z1] = spec.p1;
   const L = Math.hypot(x1 - x0, z1 - z0);
   const dx = (x1 - x0) / L, dz = (z1 - z0) / L;
-  const nx = -dz, nz = dx;                 // normale (axe z local du mur)
+  const nx = -dz, nz = dx;                 // normal (local z axis of the wall)
   const rotY = Math.atan2(-dz, dx);
   const T = spec.thick;
   const level = spec.baseY !== undefined;
@@ -275,7 +279,7 @@ function buildWall(B, spec, heightAt) {
   const qYaw = new THREE.Quaternion().setFromAxisAngle(_Y, rotY);
   const world = (s, t, y, out) => out.set(x0 + dx * s + nx * t, y, z0 + dz * s + nz * t);
 
-  // Assises
+  // Courses
   const rows = [];
   if (spec.climbable) {
     const H = LOW_WALL_TOP + SINK, n = 3;
@@ -287,14 +291,14 @@ function buildWall(B, spec, heightAt) {
   }
   const lmin = spec.climbable ? 0.3 : 0.28, lmax = spec.climbable ? 0.52 : 0.55;
   const placed = rows.map(() => []);
-  const tops = [];   // pierres du dessus (murets bas) : { s0, s1, top }
-  const stones = []; // { s, top } pour le sommet des tronçons
-  const bottoms = []; // pierres de la première assise : { s0, s1, bottom } (contrôle de pose)
+  const tops = [];   // top stones (low walls): { s0, s1, top }
+  const stones = []; // { s, top } for the top of the sections
+  const bottoms = []; // first-course stones: { s0, s1, bottom } (placement check)
   const p = new THREE.Vector3(), q = new THREE.Quaternion();
   const wallTop = (s) => top(Math.min(Math.max(s, 0), L));
 
   rows.forEach(([y0, y1], r) => {
-    // intervalles libres de la rangée (ouvertures retirées)
+    // free intervals of the course (openings removed)
     let free = [[0, L]];
     for (const o of openings) {
       const hw = cutHalf(o, y0 + 0.015, y1 - 0.015, o.vd);
@@ -341,7 +345,7 @@ function buildWall(B, spec, heightAt) {
     }
   });
 
-  // Claveaux des arches (seulement sous le sommet du mur ruiné)
+  // Arch voussoirs (only below the top of the ruined wall)
   for (const o of openings) {
     for (const v of voussoirs(o, o.vd)) {
       if (v.y + o.vd / 2 > wallTop(v.s) + 0.05) continue;
@@ -352,31 +356,229 @@ function buildWall(B, spec, heightAt) {
     }
   }
 
-  // Tronçons pleins pour la collision (une ouverture « passable » coupe le mur au sol)
+  // Sill of crossable windows: a flat stone fills the gap of the cut course, from the top of the stones under the window
+  // up to base + sill, where the cat lands. Separate random stream (`rng(seed + 700)`), so the rest of the wall does not change.
+  const randSill = rng((spec.seed ?? 1) + 700);
+  for (const o of openings) {
+    if (!o.crossable) continue;
+    const base = baseAt(o.c), sillY = base + o.sill;
+    const a = o.c - o.w / 2, b = o.c + o.w / 2;
+    const under = stones.filter((st) => st.s1 > a && st.s0 < b && st.top <= sillY + 0.01);
+    const yLow = under.length ? Math.max(...under.map((st) => st.top)) : base;
+    const hy = Math.max(0.03, (sillY - yLow) / 2 + 0.01);
+    world(o.c, 0, sillY - hy, p);
+    q.copy(qYaw);
+    B.stone(o.w / 2 + 0.02, hy, T / 2 + 0.03, 0.03, p, q, stoneColor(randSill), mossOf(randSill, 0.5));
+    o.sillY = sillY;
+  }
+
+  // Solid sections for collision (a "passable" opening cuts the wall at ground level)
   let cuts = [[0, L]];
   for (const o of openings) {
     if (!o.passable) continue;
     const a = o.c - o.w / 2, b = o.c + o.w / 2;
     cuts = cuts.flatMap(([u, v]) => (b <= u || a >= v ? [[u, v]] : [[u, a], [b, v]].filter(([m, n]) => n - m > 0.05)));
   }
+  // Crossable window: a separate walkable section (`sillOf`) under the opening, at sill height.
+  for (const o of openings) {
+    if (!o.crossable) continue;
+    const a = o.c - o.w / 2, b = o.c + o.w / 2;
+    cuts = cuts.flatMap(([u, v]) => (b <= u || a >= v ? [[u, v]]
+      : [[u, a], [Math.max(u, a), Math.min(v, b)], [b, v]].filter(([m, n]) => n - m > 0.02)));
+  }
+
+  // High wall with a walkable top (`perch`): longest run of positions in [perch[0], perch[1]] where the real top of the
+  // stones stays within 5 cm. The collision section is cut there so that this top has its own height (`top`).
+  let perch = null;
+  if (spec.perch && !spec.climbable) {
+    const colTop = (s) => {
+      let m = -Infinity;
+      for (const st of stones) if (s >= st.s0 - 1e-3 && s <= st.s1 + 1e-3 && st.top > m) m = st.top;
+      return m;
+    };
+    const pa = Math.max(0, spec.perch[0]), pb = Math.min(L, spec.perch[1]);
+    const S = [];
+    for (let s = pa; s <= pb + 1e-6; s += 0.02) S.push([s, colTop(s)]);
+    // Longest contiguous run of samples whose top stays within a 5 cm band.
+    let run = null;
+    for (let i = 0; i < S.length; i++) {
+      let lo = S[i][1], hi = S[i][1], j = i;
+      while (j + 1 < S.length && Math.max(hi, S[j + 1][1]) - Math.min(lo, S[j + 1][1]) <= 0.05) {
+        j++; lo = Math.min(lo, S[j][1]); hi = Math.max(hi, S[j][1]);
+      }
+      if (!run || S[j][0] - S[i][0] > run[1] - run[0] + 1e-6) run = [S[i][0], S[j][0]];
+    }
+    if (run && run[1] - run[0] >= 0.3) {
+      const level = Math.max(...S.filter(([s]) => s >= run[0] - 1e-6 && s <= run[1] + 1e-6).map(([, y]) => y));
+      perch = { s0: run[0], s1: run[1], top: level };
+      cuts = cuts.flatMap(([u, v]) => [u, Math.max(u, Math.min(v, run[0])), Math.max(u, Math.min(v, run[1])), v]
+        .reduce((acc, x, i, arr) => (i && arr[i] - arr[i - 1] > 0.02 ? [...acc, [arr[i - 1], x]] : acc), []));
+    }
+  }
+
   const pieces = cuts.map(([u, v]) => {
-    const inside = stones.filter((st) => st.s >= u && st.s <= v);
-    const topY = inside.length ? Math.max(...inside.map((st) => st.top)) : baseAt((u + v) / 2);
+    const sill = openings.find((o) => o.crossable && u >= o.c - o.w / 2 - 1e-6 && v <= o.c + o.w / 2 + 1e-6);
+    if (sill) {
+      let ground = Infinity;
+      for (let k = 0; k <= 8; k++) ground = Math.min(ground, baseAt(u + (v - u) * k / 8) + SINK);
+      const sc = (u + v) / 2;
+      return { name: spec.name, x: x0 + dx * sc, z: z0 + dz * sc, hx: (v - u) / 2, hz: T / 2, rotY,
+        top: sill.sillY, ground, height: sill.sillY - ground, climbable: true, sillOf: sill };
+    }
+    const isPerch = !!perch && u >= perch.s0 - 1e-6 && v <= perch.s1 + 1e-6;
+    // Wall with a walkable top: the top of a section is given by the stones overlapping it (edge included).
+    const inside = perch
+      ? stones.filter((st) => st.s1 > u + 1e-3 && st.s0 < v - 1e-3)
+      : stones.filter((st) => st.s >= u && st.s <= v);
+    const topY = isPerch ? perch.top : inside.length ? Math.max(...inside.map((st) => st.top)) : baseAt((u + v) / 2);
     let ground = Infinity;
     for (let k = 0; k <= 8; k++) ground = Math.min(ground, baseAt(u + (v - u) * k / 8) + SINK);
     const sc = (u + v) / 2;
-    return {
+    const piece = {
       name: spec.name, x: x0 + dx * sc, z: z0 + dz * sc, hx: (v - u) / 2, hz: T / 2, rotY,
       top: topY, ground, height: topY - ground, climbable: !!spec.climbable,
     };
+    if (isPerch) piece.perch = true;
+    return piece;
   });
 
-  return { name: spec.name, x0, z0, dx, dz, nx, nz, L, T, rotY, tops, bottoms, pieces, climbable: !!spec.climbable };
+  // Published openings (`ruins.openings`); the walkable sill (`surface`) of crossable windows is added to `_flat` by the constructor.
+  const kindOf = (o) => (o.kind === 'circle' ? 'oculus' : o.sill <= 0 ? (o.kind === 'round' ? 'arch' : 'door')
+    : o.kind === 'round' ? 'bay' : 'window');
+  const openingInfo = openings.map((o, i) => {
+    const base = baseAt(o.c), kind = kindOf(o);
+    const cy = o.kind === 'circle' ? o.cy : (o.sill + o.spring) / 2;
+    const info = {
+      name: `${spec.name}_${kind}_${i}`, wall: spec.name, kind, crossable: !!o.crossable, passable: !!o.passable,
+      c: o.c, w: o.w, sill: o.kind === 'circle' ? null : base + o.sill, spring: o.kind === 'circle' ? null : base + o.spring,
+      center: world(o.c, 0, base + cy, new THREE.Vector3()), normal: new THREE.Vector3(nx, 0, nz),
+      sides: null, surface: null, obstacle: null, _o: o, _base: base,
+    };
+    if (o.crossable) {
+      info.sides = [-1, 1].map((sg) => {
+        const v = world(o.c, sg * (T / 2 + 0.45), 0, new THREE.Vector3());
+        v.y = heightAt(v.x, v.z);
+        return v;
+      });
+      info.obstacle = pieces.find((pc) => pc.sillOf === o) ?? null;
+      info.surface = { kind: 'sill', name: info.name, wall: spec.name, opening: info, x: x0 + dx * o.c, z: z0 + dz * o.c,
+        hx: o.w / 2 - 0.02, hz: T / 2, rotY, top: o.sillY, topMin: o.sillY, topMax: o.sillY };
+      if (info.obstacle) info.obstacle.sillOf = info;
+    }
+    return info;
+  });
+
+  return { name: spec.name, x0, z0, dx, dz, nx, nz, L, T, rotY, tops, bottoms, pieces, climbable: !!spec.climbable,
+    perch, climbSide: spec.climbSide ?? 1, seed: spec.seed ?? 1, openings: openingInfo, topAt: wallTop };
 }
 
-// ------------------------------------------------------------------ église
+// ------------------------------------------------------------------ stepped rubble
 
-/** Repère local de l'église : x en travers, z le long de la nef, façade en +z tournée vers l'origine. */
+/**
+ * Step chain of a high wall `w` (buildWall output with `perch`). Steps stack outward from the wall face: the highest
+ * against the wall, the first (index 0) furthest out. Each step is a flat-topped chamfered slab (where the cat lands) on
+ * one or two round stones, plus a few pebbles at the foot (decoration).
+ * @returns {{climb, obstacles, rubble, surfaces}}
+ */
+function buildClimb(B, w, heightAt) {
+  B.use(w.name); // steps are part of the mesh of their wall
+  const rand = rng((w.seed ?? 1) + 500);
+  const side = w.climbSide >= 0 ? 1 : -1;
+  const P = w.perch;
+  const Y = P.top;
+  const sMid = (P.s0 + P.s1) / 2;
+  const at = (s, t) => [w.x0 + w.dx * s + w.nx * t * side, w.z0 + w.dz * s + w.nz * t * side];
+  const minUnder = (box) => {
+    let g = heightAt(box.x, box.z);
+    for (const [a, b] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) {
+      const [cx, cz] = toWorldBox(box, a * box.hx, b * box.hz);
+      g = Math.min(g, heightAt(cx, cz));
+    }
+    return g;
+  };
+  const pitch = 2 * STEP.hz + STEP.gap;
+  const tOf = (k, n) => w.T / 2 + STEP.gap + STEP.hz + (n - 1 - k) * pitch;
+  const jit = Array.from({ length: 6 }, () => [(rand() - 0.5) * 0.12, (rand() - 0.5) * 0.12]); // [Δs, Δyaw]
+
+  // Number of steps: the smallest n for which every jump (ground in front -> step 0 -> ... -> top) is at most STEP_RISE_MAX.
+  let layout = null;
+  for (let n = 1; n <= 6 && !layout; n++) {
+    const steps = [];
+    for (let k = 0; k < n; k++) {
+      const [x, z] = at(sMid + jit[k][0], tOf(k, n));
+      const box = { x, z, hx: STEP.hx, hz: STEP.hz, rotY: w.rotY + jit[k][1] };
+      steps.push({ ...box, ground: minUnder(box) });
+    }
+    const [fx, fz] = at(sMid + jit[0][0], tOf(0, n) + STEP.hz + 0.35);
+    const gFoot = heightAt(fx, fz);
+    const tops = steps.map((_, k) => gFoot + (Y - gFoot) * (k + 1) / (n + 1));
+    const rises = [tops[0] - gFoot, ...tops.slice(1).map((y, k) => y - tops[k]), Y - tops[n - 1]];
+    if (rises.every((r) => r <= STEP_RISE_MAX + 1e-6) || n === 6) layout = { n, steps, tops, rises, foot: { x: fx, z: fz, y: gFoot } };
+  }
+
+  const obstacles = [], rubble = [], surfaces = [];
+  const p = new THREE.Vector3(), q = new THREE.Quaternion();
+  const roundStone = (x, y, z, hx, hy, hz, yaw, tilt, col, moss) => {
+    p.set(x, y, z);
+    q.setFromAxisAngle(_Y, yaw).multiply(_q.setFromAxisAngle(_X, tilt));
+    B.stone(hx, hy, hz, 0.42 * Math.min(hx, hy, hz), p, q, col, moss);
+  };
+  const boulderCol = () => color(STONE.boulder).lerp(color(STONE.boulderShade), rand() * 0.3);
+
+  layout.steps.forEach((st, k) => {
+    const top = layout.tops[k];
+    // Top slab (upper face at top + 1.2 cm: the cat stands at `top`, as on the low walls)
+    const slabY = top + 0.012 - STEP.slab;
+    p.set(st.x, slabY, st.z);
+    q.setFromAxisAngle(_Y, st.rotY).multiply(_q.setFromAxisAngle(_Z, (rand() - 0.5) * 0.02));
+    B.stone(STEP.hx, STEP.slab, STEP.hz, 0.045, p, q, stoneColor(rand), mossOf(rand, 0.55));
+    // Round stones below, from the ground (buried by SINK) up to the slab
+    const y0 = st.ground - SINK, y1 = slabY - STEP.slab + 0.03;
+    const H = y1 - y0;
+    if (H > 0.05) {
+      const layers = H > 0.34 ? 2 : 1;
+      for (let l = 0; l < layers; l++) {
+        const hy = H / layers / 2 + 0.02;
+        const shrink = layers === 2 && l === 1 ? 0.86 : 0.94;
+        roundStone(st.x, y0 + H * (l + 0.5) / layers, st.z, STEP.hx * shrink, hy, STEP.hz * shrink,
+          st.rotY + (rand() - 0.5) * 0.3, (rand() - 0.5) * 0.12, boulderCol(), l === layers - 1 ? null : mossOf(rand, 0.3));
+      }
+    }
+    const name = `rubble_${w.name}_${k}`;
+    const rise = layout.rises[k];
+    obstacles.push({ name, x: st.x, z: st.z, hx: st.hx, hz: st.hz, rotY: st.rotY, top, ground: st.ground,
+      height: top - st.ground, climbable: true, step: { climb: w.name, index: k, rise } });
+    surfaces.push({ kind: 'step', name, climb: w.name, index: k, x: st.x, z: st.z, hx: st.hx, hz: st.hz,
+      rotY: st.rotY, top, topMin: top, topMax: top, rise });
+  });
+
+  // Pebbles at the foot of the first step, on the sides (decoration, no collision)
+  const n = layout.n, t0 = tOf(0, n);
+  for (const [ds, dt, size] of [[-STEP.hx - 0.16, 0.05, 0.13], [STEP.hx + 0.14, -0.08, 0.11], [STEP.hx + 0.1, STEP.hz + 0.12, 0.08], [-STEP.hx - 0.08, -STEP.hz - 0.05, 0.1]]) {
+    const [x, z] = at(sMid + jit[0][0] + ds, t0 + dt);
+    const g = heightAt(x, z);
+    roundStone(x, g + size * 0.2, z, size * 1.15, size * 0.75, size, rand() * Math.PI * 2, (rand() - 0.5) * 0.3, boulderCol(), mossOf(rand, 0.5));
+    rubble.push({ x, z, r: size * 1.15, top: g + size * 0.95 });
+  }
+
+  // Walkable top of the wall
+  const sc = sMid;
+  const [tx, tz] = [w.x0 + w.dx * sc, w.z0 + w.dz * sc];
+  const topSurface = { kind: 'top', name: w.name, climb: w.name, x: tx, z: tz, hx: (P.s1 - P.s0) / 2, hz: w.T / 2,
+    rotY: w.rotY, top: Y, topMin: Y, topMax: Y, s0: P.s0, s1: P.s1, rise: layout.rises[n] };
+  surfaces.push(topSurface);
+
+  const climb = {
+    name: w.name, side, foot: layout.foot, rises: layout.rises,
+    steps: surfaces.filter((s) => s.kind === 'step'), top: topSurface,
+  };
+  for (const s of surfaces) s.chain = climb;
+  return { climb, obstacles, rubble, surfaces };
+}
+
+// ------------------------------------------------------------------ church
+
+/** Local frame of the church: x across, z along the nave, facade at +z facing the origin. */
 function churchFrame(c) {
   const rotY = Math.atan2(-c.x, -c.z);
   const cos = Math.cos(rotY), sin = Math.sin(rotY);
@@ -392,8 +594,8 @@ function churchWalls(c, baseY) {
   const gable = (s) => e + (ap - e) * Math.max(0, 1 - Math.abs(s - mid) / (W / 2));
   return [
     {
-      // Façade : pignon cassé à droite, clocher-mur, porte en ogive, oculus.
-      name: 'eglise_facade', p0: toWorld(-W / 2, zf), p1: toWorld(W / 2, zf), thick: T, baseY, seed: 101,
+      // Facade: gable broken on the right, bell wall, pointed door, oculus.
+      name: 'church_facade', p0: toWorld(-W / 2, zf), p1: toWorld(W / 2, zf), thick: T, baseY, seed: 101,
       top: (s) => {
         const d = s - mid;
         if (Math.abs(d) < 0.62) return d > 0.22 ? c.belfry - 0.45 : c.belfry;
@@ -407,35 +609,38 @@ function churchWalls(c, baseY) {
       ],
     },
     {
-      // Mur gauche (sous le reste de toiture) : haut près de la façade, puis en gradins.
-      name: 'eglise_gauche', p0: toWorld(-xs, Lc / 2 - T), p1: toWorld(-xs, -Lc / 2 + T), thick: T, baseY, seed: 113,
+      // Left wall (under the remaining roof): high near the facade, then stepped.
+      name: 'church_left', p0: toWorld(-xs, Lc / 2 - T), p1: toWorld(-xs, -Lc / 2 + T), thick: T, baseY, seed: 113,
       top: (s) => (s < 2.6 ? e : s < 3.6 ? 2.3 : s < 4.8 ? 1.6 : s < 6.0 ? 1.1 : 1.5),
       openings: [
-        { c: 1.4, w: 0.7, sill: 0.95, spring: 1.65, kind: 'pointed' },
-        { c: 4.2, w: 0.7, sill: 0.95, spring: 1.65, kind: 'pointed' },
+        // Broken windows the cat can cross (`crossable`): sill about 0.37 m above the ground on both sides
+        // (local ground 0.29 to 0.33 m above the base).
+        { c: 1.4, w: 0.9, sill: 0.7, spring: 1.65, kind: 'pointed', crossable: true },
+        { c: 4.2, w: 0.9, sill: 0.7, spring: 1.65, kind: 'pointed', crossable: true },
       ],
     },
     {
-      name: 'eglise_droite', p0: toWorld(xs, -Lc / 2 + T), p1: toWorld(xs, Lc / 2 - T), thick: T, baseY, seed: 127,
+      name: 'church_right', p0: toWorld(xs, -Lc / 2 + T), p1: toWorld(xs, Lc / 2 - T), thick: T, baseY, seed: 127,
       top: (s) => (s < 1.6 ? 0.9 : s < 3.2 ? 1.3 : s < 4.4 ? 2.0 : s < 5.4 ? 2.5 : e),
       openings: [
-        { c: 2.2, w: 0.7, sill: 0.95, spring: 1.65, kind: 'pointed' },
-        { c: 4.9, w: 0.7, sill: 0.95, spring: 1.65, kind: 'pointed' },
+        // Same (local ground lower on this side: 0.08 to 0.18 m above the base).
+        { c: 2.2, w: 0.9, sill: 0.52, spring: 1.65, kind: 'pointed', crossable: true },
+        { c: 4.9, w: 0.9, sill: 0.56, spring: 1.65, kind: 'pointed', crossable: true },
       ],
     },
     {
-      // Chevet : haute fenêtre en ogive entre deux restes en gradins.
-      name: 'eglise_chevet', p0: toWorld(W / 2, zb), p1: toWorld(-W / 2, zb), thick: T, baseY, seed: 139,
+      // Apse wall: tall pointed window between two stepped remains.
+      name: 'church_apse', p0: toWorld(W / 2, zb), p1: toWorld(-W / 2, zb), thick: T, baseY, seed: 139,
       top: (s) => (s < 1.0 ? 1.2 : s < 1.5 ? 1.8 : s < 3.1 ? 3.0 : s < 3.8 ? 2.0 : 1.0),
       openings: [{ c: 2.3, w: 0.8, sill: 1.0, spring: 1.9, kind: 'pointed' }],
     },
   ];
 }
 
-/** Reste de toiture : tuiles chanfreinées sur le versant gauche, près de la façade, bord déchiqueté. */
+/** Remaining roof: chamfered tiles on the left slope, near the facade, with a jagged edge. */
 function buildRoof(B, c, baseY, rand) {
-  const { rotY } = churchFrame(c);
-  const { toWorld } = churchFrame(c);
+  B.use('roof');
+  const { rotY, toWorld } = churchFrame(c);
   const W = c.width, Lc = c.length;
   const run = W / 2 + 0.15, rise = c.apex - c.eave;
   const alpha = Math.atan2(rise, W / 2);
@@ -466,7 +671,7 @@ function buildRoof(B, c, baseY, rand) {
   return n;
 }
 
-// ------------------------------------------------------------------ boîtes orientées
+// ------------------------------------------------------------------ oriented boxes
 
 function toLocal(o, x, z) {
   const ddx = x - o.x, ddz = z - o.z, c = Math.cos(o.rotY), s = Math.sin(o.rotY);
@@ -478,7 +683,7 @@ function toWorldBox(o, lx, lz) {
   return [o.x + lx * c + lz * s, o.z - lx * s + lz * c];
 }
 
-/** Intersection segment / boîte agrandie de `pad` : premier t ∈ [0, 1] ou −1. */
+/** Intersection of a segment with a box enlarged by `pad`: first t in [0, 1], or -1. */
 function segBox(o, ax, az, bx, bz, pad) {
   const [lax, laz] = toLocal(o, ax, az), [lbx, lbz] = toLocal(o, bx, bz);
   const d = [lbx - lax, lbz - laz], a = [lax, laz], h = [o.hx + pad, o.hz + pad];
@@ -493,42 +698,41 @@ function segBox(o, ax, az, bx, bz, pad) {
   return t0;
 }
 
-// ------------------------------------------------------------------ classe publique
+// ------------------------------------------------------------------ public class
 
 export class Ruins {
   /**
-   * @param {THREE.Object3D|null} scene  scène où ajouter `ruins.group` (null : rien n'est ajouté)
+   * @param {THREE.Object3D|null} scene  scene receiving `ruins.group` (null: nothing is added)
    * @param {object} [opts]
-   * @param {(x:number, z:number) => number} [opts.heightAt]  hauteur du sol (Terrain.js par défaut)
-   * @param {boolean} [opts.shadows=true]  le décor projette et reçoit l'ombre du soleil
+   * @param {(x:number, z:number) => number} [opts.heightAt]  ground height (Terrain.js by default)
+   * @param {boolean} [opts.shadows=true]  the scenery casts and receives the sun's shadow
    */
   constructor(scene, { heightAt = terrainHeightAt, shadows = true } = {}) {
     this.heightAt = heightAt;
-    const B = new Builder();
+    const B = new Parts();
     const rand = rng(977);
 
-    // Église, de niveau
+    // Church, level
     const c = CHURCH;
     const { toWorld } = churchFrame(c);
-    let gmin = Infinity, gmax = -Infinity;
+    let gmin = Infinity;
     for (let i = 0; i <= 6; i++) for (let j = 0; j <= 8; j++) {
       const [wx, wz] = toWorld(-c.width / 2 + c.width * i / 6, -c.length / 2 + c.length * j / 8);
-      const h = heightAt(wx, wz); gmin = Math.min(gmin, h); gmax = Math.max(gmax, h);
+      gmin = Math.min(gmin, heightAt(wx, wz));
     }
     this.churchBase = gmin - SINK;
-    this.churchGround = [gmin, gmax];
     const specs = [...churchWalls(c, this.churchBase), ...WALLS];
     this.walls = specs.map((sp) => buildWall(B, sp, heightAt));
     const stonesWalls = B.count;
     const tiles = buildRoof(B, c, this.churchBase, rand);
 
-    /** Empreintes au sol (boîtes orientées) : murs (en tronçons) et rochers. */
+    /** Ground footprints (oriented boxes): walls (as sections) and boulders. */
     this.obstacles = this.walls.flatMap((w) => w.pieces);
 
-    // Rochers ronds au pied des murs (obstacles non praticables)
+    // Round boulders at the foot of the walls (non-walkable obstacles)
     const boulders = [
-      [c, -c.width / 2 - 0.55, c.length / 2 - 0.2, 0.42], [c, c.width / 2 + 0.5, -c.length / 2 + 0.6, 0.36],
-      [c, c.width / 2 + 0.75, 1.2, 0.3],
+      [-c.width / 2 - 0.55, c.length / 2 - 0.2, 0.42], [c.width / 2 + 0.5, -c.length / 2 + 0.6, 0.36],
+      [c.width / 2 + 0.75, 1.2, 0.3],
     ];
     const pB = new THREE.Vector3(), qB = new THREE.Quaternion();
     const placeBoulder = (wx, wz, size, name) => {
@@ -537,17 +741,35 @@ export class Ruins {
       pB.set(wx, g + size * 0.25, wz);
       qB.setFromAxisAngle(_Y, yaw).multiply(_q.setFromAxisAngle(_X, (rand() - 0.5) * 0.3));
       const col = color(STONE.boulder).lerp(color(STONE.boulderShade), rand() * 0.25);
+      B.use(name);
       B.stone(size * 1.15, size * 0.75, size, size * 0.42, pB, qB, col, mossOf(rand, 0.6));
       this.obstacles.push({ name, x: wx, z: wz, hx: size * 1.15, hz: size, rotY: yaw, top: g + size, ground: g, height: size, climbable: false });
     };
-    boulders.forEach(([cc, lx, lz, size], i) => { const [wx, wz] = toWorld(lx, lz); placeBoulder(wx, wz, size, `rocher_eglise_${i}`); });
-    { // au pied du mur haut sud-est
-      const w = this.walls.find((x) => x.name === 'mur_haut_sud_est');
-      placeBoulder(w.x0 + w.dx * 0.9 - w.nx * 0.6, w.z0 + w.dz * 0.9 - w.nz * 0.6, 0.33, 'rocher_mur_se');
+    boulders.forEach(([lx, lz, size], i) => { const [wx, wz] = toWorld(lx, lz); placeBoulder(wx, wz, size, `rock_church_${i}`); });
+    { // at the foot of the south-east high wall
+      const w = this.walls.find((x) => x.name === 'high_wall_south_east');
+      placeBoulder(w.x0 + w.dx * 0.9 - w.nx * 0.6, w.z0 + w.dz * 0.9 - w.nz * 0.6, 0.33, 'rock_wall_se');
     }
 
-    // Pierres tombées (décor, listées dans `rubble` ; pas d'obstacle)
+    // Stepped rubble at the foot of the high walls with a walkable top. Built before the fallen stones, which avoid the
+    // footprints of the steps (obstacleAt).
     this.rubble = [];
+    this.climbs = [];
+    this._flat = []; // flat walkable surfaces other than low walls: steps and high-wall tops
+    for (const w of this.walls) {
+      if (!w.perch) continue;
+      const r = buildClimb(B, w, heightAt);
+      this.climbs.push(r.climb);
+      this.obstacles.push(...r.obstacles);
+      this.rubble.push(...r.rubble);
+      this._flat.push(...r.surfaces);
+      w.climb = r.climb;
+    }
+    /** Openings of all the walls; the sills of crossable windows are surfaces. */
+    this.openings = this.walls.flatMap((w) => w.openings);
+    for (const o of this.openings) if (o.surface) this._flat.push(o.surface);
+
+    // Fallen stones (decoration, listed in `rubble`; not obstacles)
     const pR = new THREE.Vector3(), qR = new THREE.Quaternion();
     const scatter = (wall, count, spread) => {
       for (let k = 0; k < count; k++) {
@@ -564,31 +786,47 @@ export class Ruins {
           pR.set(wx, g + hy * 0.45, wz);
           qR.setFromAxisAngle(_Y, rand() * Math.PI * 2)
             .multiply(_q.setFromAxisAngle(_X, (rand() - 0.5) * 0.5)).multiply(_q2.setFromAxisAngle(_Z, (rand() - 0.5) * 0.5));
+          B.use(wall.name);
           B.stone(hx, hy, hz, 0.04, pR, qR, stoneColor(rand), mossOf(rand, 0.55));
           this.rubble.push({ x: wx, z: wz, r: Math.max(hx, hz), top: g + hy * 1.45 });
           break;
         }
       }
     };
-    for (const w of this.walls) scatter(w, w.climbable ? 2 : w.name.startsWith('eglise') ? 5 : 6, w.climbable ? 0.4 : 1.3);
+    for (const w of this.walls) scatter(w, w.climbable ? 2 : w.name.startsWith('church') ? 5 : 6, w.climbable ? 0.4 : 1.3);
 
-    // Maillage unique
-    this.geometry = B.geometry();
-    this.material = toonMaterial(0xffffff, { vertexColors: true });
-    this.mesh = new THREE.Mesh(this.geometry, this.material);
-    this.mesh.name = 'Ruins';
-    this.mesh.castShadow = shadows;
-    this.mesh.receiveShadow = shadows;
-    this.mesh.matrixAutoUpdate = false;
+    // One mesh per group (each wall with its steps and fallen stones, the roof, each boulder), each with its OWN
+    // material: Occlusion.js fades the one hiding the cat.
+    this.meshes = [...B.map].map(([key, b]) => {
+      const m = new THREE.Mesh(b.geometry(), toonMaterial(0xffffff, { vertexColors: true }));
+      m.name = `Ruins_${key}`;
+      m.castShadow = shadows;
+      m.receiveShadow = shadows;
+      m.matrixAutoUpdate = false;
+      m.userData.ruins = this;
+      return m;
+    });
+    /** Objects that can fade out in front of the camera (Occlusion.js, through World.js): every visible mesh. */
+    this.occluders = this.meshes;
 
-    // Dessus des murets bas : surfaces praticables et maillage de clic invisible
+    // Tops of the low walls: walkable surfaces and invisible click mesh
     this.surfaces = this.walls.filter((w) => w.climbable).map((w) => {
       const topY = w.tops.reduce((a, t) => a + t.top, 0) / Math.max(1, w.tops.length);
       const piece = w.pieces[0];
-      return { name: w.name, x: piece.x, z: piece.z, hx: piece.hx, hz: piece.hz, rotY: w.rotY, top: topY,
+      return { kind: 'lowWall', name: w.name, x: piece.x, z: piece.z, hx: piece.hx, hz: piece.hz, rotY: w.rotY, top: topY,
         topMin: Math.min(...w.tops.map((t) => t.top)), topMax: Math.max(...w.tops.map((t) => t.top)) };
     });
+    // Then the steps and the high-wall tops (`kind` 'step' | 'top', `chain` field).
+    this.surfaces.push(...this._flat);
     const pp = [], ii = [];
+    for (const f of this._flat) {
+      const b = pp.length / 3;
+      for (const [a, c] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) {
+        const [wx, wz] = toWorldBox(f, a * f.hx, c * f.hz);
+        pp.push(wx, f.top, wz);
+      }
+      ii.push(b, b + 2, b + 1, b, b + 3, b + 2);
+    }
     for (const w of this.walls) {
       if (!w.climbable) continue;
       for (const t of w.tops) {
@@ -605,41 +843,147 @@ export class Ruins {
     tg.computeBoundingSphere();
     this.walkMesh = new THREE.Mesh(tg, new THREE.MeshBasicMaterial({ side: THREE.DoubleSide }));
     this.walkMesh.name = 'RuinsWalkable';
-    this.walkMesh.visible = false; // jamais dessiné ; le Raycaster de three ignore `visible`
+    this.walkMesh.visible = false; // never drawn; three's Raycaster ignores `visible`
     this.walkMesh.userData.ruins = this;
-    /** Meshes à donner au clic (Picker : `world.pickables`), en plus du terrain. */
+    /** Meshes for clicks (Picker: `world.pickables`), in addition to the terrain. */
     this.pickables = [this.walkMesh];
 
     this.group = new THREE.Group();
     this.group.name = 'RuinsGroup';
-    this.group.add(this.mesh, this.walkMesh);
+    this.group.add(...this.meshes, this.walkMesh);
     if (scene) scene.add(this.group);
 
+    const sum = (f) => this.meshes.reduce((a, m) => a + f(m.geometry), 0);
     this.stats = {
-      stones: B.count, wallStones: stonesWalls, roofTiles: tiles, triangles: this.geometry.index.count / 3,
-      vertices: this.geometry.attributes.position.count, drawCalls: 1, shadowDrawCalls: shadows ? 1 : 0,
+      stones: B.count, wallStones: stonesWalls, roofTiles: tiles, triangles: sum((g) => g.index.count / 3),
+      vertices: sum((g) => g.attributes.position.count), drawCalls: this.meshes.length,
+      shadowDrawCalls: shadows ? this.meshes.length : 0, meshes: this.meshes.length,
     };
   }
 
   /**
-   * Hauteur (y monde) du dessus d'un muret bas si (x, z) est dessus, sinon null.
-   * `margin` (m) : retrait depuis les bords longs (ex. demi-largeur des pattes).
+   * World height of the highest walkable surface under (x, z) (low wall top, rubble step, high-wall top; see surfaceAt).
+   * @param {number} [margin] inset (m) from the long edges (for example half the paw width)
+   * @returns {number|null} height, or null if there is no walkable surface
    */
   walkableAt(x, z, margin = 0) {
-    let best = null;
+    const s = this.surfaceAt(x, z, margin, _hit);
+    return s ? _hit.top : null;
+  }
+
+  /**
+   * Highest walkable surface under (x, z). Same `margin` rules as walkableAt.
+   * @param {object|null} [out] receives `out.top`, the exact height (top stone for a low wall, `surface.top` otherwise)
+   * @returns {object|null} an element of `surfaces` (`kind` 'lowWall' | 'step' | 'top' | 'sill'), or null
+   */
+  surfaceAt(x, z, margin = 0, out = null) {
+    let best = null, bestTop = -Infinity;
     for (const w of this.walls) {
       if (!w.climbable) continue;
       const rx = x - w.x0, rz = z - w.z0;
       const s = rx * w.dx + rz * w.dz, t = rx * w.nx + rz * w.nz;
       if (Math.abs(t) > w.T / 2 - margin || s < margin || s > w.L - margin) continue;
       for (const st of w.tops) {
-        if (s >= st.s0 && s <= st.s1) { if (best === null || st.top > best) best = st.top; break; }
+        if (s >= st.s0 && s <= st.s1) {
+          if (st.top > bestTop) { bestTop = st.top; best = this.surfaces.find((f) => f.name === w.name); }
+          break;
+        }
       }
+    }
+    for (const f of this._flat) {
+      const [lx, lz] = toLocal(f, x, z);
+      if (Math.abs(lx) > f.hx - margin || Math.abs(lz) > f.hz - margin) continue;
+      if (f.top > bestTop) { bestTop = f.top; best = f; }
+    }
+    if (out) out.top = best ? bestTop : null;
+    return best;
+  }
+
+  /**
+   * Walkable point of `surface` closest to (x, z), inset by `margin` from the edges (at most to the centre). Low walls
+   * and high-wall tops: on the centre line (narrow tops); steps: within the rectangle.
+   * @returns {{x, y, z}} the point, with y = walkableAt at that point
+   */
+  nearestOn(surface, x, z, margin = 0.1) {
+    const f = surface;
+    const mx = Math.min(margin, f.hx), mz = Math.min(margin, f.hz);
+    let [lx, lz] = toLocal(f, x, z);
+    lx = Math.max(-f.hx + mx, Math.min(f.hx - mx, lx));
+    lz = f.kind === 'step' ? Math.max(-f.hz + mz, Math.min(f.hz - mz, lz)) : 0;
+    const [wx, wz] = toWorldBox(f, lx, lz);
+    const y = this.walkableAt(wx, wz, 0) ?? f.top;
+    return { x: wx, y, z: wz };
+  }
+
+  /**
+   * Surfaces to cross from the ground to reach `surface`, in climbing order (the last one is `surface`):
+   * [step 0, ..., step k] for a step, [steps..., top] for a high-wall top, [low wall] for a low wall (a single jump).
+   * @returns {object[]|null} null if `surface` is null
+   */
+  stepsTo(surface) {
+    if (!surface) return null;
+    const c = surface.chain;
+    if (!c) return [surface];
+    if (surface.kind === 'step') return c.steps.slice(0, surface.index + 1);
+    return [...c.steps, c.top];
+  }
+
+  /**
+   * Target of a click on a wall stone at (point.x, point.z): the nearest obstacle within `reach` m of its footprint.
+   * Low wall: its top; high wall with rubble: its walkable top; step: that step; sill of a crossable window: that sill.
+   * The target point is `nearestOn` of the clicked point.
+   * @returns {{obstacle, surface, top: THREE.Vector3, chain}|null} null elsewhere (the click then targets the ground behind)
+   */
+  climbTarget(point, reach = 0.12) {
+    let o = null, bd = Infinity;
+    for (const ob of this.obstacles) {
+      const [lx, lz] = toLocal(ob, point.x, point.z);
+      const d = Math.hypot(Math.max(Math.abs(lx) - ob.hx, 0), Math.max(Math.abs(lz) - ob.hz, 0));
+      if (d < bd) { bd = d; o = ob; }
+    }
+    if (!o || bd > reach) return null;
+    let surface = null;
+    if (o.step) surface = this._flat.find((f) => f.name === o.name) ?? null;
+    else if (o.sillOf) surface = o.sillOf.surface; // sill of a crossable window
+    else {
+      const w = this.walls.find((x) => x.name === o.name);
+      if (w?.climbable) surface = this.surfaces.find((f) => f.name === w.name) ?? null;
+      else if (w?.climb) surface = w.climb.top;
+    }
+    if (!surface) return null;
+    // High-wall top: inset by the cat radius (0.2 m, NAV.radius) from the neighbouring higher step.
+    const n = this.nearestOn(surface, point.x, point.z, surface.kind === 'top' ? 0.2 : 0.12);
+    return { obstacle: o, surface, top: new THREE.Vector3(n.x, n.y, n.z), chain: surface.chain ?? null };
+  }
+
+  /**
+   * Crossable window traversed by `ray` (THREE.Ray, normalized direction): intersection with the mid-plane of the wall,
+   * inside the inner outline of the opening and below the top of the wall.
+   * @returns {{opening, distance, point, top, surface, obstacle, chain: null}|null} `top`: sill point nearest to the target
+   */
+  openingHit(ray) {
+    let best = null;
+    for (const op of this.openings) {
+      if (!op.crossable) continue;
+      const w = this.walls.find((x) => x.name === op.wall);
+      const dn = ray.direction.x * w.nx + ray.direction.z * w.nz;
+      if (Math.abs(dn) < 1e-6) continue;
+      const t = ((w.x0 - ray.origin.x) * w.nx + (w.z0 - ray.origin.z) * w.nz) / dn;
+      if (t <= 0 || (best && t >= best.distance)) continue;
+      const px = ray.origin.x + ray.direction.x * t, py = ray.origin.y + ray.direction.y * t, pz = ray.origin.z + ray.direction.z * t;
+      const s = (px - w.x0) * w.dx + (pz - w.z0) * w.dz;
+      // Up to 0.12 m below the sill (face of the sill stone) counts as inside the opening.
+      const yy = py - op._base;
+      const hw = yy < op._o.sill - 0.12 ? -1 : halfIn(op._o, Math.max(yy, op._o.sill));
+      if (hw < 0 || Math.abs(s - op.c) > hw || py > op._base + w.topAt(s)) continue;
+      const n = this.nearestOn(op.surface, px, pz, 0.12);
+      best = { opening: op, distance: t, point: new THREE.Vector3(px, py, pz), top: new THREE.Vector3(n.x, n.y, n.z),
+        surface: op.surface, obstacle: op.obstacle, chain: null };
     }
     return best;
   }
 
-  /** Premier obstacle dont l'empreinte (agrandie de `margin`) contient (x, z), sinon null. */
+  /** First obstacle whose footprint (enlarged by `margin`) contains (x, z), or null. */
   obstacleAt(x, z, margin = 0) {
     for (const o of this.obstacles) {
       const [lx, lz] = toLocal(o, x, z);
@@ -648,7 +992,7 @@ export class Ruins {
     return null;
   }
 
-  /** Filtre commun : `y` (hauteur des pieds) ignore les obstacles dont le dessus est sous les pieds ; `climbable` false ignore les murets bas. */
+  /** Common filter: `y` (foot height) ignores obstacles whose top is below the feet; `climbable: false` ignores low walls. */
   _active(o, opts) {
     if (opts.climbable === false && o.climbable) return false;
     if (opts.y !== undefined && opts.y >= o.top - 0.05) return false;
@@ -656,8 +1000,8 @@ export class Ruins {
   }
 
   /**
-   * Repousse un disque (centre x, z, rayon `radius`) hors des obstacles actifs (deux passes).
-   * opts : { y, climbable } (voir `_active`). Renvoie { x, z, hit } (hit = dernier obstacle touché ou null).
+   * Pushes a disc (centre x, z, radius `radius`) out of the active obstacles (two passes). opts: { y, climbable } (see `_active`).
+   * @returns {{x, z, hit}} `hit`: last obstacle touched, or null
    */
   resolve(x, z, radius, opts = {}, out = { x: 0, z: 0, hit: null }) {
     out.x = x; out.z = z; out.hit = null;
@@ -674,7 +1018,7 @@ export class Ruins {
           if (d >= radius) continue;
           nlx = cx + ex / d * radius; nlz = cz + ez / d * radius;
         } else {
-          // centre dans la boîte : sortie par le côté le plus proche
+          // centre inside the box: exit through the nearest side
           const px = o.hx - Math.abs(lx), pz = o.hz - Math.abs(lz);
           if (px < pz) { nlx = Math.sign(lx || 1) * (o.hx + radius); nlz = lz; }
           else { nlx = lx; nlz = Math.sign(lz || 1) * (o.hz + radius); }
@@ -687,8 +1031,8 @@ export class Ruins {
   }
 
   /**
-   * Le segment a → b (parcouru par un disque de rayon `radius`) touche-t-il un obstacle actif ?
-   * Renvoie { t, obstacle } (t ∈ [0, 1], premier contact le long du segment) ou null.
+   * Tests whether segment a -> b, swept by a disc of radius `radius`, touches an active obstacle.
+   * @returns {{t, obstacle}|null} t in [0, 1]: first contact along the segment
    */
   blockedSegment(ax, az, bx, bz, radius = 0, opts = {}) {
     let best = null;
@@ -700,43 +1044,12 @@ export class Ruins {
     return best;
   }
 
-  /**
-   * Point de passage pour contourner le premier obstacle entre a et b : coin de sa boîte agrandie
-   * de `radius` + 0,15 m, atteignable depuis a sans retoucher cet obstacle, qui minimise
-   * |a→coin| + |coin→b|. Renvoie { x, z, obstacle } ou null si le segment est libre.
-   * À rappeler depuis le coin atteint (plusieurs obstacles).
-   */
-  detour(ax, az, bx, bz, radius = 0, opts = {}) {
-    const hit = this.blockedSegment(ax, az, bx, bz, radius, opts);
-    if (!hit) return null;
-    const o = hit.obstacle, pad = radius + 0.15;
-    let best = null;
-    for (const [sx, sz] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) {
-      const [cx, cz] = toWorldBox(o, sx * (o.hx + pad), sz * (o.hz + pad));
-      if (Math.hypot(cx - ax, cz - az) < 0.05) continue; // coin déjà atteint
-      if (segBox(o, ax, az, cx, cz, radius) >= 0) continue;
-      const cost = Math.hypot(cx - ax, cz - az) + Math.hypot(bx - cx, bz - cz);
-      if (!best || cost < best.cost) best = { x: cx, z: cz, obstacle: o, cost };
-    }
-    if (!best) {
-      // a est dans un coin mort (contre la boîte) : coin le plus proche de a
-      for (const [sx, sz] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) {
-        const [cx, cz] = toWorldBox(o, sx * (o.hx + pad), sz * (o.hz + pad));
-        const cost = Math.hypot(cx - ax, cz - az);
-        if (cost < 0.05) continue;
-        if (!best || cost < best.cost) best = { x: cx, z: cz, obstacle: o, cost };
-      }
-    }
-    return best;
-  }
-
-  /** Rien d'animé pour l'instant (présent pour l'appel uniforme depuis World.js). */
+  /** Nothing animated for now (present for the uniform call from World.js). */
   update() {}
 
   dispose() {
     this.group.parent?.remove(this.group);
-    this.geometry.dispose();
-    this.material.dispose();
+    for (const m of this.meshes) { m.geometry.dispose(); m.material.dispose(); }
     this.walkMesh.geometry.dispose();
     this.walkMesh.material.dispose();
   }

@@ -1,3 +1,6 @@
+# Prints the content of a .blend file: objects, armatures and bones, actions, animation assignments, constraints,
+# materials, images and texts. Blender script, read-only.
+# Usage (from the project root): blender -b assets/sources/cat.blend --python tools/inspect_cat.py
 import bpy
 
 print("=== BLEND", bpy.data.filepath, "version", bpy.data.version)

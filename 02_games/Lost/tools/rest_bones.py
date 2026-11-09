@@ -1,6 +1,6 @@
-"""Affiche la pose de repos (coordonnées armature, Z vers le haut) de quelques os du chat.
+"""Prints the rest pose (armature coordinates, Z up) of a few bones of the cat.
 
-Usage : blender.exe -b assets/sources/cat.blend --python tools/rest_bones.py
+Usage: blender.exe -b assets/sources/cat.blend --python tools/rest_bones.py
 """
 import bpy
 
@@ -11,12 +11,12 @@ print('REST armature matrix_world:', [list(map(lambda v: round(v, 3), row)) for 
 for n in names:
     b = arm.data.bones.get(n)
     if b is None:
-        print('absent', n)
+        print('missing', n)
         continue
     h = tuple(round(v, 3) for v in b.head_local)
     t = tuple(round(v, 3) for v in b.tail_local)
     print(f'REST {n:16s} head={h} tail={t} parent={b.parent.name if b.parent else None}')
-# Pose actuelle (frame courante, NLA mélangé) pour comparaison
+# Current pose (current frame, mixed NLA) for comparison
 for n in ['Neck.001', 'Neck.002', 'Head', 'Tail']:
     pb = arm.pose.bones[n]
     print(f'POSE {n:16s} head={tuple(round(v,3) for v in pb.head)} tail={tuple(round(v,3) for v in pb.tail)} rot={tuple(round(v,3) for v in pb.rotation_quaternion)}')

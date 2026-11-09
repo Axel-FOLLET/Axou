@@ -3,50 +3,43 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { BUTTERFLIES, toonMaterial, color, mix } from '../style/palette.js';
 import { heightAt as groundAt } from '../world/Terrain.js';
 import { MEADOW_LIMIT } from '../world/field.js';
+import { keepInsideRampart } from '../world/Rampart.js';
 
 /**
- * Un papillon : maillage (corps, deux ailes, antennes, sphère de clic invisible) et machine à
- * états. Il ne connaît ni le chat ni la prairie : l'essaim (`Butterflies.js`) lui donne les
- * fleurs libres et la position du chat.
+ * One butterfly: mesh (body, two wings, antennae, invisible click sphere) and state machine. It knows
+ * neither the cat nor the meadow: the swarm (Butterflies.js) creates it and gives it free flowers and
+ * the cat position. Local frame: head toward +Z, up toward +Y. Wingspan ≈ 12 cm × `size`.
  *
- * Repère local : museau du papillon vers +Z, haut vers +Y (même convention que le chat).
- * Échelle : envergure ≈ 12 cm × `size` (un monarque réel fait ≈ 10 cm ; un peu plus grand pour
- * se lire à côté du chat de 0,8 m).
- *
- * États (`state`) :
- * - `perched` : posé sur une fleur, ailes repliées à la verticale, ouverture lente de temps en temps ;
- * - `flying`  : vol erratique (errance `wanderLeft` secondes, puis vers sa fleur réservée et pose) ;
- * - `fleeing` : fuite rapide en zigzag, loin du point d'alerte, vers le haut ;
- * - `away`    : erre loin pendant un temps de repos, puis revient vers une fleur (`flying`) ;
- * - `caught`  : « attrapé » sous la patte, immobile un instant, puis s'échappe (`fleeing`) sans mal.
+ * States (`state`):
+ * - `perched`: on a flower, wings folded upright, opening slowly now and then;
+ * - `flying`: erratic flight (`wanderLeft` seconds), then to its reserved flower, where it lands;
+ * - `fleeing`: fast zigzag away from the alert point, upward;
+ * - `away`: wanders far off for a rest period, then returns to a flower (`flying`);
+ * - `caught`: held under the paw for a moment, then escapes (`fleeing`), unharmed.
  */
 
-/**
- * Espèces. Couleurs pastel de `BUTTERFLIES` (src/style/palette.js, mission catgame_style) : plus de
- * bord noir, bords adoucis de la même famille de teinte que la base.
- */
+/** Species. Each name is a key of `BUTTERFLIES` (palette.js), which gives the pastel base and edge colours. */
 export const SPECIES = [
-  { name: 'monarque', size: 1.0 },
-  { name: 'citron', size: 0.9 },
-  { name: 'azuré', size: 0.8 },
-  { name: 'piéride rose', size: 0.95 },
+  { name: 'monarch', size: 1.0 },
+  { name: 'brimstone', size: 0.9 },
+  { name: 'blue', size: 0.8 },
+  { name: 'pink white', size: 0.95 },
 ].map((s) => ({ ...s, base: BUTTERFLIES[s.name].base, edge: BUTTERFLIES[s.name].edge }));
 
-const WING_CLOSED = 1.38;     // rad, ailes repliées dos à dos (≈ 79° au-dessus de l'horizontale)
-const FLAP_HZ = [7, 10];      // battements par seconde en vol (tiré par papillon)
-const FLY_SPEED = 0.9;        // m/s, vol de croisière
-const FLEE_SPEED = 2.4;       // m/s, fuite
-// Hauteurs de vol mesurées au-dessus du sol du terrain (src/world/Terrain.js, mission catgame_monde).
-const MIN_FLY_Y = 0.15;       // m, hauteur minimale en vol (hors approche d'une fleur)
+const WING_CLOSED = 1.38;     // rad, wings folded back to back (≈ 79° above horizontal)
+const FLAP_HZ = [7, 10];      // wing beats per second in flight (drawn per butterfly)
+const FLY_SPEED = 0.9;        // m/s, cruising flight
+const FLEE_SPEED = 2.4;       // m/s, fleeing
+// Flight heights are measured above the terrain ground (Terrain.js).
+const MIN_FLY_Y = 0.15;       // m, minimum flight height (except when approaching a flower)
 const MAX_FLY_Y = 2.6;        // m
-const FLY_LIMIT = MEADOW_LIMIT - 0.5; // m, rayon que le papillon ne dépasse jamais (prairie)
-const PERCH_OFFSET = 0.012;   // m, le corps au-dessus du sommet de la corolle
+const FLY_LIMIT = MEADOW_LIMIT - 0.5; // m, radius the butterfly never exceeds (meadow)
+export const WALL_CLEARANCE = 2.5; // m from the rampart axis: more than the widest tower (gate tower, 2.3 m), so no flight through stone
+const PERCH_OFFSET = 0.012;   // m, body above the top of the corolla
 
-// Contours (x vers la gauche du papillon, z vers l'avant), en mètres pour `size` 1. Chaque
-// contour est « en étoile » depuis l'attache (0, 0) : l'aile est un éventail découpé en anneaux,
-// ce qui donne des sommets intérieurs pour le dégradé de couleur (base → bord).
-// Contours arrondis (style « dessin animé doux ») : aile antérieure en lobe rond, sans pointe ;
-// aile postérieure en goutte ronde.
+// Wing outlines (x toward the butterfly's left, z forward), metres at `size` 1. Each outline is star-shaped
+// around the attachment (0, 0): the wing is a fan cut into rings, giving inner vertices for the colour
+// gradient (base to edge). Rounded shapes: forewing as a round lobe, hindwing as a round drop.
 const FORE = [[0.004, 0.006], [0.016, 0.028], [0.036, 0.040], [0.054, 0.038], [0.064, 0.024], [0.060, 0.008], [0.046, -0.002], [0.026, -0.006], [0.006, -0.004]];
 const HIND = [[0.020, -0.004], [0.040, -0.012], [0.050, -0.028], [0.044, -0.046], [0.028, -0.056], [0.012, -0.050], [0.004, -0.034]];
 const RINGS = 4;
@@ -56,7 +49,7 @@ function sampleOutline(points, n) {
   return curve.getPoints(n);
 }
 
-/** Petites boules au bout des antennes (une géométrie pour les deux). */
+/** Small balls at the antenna tips (one geometry for both). */
 function mergeKnobs(points, r) {
   const parts = points.map(([x, y, z]) => new THREE.SphereGeometry(r, 6, 4).translate(x, y, z));
   const g = mergeGeometries(parts);
@@ -64,11 +57,11 @@ function mergeKnobs(points, r) {
   return g;
 }
 
-/** Géométrie de l'aile gauche (aile antérieure + postérieure), couleurs par sommet. */
+/** Left wing geometry (forewing + hindwing) with vertex colours. */
 function wingGeometry(species) {
   const base = color(species.base);
   const edge = color(species.edge);
-  const root = mix(species.base, 0xffffff, 0.2); // racine éclaircie (douce), plus assombrie
+  const root = mix(species.base, 0xffffff, 0.2); // softly lightened wing root
   const pos = [], col = [], idx = [];
   const c = new THREE.Color();
   const addFan = (outline, y, shade) => {
@@ -102,10 +95,10 @@ function wingGeometry(species) {
   return g;
 }
 
-/** Ressources partagées par espèce (géométries et matériaux créés une fois). */
+/** Resources shared per species (geometries and materials created once). */
 export class ButterflyAssets {
   constructor() {
-    // Corps dodu et tête ronde un peu grosse (proportions « mignonnes »), antennes à bout rond.
+    // Plump body, slightly oversized round head (cute proportions), antennae with round tips.
     this.body = new THREE.CapsuleGeometry(0.0058, 0.026, 3, 8).rotateX(Math.PI / 2).translate(0, 0, -0.004);
     this.head = new THREE.SphereGeometry(0.0072, 10, 8).translate(0, 0, 0.018);
     this.antennae = new THREE.BufferGeometry().setFromPoints([
@@ -115,13 +108,13 @@ export class ButterflyAssets {
     this.knobs = mergeKnobs([[0.012, 0.014, 0.042], [-0.012, 0.014, 0.042]], 0.0028);
     this.bodyMat = toonMaterial(BUTTERFLIES.body, { steps: 2 });
     this.antennaMat = new THREE.LineBasicMaterial({ color: BUTTERFLIES.antenna });
-    // Sphère de clic : invisible au rendu (`visible: false`) mais touchée par le Raycaster
-    // (Mesh.raycast de three 0.186 ne teste pas la visibilité du matériau).
+    // Click sphere: invisible (`visible: false`) but still hit by the Raycaster
+    // (Mesh.raycast of three 0.186 does not test material visibility).
     this.hit = new THREE.SphereGeometry(0.08, 8, 6);
     this.hitMat = new THREE.MeshBasicMaterial({ visible: false });
     this.wings = SPECIES.map((s) => ({
       geometry: wingGeometry(s),
-      // Aplats à 2 paliers (style.md § 5 et § 7) ; léger éclat pour rester lisibles sur l'herbe.
+      // Flat two-step toon shading; a faint glow keeps the wings readable on the grass.
       material: toonMaterial(0xffffff, {
         vertexColors: true, side: THREE.DoubleSide, steps: 2,
         emissive: s.base, emissiveIntensity: 0.15,
@@ -138,22 +131,25 @@ export class ButterflyAssets {
 
 const _v = new THREE.Vector3();
 const _d = new THREE.Vector3();
+const _wall = new THREE.Vector3();
+const _wallN = new THREE.Vector3();
 
 export class Butterfly {
   /**
    * @param {ButterflyAssets} assets
-   * @param {number} speciesIndex  indice dans SPECIES
-   * @param {() => number} rng     générateur [0, 1)
+   * @param {number} speciesIndex  index in SPECIES
+   * @param {() => number} rng     generator in [0, 1)
    * @param {number} id
    */
   constructor(assets, speciesIndex, rng, id) {
     this.id = id;
     this.species = SPECIES[speciesIndex];
     this.rng = rng;
+    this.rest = null;   // s away after fleeing, given by flee() and catchAt()
 
-    this.group = new THREE.Group();          // position logique et cap
+    this.group = new THREE.Group();          // logical position and heading
     this.group.name = `Butterfly_${id}`;
-    this.tilt = new THREE.Group();           // tangage, roulis et sautillement visuel du vol
+    this.tilt = new THREE.Group();           // pitch and visual flight bob
     this.group.add(this.tilt);
     const body = new THREE.Mesh(assets.body, assets.bodyMat);
     const head = new THREE.Mesh(assets.head, assets.bodyMat);
@@ -162,39 +158,36 @@ export class Butterfly {
     const w = assets.wings[speciesIndex];
     this.wingL = new THREE.Mesh(w.geometry, w.material);
     this.wingR = new THREE.Mesh(w.geometry, w.material);
-    this.wingR.scale.x = -1;                 // miroir de l'aile gauche
+    this.wingR.scale.x = -1;                 // mirror of the left wing
     this.wingL.castShadow = this.wingR.castShadow = true;
     this.tilt.add(body, head, ant, knobs, this.wingL, this.wingR);
 
-    /** Sphère de clic (rayon 8 cm) : `userData.butterfly` renvoie ce papillon. */
+    /** Click sphere (8 cm radius): `userData.butterfly` returns this butterfly. */
     this.hitMesh = new THREE.Mesh(assets.hit, assets.hitMat);
     this.hitMesh.userData.butterfly = this;
     this.hitMesh.name = `ButterflyHit_${id}`;
     this.group.add(this.hitMesh);
 
     this.state = 'flying';
-    this.timer = 0;            // durée restante de l'état (perched, fleeing, away, caught)
-    this.wanderLeft = 0;       // errance restante avant de rejoindre sa fleur (flying)
-    this.flower = null;        // Vector3 réservé (référence fournie par l'essaim) ou null
+    this.timer = 0;            // s left in the state (perched, fleeing, away, caught)
+    this.wanderLeft = 0;       // s of wandering left before heading to its flower (flying)
+    this.flower = null;        // reserved Vector3 (reference given by the swarm) or null
     this.goal = new THREE.Vector3();
     this.vel = new THREE.Vector3();
-    this.targeted = false;     // visé par le chat (affût) : reste posé, ne s'effraie pas du chat qui approche
+    this.targeted = false;     // targeted by the cat (stalked): stays perched, not scared by the approaching cat
     this.yaw = rng() * Math.PI * 2;
     this.phase = rng() * Math.PI * 2;
     this.freq = FLAP_HZ[0] + rng() * (FLAP_HZ[1] - FLAP_HZ[0]);
     this.wing = WING_CLOSED;
-    this.glide = 0;            // secondes restantes de plané (ailes ouvertes, fixes)
-    this.bask = rng() * 5;     // horloge de l'ouverture lente des ailes une fois posé
+    this.glide = 0;            // s of gliding left (wings open, still)
+    this.bask = rng() * 5;     // clock of the slow wing opening once perched
     this.noise = [rng() * 100, rng() * 100, rng() * 100];
     this.t = 0;
   }
 
   get position() { return this.group.position; }
-  get isPerched() { return this.state === 'perched'; }
-  /** Posé et pas en fuite : une proie possible pour la chasse. */
-  get huntable() { return this.state === 'perched'; }
 
-  /** Pose immédiate sur une fleur (placement initial). */
+  /** Perches immediately on a flower (initial placement). */
   perchAt(flower, duration) {
     this.flower = flower;
     this.state = 'perched';
@@ -204,7 +197,7 @@ export class Butterfly {
     this.wing = WING_CLOSED;
   }
 
-  /** Décolle et erre `wander` secondes avant de rejoindre `flower` (null : errance seule). */
+  /** Takes off and wanders `wander` seconds before reaching `flower` (null: wandering only). */
   takeOff(flower, wander) {
     this.state = 'flying';
     this.flower = flower;
@@ -214,7 +207,7 @@ export class Butterfly {
     this._pickWanderGoal();
   }
 
-  /** Fuite loin de `from` (alerte, bond raté, échappée). `rest` : secondes loin avant de revenir. */
+  /** Flees away from `from` (alert, missed pounce, escape). `rest`: seconds away before returning. */
   flee(from, rest) {
     this.state = 'fleeing';
     this.flower = null;
@@ -229,7 +222,7 @@ export class Butterfly {
     this.vel.copy(_d).multiplyScalar(FLEE_SPEED * 0.6).setY(1.4);
   }
 
-  /** « Attrapé » : reste sous la patte `secs` secondes puis s'échappe. */
+  /** Caught: stays under the paw for `secs` seconds, then escapes. */
   catchAt(point, secs, rest) {
     this.state = 'caught';
     this.flower = null;
@@ -246,7 +239,7 @@ export class Butterfly {
     this.goal.set(x, groundAt(x, z) + 0.35 + this.rng() * 1.2, z);
   }
 
-  /** Avance vers `goal` à `speed`, avec un bruit latéral et vertical (`erratic` 0..1). */
+  /** Moves toward `goal` at `speed` with lateral and vertical noise (`erratic` 0..1). Returns the distance to the goal. */
   _steer(dt, speed, erratic, arrive) {
     const p = this.group.position;
     _d.copy(this.goal).sub(p);
@@ -276,15 +269,15 @@ export class Butterfly {
         this.wing = 0.35 + 0.85 * Math.sin(this.phase);
         if (this.rng() < dt * 0.25) this.glide = 0.2 + this.rng() * 0.3;
       }
-      // Sautillement vertical à chaque battement (corps qui monte quand les ailes descendent).
+      // Vertical flutter on each beat (the body rises when the wings go down).
       this.tilt.position.y = -0.012 * Math.sin(this.phase);
     } else {
-      // Posé : ailes repliées, ouverture lente toutes les 3 à 6 s (se chauffer au soleil).
+      // Perched: wings folded, slow opening on a 4.5 s cycle (basking in the sun).
       this.bask += dt;
       const cycle = 4.5, u = (this.bask % cycle) / cycle;
       const open = u < 0.35 ? Math.sin((u / 0.35) * Math.PI) : 0;
       let target = WING_CLOSED - (WING_CLOSED - 0.3) * open;
-      if (this.targeted) target -= 0.15 * Math.max(0, Math.sin(this.t * 11)); // visé : petits frissons
+      if (this.targeted) target -= 0.15 * Math.max(0, Math.sin(this.t * 11)); // targeted: small shivers
       this.wing += (target - this.wing) * (1 - Math.exp(-10 * dt));
       this.tilt.position.y += (0 - this.tilt.position.y) * (1 - Math.exp(-10 * dt));
     }
@@ -307,15 +300,15 @@ export class Butterfly {
   }
 
   /**
-   * Avance d'un pas. `ctx` : { cat: Vector3 (position du chat au sol), swarm (pour réserver une
-   * fleur et émettre les évènements), bounds: { center: Vector3, radius } }.
+   * Advances one step. `ctx`: { cat: Vector3 (cat's ground position), swarm (reserves flowers and emits
+   * events), bounds: { center: Vector3, radius } }.
    */
   update(dt, ctx) {
     this.t += dt;
     const p = this.group.position;
     switch (this.state) {
       case 'perched': {
-        if (this.flower) p.copy(this.flower).y += PERCH_OFFSET; // suit la fleur si elle bouge
+        if (this.flower) p.copy(this.flower).y += PERCH_OFFSET; // follows the flower if it moves
         if (!this.targeted) this.timer -= dt;
         this.vel.set(0, 0, 0);
         this.tilt.rotation.x *= Math.exp(-8 * dt);
@@ -331,7 +324,7 @@ export class Butterfly {
       case 'caught': {
         this.timer -= dt;
         this._flap(dt, false);
-        this.wing += (0.1 - this.wing) * (1 - Math.exp(-10 * dt)); // aplati sous la patte
+        this.wing += (0.1 - this.wing) * (1 - Math.exp(-10 * dt)); // flattened under the paw
         this.wingL.rotation.z = this.wing; this.wingR.rotation.z = -this.wing;
         if (this.timer <= 0) { this.flee(this._escapeFrom ?? ctx.cat, this.rest); ctx.swarm._emit('escape', this); }
         return;
@@ -352,7 +345,7 @@ export class Butterfly {
         if (d < 0.3) this._pickWanderGoal(p, 2.5);
         if (this.timer <= 0) {
           this.takeOff(ctx.swarm._reserveFlower(this, null), this.rng() * 2);
-          this.vel.multiplyScalar(0); // pas de saut vertical au retour
+          this.vel.multiplyScalar(0); // no vertical hop on return
           ctx.swarm._emit('return', this);
         }
         break;
@@ -378,7 +371,7 @@ export class Butterfly {
         break;
       }
     }
-    // Contraintes de vol : hauteur, enceinte, et contournement du corps du chat.
+    // Flight constraints: height, enclosure, and going around the cat's body.
     const landing = this.state === 'flying' && this.flower && this.wanderLeft <= 0;
     const g = groundAt(p.x, p.z);
     if (!landing && p.y < g + MIN_FLY_Y) { p.y = g + MIN_FLY_Y; this.vel.y = Math.abs(this.vel.y); }
@@ -389,7 +382,7 @@ export class Butterfly {
       this.goal.copy(b.center).addScaledVector(_d.normalize(), b.radius * 0.6);
       this.goal.y = Math.max(this.goal.y, groundAt(this.goal.x, this.goal.z) + 0.5);
     }
-    // Limite dure de la prairie (MEADOW_LIMIT) : ramené au bord, vitesse sortante annulée.
+    // Hard meadow limit (MEADOW_LIMIT): brought back to the edge, outward speed cancelled.
     const rr = Math.hypot(p.x, p.z);
     if (rr > FLY_LIMIT) {
       const nx = p.x / rr, nz = p.z / rr;
@@ -398,16 +391,22 @@ export class Butterfly {
       if (vn > 0) { this.vel.x -= vn * nx; this.vel.z -= vn * nz; }
       if (Math.hypot(this.goal.x, this.goal.z) > FLY_LIMIT - 1) this.goal.set(nx * (FLY_LIMIT - 3), this.goal.y, nz * (FLY_LIMIT - 3));
     }
+    // Rampart: same treatment as the disc limit; the far side does not exist for a butterfly.
+    if (keepInsideRampart(p, WALL_CLEARANCE, _wallN)) {
+      const vn = this.vel.x * _wallN.x + this.vel.z * _wallN.z;
+      if (vn > 0) { this.vel.x -= vn * _wallN.x; this.vel.z -= vn * _wallN.z; }
+      if (keepInsideRampart(_wall.copy(this.goal), WALL_CLEARANCE)) this.goal.set(p.x - _wallN.x * 3, this.goal.y, p.z - _wallN.z * 3);
+    }
     if (ctx.cat) {
       _d.copy(p).sub(ctx.cat); _d.y = 0;
       const hd = _d.length();
-      // Passe par-dessus le chat (hauteur comptée depuis la racine du chat : sol ou muret).
+      // Flies over the cat (height measured from the cat's root: ground or low wall).
       if (hd < 0.45 && p.y - (ctx.cat.y ?? 0) < 0.75 && !landing) this.vel.y += 3 * dt;
     }
     this._flap(dt, true);
     this._orient(dt);
   }
 
-  /** Retire le papillon de la scène. */
+  /** Removes the butterfly from the scene. */
   remove() { this.group.removeFromParent(); }
 }

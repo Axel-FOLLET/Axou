@@ -1,5 +1,10 @@
 import * as THREE from 'three';
 
+/**
+ * Procedural animation layers applied after the mixer: breathing, tail shape and sway, ear movement and head
+ * tracking. Created by Cat.js, which calls `restore` before the mixer and `update` after it.
+ */
+
 const _q = new THREE.Quaternion();
 const _pq = new THREE.Quaternion();
 const _e = new THREE.Euler();
@@ -9,11 +14,10 @@ const _headPos = new THREE.Vector3();
 const deg = THREE.MathUtils.degToRad;
 
 /**
- * Formes de queue par situation, en degrés par os (os 0 = base, non touché), d'après l'étude
- * Stray (§ 8 du README) : basse en marche, enroulée au repos assis/couché, en crochet quand on
- * l'approche. pitch > 0 = vers l'arrière puis le bas ; yaw > 0 = vers la droite du chat.
- * `clip` : la queue est déjà posée par le clip du GLB (assis, couché, papouilles, sommeil…),
- * on n'ajoute qu'une ondulation discrète.
+ * Tail shapes by situation, in degrees per bone (bone 0 = base, untouched): low when walking, curled when sitting
+ * or lying, hooked when approached. pitch > 0 = backward then down; yaw > 0 = toward the cat's right.
+ * `clip`: the GLB clip already poses the tail, only a faint sway is added.
+ * `sway`: wave amplitude (rad); `speed`: wave speed factor.
  */
 const TAIL_MODES = {
   up:   { pitch: [0, 6, 6, 6, 6, 4, 2, 0],          yaw: [0, 0, 0, 0, 0, 0, 0, 0],      sway: 0.08, speed: 1 },
@@ -22,24 +26,22 @@ const TAIL_MODES = {
   hook: { pitch: [0, -4, -6, -10, -16, -20, -20, -14], yaw: [0, 0, 0, 0, 0, 0, 0, 0],   sway: 0.04, speed: 1.6 },
   back: { pitch: [0, 32, 30, 25, 12, 0, 0, 0],      yaw: [0, 0, 0, 0, 0, 0, 0, 0],      sway: 0.10, speed: 0.7 },
   clip: { pitch: [0, 0, 0, 0, 0, 0, 0, 0],          yaw: [0, 0, 0, 0, 0, 0, 0, 0],      sway: 0.03, speed: 0.8 },
-  // Chasse (mission catgame_jeu, fiche 01b) : queue basse et raide à l'affût, seul le bout bouge
-  // (coups de queue fréquents) ; plus basse encore au ras du sol pendant la préparation du bond,
-  // bout qui fouette vite, oreilles qui frémissent. `flick` / `twitch` = intervalle (s) entre deux
-  // coups de bout de queue / frémissements d'oreille, à la place des valeurs calmes (4-10 s, 2-7 s).
+  // Hunt: low and stiff while stalking, only the tip moves; lower still during the pounce preparation, fast-whipping
+  // tip and twitching ears. `flick` / `twitch`: interval (s) between tail-tip flicks / ear twitches, replacing the
+  // calm values (4-10 s, 2-7 s).
   stalk:  { pitch: [0, 60, 25, 10, 0, 0, 0, 0],       yaw: [0, 0, 0, 0, 0, 0, 0, 0],      sway: 0.015, speed: 1.2, flick: [0.8, 2.2] },
   crouch: { pitch: [0, 70, 25, 5, -10, -15, -20, -15], yaw: [0, 0, 0, 0, 0, 0, 0, 0],     sway: 0.06, speed: 2.2, flick: [0.25, 0.7], twitch: [0.35, 0.9] },
-  // Clip de chasse présent dans le GLB : forme du clip, on n'ajoute que les coups de bout de queue.
+  // Hunt clip in the GLB: the clip's shape, only tail-tip flicks are added.
   clipTip: { pitch: [0, 0, 0, 0, 0, 0, 0, 0],         yaw: [0, 0, 0, 0, 0, 0, 0, 0],      sway: 0.01, speed: 1, flick: [0.6, 1.8] },
 };
 
 /**
- * Couches procédurales appliquées après le mixer, en relatif : respiration, queue, oreilles,
- * tête qui suit un point avec tours de tête par à-coups.
+ * Layers applied after the mixer, as relative rotations: breathing, tail, ears, and a head that follows a point
+ * with sudden head turns.
  *
- * Les rotations « corps » sont exprimées dans le repère du chat (X à droite, Y en haut,
- * Z vers le museau) puis converties dans l'espace du parent de l'os : on n'a ainsi pas à
- * deviner l'orientation locale de chaque os Blender. Le repère du chat est donné chaque frame
- * par le quaternion monde du groupe `body`.
+ * "Body" rotations are expressed in the cat's frame (X right, Y up, Z toward the muzzle), then converted to the
+ * bone parent's space, so there is no need to guess each Blender bone's local orientation. The cat's frame comes
+ * each frame from the world quaternion of the `body` group.
  */
 export class Procedural {
   constructor(rig) {
@@ -48,7 +50,7 @@ export class Procedural {
     this.lookTarget = null;
     this.lookWeight = 1;
     this.tailMode = 'up';
-    this.focus = false;      // chasse : regard fixe sur la proie, pas de tours de tête ni de frémissements calmes
+    this.focus = false;      // hunting: gaze fixed on the prey, no head turns or calm ear twitches
     this.breathRate = 2.2;   // rad/s
     this.breathAmp = 0.02;   // rad
     this._frameQ = new THREE.Quaternion();
@@ -58,15 +60,17 @@ export class Procedural {
     this._nextTwitch = 2;
     this._earYaw = 0;
     this._gaze = { yaw: 0, pitch: 0, next: 1.5 };
+    // Actual gaze weight: `lookWeight`, except during a soft recovery (easeLook).
+    this._lookW = 1;
+    this._ease = null;
     this._gazeCur = { yaw: 0, pitch: 0 };
     this._tailPitch = new Float32Array(8);
     this._tailYaw = new Float32Array(8);
     this._flick = 0;
     this._nextFlick = 5;
     this._phase = Math.random() * 10;
-    // Valeur « sortie du mixer » de chaque os touché. L'AnimationMixer n'écrit un os que si sa
-    // valeur a changé depuis la frame précédente : sans cette sauvegarde, nos rotations
-    // relatives s'accumuleraient frame après frame (tête et queue qui partent en vrille).
+    // "Mixer output" value of each touched bone. The AnimationMixer only writes a bone whose value changed since
+    // the previous frame: without this copy, relative rotations would accumulate frame after frame.
     this._base = new Map();
   }
 
@@ -74,14 +78,14 @@ export class Procedural {
     if (!this._base.has(bone)) this._base.set(bone, bone.quaternion.clone());
   }
 
-  /** Rotation dans l'espace local de l'os (oreilles). */
+  /** Rotation in the bone's local space (ears). */
   _rotateLocal(bone, axis, angle) {
     this._touch(bone);
     _e.set(axis === 'x' ? angle : 0, axis === 'y' ? angle : 0, axis === 'z' ? angle : 0);
     bone.quaternion.multiply(_q.setFromEuler(_e));
   }
 
-  /** Rotation autour d'un axe du repère du chat, appliquée à un os. */
+  /** Rotation around an axis of the cat's frame, applied to a bone. */
   _rotateFrame(bone, axisFrame, angle) {
     if (!angle) return;
     this._touch(bone);
@@ -91,12 +95,24 @@ export class Procedural {
     bone.updateMatrixWorld(true);
   }
 
-  /** À appeler avant `mixer.update` : remet les os touchés dans leur état post-mixer. */
+  /**
+   * Soft gaze recovery: the applied weight eases from its current value to `lookWeight` over `dur` s (S curve)
+   * instead of snapping, with no new head turn meanwhile, so the head does not jump toward the pointer.
+   */
+  easeLook(dur) {
+    this._ease = { from: this._lookW, t: 0, dur };
+    this._gaze.next = Math.max(this._gaze.next, dur);
+  }
+
+  /** End of the soft recovery: the applied weight is `lookWeight` again. */
+  stopEase() { this._ease = null; }
+
+  /** Call before `mixer.update`: puts touched bones back in their post-mixer state. */
   restore() {
     for (const [bone, q] of this._base) bone.quaternion.copy(q);
   }
 
-  /** À appeler après `mixer.update` et `updateMatrixWorld` : couches relatives. `frame` = groupe `body`. */
+  /** Call after `mixer.update` and `updateMatrixWorld`: relative layers. `frame` = the `body` group. */
   update(dt, frame) {
     for (const [bone, q] of this._base) q.copy(bone.quaternion);
     this.t += dt;
@@ -105,17 +121,16 @@ export class Procedural {
     const { RIGHT, UP, FORWARD } = Procedural;
     const t = this.t + this._phase;
 
-    // Respiration : léger soulèvement du thorax (plus lente et plus ample en dormant).
+    // Breathing: slight rise of the chest (slower and deeper when asleep).
     this._rotateFrame(rig.spine[2], RIGHT, Math.sin(t * this.breathRate) * this.breathAmp);
 
-    // Queue : forme cible selon la situation, atteinte en douceur, plus une ondulation
-    // irrégulière (deux sinus de fréquences non commensurables, enveloppe lente) et un
-    // coup de queue occasionnel au bout.
+    // Tail: target shape for the situation, reached smoothly, plus an irregular wave (two incommensurate sines,
+    // slow envelope) and an occasional tip flick.
     const mode = TAIL_MODES[this.tailMode] ?? TAIL_MODES.up;
     const kt = 1 - Math.exp(-3 * dt);
     this._nextFlick -= dt;
     const [f0, f1] = mode.flick ?? [4, 10];
-    if (this._nextFlick > f1) this._nextFlick = f0 + Math.random() * (f1 - f0); // entrée en chasse
+    if (this._nextFlick > f1) this._nextFlick = f0 + Math.random() * (f1 - f0); // entering a hunt
     if (this._nextFlick <= 0) { this._flick = 1; this._nextFlick = f0 + Math.random() * (f1 - f0); }
     const flick = this._flick > 0 ? Math.sin(this._flick * Math.PI) * 0.5 : 0;
     this._flick = Math.max(0, this._flick - dt * 2.5);
@@ -131,8 +146,8 @@ export class Procedural {
       this._rotateFrame(bone, UP, this._tailYaw[i]);
     });
 
-    // Tête : suit le pointeur, angles limités, lissés ; en l'absence de cible proche, le regard
-    // change par à-coups (petits tours de tête toutes les 1,5 à 4 s, comme un vrai chat).
+    // Head: follows the pointer with clamped, smoothed angles; with no close target, small sudden head turns
+    // every 1.5 to 4 s, like a real cat.
     let yaw = 0;
     let pitch = 0;
     if (this.lookTarget) {
@@ -150,26 +165,34 @@ export class Procedural {
       this._gaze.yaw = (Math.random() - 0.5) * 0.5;
       this._gaze.pitch = (Math.random() - 0.5) * 0.25;
     }
-    const kg = 1 - Math.exp(-14 * dt); // à-coup : rapide
+    const kg = 1 - Math.exp(-14 * dt); // sudden: fast
     this._gazeCur.yaw += (this._gaze.yaw - this._gazeCur.yaw) * kg;
     this._gazeCur.pitch += (this._gaze.pitch - this._gazeCur.pitch) * kg;
+    const e = this._ease;
+    if (e) {
+      e.t += dt;
+      const u = Math.min(1, e.t / e.dur);
+      this._lookW = e.from + (this.lookWeight - e.from) * u * u * (3 - 2 * u);
+      if (u >= 1) this._ease = null;
+    } else this._lookW = this.lookWeight;
+    const lw = this._lookW;
     const k = 1 - Math.exp(-6 * dt);
-    this._yaw += ((yaw + this._gazeCur.yaw) * this.lookWeight - this._yaw) * k;
-    this._pitch += ((pitch + this._gazeCur.pitch) * this.lookWeight - this._pitch) * k;
+    this._yaw += ((yaw + this._gazeCur.yaw) * lw - this._yaw) * k;
+    this._pitch += ((pitch + this._gazeCur.pitch) * lw - this._pitch) * k;
     const parts = [[rig.neck[1], 0.3], [rig.neck[2], 0.3], [rig.head, 0.4]];
     for (const [bone, w] of parts) {
-      // Yaw : une rotation positive autour de Y amène +Z vers +X (vers la droite du chat).
+      // Yaw: a positive rotation around Y brings +Z toward +X (the cat's right).
       this._rotateFrame(bone, UP, this._yaw * w);
-      // Pitch : lever le museau = rotation négative autour de X (règle de la main droite).
+      // Pitch: raising the muzzle is a negative rotation around X (right-hand rule).
       this._rotateFrame(bone, RIGHT, -this._pitch * w);
     }
 
-    // Oreilles : elles pivotent vers le pointeur avec un temps de retard, et frémissent parfois.
+    // Ears: pivot toward the pointer with a delay, and twitch at times.
     const ke = 1 - Math.exp(-3 * dt);
-    this._earYaw += (yaw * 0.4 * this.lookWeight - this._earYaw) * ke;
+    this._earYaw += (yaw * 0.4 * lw - this._earYaw) * ke;
     this._rotateFrame(rig.earL[0], UP, this._earYaw);
     this._rotateFrame(rig.earR[0], UP, this._earYaw);
-    // À l'affût (focus), oreilles fixes vers la proie ; à la préparation du bond, frémissements rapides.
+    // While stalking (focus), ears stay fixed toward the prey; before the pounce, fast twitches.
     const twitch = mode.twitch ?? (this.focus ? null : [2, 7]);
     if (twitch) {
       this._nextTwitch = Math.min(this._nextTwitch, twitch[1]) - dt;
@@ -187,4 +210,3 @@ export class Procedural {
 Procedural.RIGHT = new THREE.Vector3(1, 0, 0);
 Procedural.UP = new THREE.Vector3(0, 1, 0);
 Procedural.FORWARD = new THREE.Vector3(0, 0, 1);
-Procedural.TAIL_MODES = TAIL_MODES;

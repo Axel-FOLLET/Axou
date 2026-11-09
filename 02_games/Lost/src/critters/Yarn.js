@@ -5,54 +5,40 @@ import { MEADOW_LIMIT } from '../world/field.js';
 import { heightAt as terrainHeightAt } from '../world/Terrain.js';
 
 /**
- * Pelote de laine : boule de 11 cm de diamètre, lancer en arc, rebonds amortis, roulement avec
- * frottement (plus fort dans l'herbe haute si une fonction de hauteur est fournie), rotation
- * cohérente avec le roulement, fil qui traîne (corde simulée, une ligne).
+ * Yarn ball: 11 cm sphere thrown in an arc, with damped bounces, rolling friction (stronger in tall grass
+ * when a height function is given), spin matching the roll and a trailing thread (simulated rope).
+ * Created by main.js; Launcher.js throws it, Brain.js chases it.
  *
- * Indépendante du chat : reçoit la scène, puis à chaque image `update(dt, positionDuChat)`.
- * Sol : relief de src/world/Terrain.js (`heightAt`, option `groundAt`) et dessus des murets bas ;
- * murs (option `ruins` ou `setRuins`, src/world/Ruins.js) : la pelote rebondit dessus et ne les
- * traverse pas (mission catgame_monde, D). Repère monde, mètres, secondes.
- *
- * Lancers : `throwTo(from, target)` (point visé) et `throwDir(from, dir, force)` (direction et
- * force, sans point visé ; touche P). Chaque appel relance la pelote, même si elle vole ou roule.
- *
- * Limite : la pelote reste dans le disque `bounds` (par défaut centre (0, 0), rayon
- * `MEADOW_LIMIT` = 18 m, limite de la prairie, src/world/field.js) :
- * un point visé hors du disque est ramené dedans, et la pelote qui touche le bord rebondit
- * mollement vers l'intérieur (lancers, roulement, coups de patte et contact du chat).
- *
- * États (`state`) : `rest` (immobile au sol), `air` (en vol ou en rebond), `rolling` (au sol, roule).
+ * Independent of the cat: it receives the scene, then `update(dt, catPosition)` every frame.
+ * Ground: `heightAt` of Terrain.js (or the `groundAt` option) plus the tops of low walls. Walls (`ruins`
+ * option or `setRuins`, Ruins.js) bounce it back. World frame, metres, seconds.
+ * It stays inside the `bounds` disc (default: the meadow, `MEADOW_LIMIT`) and bounces softly off its edge.
+ * States (`state`): `rest`, `air` (flying or bouncing), `rolling`.
  */
 
-const G = 9.81;
-/** m : distance horizontale du point de chute pour `throwDir` à force 1. */
-export const THROW_RANGE = 3.2;
-/** Forces acceptées par `throwDir` (au-delà : ramenée dans l'intervalle). */
-export const THROW_FORCE = [0.2, 2.5];
-const EDGE_BOUNCE = 0.35;       // part de la vitesse vers l'extérieur rendue vers l'intérieur au bord
-const EDGE_KEEP = 0.7;          // part de la vitesse le long du bord gardée au contact
-const EDGE_MARGIN = 0.3;        // m, un point visé est ramené à au moins ça du bord
+const G = 9.81;  // m/s²
+const EDGE_BOUNCE = 0.35;       // share of the outward speed returned inward at the edge
+const EDGE_KEEP = 0.7;          // share of the speed along the edge kept on contact
+const EDGE_MARGIN = 0.3;        // m, an aimed point is pulled at least this far inside the edge
 /**
- * Repère flottant (correction 1) : rayon de la pastille (m), hauteur moyenne d'herbe au-delà de
- * laquelle il apparaît (m ; la pelote fait 0,11 m), marge au-dessus des touffes (m), amplitude du
- * flottement (m), du « souffle » (part du rayon), vitesse du fondu (1/s).
+ * Floating marker shown when the ball is hidden in tall grass. radius: dot radius (m); showAbove: mean
+ * grass height above which it appears (m, the ball is 0.11 m wide); lift: margin above the tufts (m);
+ * bob: float amplitude (m); pulse: breathing amplitude (share of the radius); fade: fade rate (1/s).
  */
 const MARKER = { radius: 0.05, showAbove: 0.3, lift: 0.14, bob: 0.03, pulse: 0.1, fade: 4 };
-const WALL_BOUNCE = 0.5;        // part de la vitesse vers le mur rendue en rebond
-const WALL_KEEP = 0.8;          // part de la vitesse le long du mur gardée au contact
-const STEP = 1 / 120;           // s, sous-pas de simulation (rebonds et corde stables avec dt jusqu'à 0,1 s)
+const WALL_BOUNCE = 0.5;        // share of the speed into the wall returned as a bounce
+const WALL_KEEP = 0.8;          // share of the speed along the wall kept on contact
+const STEP = 1 / 120;           // s, simulation substep (keeps bounces and the rope stable at large dt)
 const _v = new THREE.Vector3();
 const _w = new THREE.Vector3();
 const _q = new THREE.Quaternion();
 const _t = new THREE.Vector3();
-const UP = new THREE.Vector3(0, 1, 0);
 const _res = { x: 0, z: 0, hit: null };
 
 /**
- * Géométrie : noyau + une douzaine de tours de fil (tores) orientés au hasard, couleurs par sommet.
- * Sans couleur imposée : trois tons de `YARN` (palette.js) ; sinon dérivés de `hex`.
- * Tours de fil épais (tube 0,1 × rayon) et ronds (6 côtés) : aspect moelleux.
+ * Ball geometry: a core plus a dozen randomly oriented thread loops (tori), with vertex colours.
+ * Without `hex`: three tones of `YARN` (palette.js); otherwise tones derived from `hex`.
+ * Thick round loops (tube 0.1 × radius, 6 sides) give a soft look.
  */
 function yarnGeometry(radius, hex, rng) {
   const base = color(hex ?? YARN.base);
@@ -82,26 +68,25 @@ export class Yarn {
   /**
    * @param {THREE.Object3D} scene
    * @param {object} [options]
-   * @param {number} [options.radius=0.055]        m (diamètre 11 cm)
-   * @param {number} [options.color]              couleur unique (hex) ; par défaut les trois tons de `YARN` (rose framboise tendre)
-   * @param {THREE.Vector3} [options.position]     position de départ au sol (centre posé à y = rayon)
-   * @param {number} [options.restitution=0.35]    rebond vertical gardé (0..1), divisé par (1 + herbe) dans l'herbe haute
-   * @param {number} [options.impactKeep=0.65]     vitesse horizontale gardée à chaque impact, divisée de même
-   * @param {number} [options.rollFriction=0.12]   coefficient de roulement sur herbe rase (décélération = coef × g)
-   * @param {(x:number, z:number) => number} [options.heightAt]  hauteur d'herbe AU-DESSUS du sol (m) ;
-   *        ex. `(x, z) => world.meadow.grassHeightAt(x, z)` (meadow.heightAt est absolu depuis la mission catgame_monde)
-   * @param {(x:number, z:number) => number} [options.groundAt]  hauteur du sol (m) ; défaut : `heightAt` de src/world/Terrain.js
-   * @param {object} [options.ruins]               murs (src/world/Ruins.js : walkableAt, resolve) ; aussi `setRuins`
-   * @param {number} [options.grassDrag=1.5]       coef ajouté par mètre d'herbe au-dessus de 0,2 m
-   * @param {number} [options.catRadius=0.15]      m, rayon du corps du chat pour le contact (0 : aucun contact)
-   * @param {boolean} [options.trail=true]         fil qui traîne
+   * @param {number} [options.radius=0.055]        m (11 cm diameter)
+   * @param {number} [options.color]               single colour (hex); default: the three `YARN` tones
+   * @param {THREE.Vector3} [options.position]     start position on the ground (centre at y = radius)
+   * @param {number} [options.restitution=0.35]    vertical bounce kept (0..1), divided by (1 + grass) in tall grass
+   * @param {number} [options.impactKeep=0.65]     horizontal speed kept at each impact, divided the same way
+   * @param {number} [options.rollFriction=0.12]   rolling coefficient on short grass (deceleration = coef × g)
+   * @param {(x:number, z:number) => number} [options.heightAt]  grass height ABOVE the ground (m),
+   *        e.g. `(x, z) => world.meadow.grassHeightAt(x, z)`
+   * @param {(x:number, z:number) => number} [options.groundAt]  ground height (m); default: `heightAt` of Terrain.js
+   * @param {object} [options.ruins]               walls (Ruins.js: walkableAt, resolve); also `setRuins`
+   * @param {number} [options.grassDrag=1.5]       coefficient added per metre of grass above 0.2 m
+   * @param {number} [options.catRadius=0.15]      m, cat body radius for contact (0: no contact)
+   * @param {boolean} [options.trail=true]         trailing thread
    * @param {number} [options.trailLength=0.5]     m
-   * @param {number} [options.seed=1]              forme des tours de fil
-   * @param {{center?: {x:number, z:number}, radius?: number}} [options.bounds]  disque où la pelote reste
-   *        (défaut : centre (0, 0), rayon MEADOW_LIMIT de src/world/field.js) ; `null` : aucune limite
-   * @param {boolean} [options.outline=true]       contour brun chaud (coque inversée, `outlineMaterial`)
-   * @param {boolean} [options.marker=true]        repère flottant au-dessus de la pelote quand elle est
-   *        dans l'herbe haute (exige `heightAt`)
+   * @param {number} [options.seed=1]              shape of the thread loops
+   * @param {{center?: {x:number, z:number}, radius?: number}} [options.bounds]  disc the ball stays in
+   *        (default: centre (0, 0), radius MEADOW_LIMIT); `null`: no limit
+   * @param {boolean} [options.outline=true]       warm brown outline (inverted shell, `outlineMaterial`)
+   * @param {boolean} [options.marker=true]        floating marker above the ball in tall grass (requires `heightAt`)
    */
   constructor(scene, options = {}) {
     this.scene = scene;
@@ -114,9 +99,9 @@ export class Yarn {
     this.ruins = options.ruins ?? null;
     this.grassDrag = options.grassDrag ?? 1.5;
     this.catRadius = options.catRadius ?? 0.15;
-    /** Rappel facultatif : (type, yarn, info) ; type ∈ thrown, bounce (info = vitesse d'impact m/s), stopped, pushed, hitCat, edge (info = vitesse vers l'extérieur m/s). */
+    /** Optional callback (type, yarn, info); type: thrown, bounce (impact speed m/s), stopped, pushed, hitCat, wall, edge (outward speed m/s). */
     this.onEvent = null;
-    /** Disque où la pelote reste : { center: {x, z}, radius } (m), ou null (aucune limite). */
+    /** Disc the ball stays in: { center: {x, z}, radius } (m), or null (no limit). */
     this.bounds = options.bounds === null ? null : {
       center: { x: options.bounds?.center?.x ?? 0, z: options.bounds?.center?.z ?? 0 },
       radius: options.bounds?.radius ?? MEADOW_LIMIT,
@@ -125,14 +110,14 @@ export class Yarn {
     let s = (options.seed ?? 1) >>> 0;
     const rng = () => ((s = (Math.imul(s, 1664525) + 1013904223) >>> 0) / 4294967296);
     this._geometry = yarnGeometry(this.radius, options.color, rng);
-    // Aplats toon (style.md § 7) + léger éclat de sa propre couleur : reste lisible dans l'herbe.
+    // Flat toon shading plus a faint glow of its own colour keeps it readable in the grass.
     this._material = toonMaterial(0xffffff, { vertexColors: true, emissive: YARN.base, emissiveIntensity: 0.12 });
     this.mesh = new THREE.Mesh(this._geometry, this._material);
     this.mesh.name = 'Yarn';
     this.mesh.castShadow = true;
     this.mesh.receiveShadow = true;
-    // Contour : coque inversée sur une sphère simple du rayon de la pelote (et non sur chaque tour
-    // de fil, qui donnerait un trait par tour) : un seul trait rond autour de la silhouette.
+    // Outline: an inverted shell on a plain sphere of the ball's radius, not on each thread loop,
+    // for one round line around the silhouette.
     this._outlineMat = null;
     this._outlineGeo = null;
     if (options.outline ?? true) {
@@ -142,7 +127,7 @@ export class Yarn {
       shell.name = 'YarnOutline';
       this.mesh.add(shell);
     }
-    // Sphère de clic un peu plus grande (9 cm de rayon), invisible au rendu mais touchée par le Raycaster.
+    // Slightly larger click sphere (9 cm radius): invisible but hit by the Raycaster.
     this._hitGeo = new THREE.SphereGeometry(0.09, 10, 8);
     this._hitMat = new THREE.MeshBasicMaterial({ visible: false });
     this.hitMesh = new THREE.Mesh(this._hitGeo, this._hitMat);
@@ -153,11 +138,11 @@ export class Yarn {
     scene.add(this.group);
     this.marker = null;
     if ((options.marker ?? true) && this.heightAt) this._makeMarker();
-    /** Objets cliquables (la sphère invisible). */
+    /** Clickable objects (the invisible sphere). */
     this.pickables = [this.hitMesh];
 
     this.velocity = new THREE.Vector3();
-    this.spin = new THREE.Vector3();        // vitesse angulaire en vol (rad/s, axe monde)
+    this.spin = new THREE.Vector3();        // angular velocity in flight (rad/s, world axis)
     this.state = 'rest';
     this.group.position.copy(options.position ?? new THREE.Vector3(0.6, 0, 0.6));
     this.group.position.y = this._ground(this.group.position.x, this.group.position.z, -Infinity) + this.radius;
@@ -168,18 +153,16 @@ export class Yarn {
     if (options.trail ?? true) this._makeTrail(options.trailLength ?? 0.5);
   }
 
-  /** Position du centre (Vector3 du groupe, repère monde). */
+  /** Centre position (the group's Vector3, world frame). */
   get position() { return this.group.position; }
-  get isMoving() { return this.state !== 'rest'; }
-  get atRest() { return this.state === 'rest'; }
   get onGround() { return this.state !== 'air'; }
 
-  /** Murs du monde (src/world/Ruins.js) ; donné par Brain.setWorld / setYarn ou par main.js. */
+  /** World walls (Ruins.js); set by Brain.setWorld / setYarn or main.js. */
   setRuins(ruins) { this.ruins = ruins ?? null; }
 
   /**
-   * Hauteur du sol sous (x, z) pour une pelote dont le bas est à `bottom` : terrain, ou dessus d'un
-   * muret bas si la pelote est au-dessus (à 5 cm près).
+   * Ground height under (x, z) for a ball whose bottom is at `bottom`: the terrain, or the top of a
+   * low wall when the ball is above it (5 cm tolerance).
    */
   _ground(x, z, bottom) {
     const g = this.groundAt(x, z);
@@ -187,37 +170,26 @@ export class Yarn {
     return top !== null && top > g && bottom >= top - 0.05 ? top : g;
   }
 
-  /** Pose la pelote immobile en `point` (x, z ; posée au sol). */
-  placeAt(point) {
-    const p = this._clampInside(this.group.position.set(point.x, 0, point.z), this.radius);
-    p.y = this._ground(p.x, p.z, Infinity) + this.radius;
-    this.velocity.set(0, 0, 0);
-    this.spin.set(0, 0, 0);
-    this.state = 'rest';
-    this._resetTrail();
-  }
-
   /**
-   * Lance la pelote depuis `from` vers le point du sol `target` : la vitesse initiale est calculée
-   * pour que le premier impact ait lieu en `target` (centre à y = rayon).
-   * Durée de vol `time` (s) ; par défaut 0,45 + 0,1 s par mètre, entre 0,5 et 1,3 s (arc plus haut pour un lancer lointain).
-   * Un point visé hors de `bounds` est ramené à `EDGE_MARGIN` m à l'intérieur du bord.
-   * Relance toujours, même si la pelote vole ou roule encore.
-   * @returns {THREE.Vector3} la vitesse initiale (m/s)
+   * Throws the ball from `from` to the ground point `target`: the initial velocity makes the first impact
+   * land on `target`. Flight time `time` (s) defaults to 0.45 + 0.1 s per metre, within 0.5..1.3 s (higher
+   * arc for a long throw). A target outside `bounds` is pulled `EDGE_MARGIN` m inside the edge.
+   * Always relaunches the ball, even if it is still flying or rolling.
+   * @returns {THREE.Vector3} initial velocity (m/s)
    */
   throwTo(from, target, { time } = {}) {
     const p = this.group.position.copy(from);
-    this._clampInside(p, this.radius);        // départ hors de la prairie : ramené au bord
+    this._clampInside(p, this.radius);        // start outside the meadow: brought back to the edge
     const g0 = this.groundAt(p.x, p.z);
     if (p.y < g0 + this.radius) p.y = g0 + this.radius;
     this._clampInside(_t.set(target.x, 0, target.z), EDGE_MARGIN);
     const dx = _t.x - p.x, dz = _t.z - p.z;
     const d = Math.hypot(dx, dz);
     const T = time ?? THREE.MathUtils.clamp(0.45 + 0.1 * d, 0.5, 1.3);
-    // Premier impact visé au sol au point visé : terrain, ou dessus du muret si le point est dessus.
+    // First impact on the aimed point: terrain, or the top of a low wall if the point is on one.
     const gT = this._ground(_t.x, _t.z, Infinity);
     this.velocity.set(dx / T, (gT + this.radius - p.y + 0.5 * G * T * T) / T, dz / T);
-    // Petit effet de rotation dans le sens du vol (sans influence sur la trajectoire).
+    // Small spin along the flight direction, with no effect on the trajectory.
     this.spin.set(dz, 0, -dx).normalize().multiplyScalar(d > 1e-3 ? 6 : 0);
     this.state = 'air';
     this._resetTrail();
@@ -226,29 +198,8 @@ export class Yarn {
   }
 
   /**
-   * Lance la pelote sans point visé : depuis `from`, dans la direction horizontale `dir`, avec la
-   * force `force`. Le point de chute (premier impact) est à `force × THROW_RANGE` m (3,2 m à
-   * force 1) de `from`, horizontalement, dans la direction `dir` ; ramené dans `bounds` s'il en
-   * sort. Durée de vol comme `throwTo`. Relance toujours, même si la pelote vole ou roule encore.
-   * @param {THREE.Vector3|{x:number, y:number, z:number}} from  point de départ (m, repère monde ; y ≥ rayon)
-   * @param {THREE.Vector3|{x:number, z:number}} dir  direction horizontale (y ignoré, longueur quelconque ;
-   *        nulle : +Z)
-   * @param {number} [force=1]  sans unité, ramenée dans THROW_FORCE (0,2 à 2,5)
-   * @param {{time?: number}} [opts]  durée de vol imposée (s)
-   * @returns {THREE.Vector3} la vitesse initiale (m/s)
-   */
-  throwDir(from, dir, force = 1, opts = {}) {
-    let dx = dir.x, dz = dir.z;
-    const L = Math.hypot(dx, dz);
-    if (L < 1e-6) { dx = 0; dz = 1; } else { dx /= L; dz /= L; }
-    const f = THREE.MathUtils.clamp(Number.isFinite(force) ? force : 1, THROW_FORCE[0], THROW_FORCE[1]);
-    const d = f * THROW_RANGE;
-    return this.throwTo(from, { x: from.x + dx * d, z: from.z + dz * d }, opts);
-  }
-
-  /**
-   * Ramène le point (x, z) de `v` dans le disque `bounds`, à au moins `margin` m du bord
-   * (y inchangé). Renvoie `v`. Sans `bounds` : ne fait rien.
+   * Pulls point (x, z) of `v` into the `bounds` disc, at least `margin` m inside the edge (y unchanged).
+   * Returns `v`. Does nothing without `bounds`.
    */
   _clampInside(v, margin = 0) {
     const b = this.bounds;
@@ -259,7 +210,7 @@ export class Yarn {
     return v;
   }
 
-  /** Bord de la prairie : la pelote qui le dépasse y est ramenée et rebondit mollement vers l'intérieur. */
+  /** Meadow edge: a ball past it is brought back and bounces softly inward. */
   _edge() {
     const b = this.bounds;
     if (!b) return;
@@ -269,7 +220,7 @@ export class Yarn {
     if (d <= max || d < 1e-6) return;
     const nx = dx / d, nz = dz / d;
     p.x = b.center.x + nx * max; p.z = b.center.z + nz * max;
-    const vn = v.x * nx + v.z * nz;          // vitesse vers l'extérieur
+    const vn = v.x * nx + v.z * nz;          // outward speed
     if (vn > 0) {
       const tx = v.x - vn * nx, tz = v.z - vn * nz;
       v.x = tx * EDGE_KEEP - vn * EDGE_BOUNCE * nx;
@@ -280,8 +231,8 @@ export class Yarn {
   }
 
   /**
-   * Poussée du chat (patte ou museau) : ajoute `strength` m/s dans la direction horizontale `dir`
-   * (un petit saut si la poussée dépasse 1,5 m/s).
+   * Push from the cat (paw or muzzle): adds `strength` m/s along the horizontal `dir` (a small hop if the
+   * push exceeds 1.5 m/s).
    */
   push(dir, strength = 1) {
     _v.set(dir.x, 0, dir.z);
@@ -293,23 +244,23 @@ export class Yarn {
     this._emit('pushed', strength);
   }
 
-  /** Poussée depuis un point (museau ou patte du chat) : direction = de `fromPoint` vers la pelote. */
+  /** Push from a point (the cat's muzzle or paw): direction from `fromPoint` to the ball. */
   nudge(fromPoint, strength = 1) {
     _w.copy(this.group.position).sub(fromPoint);
     if (_w.x * _w.x + _w.z * _w.z < 1e-8) _w.set(1, 0, 0);
     this.push(_w, strength);
   }
 
-  /** Distance horizontale du centre à `point`. */
+  /** Horizontal distance from the centre to `point`. */
   distanceTo(point) { return Math.hypot(this.group.position.x - point.x, this.group.position.z - point.z); }
 
-  /** Vrai si un rayon (`THREE.Raycaster` réglé) touche la pelote. */
+  /** True if a ray (a set-up `THREE.Raycaster`) hits the ball. */
   pick(raycaster) { return raycaster.intersectObjects(this.pickables, false).length > 0; }
 
   /**
-   * À appeler à chaque image.
-   * @param {number} dt  secondes
-   * @param {THREE.Vector3} [catPos]  position du chat au sol (contact avec son corps si `catRadius` > 0)
+   * Call every frame.
+   * @param {number} dt  seconds
+   * @param {THREE.Vector3} [catPos]  cat's ground position (body contact if `catRadius` > 0)
    */
   update(dt, catPos) {
     this._cat = catPos ?? null;
@@ -319,10 +270,9 @@ export class Yarn {
     if (this.marker) this._updateMarker(Math.min(dt, 0.25));
   }
 
-  // --- Repère flottant (correction 1, captures du chef : pelote invisible dans l'herbe haute).
-  // Pastille ronde rose qui flotte et « respire » au-dessus des touffes, reliée à la pelote par un
-  // fil de laine pâle. Visible seulement quand la pelote est au sol dans l'herbe haute (hauteur
-  // moyenne `heightAt` > MARKER.showAbove) ; apparaît et disparaît en fondu.
+  // --- Floating marker: a pink dot that floats and breathes above the tufts, tied to the ball by a pale
+  // thread. Shown only when the ball is on the ground in tall grass (mean `heightAt` above
+  // MARKER.showAbove); it fades in and out.
   _makeMarker() {
     const geo = new THREE.SphereGeometry(MARKER.radius, 16, 12);
     const mat = toonMaterial(YARN.base, {
@@ -330,9 +280,8 @@ export class Yarn {
     });
     const dot = new THREE.Mesh(geo, mat);
     dot.name = 'YarnMarkerDot';
-    // Contour rose foncé (et non brun) : la coque est dessinée AVANT la pastille (renderOrder) et la
-    // pastille écrit la profondeur, sinon la coque (faces arrière, sans profondeur) la recouvrait
-    // entièrement et la pastille paraissait brun foncé (capture du chef, final2_pelote).
+    // Dark pink outline, not brown. The shell is drawn BEFORE the dot (renderOrder) and the dot writes
+    // depth, otherwise the depth-less back-face shell would cover the dot entirely.
     const shellMat = outlineMaterial({ color: YARN.dark, thickness: 0.004 });
     shellMat.transparent = true; shellMat.opacity = 0; shellMat.depthWrite = false;
     const shell = new THREE.Mesh(geo, shellMat);
@@ -348,8 +297,8 @@ export class Yarn {
     group.name = 'YarnMarker';
     group.visible = false;
     group.add(dot, line);
-    this.group.add(group); // suit la pelote (le groupe ne tourne pas, seul `mesh` tourne)
-    for (const o of [dot, shell, line]) o.raycast = () => {}; // jamais touché par un clic
+    this.group.add(group); // follows the ball (the group does not rotate, only `mesh` does)
+    for (const o of [dot, shell, line]) o.raycast = () => {}; // never hit by a click
     this.marker = { group, dot, line, geo, mats: [mat, shellMat, lineMat], lineGeo, opacity: 0, t: 0 };
   }
 
@@ -362,7 +311,7 @@ export class Yarn {
     m.group.visible = m.opacity > 0;
     if (!m.group.visible) return;
     m.t += dt;
-    // Au-dessus des touffes voisines (hauteur moyenne × 1,15, touffes jusqu'à ×1,2) + marge, qui flotte.
+    // Above the neighbouring tufts (mean height × 1.15, tufts reach × 1.2) plus a floating margin.
     const top = this._ground(p.x, p.z, p.y - this.radius) + h * 1.15 + MARKER.lift + MARKER.bob * Math.sin(m.t * 1.8);
     const y = top - p.y;
     m.dot.position.set(0, y, 0);
@@ -374,7 +323,7 @@ export class Yarn {
     m.mats[2].opacity = 0.7 * m.opacity;
   }
 
-  /** Part due à l'herbe haute : grassDrag × (hauteur − 0,2 m), 0 sans `heightAt` ou en herbe rase. */
+  /** Tall-grass contribution: grassDrag × (height − 0.2 m), 0 without `heightAt` or on short grass. */
   _grass(x, z) {
     return this.heightAt ? this.grassDrag * Math.max(0, this.heightAt(x, z) - 0.2) : 0;
   }
@@ -392,13 +341,13 @@ export class Yarn {
       if (p.y <= g + r && v.y < 0) {
         p.y = g + r;
         const impact = -v.y;
-        const soft = 1 + this._grass(p.x, p.z); // l'herbe haute amortit rebond et glissade
+        const soft = 1 + this._grass(p.x, p.z); // tall grass damps both bounce and slide
         v.y = impact * this.restitution / soft;
-        const keep = this.impactKeep / soft;     // frottement à l'impact
+        const keep = this.impactKeep / soft;     // friction at impact
         v.x *= keep; v.z *= keep;
         this._emit('bounce', impact);
         if (v.y < 0.35) { v.y = 0; this.state = 'rolling'; }
-        this.spin.set(v.z, 0, -v.x).divideScalar(r); // reprend le roulement
+        this.spin.set(v.z, 0, -v.x).divideScalar(r); // back to rolling spin
       }
     } else if (this.state === 'rolling') {
       v.y = 0;
@@ -413,19 +362,19 @@ export class Yarn {
         v.x *= k; v.z *= k;
         p.addScaledVector(v, h);
         this._walls();
-        // Roulement sans glissement : ω = (haut × v) / r.
+        // Rolling without slipping: ω = (up × v) / r.
         _w.set(v.z, 0, -v.x).divideScalar(r);
         this._rotate(_w, h);
       }
-      // Suit le relief ; au bord du dessus d'un muret, elle tombe (vol).
+      // Follows the terrain; at the edge of a low wall top, it falls (air state).
       const g = this._ground(p.x, p.z, p.y - r);
       if (p.y - r > g + 0.03) { this.state = 'air'; this.spin.set(v.z, 0, -v.x).divideScalar(r); }
       else p.y = g + r;
     } else {
-      // Au repos : posée sur le relief (terrain ou muret).
+      // At rest: sits on the terrain or a low wall.
       p.y = this._ground(p.x, p.z, p.y - r) + r;
     }
-    // Contact avec le corps du chat (racine au sol ou sur un muret) : la pelote est repoussée et rebondit mollement.
+    // Contact with the cat's body (root on the ground or on a low wall): the ball is pushed away and bounces softly.
     if (this._cat && this.catRadius > 0 && p.y - (this._cat.y ?? 0) < 0.45 && p.y - (this._cat.y ?? 0) > -0.2) {
       const dx = p.x - this._cat.x, dz = p.z - this._cat.z;
       const d = Math.hypot(dx, dz), min = this.catRadius + r;
@@ -434,21 +383,21 @@ export class Yarn {
         p.x = this._cat.x + nx * min; p.z = this._cat.z + nz * min;
         const vn = v.x * nx + v.z * nz;
         if (vn < 0) {
-          v.x -= 1.5 * vn * nx; v.z -= 1.5 * vn * nz; // rebond à moitié amorti
+          v.x -= 1.5 * vn * nx; v.z -= 1.5 * vn * nz; // half-damped bounce
           if (this.state === 'rest') this.state = 'rolling';
           this._emit('hitCat', -vn);
         }
       }
     }
-    this._walls(); // le chat ne pousse pas la pelote dans un mur
-    this._edge(); // après le contact du chat : la pelote ne sort jamais de la prairie
+    this._walls(); // the cat does not push the ball into a wall
+    this._edge(); // after cat contact: the ball never leaves the meadow
     if (this.trail) this._stepTrail(h);
   }
 
   /**
-   * Murs : la pelote (disque de rayon r, bas à p.y − r) est repoussée hors des obstacles plus hauts
-   * qu'elle (Ruins.resolve, option `y`) ; la vitesse vers le mur est renvoyée (WALL_BOUNCE), la
-   * vitesse le long du mur gardée en partie (WALL_KEEP).
+   * Walls: the ball (disc of radius r, bottom at p.y − r) is pushed out of obstacles taller than itself
+   * (Ruins.resolve, `y` option); the speed into the wall is returned (WALL_BOUNCE), the speed along it
+   * partly kept (WALL_KEEP).
    */
   _walls() {
     if (!this.ruins) return;
@@ -460,7 +409,7 @@ export class Yarn {
     p.x = out.x; p.z = out.z;
     if (d < 1e-9) return;
     nx /= d; nz /= d;
-    const vn = v.x * nx + v.z * nz; // < 0 : vers le mur
+    const vn = v.x * nx + v.z * nz; // < 0: toward the wall
     if (vn >= 0) return;
     const tx = v.x - vn * nx, tz = v.z - vn * nz;
     v.x = tx * WALL_KEEP - vn * WALL_BOUNCE * nx;
@@ -477,8 +426,8 @@ export class Yarn {
     this.mesh.quaternion.premultiply(_q);
   }
 
-  // --- Fil qui traîne : corde de N points (intégration de Verlet), attachée à un point de la surface
-  // de la boule qui tourne avec elle ; collisions avec le sol et avec la boule.
+  // --- Trailing thread: rope of N points (Verlet integration), attached to a surface point of the ball
+  // that rotates with it; collides with the ground and the ball.
   _makeTrail(length) {
     const n = 20;
     this.trail = {
@@ -515,7 +464,7 @@ export class Yarn {
   _stepTrail(h) {
     const t = this.trail, P = t.p, Q = t.q, n = t.n;
     const c = this.group.position, rr = this.radius * 1.03;
-    // Sol sous chaque point (terrain ou dessus de muret), calculé une fois par sous-pas.
+    // Ground under each point (terrain or low wall top), computed once per substep.
     const gr = t.ground ??= new Float32Array(n);
     for (let i = 1; i < n; i++) gr[i] = this._ground(P[i * 3], P[i * 3 + 2], P[i * 3 + 1]) + 0.003;
     for (let i = 1; i < n; i++) {
@@ -561,7 +510,7 @@ export class Yarn {
 
   _emit(type, info) { this.onEvent?.(type, this, info); }
 
-  /** Retire la pelote (et son fil) de la scène et libère géométries et matériaux. */
+  /** Removes the ball and its thread from the scene and frees geometries and materials. */
   dispose() {
     this.group.removeFromParent();
     this._geometry.dispose(); this._material.dispose();

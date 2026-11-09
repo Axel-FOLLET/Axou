@@ -1,3 +1,5 @@
+# Exports the cat of a .blend file to a GLB (mesh, eyes, armature, Walk and run clips). Blender script.
+# Usage (from the project root): blender -b assets/sources/cat.blend --python tools/export_cat.py -- <out.glb>
 import bpy, sys, os
 
 out = sys.argv[sys.argv.index("--") + 1]
@@ -13,10 +15,9 @@ bpy.data.objects["Sphere"].name = "EyeA"
 bpy.data.objects["Sphere.001"].name = "EyeB"
 
 # Particle hair is not representable in glTF: drop the modifiers so export_apply does not choke on them.
-for o in (cat,):
-    for md in list(o.modifiers):
-        if md.type == "PARTICLE_SYSTEM":
-            o.modifiers.remove(md)
+for md in list(cat.modifiers):
+    if md.type == "PARTICLE_SYSTEM":
+        cat.modifiers.remove(md)
 
 def principled(name, image=None, color=(1, 1, 1, 1), rough=0.8, metal=0.0):
     m = bpy.data.materials.new(name)

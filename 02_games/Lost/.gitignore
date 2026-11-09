@@ -3,3 +3,6 @@ dist/
 assets/sources/
 .shots/
 .playwright-mcp/
+archive/
+tools/.audio-env/
+__pycache__/

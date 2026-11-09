@@ -1,16 +1,38 @@
 /**
- * Ronronnement synthétisé (Web Audio, aucun fichier) : grondement grave (bruit brun filtré
- * à 140 Hz) haché à ~26 Hz comme le vrai ronron, avec une enveloppe de respiration lente.
- * Le contexte audio est créé au premier appel, qui doit suivre un geste de l'utilisateur.
+ * Synthesized cat purr (Web Audio, no audio file), played on the shared context of context.js. main.js creates one
+ * for petting and two for the hug (kitten and Maman).
+ */
+
+import { currentAudioContext } from './context.js';
+import { VOLUMES } from './volumes.js';
+
+/**
+ * Default settings, tuned by ear (the kitten's): `lowpass`, `chop`, `breath` and `tone` in Hz, `gain` linear
+ * (`VOLUMES.purr.pet` in volumes.js). Maman's purr, lower with a shifted breath, is passed to the constructor by main.js.
+ */
+export const PURR = { lowpass: 140, chop: 26, breath: 0.55, tone: 52, gain: VOLUMES.purr.pet };
+
+/**
+ * A low rumble (brown noise filtered at `lowpass` Hz) chopped at `chop` Hz like a real purr, with a slow breathing
+ * envelope (`breath` Hz) and a soft fundamental (`tone` Hz). No context is created here: without one (before the
+ * Play button), `start` does nothing. Readable state: `active` (purr requested), `level` (current output gain).
  */
 export class Purr {
-  constructor() {
+  /** @param {Partial<typeof PURR>} [opts] settings overriding those of PURR */
+  constructor(opts = {}) {
+    this.opts = { ...PURR, ...opts };
     this.ctx = null;
     this.master = null;
+    this.active = false;
   }
 
+  /** Current output gain (0 without a context). */
+  get level() { return this.master?.gain.value ?? 0; }
+
   _init() {
-    const ctx = new AudioContext();
+    const ctx = currentAudioContext();
+    if (!ctx) return false;
+    const o = this.opts;
     const seconds = 2;
     const buffer = ctx.createBuffer(1, ctx.sampleRate * seconds, ctx.sampleRate);
     const data = buffer.getChannelData(0);
@@ -26,23 +48,23 @@ export class Purr {
 
     const lowpass = ctx.createBiquadFilter();
     lowpass.type = 'lowpass';
-    lowpass.frequency.value = 140;
+    lowpass.frequency.value = o.lowpass;
     lowpass.Q.value = 0.8;
 
-    // Hachage à 26 Hz : gain modulé par un oscillateur (0,5 ± 0,5).
+    // Chopping (26 Hz for the kitten): gain modulated by an oscillator (0.5 +/- 0.5).
     const chop = ctx.createGain();
     chop.gain.value = 0.5;
     const chopOsc = ctx.createOscillator();
-    chopOsc.frequency.value = 26;
+    chopOsc.frequency.value = o.chop;
     const chopDepth = ctx.createGain();
     chopDepth.gain.value = 0.5;
     chopOsc.connect(chopDepth).connect(chop.gain);
 
-    // Respiration : enveloppe lente, inspiration un peu plus aiguë que l'expiration.
+    // Breathing: slow envelope, inhale slightly higher-pitched than exhale.
     const breath = ctx.createGain();
     breath.gain.value = 0.7;
     const breathOsc = ctx.createOscillator();
-    breathOsc.frequency.value = 0.55;
+    breathOsc.frequency.value = o.breath;
     const breathDepth = ctx.createGain();
     breathDepth.gain.value = 0.3;
     breathOsc.connect(breathDepth).connect(breath.gain);
@@ -50,10 +72,10 @@ export class Purr {
     pitchDepth.gain.value = 3;
     breathOsc.connect(pitchDepth).connect(chopOsc.frequency);
 
-    // Corps : fondamentale douce à 52 Hz, elle aussi hachée.
+    // Body: soft fundamental (52 Hz for the kitten), chopped as well.
     const tone = ctx.createOscillator();
     tone.type = 'triangle';
-    tone.frequency.value = 52;
+    tone.frequency.value = o.tone;
     const toneGain = ctx.createGain();
     toneGain.gain.value = 0.12;
 
@@ -65,17 +87,22 @@ export class Purr {
     noise.start(); chopOsc.start(); breathOsc.start(); tone.start();
     this.ctx = ctx;
     this.master = master;
+    return true;
   }
 
   start() {
-    if (!this.ctx) this._init();
-    this.ctx.resume();
+    if (!this.ctx && !this._init()) return;
+    this.active = true;
+    if (this.ctx.state !== 'running') {
+      try { this.ctx.resume?.()?.catch?.(() => {}); } catch { /* resume rejected: stay silent */ }
+    }
     const now = this.ctx.currentTime;
     this.master.gain.cancelScheduledValues(now);
-    this.master.gain.setTargetAtTime(0.4, now, 0.3);
+    this.master.gain.setTargetAtTime(this.opts.gain, now, 0.3);
   }
 
   stop() {
+    this.active = false;
     if (!this.ctx) return;
     const now = this.ctx.currentTime;
     this.master.gain.cancelScheduledValues(now);

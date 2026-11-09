@@ -1,33 +1,34 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-import { GLSL_FIELD, inject, windAt, pushFrom } from './field.js';
+import { GLSL_FIELD, inject, windAt, pushFrom, MEADOW_LIMIT } from './field.js';
 import { heightAt as groundAt } from './Terrain.js';
-import { grassHeight, exclusionDistance } from './Grass.js';
+import { grassHeight, exclusionDistance, catBend, GLSL_CAT } from './Grass.js';
 import { FLOWERS, toonMaterial, color, mix } from '../style/palette.js';
+import { rng } from './random.js';
 
 /**
- * Fleurs hautes : cinq espèces simples (tige, feuilles, corolle), une `InstancedMesh` par espèce,
- * positions fixes autour du point de départ (tirage à graine fixe : mêmes fleurs à chaque partie).
- * Chaque fleur est modélisée avec une tige de hauteur 1 puis mise à l'échelle (uniforme) à sa
- * hauteur réelle ; le vent plie la tige (déplacement ∝ hauteur²), comme l'herbe mais plus raide.
+ * Tall flowers of the meadow, used by Meadow.js: five simple species (stem, leaves, corolla), one `InstancedMesh` per
+ * species, fixed positions around the start point (fixed seed: same flowers every game). Each flower is modelled with a
+ * stem of height 1, then scaled to its real height; wind bends the stem (offset proportional to height^2), like the grass
+ * but stiffer.
  *
- * Style « dessin animé doux » (mission catgame_style, docs/recherche/style.md § 6, point 7) :
- * couleurs pastel de `FLOWERS`, pétales ronds et larges (plus de cônes pointus), cœurs bruns doux
- * au lieu de noir, ombrage en aplats (`toonMaterial`).
- *
- * Mission catgame_monde (2026-10-26, agent G) : pied posé sur le relief (`f.ground` = Terrain.js
- * `heightAt`), hauteur de tige d'après le champ d'herbe de Grass.js (`grassHeight`), aucune fleur
- * dans l'emprise des murs ni à moins de FLOWER_WALL_GAP de leur bord.
+ * Soft cartoon style: pastel `FLOWERS` colours, large round petals, soft brown hearts instead of black, flat toon shading.
+ * Feet sit on the relief (Terrain.js `heightAt`), stem height follows the grass (Grass.js `grassHeight`), and no flower
+ * grows in wall footprints or within FLOWER_WALL_GAP of their edge.
  */
 
-export const FLOWER_WIND = 0.45; // une tige de fleur plie moins qu'un brin d'herbe
-export const FLOWER_PUSH = 0.8;  // écartée par le chat (et la caméra) un peu moins que l'herbe
-export const FIELD_RADIUS = 20;  // fleurs semées dans ce rayon autour de l'origine (m)
+export const FLOWER_WIND = 0.45; // a flower stem bends less than a grass blade
+export const FLOWER_PUSH = 0.8;  // pushed by the cat (and the camera) a little less than grass
+// Flowers are seeded within this radius around the origin (m). The first 46 clumps use NEAR_RADIUS;
+// OUTER_CLUMPS sparser clumps then cover 20 to 41 m.
+export const FIELD_RADIUS = MEADOW_LIMIT + 2;
+const NEAR_RADIUS = 20;
+const OUTER_CLUMPS = 30;
 
 const STEM = FLOWERS.stem, LEAF = FLOWERS.leaf;
-// Couleurs dérivées localement de la palette (absentes de palette.js) :
-const CORNFLOWER_LIGHT = mix(FLOWERS.cornflower, 0xffffff, 0.3).getHex(); // pétale clair du bleuet (alterné)
-const POPPY_LIGHT = mix(FLOWERS.poppy, 0xffffff, 0.18).getHex();          // pétale clair du coquelicot (alterné)
+// Colours derived locally from the palette (not in palette.js):
+const CORNFLOWER_LIGHT = mix(FLOWERS.cornflower, 0xffffff, 0.3).getHex(); // light cornflower petal (alternating)
+const POPPY_LIGHT = mix(FLOWERS.poppy, 0xffffff, 0.18).getHex();          // light poppy petal (alternating)
 
 function colored(geom, hex) {
   const c = color(hex);
@@ -41,7 +42,7 @@ function colored(geom, hex) {
 const _m = new THREE.Matrix4(), _q = new THREE.Quaternion(), _s = new THREE.Vector3(), _p = new THREE.Vector3();
 const _e = new THREE.Euler();
 
-/** Ellipsoïde (pétale, feuille) : rayons rx, ry, rz, placé en (x, y, z), tourné (ax, ay, az). */
+/** Ellipsoid (petal, leaf): radii rx, ry, rz, placed at (x, y, z), rotated by (ax, ay, az). */
 function ellipsoid(rx, ry, rz, x, y, z, ax, ay, az, hex, ws = 6, hs = 4) {
   const g = new THREE.SphereGeometry(1, ws, hs);
   _m.compose(_p.set(x, y, z), _q.setFromEuler(_e.set(ax, ay, az, 'YZX')), _s.set(rx, ry, rz));
@@ -55,7 +56,7 @@ function stem(r0 = 0.012, r1 = 0.009) {
   return colored(g, STEM);
 }
 
-/** Deux feuilles ovales et larges (bouts ronds), de part et d'autre de la tige. */
+/** Two wide oval leaves (round tips), on either side of the stem. */
 function leaves(y0 = 0.28, y1 = 0.5) {
   return [
     ellipsoid(0.09, 0.008, 0.038, 0.075, y0, 0, 0, 0, 0.5, LEAF),
@@ -64,14 +65,13 @@ function leaves(y0 = 0.28, y1 = 0.5) {
 }
 
 /**
- * Disque de pétales ronds autour de l'axe Y, à la hauteur y. `hex` : une couleur, ou deux
- * couleurs alternées ([a, b]).
+ * Disc of round petals around the Y axis, at height y. `hex`: one colour, or two alternating colours ([a, b]).
  */
 function petalRing(count, len, width, thick, y, tilt, hex, offset = 0) {
   const out = [];
   for (let k = 0; k < count; k++) {
     const a = (k / count) * Math.PI * 2 + offset;
-    // Pétale ovale selon X local, tourné autour de Y, incliné (tilt > 0 : vers le haut).
+    // Oval petal along local X, turned around Y, tilted (tilt > 0: upwards).
     const g = new THREE.SphereGeometry(1, 6, 3);
     g.scale(len, thick, width);
     g.translate(len * 0.9, 0, 0);
@@ -84,34 +84,33 @@ function petalRing(count, len, width, thick, y, tilt, hex, offset = 0) {
 }
 
 /**
- * Espèces : géométrie normalisée (tige de hauteur 1), poids de tirage, facteur de hauteur.
- * Correction 1 : corolles environ deux fois plus grandes et plus rondes (lisibles de loin),
- * tiges plus courtes (voir `scatter`) et feuilles plus larges pour habiller la tige.
+ * Species: normalised geometry (stem of height 1), draw weight, height factor. Large round corollas stay readable from
+ * afar; short stems (see `scatter`) and wide leaves dress the stem.
  */
 export const SPECIES = {
-  marguerite: {
+  daisy: {
     weight: 3, heightFactor: [1.05, 1.2], headY: 1.012,
     build: () => [stem(), ...leaves(),
-      // Cœur bombé (demi-boule aplatie) et 11 pétales ovales larges, un peu relevés.
+      // Domed heart (flattened half ball) and 11 wide oval petals, slightly raised.
       ellipsoid(0.04, 0.022, 0.04, 0, 1.012, 0, 0, 0, 0, FLOWERS.daisyHeart, 8, 4),
       ...petalRing(11, 0.05, 0.027, 0.008, 1.008, 0.12, FLOWERS.daisyPetal)],
   },
-  coquelicot: {
+  poppy: {
     weight: 2, heightFactor: [1.05, 1.2], headY: 1.04,
     build: () => [stem(0.011, 0.008), ...leaves(0.22, 0.4),
-      // Coupe de cinq grands pétales ronds (deux tons corail) autour d'un cœur brun doux.
+      // Cup of five large round petals (two coral tones) around a soft brown heart.
       ...petalRing(5, 0.056, 0.052, 0.01, 1.0, 0.6, [FLOWERS.poppy, POPPY_LIGHT]),
       ellipsoid(0.022, 0.02, 0.022, 0, 1.024, 0, 0, 0, 0, FLOWERS.poppyHeart)],
   },
-  bleuet: {
+  cornflower: {
     weight: 2, heightFactor: [1.0, 1.15], headY: 1.035,
     build: () => [stem(0.01, 0.008), ...leaves(0.3, 0.55),
-      // Calice vert tendre, couronne de 8 pétales ronds pervenche (deux tons), cœur lavande.
+      // Light green calyx, ring of 8 round periwinkle petals (two tones), lavender heart.
       ellipsoid(0.022, 0.026, 0.022, 0, 1.0, 0, 0, 0, 0, FLOWERS.cornflowerBud),
       ...petalRing(8, 0.036, 0.025, 0.009, 1.024, 0.4, [FLOWERS.cornflower, CORNFLOWER_LIGHT]),
       ellipsoid(0.017, 0.015, 0.017, 0, 1.036, 0, 0, 0, 0, FLOWERS.lavender)],
   },
-  boutonDOr: {
+  buttercup: {
     weight: 2, heightFactor: [0.95, 1.1], headY: 1.015,
     build: () => [stem(0.01, 0.008), ...leaves(0.2, 0.42),
       ...petalRing(5, 0.033, 0.033, 0.008, 1.0, 0.45, FLOWERS.buttercup),
@@ -120,7 +119,7 @@ export const SPECIES = {
   lupin: {
     weight: 1, heightFactor: [1.1, 1.25], headY: 0.9,
     build: () => {
-      // Épi de lavande : boules rondes dodues, plus claires vers le haut.
+      // Lavender spike: plump round balls, lighter towards the top.
       const parts = [stem(0.012, 0.009), ...leaves(0.2, 0.36)];
       for (let k = 0; k < 11; k++) {
         const t = k / 10;
@@ -133,21 +132,12 @@ export const SPECIES = {
   },
 };
 
-function rng(seed) {
-  return () => {
-    seed |= 0; seed = (seed + 0x6d2b79f5) | 0;
-    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-/** Distance au mur en deçà de laquelle aucune fleur n'est semée (m). */
+/** Distance from a wall below which no flower is seeded (m). */
 export const FLOWER_WALL_GAP = 0.35;
 
 /**
- * Tirage des fleurs : massifs d'une espèce, quelques-uns au bord de la clairière, rien sous le chat
- * au départ, rien dans l'emprise des murs (`exclusions`, voir Grass.js `exclusionDistance`).
+ * Flower draw: clumps of one species, some at the edge of the clearing, nothing under the cat at the start, nothing in
+ * wall footprints (`exclusions`, see Grass.js `exclusionDistance`).
  */
 function scatter(seed, exclusions = []) {
   const rand = rng(seed);
@@ -159,40 +149,50 @@ function scatter(seed, exclusions = []) {
     return names[0];
   };
   const out = [];
-  const clump = (cx, cz, species, n, spread = 0.9) => {
+  const clump = (cx, cz, species, n, spread = 0.9, limit = NEAR_RADIUS) => {
     for (let i = 0; i < n; i++) {
       const a = rand() * Math.PI * 2, d = Math.sqrt(rand()) * spread;
       const x = cx + Math.cos(a) * d, z = cz + Math.sin(a) * d;
-      if (Math.hypot(x, z) < 1.0 || Math.hypot(x, z) > FIELD_RADIUS) continue;
+      if (Math.hypot(x, z) < 1.0 || Math.hypot(x, z) > limit) continue;
       if (out.some((f) => Math.hypot(f.x - x, f.z - z) < 0.12)) continue;
       const sp = SPECIES[species];
       const k = sp.heightFactor[0] + (sp.heightFactor[1] - sp.heightFactor[0]) * rand();
       const wall = exclusions.length ? exclusionDistance(exclusions, x, z) : 2;
       if (wall < FLOWER_WALL_GAP) continue;
-      // Clairière : tiges courtes (0,26-0,36 m, sous la tête du chat à 0,54 m) ; ailleurs, la
-      // corolle affleure le haut de l'herbe et la tige reste cachée dans les brins.
+      // Clearing: short stems (0.26-0.36 m, below the cat's head at 0.54 m); elsewhere, the corolla reaches the top of
+      // the grass and the stem stays hidden in the blades.
       const fh = grassHeight(x, z, wall);
       const height = Math.max(0.26 + 0.1 * rand(), fh * k);
-      // Correction 2 : en herbe haute, corolle élargie (×1 à ×1,7 en largeur seulement) pour
-      // que les têtes restent grosses et lisibles au-dessus des touffes ; ×1 en clairière.
+      // In tall grass, wider corolla (x1 to x1.7, width only) so heads stay large and readable above the tufts; x1 in
+      // the clearing.
       const spreadXZ = 1 + 0.7 * Math.min(Math.max((fh - 0.3) / 0.6, 0), 1);
       out.push({ species, x, z, ground: groundAt(x, z), height, spreadXZ, yaw: rand() * Math.PI * 2 });
     }
   };
-  // Huit bouquets serrés au bord de la clairière (visibles depuis le départ), puis le reste de la prairie.
+  // Eight tight clumps at the edge of the clearing (visible from the start), then the rest of the meadow.
   for (let i = 0; i < 8; i++) {
     const a = (i / 8) * Math.PI * 2 + rand() * 0.5, r = 1.8 + rand() * 1.4;
     clump(Math.cos(a) * r, Math.sin(a) * r, pick(), 4 + Math.floor(rand() * 3), 0.4);
   }
   for (let i = 0; i < 38; i++) {
-    const a = rand() * Math.PI * 2, r = 3.5 + Math.sqrt(rand()) * (FIELD_RADIUS - 4);
+    const a = rand() * Math.PI * 2, r = 3.5 + Math.sqrt(rand()) * (NEAR_RADIUS - 4);
     clump(Math.cos(a) * r, Math.sin(a) * r, pick(), 3 + Math.floor(rand() * 6));
+  }
+  // Outer ring (drawn last, so the inner flowers do not move), spread by equal area between NEAR_RADIUS and
+  // FIELD_RADIUS - 1.
+  const R0 = NEAR_RADIUS, R1 = FIELD_RADIUS - 1;
+  for (let i = 0; i < OUTER_CLUMPS; i++) {
+    const a = rand() * Math.PI * 2, r = Math.sqrt(R0 * R0 + rand() * (R1 * R1 - R0 * R0));
+    clump(Math.cos(a) * r, Math.sin(a) * r, pick(), 3 + Math.floor(rand() * 4), 0.9, FIELD_RADIUS);
   }
   return out;
 }
 
+// The cat bends flowers like grass (Grass.js `catBend`: oriented body + planted paws); under the belly, the stem lies
+// down along the flower's own orientation (`yaw`, read from instanceMatrix).
 const VERTEX_HEAD = /* glsl */ `
 ${GLSL_FIELD}
+${GLSL_CAT}
 `;
 const VERTEX_SWAY = /* glsl */ `
 vec3 transformed = vec3( position );
@@ -200,16 +200,18 @@ vec3 transformed = vec3( position );
   vec3 fRoot = ( instanceMatrix * vec4( 0.0, 0.0, 0.0, 1.0 ) ).xyz;
   float fH = length( instanceMatrix[1].xyz );
   float fY = max( position.y, 0.0 );
-  vec2 fOff = ( windAt( fRoot.xz, uTime ) * ${FLOWER_WIND.toFixed(3)} + pushAt( fRoot.xz ) * ${FLOWER_PUSH.toFixed(3)} ) * ( fH * fY * fY );
+  float fYaw = fH > 0.0 ? atan( -instanceMatrix[0].z, instanceMatrix[0].x ) : 0.0; // hidden flower: scale 0
+  vec2 fPush = catBend( fRoot.xz, 1.0, 1.0, fYaw ) + pushOne( fRoot.xz, uPushB );
+  vec2 fOff = ( windAt( fRoot.xz, uTime ) * ${FLOWER_WIND.toFixed(3)} + fPush * ${FLOWER_PUSH.toFixed(3)} ) * ( fH * fY * fY );
   transformed += inverse( mat3( instanceMatrix ) ) * vec3( fOff.x, 0.0, fOff.y );
 }
 `;
 
 export class Flowers {
   /**
-   * @param {object} uniforms uniformes partagés de la prairie
-   * @param {number} seed graine du tirage
-   * @param {object[]} exclusions zones sans fleurs (murs), voir Grass.js `exclusionDistance`
+   * @param {object} uniforms shared meadow uniforms
+   * @param {number} seed draw seed
+   * @param {object[]} exclusions flower-free areas (walls), see Grass.js `exclusionDistance`
    */
   constructor(uniforms, seed = 7, exclusions = []) {
     this.group = new THREE.Group();
@@ -221,7 +223,7 @@ export class Flowers {
       shader.vertexShader = inject(shader.vertexShader, '#include <common>', VERTEX_HEAD);
       shader.vertexShader = inject(shader.vertexShader, '#include <begin_vertex>', VERTEX_SWAY, true);
     };
-    mat.customProgramCacheKey = () => 'catgame-flowers-toon-1';
+    mat.customProgramCacheKey = () => 'lost-flowers-toon';
     this.material = mat;
     this.meshes = {};
     this.triangles = 0;
@@ -231,7 +233,7 @@ export class Flowers {
       const geom = mergeGeometries(sp.build(), false);
       const mesh = new THREE.InstancedMesh(geom, mat, items.length);
       items.forEach((f, i) => {
-        // Pied posé sur le relief (Terrain.js `heightAt`).
+        // Foot on the relief (Terrain.js `heightAt`).
         _m.compose(_p.set(f.x, f.ground, f.z), _q.setFromAxisAngle(_s.set(0, 1, 0), f.yaw), _s.set(f.height * f.spreadXZ, f.height, f.height * f.spreadXZ));
         mesh.setMatrixAt(i, _m);
         f.slot = i;
@@ -241,12 +243,12 @@ export class Flowers {
       mesh.name = `Flowers_${name}`;
       mesh.receiveShadow = true;
       mesh.castShadow = false;
-      mesh.raycast = () => {}; // jamais touché par un Raycaster (clic au sol de Picker.js)
+      mesh.raycast = () => {}; // never hit by a Raycaster (ground click of Picker.js)
       this.group.add(mesh);
       this.meshes[name] = mesh;
       this.triangles += (geom.index ? geom.index.count / 3 : geom.attributes.position.count / 3) * items.length;
     }
-    // Liste publique : index stable, espèce, pied (x, z), hauteur de la tige, centre de corolle au repos.
+    // Public list: stable index, species, foot (x, z), stem height, corolla centre at rest.
     this.list.forEach((f, i) => {
       f.index = i;
       f.hidden = false;
@@ -256,9 +258,8 @@ export class Flowers {
   }
 
   /**
-   * Zones de murs connues après la création : les fleurs qui y tombent sont cachées (échelle 0,
-   * `hidden = true`) ; les index restent stables (listes des papillons). Une fleur cachée reste
-   * cachée tant qu'elle est dans une zone ; elle réapparaît si la liste ne la couvre plus.
+   * Wall areas known after creation: flowers falling in them are hidden (scale 0, `hidden = true`); indices stay stable
+   * (butterfly lists). A hidden flower stays hidden while inside an area and reappears when the list no longer covers it.
    */
   applyExclusions(exclusions) {
     const touched = new Set();
@@ -277,13 +278,13 @@ export class Flowers {
   }
 
   /**
-   * Centre de la corolle de la fleur `i` à l'instant `t`, vent et écartement compris (même
-   * formule que le shader, à la torsion près de la tige). `env` = { windDir, windStrength, pushA, pushB }.
+   * Centre of the corolla of flower `i` at time `t`, with wind and parting (same formula as the shader, except for the
+   * stem twist). `env` = { windDir, windStrength, cat, pushB } (`cat`: state of the cat's passage, Grass.js `catBend`).
    */
   top(i, t, env, out = new THREE.Vector3()) {
     const f = this.list[i];
     const w = windAt(f.x, f.z, t, env.windDir, env.windStrength, _w1);
-    const a = pushFrom(f.x, f.z, env.pushA, _w2);
+    const a = catBend(f.x, f.z, env.cat, t, 1, 1, f.yaw, _w2);
     const b = pushFrom(f.x, f.z, env.pushB, _w3);
     const y = f.headY, k = f.height * y * y;
     out.set(

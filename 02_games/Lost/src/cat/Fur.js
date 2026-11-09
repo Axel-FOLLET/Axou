@@ -2,42 +2,31 @@ import * as THREE from 'three';
 import { CAT, color } from '../style/palette.js';
 
 /**
- * Fourrure en coques (« shells ») : copies du maillage du corps, chacune gonflée un peu plus le
- * long de la normale et percée de trous pour ne garder que des sections de poils.
+ * Shell fur: copies of the body mesh, each inflated a little further along the normal and pierced with holes so
+ * that only hair cross-sections remain. Created by Cat.js and Npc.js (optional belly colour).
  *
- * - Chaque coque est un SkinnedMesh qui partage la géométrie et le squelette du corps : la
- *   fourrure suit tous les clips sans calcul côté CPU.
- * - Le décalage est appliqué dans l'espace de liaison (avant le skinning) : normale de repos,
- *   peignage vers la queue et léger tombant, petite ondulation de vent ; le skinning plie ensuite
- *   le tout avec le corps.
- * - Les poils sont un motif cellulaire 3D calculé sur la position de repos du sommet (donc stable
- *   pendant les animations et sans coutures d'UV) : un poil par cellule, de hauteur aléatoire,
- *   qui s'affine en montant.
- * - La longueur dépend des os qui portent le sommet (`LENGTH_BY_BONE`) : courte sur le museau,
- *   les oreilles et les pattes, plus longue sur le tronc, le cou et la queue.
+ * - Each shell is a SkinnedMesh sharing the body's geometry and skeleton: the fur follows every clip at no CPU cost.
+ * - The offset is applied in bind space (before skinning): rest normal, combing toward the tail with a slight
+ *   droop, small wind sway.
+ * - Hairs are a 3D cellular pattern on the vertex rest position (stable in animation, no UV seams): one hair per
+ *   cell, random height, thinner toward the tip.
+ * - Length depends on the bones carrying the vertex (`LENGTH_BY_BONE`): short on the muzzle, ears and legs, longer
+ *   on the trunk, neck and tail.
  */
-const SHELLS = 18;          // 24 ralentissait trop les animations (choix de l'utilisateur, 2026-10-22)
-const MAX_LENGTH = 0.022;   // mètres, longueur de référence (facteur 1 de LENGTH_BY_BONE)
-const SPACING = 0.0013;     // mètres entre deux poils : valeur actuelle = 1,3 mm (historique : 1,8 mm, puis 1,5 mm le 2026-10-23 soir « + de poils », puis 1,3 mm le même soir à la demande de l'utilisateur)
-// Robe noire (choix de l'utilisateur, 2026-10-22) : la texture d'origine ne sert plus qu'à
-// moduler légèrement la teinte et à repérer la peau rose (truffe) ; pointes un peu rousses au
-// soleil, comme un vrai chat noir.
-// Style « dessin animé doux » (2026-10-25, docs/recherche/style.md § 5 « Chat ») : couleurs prises
-// dans palette.js ; noir un peu plus chaud et moins profond (0x221d19 -> 0x2a2320), pointes plus
-// rousses (0x4a3628 -> 0x5c4536), liseré doré (`CAT.sheen`) au lieu du gris.
+const SHELLS = 18;          // number of shells (24 slowed the animations too much)
+const MAX_LENGTH = 0.022;   // m, reference length (factor 1 of LENGTH_BY_BONE)
+const SPACING = 0.0013;     // m between two hairs
+// Black coat: the original texture only modulates the tint slightly; tips are slightly rufous in the sun, like a
+// real black cat. Colours come from palette.js.
 const COAT = color(CAT.coat);
 const TIP = color(CAT.tip);
 const SHEEN = color(CAT.sheen).multiplyScalar(CAT.sheenStrength);
-// Correction 2 (2026-10-26) : aplat gris-brun côté soleil (CAT.coatLit × CAT.coatLitStrength).
+// Grey-brown tint on the sun side (CAT.coatLit × CAT.coatLitStrength).
 const COAT_LIT = color(CAT.coatLit).multiplyScalar(CAT.coatLitStrength);
 
 /**
- * Facteur de longueur selon le nom de l'os (premier motif qui correspond), multiplié par
- * MAX_LENGTH. Corps plus fourni le 2026-10-23 (demande de l'utilisateur) : tronc 0,85 -> 1,3,
- * cou 1,0 -> 1,3 et collerette en haut du cou (`Neck002`) 1,6, queue 1,0 -> 1,2, bout de queue
- * 0,85 -> 1,0, mollets 0,45 -> 0,6 ; oreilles et pieds inchangés. Les os de la tête (`Head`,
- * `Nose`, `Mouth`, `Ear_connector`) ne servent plus que de repli : leur longueur vient de
- * headFactor.
+ * Hair length factor by bone name (first matching pattern), multiplied by MAX_LENGTH. Head bones (`Head`, `Nose`,
+ * `Mouth`, `Ear_connector`) are only a fallback: their length comes from headFactor.
  */
 const LENGTH_BY_BONE = [
   [/^Ear(?!_connector)/, 0.06],
@@ -54,22 +43,17 @@ const LENGTH_BY_BONE = [
   [/./, 1.3],
 ];
 
-// Tête touffue (2026-10-23, demande de l'utilisateur : « touffu et mignon ») : voir headFactor.
-// Un peu plus fourni le 2026-10-23 au soir (demande de l'utilisateur : « légèrement plus de poils
-// sur le crâne et le visage ») : crâne 1,0 -> 1,2, joues 1,45 -> 1,6, museau 0,15 -> 0,22.
-// Les noms d'os perdent leurs points dans three.js (`Tail.007` -> `Tail007`).
-// `Ear_connector*` porte le dessus du crâne entre les oreilles.
+// Tufted head, see headFactor. three.js drops the dots from bone names (`Tail.007` -> `Tail007`).
+// `Ear_connector*` carries the top of the skull between the ears.
 const HEAD_BONES = /^(Head|Nose|Mouth|Ear_connector)/;
 const HEAD_SKULL = 1.2;
 const HEAD_CHEEK = 1.6;
 const HEAD_MUZZLE = 0.22;
-// Rayon (en rayons d'œil) où la fourrure reprend toute sa longueur autour des yeux. 1,7 avant :
-// avec les yeux agrandis (rayon 0,32, écart 0,99 dans l'espace de liaison), ce disque couvrait
-// tout l'espace entre les yeux et le front, rasés (mesuré le 2026-10-23).
+// Radius (in eye radii) where fur regains its full length around the eyes; a wider disc shaves the space
+// between the eyes and the forehead.
 const EYE_CLEAR = 1.5;
-// Correction 2 (2026-10-26) : forme des poils. HEIGHT_MIN = hauteur minimale d'un poil (fraction
-// de la longueur ; 0,5 avant) ; TIP_TAPER = part de l'effilement vers la pointe (1 avant : pointe
-// de largeur nulle, d'où des points isolés sur les coques extérieures).
+// Hair shape. HEIGHT_MIN: minimum hair height (share of the length); TIP_TAPER: taper toward the tip (at 1 the
+// tip has zero width, leaving isolated dots on the outer shells).
 const HEIGHT_MIN = 0.7;
 const TIP_TAPER = 0.7;
 
@@ -79,15 +63,14 @@ function lengthFactor(name) {
 }
 
 /**
- * Inverse de la matrice de liaison. Ne pas utiliser `mesh.bindMatrixInverse` : en mode
- * « attached », three.js la remplace à chaque image par l'inverse de la matrice monde (mesuré :
- * échelle 11,5 alors que `bindMatrix` est l'identité).
+ * Inverse of the bind matrix. Do not use `mesh.bindMatrixInverse`: in "attached" mode three.js overwrites it
+ * every frame with the inverse of the world matrix.
  */
 function bindInverse(mesh) {
   return mesh.bindMatrix.clone().invert();
 }
 
-/** Sphères englobantes des yeux, exprimées dans l'espace de liaison du corps. */
+/** Eye bounding spheres, in the body's bind space. */
 function eyeSpheres(body, eyes) {
   return eyes.map((eye) => {
     eye.geometry.computeBoundingSphere();
@@ -98,8 +81,8 @@ function eyeSpheres(body, eyes) {
 }
 
 /**
- * Attribut `furMask` : moyenne pondérée par la peau des facteurs de longueur des os, ramenée à
- * zéro autour des yeux (sinon les poils des paupières mordent sur le globe).
+ * `furMask` attribute: skin-weighted average of the bone length factors, faded to zero around the eyes
+ * (otherwise eyelid hairs bite into the globe).
  */
 function buildMask(mesh, eyes) {
   const geo = mesh.geometry;
@@ -135,17 +118,16 @@ function buildMask(mesh, eyes) {
 }
 
 /**
- * Facteur de longueur sur la tête, selon la position et non selon l'os : presque toute la tête
- * est pondérée sur l'os `Nose` (mesuré le 2026-10-23 : 907 sommets contre 38 sur `Head`), si bien
- * qu'un facteur par os rasait le crâne et les joues. Repère : centre et écart des yeux, dans
- * l'espace de liaison (+Y haut, +Z avant).
- * - crâne et front : HEAD_SKULL ;
- * - joues, sous et derrière les yeux, sur les côtés : jusqu'à HEAD_CHEEK (collerette) ;
- * - museau, devant les yeux et sous leur niveau, et bout du nez : HEAD_MUZZLE.
+ * Head length factor, from position rather than bone: nearly the whole head is weighted on the `Nose` bone
+ * (907 vertices against 38 on `Head`), so a per-bone factor would shave the skull and cheeks. Frame: eye centre
+ * and spacing, in bind space (+Y up, +Z forward).
+ * - skull and forehead: HEAD_SKULL;
+ * - cheeks, below and behind the eyes, on the sides: up to HEAD_CHEEK (ruff);
+ * - muzzle, in front of and below the eyes, and nose tip: HEAD_MUZZLE.
  */
 function headFactor(p, [a, b]) {
   const S = THREE.MathUtils.smoothstep;
-  const u = a.center.distanceTo(b.center);              // écart des yeux
+  const u = a.center.distanceTo(b.center);              // eye spacing
   const c = a.center.clone().add(b.center).multiplyScalar(0.5);
   const dx = Math.abs(p.x - c.x) / u, dy = (p.y - c.y) / u, dz = (p.z - c.z) / u;
   const cheek = S(dx, 0.45, 0.75) * (1 - S(dy, -0.1, 0.15)) * (1 - S(dz, -0.05, 0.2));
@@ -154,12 +136,12 @@ function headFactor(p, [a, b]) {
   return THREE.MathUtils.lerp(f, HEAD_MUZZLE, muzzle);
 }
 
-/** Direction en espace de liaison du maillage (repère où vivent `position` et `normal`). */
+/** Direction in the mesh's bind space (the frame of `position` and `normal`). */
 function bindDirection(mesh, worldDir) {
   return worldDir.clone().transformDirection(bindInverse(mesh));
 }
 
-/** Position en espace de liaison de l'origine d'un os. */
+/** Bind-space position of a bone's origin. */
 function bindBonePosition(mesh, name) {
   const i = mesh.skeleton.bones.findIndex((b) => b.name === name);
   if (i < 0) return null;
@@ -190,9 +172,8 @@ const VERTEX_BODY = /* glsl */`
 }
 `;
 
-// Teinte de la robe, partagée par la peau de base et les coques. Tout est noir, truffe comprise
-// (une détection de la peau rose par couleur prenait aussi les frontières roux/blanc de la
-// texture calico : liserés roux observés le 2026-10-22).
+// Coat tint, shared by the base skin and the shells. All black, nose included (detecting the pink skin by
+// colour also caught the rufous/white borders of the calico texture).
 const COAT_GLSL = /* glsl */`
 uniform vec3 furCoat;
 uniform vec3 furSheen;
@@ -201,6 +182,49 @@ void furCoatColor(inout vec3 c) {
   float lum = dot(c, vec3(0.3, 0.59, 0.11));
   c = furCoat * (0.8 + 0.4 * lum);
 }
+`;
+
+// Belly band: angle and edge in rad; s0, s1 and end along the trunk (0..1); r0 and r1 radial limit in trunk lengths.
+const BELLY_BAND = { angle: 0.95, edge: 0.05, s0: 0.15, s1: 0.97, end: 0.025, r0: 0.27, r1: 0.35 };
+
+// Light belly (`belly` constructor option: beige coat, white belly). Absent by default, so the hero and other NPCs
+// keep their usual shader programs ('cat-coat', 'cat-fur').
+// White is decided in the shader by an analytic band: the continuous attribute `furBellyP` (computed once by
+// `buildBellyMask`, trunk rest frame: u = side, v = downward from the trunk axis, s = position along the trunk from
+// back to front, k = trunk membership) is interpolated, so the edge stays smooth on any mesh and in any pose.
+const BELLY_VERTEX_HEAD = /* glsl */`
+attribute vec4 furBellyP;
+varying vec4 vBellyP;
+`;
+const BELLY_VERTEX_SET = /* glsl */`
+vBellyP = furBellyP;
+`;
+const BELLY_COAT_GLSL = /* glsl */`
+uniform vec3 furCoat;
+uniform vec3 furSheen;
+uniform vec3 furCoatLit;
+uniform vec3 furBellyColor;
+varying vec4 vBellyP;
+// Band under the body: half-angle ${BELLY_BAND.angle} rad from the bottom of the trunk, from the lower belly (s ${BELLY_BAND.s0}, groin)
+// to the chest (s ${BELLY_BAND.s1}); narrow, regular transitions.
+float furBellyHard() {
+  float ang = atan(abs(vBellyP.x), vBellyP.y);
+  float band = 1.0 - smoothstep(${BELLY_BAND.angle} - ${BELLY_BAND.edge}, ${BELLY_BAND.angle} + ${BELLY_BAND.edge}, ang);
+  float ends = smoothstep(${BELLY_BAND.s0} - ${BELLY_BAND.end}, ${BELLY_BAND.s0} + ${BELLY_BAND.end}, vBellyP.z)
+    * (1.0 - smoothstep(${BELLY_BAND.s1} - ${BELLY_BAND.end}, ${BELLY_BAND.s1} + ${BELLY_BAND.end}, vBellyP.z));
+  float trunkR = 1.0 - smoothstep(${BELLY_BAND.r0}, ${BELLY_BAND.r1}, length(vBellyP.xy)); // analytic limit: neither upper legs nor thighs
+  return band * ends * trunkR * smoothstep(0.5, 0.9, vBellyP.w);
+}
+void furCoatColor(inout vec3 c) {
+  float lum = dot(c, vec3(0.3, 0.59, 0.11));
+  c = mix(furCoat * (0.8 + 0.4 * lum), furBellyColor, furBellyHard()); // belly: the colour as is, no texture tint
+}
+`;
+// Pure white belly: on the shells, no darkened roots or tinted tips; in lighting, an emissive term keeps it
+// white both in sun and shade.
+const BELLY_SHELL_TINT = `diffuseColor.rgb = mix(diffuseColor.rgb * mix(0.55, 1.0, furShell) + furTip * furShell * furShell, furBellyColor, furBellyHard());`;
+const BELLY_LIGHT = /* glsl */`
+totalEmissiveRadiance += furBellyColor * furBellyHard() * 0.45;
 `;
 
 const BASE_FRAGMENT = /* glsl */`
@@ -222,7 +246,7 @@ vec3 furHash(vec3 p) {
 
 const FRAGMENT_BODY = /* glsl */`
 {
-  // Poil le plus proche (cellules voisines 2×2×2) : distance et hauteur aléatoire.
+  // Nearest hair (2×2×2 neighbouring cells): distance and random height.
   vec3 p = vFurPos * furDensity;
   vec3 cell = floor(p);
   vec3 o = step(0.5, fract(p)) - 1.0;
@@ -237,33 +261,26 @@ const FRAGMENT_BODY = /* glsl */`
     float dd = dot(d, d);
     if (dd < best) { best = dd; height = mix(${HEIGHT_MIN.toFixed(2)}, 1.0, fract(h.x * 7.13 + h.z * 3.71)); }
   }
-  // Largeur à la racine en fraction de case : 0,6 -> 0,65 le 2026-10-23 (cases plus petites).
-  // Correction 2 (2026-10-26) : pointe moins effilée (TIP_TAPER) et hauteurs moins dispersées
-  // (HEIGHT_MIN) : les coques extérieures ne sont plus des points épars (bord bruité).
+  // Root width as a share of a cell; the taper (TIP_TAPER) and height spread (HEIGHT_MIN) keep the outer
+  // shells from breaking into scattered dots.
   float r = 0.65 * (1.0 - ${TIP_TAPER.toFixed(2)} * furShell / height);
   diffuseColor.a = furShell < height ? 1.0 - smoothstep(r * 0.6, r, sqrt(best)) : 0.0;
-  // Entre les poils : on sort tout de suite, sans payer l'éclairage (la majorité des pixels).
+  // Between hairs: exit at once, without paying for lighting (most pixels).
   if (diffuseColor.a < 0.02) discard;
   furCoatColor(diffuseColor.rgb);
-  // Racines dans l'ombre des poils voisins, pointes plus claires et légèrement rousses.
+  // Roots in the shadow of neighbouring hairs, lighter and slightly rufous tips.
   diffuseColor.rgb = diffuseColor.rgb * mix(0.55, 1.0, furShell) + furTip * furShell * furShell;
 }
 #include <alphamap_fragment>
 `;
 
-// Liseré de contre-jour : les poils vus par la tranche s'éclairent, ce qui dessine le volume
-// d'un pelage noir (sinon une silhouette plate). Renforcé de 0,22 à 0,3 le 2026-10-23, en même
-// temps que le peignage passait de 0,9 à 0,6 (poils plus dressés, chat plus touffu).
-// 2026-10-25 : teinte dorée chaude `furSheen` (CAT.sheen × CAT.sheenStrength, palette.js) au lieu
-// du gris vec3(0.3, 0.27, 0.25) : reflet doux de soleil, silhouette détachée du fond.
-// Correction 2 (2026-10-26, captures « final » : silhouette noir brun uniforme, sans liseré ni
-// aplat de lumière) : `coatLight(shell)` remplace l'ancien liseré `furSheen * rim * rim * furShell`,
-// qui ne touchait presque que les coques extérieures, éparses. Calcul en espace vue :
-// - `sun` : demi-Lambert doux avec le soleil (`directionalLights[0]` : three place d'abord les
-//   lumières qui projettent une ombre, donc le soleil de World.js) ;
-// - aplat gris-brun `furCoatLit` côté soleil, renforcé sur le dessus (dos, tête) ;
-// - liseré pêche `furSheen` sur les contours, fort côté soleil, faible (0,3) à l'ombre ;
-// - le tout atténué vers les racines (profondeur du pelage), mais présent sur la peau de base.
+// Rim lighting: hairs seen edge-on catch the light, which draws the volume of a black coat (otherwise a flat
+// silhouette). `coatLight(shell)`, in view space:
+// - `furSun`: soft half-Lambert with the sun (`directionalLights[0]`: three.js lists shadow-casting lights first,
+//   so it is the sun of World.js);
+// - grey-brown `furCoatLit` tint on the sun side, stronger on top (back, head);
+// - peach `furSheen` rim on the contours, strong on the sun side, faint (0.3) in the shade;
+// - all fading toward the roots (coat depth), but still present on the base skin.
 function coatLight(shell) {
   return /* glsl */`
 #include <emissivemap_fragment>
@@ -288,13 +305,69 @@ function coatLight(shell) {
 const RIM_FRAGMENT = coatLight('furShell');
 const BASE_LIGHT_FRAGMENT = coatLight('0.0');
 
+/**
+ * `furBellyP` attribute (vec4 per vertex), computed once on the rest pose (mesh bind frame, heights and lengths
+ * divided by the trunk length): `u` side, `v` downward from the trunk axis (mid-height per slice), `s` along the
+ * trunk (0 back, 1 front), `k` 1 for trunk and thighs, 0 for head, tail, calves and feet. No colour decision here:
+ * see `furBellyHard`. The geometry is shared between NPCs: only those reading the attribute (BELLY_VERTEX_HEAD) use it.
+ */
+function buildBellyMask(body) {
+  const geo = body.geometry;
+  if (geo.getAttribute('furBellyP')) return;
+  const pos = geo.attributes.position, si = geo.attributes.skinIndex, sw = geo.attributes.skinWeight;
+  const bones = body.skeleton.bones;
+  const up = bindDirection(body, new THREE.Vector3(0, 1, 0)), front = bindDirection(body, new THREE.Vector3(0, 0, 1));
+  const right = bindDirection(body, new THREE.Vector3(1, 0, 0));
+  const n = pos.count, A = new Float32Array(n), B = new Float32Array(n), Lt = new Float32Array(n), name = new Array(n);
+  const v = new THREE.Vector3();
+  let a0 = Infinity, a1 = -Infinity, lSum = 0, lN = 0;
+  for (let i = 0; i < n; i++) {
+    let best = 0, bw = -1;
+    for (let k = 0; k < 4; k++) { const w = sw.getComponent(i, k); if (w > bw) { bw = w; best = si.getComponent(i, k); } }
+    name[i] = bones[best]?.name ?? '';
+    v.fromBufferAttribute(pos, i);
+    A[i] = v.dot(front); B[i] = v.dot(up); Lt[i] = v.dot(right);
+    if (/^(Spine|Hip|Shoulder)/.test(name[i])) { a0 = Math.min(a0, A[i]); a1 = Math.max(a1, A[i]); lSum += Lt[i]; lN++; }
+  }
+  const L = a1 - a0, lc = lSum / Math.max(lN, 1), N = 32;
+  // Trunk axis: mid-height of the trunk vertices per slice of s, smoothed, empty slices filled.
+  const lo = new Float32Array(N).fill(Infinity), hi = new Float32Array(N).fill(-Infinity);
+  for (let i = 0; i < n; i++) {
+    if (!/^(Spine|Hip|Shoulder)/.test(name[i])) continue;
+    const t = Math.min(N - 1, Math.max(0, Math.floor((A[i] - a0) / L * N)));
+    lo[t] = Math.min(lo[t], B[i]); hi[t] = Math.max(hi[t], B[i]);
+  }
+  let mid = Array.from({ length: N }, (_, t) => (hi[t] > lo[t] ? (hi[t] + lo[t]) / 2 : NaN));
+  for (let t = 0; t < N; t++) if (Number.isNaN(mid[t])) mid[t] = mid[t > 0 ? t - 1 : t + 1] ?? 0;
+  for (let pass = 0; pass < 2; pass++) mid = mid.map((m, t) => (mid[Math.max(0, t - 1)] + 2 * m + mid[Math.min(N - 1, t + 1)]) / 4);
+  const axisAt = (s) => { const x = Math.min(N - 1, Math.max(0, s * N - 0.5)), i0 = Math.floor(x), i1 = Math.min(N - 1, i0 + 1); return mid[i0] + (mid[i1] - mid[i0]) * (x - i0); };
+  // Continuous `k`: 1 minus the sum of skin weights on excluded bones (head, tail, calves, feet, hind thighs);
+  // the limit around the trunk (upper legs) is analytic in the shader, on interpolated (u, v).
+  const ex = /^(Head|Mouth|Nose|Jaw|Ear|Eye|Tongue|Tail|Calf|Foot|Toe|toe|Thigh_Back)/;
+  const out_ex = new Float32Array(n);
+  for (let i = 0; i < n; i++) {
+    for (let k = 0; k < 4; k++) if (ex.test(bones[si.getComponent(i, k)]?.name ?? '')) out_ex[i] += sw.getComponent(i, k);
+    out_ex[i] = Math.min(1, out_ex[i]);
+  }
+  const out = new Float32Array(n * 4);
+  for (let i = 0; i < n; i++) {
+    const s = (A[i] - a0) / L, u = (Lt[i] - lc) / L, w = (axisAt(s) - B[i]) / L;
+    out.set([u, w, s, 1 - out_ex[i]], i * 4);
+  }
+  geo.setAttribute('furBellyP', new THREE.BufferAttribute(out, 4));
+}
+
 export class Fur {
   /**
-   * @param {THREE.SkinnedMesh} body maillage du corps (géométrie, squelette et matériau partagés)
-   * @param {THREE.SkinnedMesh[]} eyes globes oculaires, autour desquels la fourrure s'efface
+   * @param {THREE.SkinnedMesh} body body mesh (shared geometry, skeleton and material)
+   * @param {THREE.SkinnedMesh[]} eyes eye globes, around which the fur fades out
+   * @param {object} [opts]
+   * @param {number} [opts.belly] belly colour (sRGB hex), added to the coat: without it the coat is plain and the
+   *   shader programs are the hero's (see BELLY_COAT_GLSL)
    */
-  constructor(body, eyes = []) {
+  constructor(body, eyes = [], opts = {}) {
     this.body = body;
+    this.belly = opts.belly !== undefined;
     this.shells = [];
     buildMask(body, eyes);
 
@@ -314,8 +387,12 @@ export class Fur {
       furSheen: { value: SHEEN.clone() },
       furCoatLit: { value: COAT_LIT.clone() },
     };
+    if (this.belly) {
+      this.uniforms.furBellyColor = { value: color(opts.belly) };
+      buildBellyMask(body);
+    }
 
-    // Racine de la fourrure : la peau lisse devient mate et sombre, comme le fond d'un pelage.
+    // Fur root: the smooth skin becomes matte and dark, like the base of a coat.
     const baseColor = body.material.color.clone();
     body.material.roughness = 1;
     body.material.color.multiplyScalar(0.7);
@@ -323,11 +400,15 @@ export class Fur {
       shader.uniforms.furCoat = this.uniforms.furCoat;
       shader.uniforms.furSheen = this.uniforms.furSheen;
       shader.uniforms.furCoatLit = this.uniforms.furCoatLit;
-      shader.fragmentShader = COAT_GLSL + shader.fragmentShader
+      if (this.belly) {
+        shader.uniforms.furBellyColor = this.uniforms.furBellyColor;
+        shader.vertexShader = BELLY_VERTEX_HEAD + shader.vertexShader.replace('#include <begin_vertex>', `#include <begin_vertex>${BELLY_VERTEX_SET}`);
+      }
+      shader.fragmentShader = (this.belly ? BELLY_COAT_GLSL : COAT_GLSL) + shader.fragmentShader
         .replace('#include <alphamap_fragment>', BASE_FRAGMENT)
-        .replace('#include <emissivemap_fragment>', BASE_LIGHT_FRAGMENT);
+        .replace('#include <emissivemap_fragment>', BASE_LIGHT_FRAGMENT + (this.belly ? BELLY_LIGHT : ''));
     };
-    body.material.customProgramCacheKey = () => 'cat-coat';
+    body.material.customProgramCacheKey = () => (this.belly ? 'cat-coat-belly' : 'cat-coat');
     body.material.needsUpdate = true;
 
     for (let i = 1; i <= SHELLS; i++) {
@@ -349,12 +430,11 @@ export class Fur {
   _material(base, color, t) {
     const m = base.clone();
     m.color.copy(color);
-    // Un peu de brillance : sans reflet, un pelage noir n'est plus qu'une silhouette.
+    // A little gloss: without any highlight a black coat is just a silhouette.
     m.roughness = 0.62;
     m.alphaTest = 0.5;
     m.alphaToCoverage = true;
-    // L'alpha sert seulement à la couverture : on garde celui du canvas (1), sinon le fond de la
-    // page transparaît à travers les poils (mesuré : 80 509 pixels à alpha < 1, points clairs).
+    // Alpha is only for coverage: keep the canvas alpha (1), otherwise the page background shows through the hairs.
     m.blending = THREE.CustomBlending;
     m.blendSrc = THREE.OneFactor;
     m.blendDst = THREE.ZeroFactor;
@@ -362,18 +442,19 @@ export class Fur {
     m.blendDstAlpha = THREE.OneFactor;
     m.onBeforeCompile = (shader) => {
       Object.assign(shader.uniforms, this.uniforms, { furShell: { value: t } });
-      shader.vertexShader = VERTEX_HEAD + shader.vertexShader.replace('#include <begin_vertex>', VERTEX_BODY);
-      shader.fragmentShader = COAT_GLSL + FRAGMENT_HEAD + shader.fragmentShader
-        .replace('#include <alphamap_fragment>', FRAGMENT_BODY)
-        .replace('#include <emissivemap_fragment>', RIM_FRAGMENT);
+      shader.vertexShader = (this.belly ? BELLY_VERTEX_HEAD : '') + VERTEX_HEAD
+        + shader.vertexShader.replace('#include <begin_vertex>', this.belly ? VERTEX_BODY + BELLY_VERTEX_SET : VERTEX_BODY);
+      shader.fragmentShader = (this.belly ? BELLY_COAT_GLSL : COAT_GLSL) + FRAGMENT_HEAD + shader.fragmentShader
+        .replace('#include <alphamap_fragment>', this.belly ? FRAGMENT_BODY.replace('  diffuseColor.rgb = diffuseColor.rgb * mix(0.55, 1.0, furShell) + furTip * furShell * furShell;', BELLY_SHELL_TINT) : FRAGMENT_BODY)
+        .replace('#include <emissivemap_fragment>', RIM_FRAGMENT + (this.belly ? BELLY_LIGHT : ''));
     };
-    m.customProgramCacheKey = () => 'cat-fur';
+    m.customProgramCacheKey = () => (this.belly ? 'cat-fur-belly' : 'cat-fur');
     return m;
   }
 
   /**
-   * Garde une coque sur `step` (1 = toutes, Infinity = aucune) : moins de passes pour les cartes
-   * graphiques faibles. Ne fait que réduire : un réglage plus léger déjà posé est conservé.
+   * Keeps one shell every `step` (1 = all, Infinity = none): fewer passes for weak GPUs.
+   * Only reduces: a lighter setting already in place is kept.
    */
   setStep(step) {
     step = Math.max(this.step ?? 1, step);

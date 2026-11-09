@@ -1,8 +1,7 @@
-import * as THREE from 'three';
 
 /**
- * Accès nommé aux os du chat BlendSwap (85 os) et à leur pose de repos.
- * three.js retire les points des noms Blender : « Spine.001 » devient « Spine001 ».
+ * Named access to the bones of the cat rig (85 bones) and to their rest pose. Used by Cat.js, Procedural.js and
+ * Npc.js. three.js strips the dots from Blender names: `Spine.001` becomes `Spine001`.
  */
 export class CatRig {
   constructor(gltfScene) {
@@ -10,8 +9,8 @@ export class CatRig {
     this.bones = new Map();
     this.rest = new Map();
     this.meshes = [];
-    // Le GLB est exporté avec les pistes NLA actives : les transformations statiques des os
-    // sont une pose mélangée. La vraie pose de repos est la pose de liaison du skin.
+    // The GLB is exported with active NLA tracks: static bone transforms are a blended pose.
+    // The real rest pose is the skin's bind pose.
     gltfScene.traverse((o) => { if (o.isSkinnedMesh) o.skeleton.pose(); });
     gltfScene.updateMatrixWorld(true);
     gltfScene.traverse((o) => {
@@ -24,7 +23,7 @@ export class CatRig {
 
     const b = (name) => {
       const bone = this.bones.get(name.replace(/\./g, ''));
-      if (!bone) console.warn('os introuvable :', name);
+      if (!bone) console.warn('bone not found:', name);
       return bone;
     };
     this.spine = ['Spine', 'Spine.001', 'Spine.002', 'Spine.003', 'Spine.004'].map(b);
@@ -42,16 +41,14 @@ export class CatRig {
       BR: { thigh: b('Thigh_Back_R'), calf: b('Calf_back_R'), foot: b('Foot_Back_R'), paw: b('Foot_Back_L2.002') },
     };
 
-    this.controllerWeights = this._reassignControllerWeights();
+    this._reassignControllerWeights();
   }
 
   /**
-   * Le GLB donne des poids de peau aux contrôleurs IK de Blender (Foot_Back_IK_*, Knee_front_IK_L,
-   * Tail_controller, Head_controller, Spine_controller_1/2 : mesuré, jusqu'à 50 % du poids d'un
-   * sommet). Ces os racines ne bougent jamais ici : les sommets concernés restaient tirés vers la
-   * pose de repos (patte arrière 8 à 11 cm sous l'os, bout de queue et tête à moitié figés).
-   * On reporte chaque poids de contrôleur sur l'os déformant le plus pesant du même sommet,
-   * sinon sur un os de repli proche du contrôleur.
+   * The GLB gives skin weights to Blender's IK controllers (up to 50% of a vertex). These bones never move
+   * here, which would pin skin to the rest pose (hind paw, tail tip, head), so each controller weight is moved
+   * to the vertex's heaviest deforming bone, or else to a fallback bone close to the controller.
+   * @returns {{vertices: number, fallbacks: number}} vertices touched and weights sent to a fallback bone
    */
   _reassignControllerWeights() {
     const fallback = {
@@ -77,7 +74,7 @@ export class CatRig {
         for (let k = 0; k < 4; k++) if (sw.getComponent(v, k) > 0 && isCtrl[si.getComponent(v, k)]) hasCtrl = true;
         if (!hasCtrl) continue;
         stats.vertices++; touched = true;
-        // Emplacement déformant le plus pesant du sommet.
+        // Heaviest deforming slot of this vertex.
         let best = -1;
         for (let k = 0; k < 4; k++) {
           const w = sw.getComponent(v, k);
@@ -101,13 +98,15 @@ export class CatRig {
     return stats;
   }
 
-  /** Remet un os dans sa pose de repos (utile avant une couche procédurale). */
-  resetBone(bone) {
-    const r = this.rest.get(bone.name);
-    if (r) { bone.quaternion.copy(r.q); bone.position.copy(r.p); }
-  }
+}
 
-  restQuaternion(bone) {
-    return this.rest.get(bone.name)?.q ?? new THREE.Quaternion();
-  }
+/** True if `o` is below `ancestor` in the scene graph. */
+export function isDescendant(o, ancestor) {
+  for (let p = o.parent; p; p = p.parent) if (p === ancestor) return true;
+  return false;
+}
+
+/** Bone of the paw that touches the ground or holds an object (foot under the calf), otherwise the calf. */
+export function pawHolder(leg) {
+  return [leg.paw, leg.foot].find((b) => b && isDescendant(b, leg.calf)) ?? leg.calf;
 }

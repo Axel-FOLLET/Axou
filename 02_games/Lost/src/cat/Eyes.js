@@ -2,35 +2,34 @@ import * as THREE from 'three';
 import { CAT, color } from '../style/palette.js';
 
 /**
- * Yeux dessinés au shader sur les globes `EyeA` / `EyeB` (sphères vertes unies dans le GLB) :
- * iris dégradé et strié, cercle sombre au bord, grosse pupille ronde (regard tendre) et deux
- * reflets de lumière. Tout est calculé dans le repère de repos du globe : le dessin tourne avec
- * la tête sans calcul côté CPU.
+ * Eyes drawn by a shader on the `EyeA` / `EyeB` globes of the GLB: streaked gradient iris, dark ring, large
+ * round pupil and two highlights. Everything is computed in the globe's rest frame, so the drawing turns with
+ * the head at no CPU cost. Created by Cat.js and Npc.js.
  *
- * Coordonnées : `dir` = direction du point depuis le centre du globe ; (u, v) = sa projection sur
- * le plan face au regard (u vers la droite du monde, v vers le haut), donc sin de l'angle au
- * centre de l'iris. Les reflets ont la même position sur les deux yeux, comme une vraie lumière.
+ * Coordinates: `dir` = point direction from the globe centre; (u, v) = its projection on the plane facing the
+ * gaze, i.e. the sine of the angle at the iris centre. Highlights sit at the same place on both eyes.
  *
- * Style « dessin animé doux » (2026-10-25, docs/recherche/style.md § 5 « Chat ») : iris plus
- * lumineux (`CAT.eyeIrisIn` / `CAT.eyeIrisOut`), cercle et coin de l'œil en brun chaud
- * (`CAT.eyeRing`) au lieu du presque noir.
- *
- * Paupières (2026-10-25) : le rig n'a pas d'os de paupière ; `setLid(t)` fait descendre une
- * paupière procédurale de la couleur du pelage devant le globe, du haut vers le bas, avec un fin
- * liseré brun au bord. t = 0 : yeux ouverts ; t = 1 : yeux fermés. Les deux yeux partagent la même
- * valeur (un seul uniform).
+ * Eyelids: the rig has no eyelid bone; `setLid(t)` lowers a procedural lid of the coat colour in front of the
+ * globe, from top to bottom (t = 0 open, t = 1 closed; one shared uniform).
  */
-const IRIS = 0.78;                          // rayon de l'iris (sin de l'angle) : l'œil d'un chat est presque tout iris
-// Demi-axes de la pupille, un peu plus haute que large. Agrandie de 15 % le 2026-10-23 (demande
-// de l'utilisateur : « pupilles légèrement plus grosses ») : 0,36 × 0,44 -> 0,42 × 0,50.
+const IRIS = 0.78;                          // iris radius (sine of the angle): a cat's eye is almost all iris
+// Pupil half-axes, slightly taller than wide.
 const PUPIL = new THREE.Vector2(0.42, 0.50);
-const OUTWARD = 0.22;                       // les yeux regardent un peu vers l'extérieur
-// Bord de la paupière en v (haut = +1) : LID_OPEN à t = 0 (au-dessus du globe), LID_CLOSED à t = 1
-// (sous le globe, tout est couvert, arrondi compris). LID_ARCH : bord en arc, plus haut au milieu.
+const OUTWARD = 0.22;                       // the eyes look slightly outward
+// Lid edge in v (top = +1): LID_OPEN at t = 0 (above the globe), LID_CLOSED at t = 1 (below the globe, fully
+// covered). LID_ARCH: the edge is arched, higher in the middle.
 const LID_OPEN = 1.05;
 const LID_CLOSED = -1.2;
 const LID_ARCH = 0.12;
-// Part de la couleur de l'iris ajoutée en émissif (correction 1) : éclat léger, pas un œil luminescent.
+// Closed-eye crease: fully covered, the globe reads as an empty socket, so a brown arc at LID_CREASE (curvature
+// LID_ARCH, half-thickness LID_CREASE_W) appears from t = LID_CREASE_FROM to 1.
+const LID_CREASE = -0.2;
+const LID_CREASE_W = 0.05;
+const LID_CREASE_FROM = 0.85;
+// Share of the coat's emissive tint (CAT.coatLit × coatLitStrength) given to the lid: at 1 the lid is lighter
+// than the surrounding fur; 0.6 blends it into the head.
+const LID_LIT = 0.6;
+// Share of the iris colour added as emissive: a light sparkle, not a glowing eye.
 const IRIS_GLOW = 0.35;
 
 const VERTEX_HEAD = /* glsl */`
@@ -52,9 +51,11 @@ uniform vec3 eyeIrisOut;
 uniform vec3 eyeRing;
 uniform vec3 eyeLidColor;
 uniform float eyeLid;
+uniform vec3 eyeLidLit;
 varying vec3 vEyeDir;
 float eyeLight;
 float eyeLidMask;
+float eyeCreaseMask;
 vec3 eyeGlow;
 `;
 
@@ -64,31 +65,35 @@ const FRAGMENT_BODY = /* glsl */`
   vec2 uv = vec2(dot(d, eyeRight), dot(d, eyeUp));
   float r = dot(d, eyeForward) > 0.0 ? length(uv) : 2.0;
   float a = atan(uv.y, uv.x);
-  // Iris : clair près de la pupille, plus foncé vers le bord, stries rayonnantes.
+  // Iris: lighter near the pupil, darker toward the edge, radial streaks.
   float t = clamp(r / ${IRIS.toFixed(2)}, 0.0, 1.0);
   float streak = 0.85 + 0.15 * sin(a * 37.0 + sin(a * 11.0) * 2.0) * (0.4 + t);
   vec3 iris = mix(eyeIrisIn, eyeIrisOut, smoothstep(0.25, 1.0, t)) * streak;
-  // Cercle brun chaud au bord de l'iris, puis le coin de l'œil (caché par les paupières).
+  // Warm brown ring at the iris edge, then the eye corner (hidden by the lids).
   iris = mix(iris, eyeRing, 0.8 * smoothstep(0.82, 0.98, t));
   vec3 c = mix(iris, eyeRing, smoothstep(${IRIS.toFixed(2)}, ${(IRIS + 0.03).toFixed(2)}, r));
-  // Pupille.
+  // Pupil.
   float p = length(uv / vec2(${PUPIL.x.toFixed(2)}, ${PUPIL.y.toFixed(2)}));
   c = mix(vec3(0.004), c, smoothstep(0.92, 1.02, p));
-  // Éclat de l'iris (correction 1, 2026-10-26 : yeux petits et ternes de loin) : l'iris émet un
-  // peu de sa propre couleur, il reste vert tilleul lumineux même à l'ombre de la tête.
+  // Iris glow: the iris emits a little of its own colour, so it stays bright even in the head's shadow.
   eyeGlow = c * ${IRIS_GLOW.toFixed(2)} * (1.0 - smoothstep(${IRIS.toFixed(2)}, ${(IRIS + 0.03).toFixed(2)}, r)) * smoothstep(0.92, 1.02, p);
-  // Reflets : un gros en haut à gauche, un petit en bas à droite (gros reflet agrandi de 0,075
-  // à 0,085 le 2026-10-26, correction 1).
+  // Highlights: a large one top left, a small one bottom right.
   eyeLight = 1.0 - smoothstep(0.085, 0.105, length(uv - vec2(-0.2, 0.24)));
   eyeLight += 0.8 * (1.0 - smoothstep(0.03, 0.045, length(uv - vec2(0.17, -0.15))));
   eyeLight *= step(0.0, dot(d, eyeForward));
-  // Paupière : au-dessus du bord (arc plus haut au milieu), couleur du pelage, mate, sans reflet ;
-  // fin liseré brun juste au bord pour que l'œil mi-clos reste lisible.
+  // Eyelid: above the edge (arched, higher in the middle), coat colour, matte, no highlight; a thin brown line
+  // at the edge keeps the half-closed eye readable.
   float edge = mix(${LID_OPEN.toFixed(2)}, ${LID_CLOSED.toFixed(2)}, eyeLid) - ${LID_ARCH.toFixed(2)} * uv.x * uv.x;
   float below = edge - uv.y;
   c = mix(c, eyeRing * 0.6, 1.0 - smoothstep(0.0, 0.06, abs(below)));
   eyeLidMask = 1.0 - smoothstep(-0.015, 0.015, below);
   c = mix(c, eyeLidColor, eyeLidMask);
+  // Closed eye: crease of the joined lids, a brown arc on the lid that appears only at the end of the closing
+  // (t from ${LID_CREASE_FROM.toFixed(2)} to 1).
+  float crease = abs(uv.y - (${LID_CREASE.toFixed(2)} - ${LID_ARCH.toFixed(2)} * uv.x * uv.x));
+  float creaseK = smoothstep(${LID_CREASE_FROM.toFixed(2)}, 1.0, eyeLid) * eyeLidMask * step(0.0, dot(d, eyeForward));
+  eyeCreaseMask = creaseK * (1.0 - smoothstep(${LID_CREASE_W.toFixed(3)}, ${(LID_CREASE_W * 2).toFixed(3)}, crease));
+  c = mix(c, eyeRing * 0.5, eyeCreaseMask);
   eyeLight *= 1.0 - smoothstep(-0.03, 0.03, -below);
   eyeGlow *= 1.0 - eyeLidMask;
   diffuseColor.rgb = c;
@@ -103,23 +108,26 @@ roughnessFactor = mix(roughnessFactor, 0.8, eyeLidMask);
 const EMISSIVE_BODY = /* glsl */`
 #include <emissivemap_fragment>
 totalEmissiveRadiance += vec3(eyeLight) * 2.5 + eyeGlow;
+// Eyelid: same emissive tint as the sun side of the coat (Fur.js, COAT_LIT), otherwise the covered globe,
+// recessed in the socket, looks darker than the fur around it and reads as a hole.
+totalEmissiveRadiance += eyeLidLit * eyeLidMask * (1.0 - eyeCreaseMask);
 `;
 
 export class Eyes {
-  /** @param {THREE.SkinnedMesh[]} eyes globes oculaires (repère de repos du maillage) */
+  /** @param {THREE.SkinnedMesh[]} eyes eye globes (mesh rest frame) */
   constructor(eyes) {
     this.eyes = eyes;
-    // Uniform partagé par les deux yeux : 0 = ouverts, 1 = fermés (voir setLid).
+    // Uniform shared by both eyes: 0 = open, 1 = closed (see setLid).
     this.lid = { value: 0 };
     for (const eye of eyes) {
       eye.geometry.computeBoundingSphere();
       const center = eye.geometry.boundingSphere.center.clone();
-      // Le museau pointe vers +Z (repère de repos) ; chaque œil s'ouvre un peu vers son côté.
+      // The muzzle points toward +Z (rest frame); each eye opens slightly toward its own side.
       const toMesh = eye.bindMatrix.clone().invert();
       const side = Math.sign(center.x) || 1;
       const forward = new THREE.Vector3(side * OUTWARD, 0.05, 1).normalize().transformDirection(toMesh);
       const up = new THREE.Vector3(0, 1, 0).transformDirection(toMesh);
-      // Droite et haut vus de face (spectateur devant le chat).
+      // Right and up as seen from the front (viewer in front of the cat).
       const right = new THREE.Vector3().crossVectors(up, forward).normalize();
       up.crossVectors(forward, right).normalize();
 
@@ -136,6 +144,7 @@ export class Eyes {
           eyeIrisOut: { value: color(CAT.eyeIrisOut) },
           eyeRing: { value: color(CAT.eyeRing) },
           eyeLidColor: { value: color(CAT.coat) },
+          eyeLidLit: { value: color(CAT.coatLit).multiplyScalar(CAT.coatLitStrength * LID_LIT) },
           eyeLid: this.lid,
         });
         shader.vertexShader = VERTEX_HEAD + shader.vertexShader.replace('#include <begin_vertex>', VERTEX_BODY);
@@ -150,17 +159,14 @@ export class Eyes {
   }
 
   /**
-   * Paupières procédurales (pas d'os dans le rig) : 0 = yeux ouverts, 1 = yeux fermés ; valeur
-   * bornée à [0, 1], appliquée aux deux yeux à l'image suivante. Exemple « yeux mi-clos de
-   * contentement » pendant les papouilles : `cat.eyes.setLid(0.6)`, puis `setLid(0)` à la fin
-   * (D peut interpoler t lui-même pour une fermeture douce).
+   * Procedural eyelids: 0 = open, 1 = closed; clamped to [0, 1], applied to both eyes on the next frame.
    * @param {number} t
    */
   setLid(t) {
     this.lid.value = THREE.MathUtils.clamp(Number(t) || 0, 0, 1);
   }
 
-  /** Valeur actuelle de la paupière (0 à 1). */
+  /** Current lid value (0 to 1). */
   getLid() {
     return this.lid.value;
   }

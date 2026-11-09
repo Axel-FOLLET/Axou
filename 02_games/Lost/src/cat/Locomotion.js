@@ -2,18 +2,18 @@ import * as THREE from 'three';
 
 const _dir = new THREE.Vector3();
 
-/** Déplacement et orientation du groupe racine du chat vers un point du sol. */
+/** Moves and turns the cat's root group toward a ground point. Owned by Cat.js, driven by Brain.js. */
 export class Locomotion {
   constructor(root) {
     this.root = root;
     this.speed = 0.9;      // m/s
     this.turnRate = 4;     // rad/s
-    this.arriveRadius = 0.12;
-    this.heading = 0;      // angle autour de Y, 0 = +Z
+    this.arriveRadius = 0.12;  // m
+    this.heading = 0;      // rad around Y, 0 = +Z
     this.moving = false;
   }
 
-  /** Avance d'un pas vers `target`. Retourne true à l'arrivée. */
+  /** Advances one step toward `target`. Returns true on arrival. */
   stepToward(target, dt) {
     _dir.copy(target).sub(this.root.position).setY(0);
     const dist = _dir.length();
@@ -27,7 +27,7 @@ export class Locomotion {
     this.heading += step;
     this.root.rotation.y = this.heading;
 
-    // On n'avance franchement que lorsque le chat regarde à peu près vers la cible.
+    // Forward speed scales with facing: the cat only really advances once it roughly faces the target.
     const facing = Math.max(0, Math.cos(diff));
     const move = Math.min(dist, this.speed * facing * dt);
     this.root.position.x += Math.sin(this.heading) * move;
