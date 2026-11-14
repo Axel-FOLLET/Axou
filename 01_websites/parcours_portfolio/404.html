@@ -6,14 +6,15 @@
     <!--
         Base of the relative addresses, written in the HTML before any style sheet or image.
         GitHub Pages shows this file for any missing address of the site, whatever the folder
-        (for example /parcours_portfolio/a/b/c): plain relative paths would start from that missing folder.
+        (for example /my_website/a/b/c): plain relative paths would start from that missing folder.
         Written in the HTML, the base is also read by the browser's preloader, which requests the style sheets,
         the fonts and the modules before any script runs: each file is requested only once,
-        at the right address (https://axel-follet.github.io/parcours_portfolio/, or the site served under /parcours_portfolio/ locally).
+        at the right address (https://axel-follet.github.io/my_website/, the name of the repository on GitHub).
     -->
-    <base href="/parcours_portfolio/">
+    <base href="/my_website/">
     <!--
-        Fallback for the other ways of opening the page: the base becomes the address up to and including "/parcours_portfolio/",
+        Fallback for the other ways of opening the page: the base becomes the address up to and including the site folder,
+        "/my_website/" (published name) or "/parcours_portfolio/" (name of the working folder on the disk),
         wherever that folder is in the address (server started in a parent folder, file opened from the disk),
         or "/" without that folder (server started in the site folder, http://localhost:8080/404.html).
         The script runs before the rest of <head>: the links that follow are read with this base.
@@ -22,10 +23,11 @@
     <script>
         {
             const base = document.querySelector("base");
-            const folder = "/parcours_portfolio/";
-            const index = location.pathname.indexOf(folder);
-            const href = index >= 0 ? location.pathname.slice(0, index + folder.length) : "/";
-            if (href !== folder) base.setAttribute("href", href);
+            const folders = ["/my_website/", "/parcours_portfolio/"];
+            const path = location.pathname;
+            const folder = folders.find(name => path.includes(name));
+            const href = folder ? path.slice(0, path.indexOf(folder) + folder.length) : "/";
+            if (href !== base.getAttribute("href")) base.setAttribute("href", href);
         }
     </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">

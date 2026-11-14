@@ -1,276 +1,280 @@
 # PROJECT JOB BOARD - Y.I.A Jobs
 
-> À jour du 22/10/2026.
+> Last updated: 14/11/2026.
 
-Y.I.A Jobs (initiales de Yohan, Ismail et Axel) est une plateforme d’annonces d’emploi développée avec React, Flask et SQLite.
-Projet Epitech réalisé à trois : Axel FOLLET (chef de projet, front-end), Yohan AVRONSART (back-end : données et métier) et Ismail BASSIT (back-end : comptes et sécurité).
+Y.I.A Jobs (the initials of Yohan, Ismail and Axel) is a job board built with React, Flask and SQLite.
+Epitech project carried out by a team of three: Axel FOLLET (project manager, front-end), Yohan AVRONSART (back-end: data and business logic) and Ismail BASSIT (back-end: accounts and security).
 
 ## Technologies
 
-| Partie | Outils |
+| Part | Tools |
 | --- | --- |
-| Base de données | SQLite (fichier `backend/jobboard.db`) |
-| Back-end / API | Python, Flask 3, sessions par cookie, python-dotenv |
+| Database | SQLite (file `backend/jobboard.db`) |
+| Back-end / API | Python, Flask 3, cookie sessions, python-dotenv |
 | Front-end | React 19, React Router 8, Vite 8, ESLint |
-| Déploiement | Render (gunicorn ; Flask sert le build React), décrit dans `render.yaml` |
+| Deployment | Render (gunicorn; Flask serves the React build), described in `render.yaml` |
 
-## Structure du dépôt
+## Repository structure
 ```
 JobBoard/
-├── backend/                     API Flask et base de données
-│   ├── app.py                   crée l'application, enregistre les blueprints et sert frontend/dist s'il existe (port 5000)
-│   ├── db.py                    ouverture de la base (clés étrangères activées)
-│   ├── auth_utils.py            clé secrète, cookie de session, personne connectée, @login_required, @admin_required
+├── backend/                     Flask API and database
+│   ├── app.py                   creates the application, registers the blueprints and serves frontend/dist if it exists (port 5000)
+│   ├── db.py                    opens the database (foreign keys enabled)
+│   ├── auth_utils.py            secret key, session cookie, logged-in person, @login_required, @admin_required
 │   ├── routes/
-│   │   ├── ads.py               annonces, candidatures, « Mes candidatures », CV du profil, clôture
-│   │   ├── admin.py             CRUD d'administration des cinq tables
-│   │   ├── auth.py              inscription, connexion, déconnexion, compte
-│   │   ├── recruiter.py         catégories, espace recruteur (son entreprise et ses annonces)
-│   │   └── verification.py      confirmation de l'adresse e-mail
-│   ├── pending_registrations.py inscriptions en attente de confirmation de l'adresse
-│   ├── pending_email_changes.py changements d'adresse e-mail en attente de confirmation
-│   ├── application_cvs.py       CV en PDF : celui du profil et ceux joints aux candidatures
-│   ├── mailer.py                envoi des e-mails (SMTP), désactivable
-│   ├── login_limit.py           limite des essais de connexion (5 échecs en 15 minutes)
-│   ├── create_admin.py          crée le compte administrateur à partir du .env
-│   ├── demo.py                  mode démo (DEMO_MODE=1) : trois comptes et la route GET /api/demo/login
-│   ├── schema.sql               création des tables
-│   ├── seed.sql                 données de test
-│   ├── init_db.py               crée jobboard.db à partir de schema.sql et seed.sql
-│   ├── seed_data.py             remplit la base à partir de data/annonces.json (une seule fois)
-│   ├── data/annonces.json       données des annonces pour le remplissage de la base
-│   ├── queries.sql              requêtes d'exemple
-│   ├── checks.sql               insertions qui doivent échouer (tests des contraintes)
-│   ├── curl_tests.md            tests de l'API (commandes, codes, réponses)
-│   ├── tests/curl_auth.md       tests de l'inscription et de la connexion
-│   ├── tests/test_login_limit.py tests automatiques de la limite de connexion (unittest)
-│   ├── .env.example             modèle du fichier de configuration
+│   │   ├── ads.py               job ads, applications, "My applications", profile CV, closure
+│   │   ├── admin.py             admin CRUD of the five tables
+│   │   ├── auth.py              registration, login, logout, account
+│   │   ├── recruiter.py         categories, recruiter area (their company and its job ads)
+│   │   └── verification.py      email address confirmation
+│   ├── pending_registrations.py registrations waiting for the address to be confirmed
+│   ├── pending_email_changes.py email address changes waiting to be confirmed
+│   ├── application_cvs.py       PDF CVs: the profile CV and those attached to applications
+│   ├── mailer.py                sends the emails (SMTP), can be disabled
+│   ├── login_limit.py           limit on login attempts (5 failures in 15 minutes)
+│   ├── create_admin.py          creates the administrator account from .env
+│   ├── demo.py                  demo mode (DEMO_MODE=1): three accounts and the route GET /api/demo/login
+│   ├── schema.sql               creates the tables
+│   ├── seed.sql                 test data
+│   ├── init_db.py               creates jobboard.db from schema.sql and seed.sql
+│   ├── seed_data.py             fills the database from data/ads.json (once only)
+│   ├── data/ads.json            job ad data used to fill the database
+│   ├── queries.sql              example queries
+│   ├── checks.sql               inserts that must fail (constraint tests)
+│   ├── curl_tests.md            API tests (commands, codes, responses)
+│   ├── tests/curl_auth.md       registration and login tests
+│   ├── tests/test_login_limit.py automated tests of the login limit (unittest)
+│   ├── .env.example             template of the configuration file
 │   └── requirements.txt
-├── docs/
-│   ├── contrat_api.md           contrat de l'API : routes, champs, codes, messages d'erreur
-│   ├── choix_techniques_front.md            choix techniques du front-end
-│   ├── choix_techniques_back_donnees.md     choix techniques du back-end : données et API
-│   ├── choix_techniques_comptes_securite.md choix techniques du back-end : comptes et sécurité
-│   └── usage_ia.md              usage de l'IA par chaque membre de l'équipe
-├── frontend/                    interface React (Vite)
+├── docs/                        project documents, written in French
+│   ├── contrat_api.md           API contract: routes, fields, codes, error messages
+│   ├── choix_techniques_front.md            technical choices of the front-end
+│   ├── choix_techniques_back_donnees.md     technical choices of the back-end: data and API
+│   ├── choix_techniques_comptes_securite.md technical choices of the back-end: accounts and security
+│   └── usage_ia.md              use of AI by each member of the team
+├── frontend/                    React interface (Vite)
 │   ├── index.html
-│   ├── vite.config.js           proxy des appels /api vers l'API Flask
+│   ├── vite.config.js           proxy of the /api calls to the Flask API
 │   └── src/
-│       ├── App.jsx              routes de l'interface
-│       ├── api.js               point d'accès unique à l'API (cookie, JSON, erreurs)
-│       ├── AuthProvider.jsx     personne connectée, partagée par toutes les pages
-│       ├── adminTables.js       description des cinq tables pour l'administration
-│       ├── components/          habillage commun, pied de page, barre de recherche, carte d'annonce, formulaires
-│       ├── pages/               une page par adresse
-│       └── styles/              feuilles de style, une par usage
-├── render.yaml                  déploiement sur Render (build, démarrage, variables)
+│       ├── App.jsx              routes of the interface
+│       ├── api.js               single access point to the API (cookie, JSON, errors)
+│       ├── AuthProvider.jsx     logged-in person, shared by all the pages
+│       ├── LangProvider.jsx     language of the interface (French or English), shared by all the pages
+│       ├── lang.js              useLang(): current language and t(fr, en), the text in the chosen language
+│       ├── adminTables.js       description of the five tables for the admin page
+│       ├── components/          common layout, footer, search bar, job ad card, forms
+│       ├── pages/               one page per address
+│       └── styles/              style sheets, one per use
+├── render.yaml                  deployment on Render (build, start, variables)
 └── .gitignore
 ```
 
-## Prérequis
+## Requirements
 
-- Python 3 (testé avec 3.13 et 3.14)
-- Node.js (testé avec v24) et npm
+- Python 3 (tested with 3.13 and 3.14)
+- Node.js (tested with v24) and npm
 
-## Installation et lancement
+## Installation and launch
 
 ### Back-end
 
-Les commandes suivantes s’exécutent depuis la racine du dépôt, dans un terminal WSL ou Linux. `init_db.py` recrée les tables : les données existantes sont supprimées, compte administrateur compris. Il faut le relancer après toute modification de `schema.sql`, puis relancer `seed_data.py` et `create_admin.py`.
+The following commands are run from the root of the repository, in a WSL or Linux terminal. `init_db.py` recreates the tables: the existing data is deleted, administrator account included. It must be run again after any change to `schema.sql`, followed by `seed_data.py` and `create_admin.py`.
 
 ```bash
 cd backend
-python3 -m venv venv            # sous WSL ou Ubuntu, la commande « python » peut ne pas exister avant le venv
-source venv/bin/activate        # dans le venv, « python » fonctionne
+python3 -m venv venv            # on WSL or Ubuntu, the "python" command may not exist before the venv
+source venv/bin/activate        # inside the venv, "python" works
 pip install -r requirements.txt
-cp .env.example .env            # puis remplir .env comme décrit ci-dessous, avant la suite
-python init_db.py               # crée jobboard.db et affiche le nombre de lignes par table
-python seed_data.py             # ajoute une cinquantaine d'annonces (à relancer seulement après init_db.py)
-python create_admin.py          # crée l'administrateur décrit dans .env
-python app.py                   # API sur http://localhost:5000
+cp .env.example .env            # then fill in .env as described below, before going on
+python init_db.py               # creates jobboard.db and prints the number of rows per table
+python seed_data.py             # adds about fifty job ads (run it again only after init_db.py)
+python create_admin.py          # creates the administrator described in .env
+python app.py                   # API on http://localhost:5000
 ```
 
-Sous Windows avec PowerShell, le venv s’active avec `.\venv\Scripts\Activate.ps1`.
+On Windows with PowerShell, the venv is activated with `.\venv\Scripts\Activate.ps1`.
 
-Dans `backend/.env`, avant `init_db.py` (le rôle de chaque clé est dans [Configuration](#configuration)) :
+In `backend/.env`, before `init_db.py` (the role of each key is in [Configuration](#configuration)):
 
-- `SECRET_KEY` : remplacer `change-me` par une chaîne aléatoire, par exemple celle que donne `python3 -c "import secrets; print(secrets.token_hex(32))"`.
-- `ADMIN_EMAIL` et `ADMIN_PASSWORD` : les identifiants de l'administrateur, à choisir **avant** `create_admin.py`. Les modifier ensuite n'a aucun effet : le script répond `Admin déjà existant` et garde l'ancien mot de passe.
-- E-mails : laisser `MAIL_ENABLED=0` pour tester. Rien n'est envoyé, et chaque e-mail (avec le lien de vérification d'une inscription ou d'un changement d'adresse) s'affiche dans le terminal de l'API, sur une ligne `[mail désactivé]`. Les clés `SMTP_*` et `MAIL_FROM` ne servent qu'avec `MAIL_ENABLED=1` : `SMTP_USER` est le compte Gmail d'envoi de l'équipe, et `SMTP_PASSWORD` son mot de passe d'application Gmail (16 lettres, pas le mot de passe du compte), communiqués par l'équipe et jamais écrits dans le dépôt.
+- `SECRET_KEY`: replace `change-me` with a random string, for example the one given by `python3 -c "import secrets; print(secrets.token_hex(32))"`.
+- `ADMIN_EMAIL` and `ADMIN_PASSWORD`: the administrator's credentials, to be chosen **before** `create_admin.py`. Changing them afterwards has no effect: the script answers `Admin already exists` and keeps the old password.
+- Emails: leave `MAIL_ENABLED=0` for testing. Nothing is sent, and each email (with the verification link of a registration or of an address change) is printed in the API terminal, on a line starting with `[mail disabled]`. The `SMTP_*` and `MAIL_FROM` keys are only used with `MAIL_ENABLED=1`: `SMTP_USER` is the team's sending Gmail account, and `SMTP_PASSWORD` its Gmail app password (16 letters, not the account password), shared by the team and never written in the repository.
 
 ### Front-end
 
-Dans un second terminal, depuis la racine du dépôt :
+In a second terminal, from the root of the repository:
 ```bash
 cd frontend
 npm install
-npm run dev                     # interface sur http://localhost:5173, à ouvrir dans le navigateur
+npm run dev                     # interface on http://localhost:5173, to open in the browser
 ```
 
-Vite transmet à Flask tous les appels dont l’adresse commence par `/api` (proxy de `vite.config.js`) : le navigateur ne parle qu'à une seule origine, ce qui évite les erreurs CORS.
+Vite forwards to Flask every call whose address starts with `/api` (proxy of `vite.config.js`): the browser talks to a single origin, which avoids CORS errors.
 
-### Site complet servi par Flask
+### Whole site served by Flask
 
-Comme en production, Flask peut servir le site construit, sans `npm run dev` : `npm run build` dans `frontend/` produit `frontend/dist/`, que `app.py` sert dès qu'il existe (les adresses des pages React renvoient `index.html`). Le site est alors sur http://localhost:5000.
+As in production, Flask can serve the built site, without `npm run dev`: `npm run build` in `frontend/` produces `frontend/dist/`, which `app.py` serves as soon as it exists (the addresses of the React pages return `index.html`). The site is then on http://localhost:5000.
 
 ## Configuration
 
-Le back-end utilise `jobboard.db`, dans son dossier de lancement, et le port 5000, que cible le proxy Vite.
+The back-end uses `jobboard.db`, in the folder it is started from, and port 5000, which the Vite proxy targets.
 
-La configuration est lue dans `backend/.env`, jamais dans le code. Ce fichier n'est pas suivi par Git : `.env.example` en donne le modèle.
+The configuration is read from `backend/.env`, never from the code. This file is not tracked by Git: `.env.example` gives its template.
 
-| Clé | Rôle |
+| Key | Role |
 | --- | --- |
-| `SECRET_KEY` | signe le cookie de session ; l'API refuse de démarrer sans elle |
-| `ADMIN_EMAIL`, `ADMIN_PASSWORD` | compte administrateur créé par `create_admin.py` |
-| `COOKIE_SECURE` | `1` pour n'envoyer le cookie qu'en HTTPS (facultatif, absent de `.env.example` : à ajouter soi-même) |
-| `APP_BASE_URL` | adresse du site, utilisée dans le lien de confirmation envoyé par e-mail |
-| `MAIL_ENABLED` | `1` pour envoyer les e-mails ; `0` ou absent : rien n'est envoyé, le message s'affiche dans le terminal de l'API |
-| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `MAIL_FROM` | serveur d'envoi des e-mails |
-| `DEMO_MODE` | `1` active le mode démo (voir [Déploiement sur Render](#déploiement-sur-render)) ; absent ou autre valeur : rien n'est ajouté |
+| `SECRET_KEY` | signs the session cookie; the API refuses to start without it |
+| `ADMIN_EMAIL`, `ADMIN_PASSWORD` | administrator account created by `create_admin.py` |
+| `COOKIE_SECURE` | `1` to send the cookie over HTTPS only (optional, absent from `.env.example`: to be added by hand) |
+| `APP_BASE_URL` | address of the site, used in the confirmation link sent by email |
+| `MAIL_ENABLED` | `1` to send the emails; `0` or absent: nothing is sent, the message is printed in the API terminal |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `MAIL_FROM` | server that sends the emails |
+| `DEMO_MODE` | `1` turns the demo mode on (see [Deployment on Render](#deployment-on-render)); absent or any other value: nothing is added |
 
-Le cookie de session est `HttpOnly` et `SameSite=Lax` ; sa signature expire au bout d'un jour. Les mots de passe sont enregistrés hachés (`scrypt`).
+The session cookie is `HttpOnly` and `SameSite=Lax`; its signature expires after one day. Passwords are stored hashed (`scrypt`).
 
-## Déploiement sur Render
+## Deployment on Render
 
-`render.yaml`, à la racine, décrit un seul service web gratuit : le build installe les dépendances et construit le front (`npm ci && npm run build`, `pip install`), puis le démarrage recrée la base (`init_db.py`, `seed_data.py`, `create_admin.py`) et lance `gunicorn` sur le port fourni par Render (`$PORT`). Le système de fichiers de Render est éphémère : à chaque redémarrage ou nouveau déploiement, la base repart des données de démonstration, ce qui remet la démo à zéro.
+`render.yaml`, at the root, describes a single free web service: the build installs the dependencies and builds the front-end (`npm ci && npm run build`, `pip install`), then the start command recreates the database (`init_db.py`, `seed_data.py`, `create_admin.py`) and starts `gunicorn` on the port given by Render (`$PORT`). Render's file system is ephemeral: at each restart or new deployment, the database starts again from the demo data, which resets the demo.
 
-Variables à saisir à la création du service : `ADMIN_EMAIL` et `ADMIN_PASSWORD`. `SECRET_KEY` est générée par Render ; `DEMO_MODE=1`, `MAIL_ENABLED=0` (Render bloque le SMTP sortant sur l'offre gratuite) et `COOKIE_SECURE=1` sont fixées dans le fichier.
+Variables to enter when the service is created: `ADMIN_EMAIL` and `ADMIN_PASSWORD`. `SECRET_KEY` is generated by Render; `DEMO_MODE=1`, `MAIL_ENABLED=0` (Render blocks outgoing SMTP on the free plan) and `COOKIE_SECURE=1` are set in the file.
 
-Le mode démo (`DEMO_MODE=1`, `backend/demo.py`) crée au démarrage trois comptes aux mots de passe aléatoires et ajoute une route :
+The demo mode (`DEMO_MODE=1`, `backend/demo.py`) creates three accounts with random passwords at start-up and adds one route:
 
-| Méthode | Route | Effet |
+| Method | Route | Effect |
 | --- | --- | --- |
-| GET | `/api/demo/login?role=candidat` | ouvre la session du candidat de démo (deux candidatures déjà déposées) et redirige vers la page d'accueil `/` |
-| GET | `/api/demo/login?role=recruteur` | ouvre la session du recruteur de démo, rattaché à l'entreprise qui a le plus d'annonces, et redirige vers `/recruteur` |
-| GET | `/api/demo/login?role=admin` | ouvre la session de l'administrateur de démo et redirige vers `/admin` |
+| GET | `/api/demo/login?role=candidat` | opens the session of the demo candidate (two applications already submitted) and redirects to the home page `/` |
+| GET | `/api/demo/login?role=recruteur` | opens the session of the demo recruiter, attached to the company with the most job ads, and redirects to `/recruteur` |
+| GET | `/api/demo/login?role=admin` | opens the session of the demo administrator and redirects to `/admin` |
 
-Un rôle inconnu renvoie 400 ; sans `DEMO_MODE=1`, la route n'existe pas (404).
+An unknown role returns 400; without `DEMO_MODE=1`, the route does not exist (404).
 
-## Base de données
+## Database
 
-| Table | Rôle | Colonnes principales |
+| Table | Role | Main columns |
 | --- | --- | --- |
-| `companies` | entreprises | id, name, description, location, website, siren (9 chiffres, unique) |
-| `categories` | catégories d'annonces | id, name (unique) |
-| `people` | candidats, comptes et responsables d'annonces | id, first_name, last_name, email (unique), phone, password_hash, role (`user` / `admin`), company_id |
-| `ads` | annonces | id, title, short_description, description, salary, location, working_time, contract_type, status (`open` / `closed`), created_at, company_id, category_id, contact_id |
-| `applications` | candidatures | id, ad_id, person_id, message, status (`pending` / `accepted` / `rejected`), created_at, receipt_email_sent_at, decision_email_sent_at (date d'envoi de l'accusé de réception et de la réponse ; `NULL` : pas envoyé) |
-| `pending_registrations` | inscriptions en attente de confirmation de l'adresse | id, person_id (unique), token_hash (unique), first_name, last_name, phone, password_hash, created_at, expires_at |
-| `pending_email_changes` | changements d'adresse e-mail en attente de confirmation | id, person_id (unique), new_email, token_hash (unique), created_at, expires_at |
-| `person_cvs` | CV enregistré dans l'espace candidat (un par personne) | person_id (clé primaire), filename, content (le PDF), uploaded_at |
-| `application_cvs` | CV joint à une candidature (une copie, un par candidature) | application_id (clé primaire), filename, content (le PDF), uploaded_at |
+| `companies` | companies | id, name, description, location, website, siren (9 digits, unique) |
+| `categories` | job ad categories | id, name (unique) |
+| `people` | candidates, accounts and job ad contacts | id, first_name, last_name, email (unique), phone, password_hash, role (`user` / `admin`), company_id |
+| `ads` | job ads | id, title, short_description, description, salary, location, working_time, contract_type, status (`open` / `closed`), created_at, company_id, category_id, contact_id |
+| `applications` | applications | id, ad_id, person_id, message, status (`pending` / `accepted` / `rejected`), created_at, receipt_email_sent_at, decision_email_sent_at (date the acknowledgement and the answer were sent; `NULL`: not sent) |
+| `pending_registrations` | registrations waiting for the address to be confirmed | id, person_id (unique), token_hash (unique), first_name, last_name, phone, password_hash, created_at, expires_at |
+| `pending_email_changes` | email address changes waiting to be confirmed | id, person_id (unique), new_email, token_hash (unique), created_at, expires_at |
+| `person_cvs` | CV saved in the candidate area (one per person) | person_id (primary key), filename, content (the PDF), uploaded_at |
+| `application_cvs` | CV attached to an application (a copy, one per application) | application_id (primary key), filename, content (the PDF), uploaded_at |
 
 ```text
 companies 1 ───< N ads N >─── 1 categories
     1             N
-    │             │ contact_id (responsable de l'annonce)
+    │             │ contact_id (contact of the job ad)
     │             1
-    └─────────< N people          (company_id : recruteurs rattachés)
+    └─────────< N people          (company_id: attached recruiters)
 
-ads 1 ───< N applications N >─── 1 people   (person_id : candidat)
+ads 1 ───< N applications N >─── 1 people   (person_id: candidate)
 
-people 1 ─── 0..1 pending_registrations     (inscription en attente)
-people 1 ─── 0..1 pending_email_changes     (changement d'adresse en attente)
-people 1 ─── 0..1 person_cvs                (CV du profil)
-applications 1 ─── 0..1 application_cvs    (CV joint à la candidature)
+people 1 ─── 0..1 pending_registrations     (pending registration)
+people 1 ─── 0..1 pending_email_changes     (pending address change)
+people 1 ─── 0..1 person_cvs                (profile CV)
+applications 1 ─── 0..1 application_cvs    (CV attached to the application)
 ```
 
-Relations :
-- une entreprise publie plusieurs annonces (`ads.company_id`) ;
-- une annonce appartient à une seule catégorie (`ads.category_id`) et a un responsable (`ads.contact_id`) ;
-- un recruteur est rattaché à une entreprise (`people.company_id`), par l'administration uniquement ;
-- une personne peut postuler à plusieurs annonces et une annonce recevoir plusieurs candidatures (table `applications`) ;
-- une personne ne peut pas postuler deux fois à la même annonce (`UNIQUE (ad_id, person_id)`) ;
-- une personne sans `password_hash` (candidat sans compte) existe en base mais ne peut pas se connecter.
+Relationships:
+- a company publishes several job ads (`ads.company_id`);
+- a job ad belongs to a single category (`ads.category_id`) and has a contact (`ads.contact_id`);
+- a recruiter is attached to a company (`people.company_id`), by the administration only;
+- a person can apply to several job ads and a job ad can receive several applications (table `applications`);
+- a person cannot apply twice to the same job ad (`UNIQUE (ad_id, person_id)`);
+- a person without `password_hash` (candidate without an account) exists in the database but cannot log in.
 
-Deux règles surprennent à la lecture :
-- **Aucune suppression en cascade.** Les clés étrangères des cinq tables principales sont en `ON DELETE RESTRICT` : la base refuse de supprimer une entreprise, une catégorie ou une personne encore référencée, et une annonce qui a des candidatures. Il faut d'abord supprimer ou réaffecter ce qui y fait référence (l'API répond alors 409 `Record is still referenced`).
-- **Les valeurs autorisées sont tenues par la base**, avec des contraintes `CHECK` : `ads.status`, `applications.status`, `people.role` et le format de `companies.siren`. Une valeur hors liste est refusée même si elle ne passe pas par l'API.
+Two rules are surprising at first reading:
+- **No cascading deletion.** The foreign keys of the five main tables are `ON DELETE RESTRICT`: the database refuses to delete a company, a category or a person that is still referenced, and a job ad that has applications. What refers to it must first be deleted or reassigned (the API then answers 409 `Record is still referenced`).
+- **The allowed values are enforced by the database**, with `CHECK` constraints: `ads.status`, `applications.status`, `people.role` and the format of `companies.siren`. A value outside the list is refused even if it does not go through the API.
 
-Une personne qui a candidaté sans compte est enregistrée dans `people` sans mot de passe. Si elle crée ensuite son compte avec la même adresse, l'inscription attend dans `pending_registrations` qu'elle ouvre le lien envoyé à cette adresse : connaître un e-mail ne donne jamais accès au compte ni aux candidatures de quelqu'un d'autre. Le jeton du lien n'est enregistré que haché ; il est valable 24 heures et ne sert qu'une fois. Cette table est créée automatiquement au premier usage si la base existe déjà.
+A person who applied without an account is stored in `people` without a password. If they later create their account with the same address, the registration waits in `pending_registrations` until they open the link sent to that address: knowing an email never gives access to someone else's account or applications. The token of the link is only stored hashed; it is valid for 24 hours and can be used once. This table is created automatically at first use if the database already exists.
 
-Les CV sont des PDF de 2 Mo maximum, enregistrés directement dans la base. Le CV joint à une candidature est une copie : le recruteur garde celui qu'il a reçu, même si le candidat remplace ou supprime ensuite le CV de son profil. Comme les deux tables d'attente, ces tables sont en `ON DELETE CASCADE` : un CV disparaît avec sa personne ou sa candidature. Elles sont créées automatiquement au premier usage si la base existe déjà, sans relancer `init_db.py`.
+CVs are PDF files of 2 MB at most, stored directly in the database. The CV attached to an application is a copy: the recruiter keeps the one they received, even if the candidate later replaces or deletes the CV of their profile. Like the two waiting tables, these tables are `ON DELETE CASCADE`: a CV disappears with its person or its application. They are created automatically at first use if the database already exists, without running `init_db.py` again.
 
-## Routes de l'API
+## API routes
 
-Toutes les routes sont sous `/api` et répondent en JSON, sauf les téléchargements de CV, qui renvoient le PDF. Un CV s'envoie en `multipart/form-data`, dans un champ `cv`. Le détail des champs, des codes et des messages est dans [`docs/contrat_api.md`](docs/contrat_api.md).
+All the routes are under `/api` and answer in JSON, except the CV downloads, which return the PDF. A CV is sent as `multipart/form-data`, in a `cv` field. The details of the fields, codes and messages are in [`docs/contrat_api.md`](docs/contrat_api.md) (in French).
 
-Accès : **public** (sans connexion), **connecté** (session ouverte), **recruteur** (connecté et rattaché à une entreprise), **admin** (compte de rôle `admin`).
+Access: **public** (no login), **logged in** (open session), **recruiter** (logged in and attached to a company), **admin** (account with the `admin` role).
 
-| Méthode | Route | Accès | Fonction | Codes |
+| Method | Route | Access | Purpose | Codes |
 | --- | --- | --- | --- | --- |
-| GET | `/api/ads` | public | Lister les annonces ouvertes, avec filtres et pagination facultatifs | 200, 400 |
-| GET | `/api/ads/<id>` | public | Obtenir le détail d’une annonce (même fermée) | 200, 404 |
-| GET | `/api/companies/<id>/ads` | public | Lister les annonces ouvertes d’une entreprise | 200, 404 |
-| GET | `/api/categories` | public | Lister les catégories | 200 |
-| POST | `/api/ads/<id>/applications` | public | Enregistrer une candidature, avec ou sans compte, avec un CV facultatif (fichier envoyé ou, connecté, CV du profil) | 201, 400, 401, 404, 409 |
-| POST | `/api/auth/register` | public | Créer un compte (ouvre la session) | 201, 202, 400, 409 |
-| POST | `/api/auth/verify` | public | Confirmer l'adresse d'une inscription en attente | 200, 400, 409 |
-| POST | `/api/auth/login` | public | Se connecter (ouvre la session) | 200, 400, 401, 429 |
-| POST | `/api/auth/logout` | public | Se déconnecter | 204 |
-| GET, PATCH | `/api/auth/me` | connecté | Lire ou modifier son compte (sauf l'adresse e-mail) | 200, 400, 401, 409 |
-| POST | `/api/auth/email-change` | connecté | Demander à changer son adresse e-mail (lien envoyé à la nouvelle adresse) | 202, 400, 401, 409 |
-| POST | `/api/auth/email-change/confirm` | public | Confirmer la nouvelle adresse avec le jeton du lien | 200, 400, 409 |
-| GET | `/api/me/applications` | connecté | Lister ses candidatures | 200, 401 |
-| GET | `/api/me/cv` | connecté | Lire le nom et la date du CV de son profil | 200, 401, 404 |
-| PUT | `/api/me/cv` | connecté | Enregistrer ou remplacer le CV de son profil | 200, 400, 401 |
-| DELETE | `/api/me/cv` | connecté | Supprimer le CV de son profil (les CV déjà joints restent) | 204, 401, 404 |
-| GET | `/api/me/cv/file` | connecté | Télécharger le CV de son profil | 200, 401, 404 |
-| GET, PATCH | `/api/recruiter/company` | recruteur | Lire ou modifier son entreprise (sauf le SIREN) | 200, 400, 401, 403 |
-| GET, POST | `/api/recruiter/ads` | recruteur | Lister les annonces de son entreprise ou en publier une | 200, 201, 400, 401, 403 |
-| PATCH | `/api/recruiter/ads/<id>` | recruteur | Modifier une annonce ouverte de son entreprise | 200, 400, 401, 403, 404, 409 |
-| DELETE | `/api/recruiter/ads/<id>` | recruteur | Supprimer une annonce de son entreprise qui n'a aucune candidature | 204, 401, 403, 404, 409 |
-| GET | `/api/recruiter/ads/<id>/applications` | recruteur | Lister les candidatures d'une annonce de son entreprise | 200, 401, 403, 404 |
-| GET | `/api/recruiter/ads/<id>/applications/<application_id>/cv` | recruteur | Télécharger le CV joint à une candidature | 200, 401, 403, 404 |
-| POST | `/api/recruiter/ads/<id>/closure` | recruteur | Clôturer une annonce de son entreprise, avec ou sans candidature retenue | 200, 400, 401, 403, 404, 409 |
-| POST | `/api/recruiter/ads/<id>/applications/<application_id>/rejection` | recruteur | Refuser une candidature sans clôturer l'annonce | 200, 401, 403, 404, 409 |
-| POST | `/api/ads` | admin | Créer une annonce | 201, 400, 401, 403 |
-| POST | `/api/ads/<id>/closure` | admin | Clôturer une annonce et désigner la candidature retenue | 200, 400, 401, 403, 404, 409 |
-| GET | `/api/admin/<table>` | admin | Lister les lignes d'une table, avec pagination | 200, 400, 401, 403, 404 |
-| GET | `/api/admin/<table>/<id>` | admin | Lire une ligne | 200, 401, 403, 404 |
-| POST | `/api/admin/<table>` | admin | Créer une ligne | 201, 400, 401, 403, 404, 409 |
-| PATCH | `/api/admin/<table>/<id>` | admin | Modifier une ligne | 200, 400, 401, 403, 404, 409 |
-| DELETE | `/api/admin/<table>/<id>` | admin | Supprimer une ligne | 204, 401, 403, 404, 409 |
+| GET | `/api/ads` | public | List the open job ads, with optional filters and pagination | 200, 400 |
+| GET | `/api/ads/<id>` | public | Get the details of a job ad (even a closed one) | 200, 404 |
+| GET | `/api/companies/<id>/ads` | public | List the open job ads of a company | 200, 404 |
+| GET | `/api/categories` | public | List the categories | 200 |
+| POST | `/api/ads/<id>/applications` | public | Record an application, with or without an account, with an optional CV (uploaded file or, when logged in, profile CV) | 201, 400, 401, 404, 409 |
+| POST | `/api/auth/register` | public | Create an account (opens the session) | 201, 202, 400, 409 |
+| POST | `/api/auth/verify` | public | Confirm the address of a pending registration | 200, 400, 409 |
+| POST | `/api/auth/login` | public | Log in (opens the session) | 200, 400, 401, 429 |
+| POST | `/api/auth/logout` | public | Log out | 204 |
+| GET, PATCH | `/api/auth/me` | logged in | Read or edit one's account (except the email address) | 200, 400, 401, 409 |
+| POST | `/api/auth/email-change` | logged in | Ask to change one's email address (link sent to the new address) | 202, 400, 401, 409 |
+| POST | `/api/auth/email-change/confirm` | public | Confirm the new address with the token of the link | 200, 400, 409 |
+| GET | `/api/me/applications` | logged in | List one's applications | 200, 401 |
+| GET | `/api/me/cv` | logged in | Read the name and date of one's profile CV | 200, 401, 404 |
+| PUT | `/api/me/cv` | logged in | Save or replace one's profile CV | 200, 400, 401 |
+| DELETE | `/api/me/cv` | logged in | Delete one's profile CV (the CVs already attached remain) | 204, 401, 404 |
+| GET | `/api/me/cv/file` | logged in | Download one's profile CV | 200, 401, 404 |
+| GET, PATCH | `/api/recruiter/company` | recruiter | Read or edit one's company (except the SIREN) | 200, 400, 401, 403 |
+| GET, POST | `/api/recruiter/ads` | recruiter | List the job ads of one's company or publish one | 200, 201, 400, 401, 403 |
+| PATCH | `/api/recruiter/ads/<id>` | recruiter | Edit an open job ad of one's company | 200, 400, 401, 403, 404, 409 |
+| DELETE | `/api/recruiter/ads/<id>` | recruiter | Delete a job ad of one's company that has no application | 204, 401, 403, 404, 409 |
+| GET | `/api/recruiter/ads/<id>/applications` | recruiter | List the applications to a job ad of one's company | 200, 401, 403, 404 |
+| GET | `/api/recruiter/ads/<id>/applications/<application_id>/cv` | recruiter | Download the CV attached to an application | 200, 401, 403, 404 |
+| POST | `/api/recruiter/ads/<id>/closure` | recruiter | Close a job ad of one's company, with or without a selected application | 200, 400, 401, 403, 404, 409 |
+| POST | `/api/recruiter/ads/<id>/applications/<application_id>/rejection` | recruiter | Reject an application without closing the job ad | 200, 401, 403, 404, 409 |
+| POST | `/api/ads` | admin | Create a job ad | 201, 400, 401, 403 |
+| POST | `/api/ads/<id>/closure` | admin | Close a job ad and name the selected application | 200, 400, 401, 403, 404, 409 |
+| GET | `/api/admin/<table>` | admin | List the rows of a table, with pagination | 200, 400, 401, 403, 404 |
+| GET | `/api/admin/<table>/<id>` | admin | Read a row | 200, 401, 403, 404 |
+| POST | `/api/admin/<table>` | admin | Create a row | 201, 400, 401, 403, 404, 409 |
+| PATCH | `/api/admin/<table>/<id>` | admin | Edit a row | 200, 400, 401, 403, 404, 409 |
+| DELETE | `/api/admin/<table>/<id>` | admin | Delete a row | 204, 401, 403, 404, 409 |
 
-Un recruteur est une personne connectée dont la fiche est rattachée à une entreprise : le serveur lit cette entreprise dans la base, jamais dans la requête.
+A recruiter is a logged-in person whose record is attached to a company: the server reads that company from the database, never from the request.
 
-Filtres de `GET /api/ads`, tous facultatifs et combinables : `q` (texte dans le titre ou la description courte), `category`, `contract_type` et `location` (valeurs exactes). Les annonces fermées n’apparaissent jamais dans les listes. Pagination : `page` et `per_page` (1 à 50) ; le nombre total de lignes est renvoyé dans l'en-tête `X-Total-Count`.
+Filters of `GET /api/ads`, all optional and combinable: `q` (text in the title or the short description), `category`, `contract_type` and `location` (exact values). Closed job ads never appear in the lists. Pagination: `page` and `per_page` (1 to 50); the total number of rows is returned in the `X-Total-Count` header.
 
-Les routes renvoient 200 en lecture, 201 à la création, 202 pour une inscription en attente de confirmation, 204 après une suppression, 400 pour une requête invalide, 401 sans connexion ou pour un identifiant incorrect, 403 sans le rôle administrateur ou, pour l'espace recruteur, sans entreprise rattachée, 404 pour une ressource inexistante, 409 pour un doublon ou une ligne encore référencée, et 429 après 5 échecs de connexion en 15 minutes pour le même e-mail (l'en-tête `Retry-After` donne l'attente en secondes). Les erreurs ont toujours la forme `{"error": "..."}`. Aucune réponse ne contient de mot de passe ni d'empreinte.
+The routes return 200 for a read, 201 for a creation, 202 for a registration waiting for confirmation, 204 after a deletion, 400 for an invalid request, 401 without a login or for wrong credentials, 403 without the administrator role or, for the recruiter area, without an attached company, 404 for a resource that does not exist, 409 for a duplicate or a row that is still referenced, and 429 after 5 login failures in 15 minutes for the same email (the `Retry-After` header gives the wait in seconds). Errors always have the form `{"error": "..."}`. No response contains a password or a hash.
 
-Les commandes et résultats des vérifications sont dans `backend/curl_tests.md` et `backend/tests/curl_auth.md`. Les tests automatiques de la limite de connexion se lancent depuis `backend/` avec `python -m unittest tests.test_login_limit -v`.
+The commands and results of the checks are in `backend/curl_tests.md` and `backend/tests/curl_auth.md`. The automated tests of the login limit are run from `backend/` with `python -m unittest tests.test_login_limit -v`.
 
 ## Pages
 
-Navigation sans rechargement de la page (React Router), avec une barre commune : la page active est marquée et le logo ramène à l'accueil. Le menu dépend de la personne : « Offres d'emploi » pour tous, « Connexion » pour un visiteur, « Espace recruteur », « Espace candidat » et « Se déconnecter » une fois connecté, « Administration » pour un administrateur. Sur mobile, il se replie derrière un bouton « Menu ». Le pied de page reprend la navigation et les mentions légales.
+Navigation without reloading the page (React Router), with a common bar: the active page is marked and the logo leads back to the home page. The menu depends on the person: "Job offers" for everyone, "Log in" for a visitor, "Recruiter area", "Candidate area" and "Log out" once logged in, "Admin" for an administrator. On mobile, it folds behind a "Menu" button. The footer repeats the navigation and holds the legal notice.
 
-| Adresse | Page |
+The interface is in French and in English: an "English" / "Français" button in the bar switches the language, and a `?lang=en` link opens the site in English. The labels quoted in this file are the English ones. The addresses of the pages are in French in both languages.
+
+| Address | Page |
 | --- | --- |
-| `/` | Accueil : barre de recherche et les deux offres les plus récentes |
-| `/offres` | Offres d'emploi : liste des annonces ouvertes, filtrée par la recherche de l'accueil |
-| `/login` | Connexion |
-| `/account` | Création de compte : la session s'ouvre dès la création, puis l'accueil s'affiche |
-| `/verification` | Confirmation de l'adresse, ouverte depuis le lien reçu par e-mail |
-| `/confirmation-email` | Confirmation d'une nouvelle adresse e-mail, ouverte depuis le lien reçu à cette adresse |
-| `/espace-candidat` | Espace candidat, onglet « Mes candidatures » |
-| `/espace-candidat/informations` | Espace candidat, onglet « Mes informations » : modification du compte ; l'adresse e-mail change par « Changer d'adresse », confirmée par un lien ; section « Mon CV » pour enregistrer, remplacer, télécharger ou supprimer son CV |
-| `/recruteur` | Espace recruteur, onglet « Vue d'ensemble » |
-| `/recruteur/entreprise` | Espace recruteur, onglet « Mon entreprise » : fiche de l'entreprise, SIREN en lecture seule |
-| `/recruteur/postes` | Espace recruteur, onglet « Mes postes » : annonces de l'entreprise |
-| `/recruteur/postes/:id/candidatures` | Candidatures reçues pour une annonce : télécharger le CV, retenir ou refuser un candidat, clôturer l'annonce |
-| `/recruteur/postes/:id/modifier` | Modification d'une annonce ouverte |
-| `/recruteur/nouvelle-offre` | Espace recruteur, onglet « Publier une offre » |
-| `/admin` | Administration : les cinq tables, avec création, modification, suppression et pagination |
-| autre adresse | Page introuvable |
+| `/` | Home: search bar and the two most recent job offers |
+| `/offres` | Job offers: list of the open job ads, filtered by the search of the home page |
+| `/login` | Log in |
+| `/account` | Account creation: the session opens as soon as the account is created, then the home page is shown |
+| `/verification` | Address confirmation, opened from the link received by email |
+| `/confirmation-email` | Confirmation of a new email address, opened from the link received at that address |
+| `/espace-candidat` | Candidate area, "My applications" tab |
+| `/espace-candidat/informations` | Candidate area, "My details" tab: account editing; the email address is changed with "Change email address", confirmed by a link; "My CV" section to save, replace, download or delete one's CV |
+| `/recruteur` | Recruiter area, "Overview" tab |
+| `/recruteur/entreprise` | Recruiter area, "My company" tab: company record, SIREN read-only |
+| `/recruteur/postes` | Recruiter area, "My positions" tab: job ads of the company |
+| `/recruteur/postes/:id/candidatures` | Applications received for a job ad: download the CV, select or reject a candidate, close the job ad |
+| `/recruteur/postes/:id/modifier` | Editing of an open job ad |
+| `/recruteur/nouvelle-offre` | Recruiter area, "Post a job offer" tab |
+| `/admin` | Admin: the five tables, with creation, editing, deletion and pagination |
+| any other address | Page not found |
 
-Toutes ces pages lisent et écrivent dans l'API. Les espaces candidat et recruteur demandent d'être connecté : un visiteur y trouve un lien vers la connexion. Sans entreprise rattachée, l'espace recruteur indique que l'administration doit rattacher le compte. L'administration est réservée aux administrateurs : sinon, la page affiche un message sans rien demander à l'API.
+All these pages read and write through the API. The candidate and recruiter areas require a login: a visitor finds a link to the login page there. Without an attached company, the recruiter area says that the administration must attach the account. The admin page is reserved for administrators: otherwise, the page shows a message without asking the API for anything.
 
-Sur chaque annonce, le bouton « En savoir plus » affiche dans la carte toutes les informations de l’annonce, sans fenêtre modale ; un message signale le chargement ou l’échec d’une requête. Le bouton « Postuler » ouvre sous l’annonce le formulaire de candidature, avec ou sans compte ; on peut y joindre un CV en PDF, et une personne connectée qui a enregistré un CV le voit proposé par défaut. Les textes de l’interface sont en français.
+On each job ad, a click on its title shows all the information of the ad in the card, without a modal window; a message reports the loading or the failure of a request. The "Apply" button opens the application form under the job ad, with or without an account; a PDF CV can be attached, and a logged-in person who has saved a CV sees it offered by default.
 
-## Limites connues
+## Known limits
 
-- **Pas de protection CSRF.** Le cookie de session est `SameSite=Lax`, ce qui bloque l'envoi du cookie par la plupart des requêtes venues d'un autre site, mais aucun jeton CSRF n'est vérifié par l'API.
-- **Le salaire n'est pas contrôlé par l'API.** `POST` et `PATCH` acceptent une valeur non numérique (par exemple `"abc"`) ; seul le formulaire du site impose un nombre.
-- **Le mode démo ouvre toutes les sessions sans mot de passe.** Avec `DEMO_MODE=1`, n'importe qui peut devenir administrateur par `/api/demo/login?role=admin` et modifier les données ; c'est voulu pour la démonstration, et la base repart des données de démonstration à chaque redémarrage du service. Ce mode ne doit jamais être activé sur un site réel.
-- **Pas de bouton de clôture dans la page d'administration.** L'administrateur peut clôturer une annonce par l'API (`POST /api/ads/<id>/closure`), mais la page admin ne le propose pas ; dans le site, seul le recruteur clôture ses annonces.
+- **No CSRF protection.** The session cookie is `SameSite=Lax`, which blocks the cookie from being sent by most requests coming from another site, but no CSRF token is checked by the API.
+- **The salary is not checked by the API.** `POST` and `PATCH` accept a non-numeric value (for example `"abc"`); only the form of the site requires a number.
+- **The demo mode opens every session without a password.** With `DEMO_MODE=1`, anyone can become administrator through `/api/demo/login?role=admin` and change the data; this is intended for the demonstration, and the database starts again from the demo data at each restart of the service. This mode must never be turned on for a real site.
+- **No closure button in the admin page.** The administrator can close a job ad through the API (`POST /api/ads/<id>/closure`), but the admin page does not offer it; in the site, only the recruiter closes their job ads.

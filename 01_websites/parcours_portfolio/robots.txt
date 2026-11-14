@@ -2,4 +2,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://axel-follet.github.io/parcours_portfolio/sitemap.xml
+Sitemap: https://axel-follet.github.io/my_website/sitemap.xml
