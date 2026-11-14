@@ -14,7 +14,7 @@
     <base href="/my_website/">
     <!--
         Fallback for the other ways of opening the page: the base becomes the address up to and including the site folder,
-        "/my_website/" (published name) or "/parcours_portfolio/" (name of the working folder on the disk),
+        "/my_website/" (name of the repository on GitHub and of the working folder on the disk),
         wherever that folder is in the address (server started in a parent folder, file opened from the disk),
         or "/" without that folder (server started in the site folder, http://localhost:8080/404.html).
         The script runs before the rest of <head>: the links that follow are read with this base.
@@ -23,10 +23,9 @@
     <script>
         {
             const base = document.querySelector("base");
-            const folders = ["/my_website/", "/parcours_portfolio/"];
+            const folder = "/my_website/";
             const path = location.pathname;
-            const folder = folders.find(name => path.includes(name));
-            const href = folder ? path.slice(0, path.indexOf(folder) + folder.length) : "/";
+            const href = path.includes(folder) ? path.slice(0, path.indexOf(folder) + folder.length) : "/";
             if (href !== base.getAttribute("href")) base.setAttribute("href", href);
         }
     </script>

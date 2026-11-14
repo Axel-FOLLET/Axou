@@ -11,8 +11,7 @@ Code and comments are in English. Folder names and the text shown to users are m
 | Folder | Project |
 | --- | --- |
 | [`jobBoard/`](01_websites/jobBoard/) | **Y.I.A Jobs**, a job board built with React, Flask and SQLite. Epitech project by a team of three, which I led. Its [README](01_websites/jobBoard/README.md) explains how to install and run it. |
-| [`parcours_portfolio/`](01_websites/parcours_portfolio/) | **Resume & Portfolio**, my resume website and my portfolio brought together in a single site, with no framework. This is the site published at the address above, from its own repository, [my_website](https://github.com/Axel-FOLLET/my_website). See its [README](01_websites/parcours_portfolio/README.md). |
-| [`portfolio/`](01_websites/portfolio/) and [`website_resume/`](01_websites/website_resume/) | My two earlier sites, a portfolio and a resume website, replaced by Resume & Portfolio. |
+| [`my_website/`](01_websites/my_website/) | **Resume & Portfolio**, my resume website and my portfolio brought together in a single site, with no framework. This is the site published at the address above, from its own repository, [my_website](https://github.com/Axel-FOLLET/my_website). See its [README](01_websites/my_website/README.md). |
 
 ## Games — `02_games/`
 
