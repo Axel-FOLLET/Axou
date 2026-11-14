@@ -8,24 +8,25 @@ import { BOSS } from './combat.js';
 import { Wizard } from './Wizard.js';
 import { Crossing } from './Crossing.js';
 import { CHAVALANCHE } from './Chavalanche.js';
-import { VEIL_CSS, OPENING, SHOT, HUG, TALK, MOVING, REFRAME, SKIP_DIST, LOSS } from './story/tuning.js';
+import { VEIL_CSS, OPENING, SHOT, TALK, MOVING, REFRAME, SKIP_DIST, LOSS } from './story/tuning.js';
 import { dialogueScenes } from './story/dialogue.js';
 import { openingScene } from './story/opening.js';
 import { endingScene } from './story/ending.js';
 import { fightDirection } from './story/fight.js';
-import { swordPullScene } from './story/swordPull.js';
+import { swordCutscene } from './story/swordCutscene.js';
 import { victoryScene } from './story/victory.js';
 import { mixin } from '../mixin.js';
 
 /**
  * Story flow of Lost, created by main.js. Steps (`story.step`):
- * - 'title' at load (main.js: title screen, name field). The play button unlocks audio and starts the opening.
- * - 'opening': fixed tight shot with black bars (Letterbox.js). Maman enters from the left of the screen with the
- *   kitten (scale 1) hanging from her mouth, stops, lowers her head and releases it on contact with the ground, asleep
- *   (it does not get up), raises her head, turns around, leaves by the left and disappears. The kitten sleeps for a
- *   moment, wakes by itself (Wake), looks around, sits and yawns (Yawn). The shot widens, then 'chagicien' (minimap shown,
- *   control returned, bars removed softly). Clicks are ignored during the whole opening (transparent veil), the minimap
- *   is hidden and there is no text.
+ * - 'title' at load (main.js: title screen, name field). Behind it, the scene of the opening, frozen: the kitten asleep among the
+ *   scattered armour pieces (the first image of the game once the arrival cutscene is over). The play button unlocks audio and
+ *   starts the arrival cutscene.
+ * - 'arrival': cutscene 1 (video, CutscenePlayer), silence (soundtrack.js). A skip button shows from the second playthrough.
+ * - 'opening': fixed tight shot with black bars (Letterbox.js). The kitten lies asleep on the ground (`OPENING.drop`) among the
+ *   armour pieces, Maman already at the summit. It sleeps for a moment, wakes by itself (Wake), looks around, sits and yawns
+ *   (Yawn). The shot widens, then 'chagicien' (minimap shown, control returned, bars removed softly). Clicks are ignored during
+ *   the whole opening (transparent veil), the minimap is hidden and there is no text.
  * - 'wakeup': test access only (`skipTo('wakeup')`: wakes on the ground), then 'chagicien'.
  * - 'chagicien', 'chartiste', 'maman': NPCs to find (minimap: ruins, forest, Maman). Speech bubble on clicking the NPC or
  *   on approach (TALK.approach); the end of the bubble moves to the next step. A second visit to the Chartiste before
@@ -35,29 +36,27 @@ import { mixin } from '../mixin.js';
  *   the goal back to Maman (step 'maman'). Maman also responds at this step: the Chavalanche is never a gate to pass.
  * - 'combat': arena built around the Chartiste (World.enterArena), transformation into a red boss (Npc.startBoss), life
  *   bar shown. Control is then returned with a farther camera. Damage (combat.js, Duel), sword in the stone that can be
- *   taken during combat (`pickSword`, sword-pull cinematic, src/world/Sword.js) and full victory (`_victory`, VICTORY):
+ *   taken during combat (`pickSword`: cutscene 2 (video), the stone is left split and the kitten holds the sword,
+ *   src/world/Sword.js) and full victory (`_victory`, VICTORY):
  *   Defeat, back to ginger and small, dissolve, sword dropped, arena undone, then 'maman'. Any step skip (`skipTo`), replay
  *   or title screen restores the out-of-combat state (`_endCombat`) and the sword in its stone (`_resetVictory`). Music:
  *   `onMusicCue` (see `_cue`).
- * - 'hug': the kitten curls up against Maman's belly (Npc.startHug, hugSpot) and falls asleep, camera on the belly side;
- *   two purrs (main.js, onStep), then 'end' (end screen).
+ * - 'hug': the kitten curls up against Maman's belly (Npc.startHug, hugSpot) and falls asleep, camera on the belly side, under
+ *   cutscene 3 (video, music unchanged, two purrs: main.js, onStep); at its end, 'end' (end screen).
  * - 'free' (stay button: minimap towards Maman) or 'title' (quit button: title screen, kitten name asked again, then the
- *   play button restarts the opening).
+ *   play button restarts the arrival cutscene).
  *
  * During a speech bubble the cat no longer moves (Brain.setHold), the camera frames both cats with their heads above the
  * bubble and each meows in turn (`_meowPage`). On closing, the camera returns softly to the game shot from before the
  * bubble (`_back`).
  *
  * `update(dt)`: every frame BEFORE `npc.update` and `cat.update` (Maman moves, the kitten follows her mouth). Without NPCs
- * (`?npc=0`): no opening, step 'free', minimap shown without a goal.
+ * (`?npc=0`): no opening and no cutscene, step 'free', minimap shown without a goal.
  *
  * The class is split by scene: each file of `story/` adds its methods through the `mixin` call at the end of this file.
  */
 
 const _v = new THREE.Vector3();
-const _frustum = new THREE.Frustum();
-const _pv = new THREE.Matrix4();
-const _sphere = new THREE.Sphere();
 
 export class Story {
   /**
@@ -72,21 +71,22 @@ export class Story {
    * @param {object} [o.catBar] BossBar.js, `cat` variant: kitten's bar; absent: no bar.
    * @param {object} [o.sword] Sword.js (sword in the stone); absent: no sword.
    * @param {object} [o.dissolve] Dissolve.js (dissolve of the defeated boss); absent: body hidden.
+   * @param {object} [o.cutscene] CutscenePlayer.js; absent: the cutscenes are skipped.
    */
-  constructor({ world, cat, npcs, minimap, endScreen, places, bossBar = null, catBar = null, sword = null, dissolve = null }) {
+  constructor({ world, cat, npcs, minimap, endScreen, places, bossBar = null, catBar = null, sword = null, dissolve = null, cutscene = null }) {
     this.world = world;
     this.cat = cat;
     this.npcs = npcs;
     this.minimap = minimap;
     this.end = endScreen;
+    this.cutscene = cutscene;
     this.places = places;
     this.bubble = new Bubble();
     this.step = '';
     this.met = { chagicien: false, chartiste: false, maman: false, boss: false, chavalanche: false };
     this.chavalanche = null; // Chavalanche.js (main.js): follows the kitten on the mountain, helps on request
     this.onStep = null; // (step) => void
-    this._open = null;  // opening in progress: { phase, t, … }
-    this._hugT = 0;
+    this._open = null;  // opening in progress (from the arrival cutscene on): { phase, t, … }
     this._talking = null; // NPC whose speech bubble is open
     this._cam = null;     // current shot (see SHOT, _shot)
     this._pin = null;     // point followed by the camera during the opening (fixed shot), otherwise null
@@ -94,7 +94,6 @@ export class Story {
     this._gameOff = null; // camera-to-target offset of the game shot, kept when a bubble opens
     this._back = 0;       // s remaining of the camera return after a bubble
     this._meowN = 0;      // meows of the conversation (variant)
-    this.lastDrop = null; // last release of the kitten { t, gap, k, fallback } (for tests)
     this._shake = null;   // shake in progress before the hug: { t, dur, dropped }
     this.lastHelmetDrop = null; // last helmet detachment { t, clipTime, side } (for tests)
     this.bars = new Letterbox();
@@ -116,11 +115,9 @@ export class Story {
     // Sword and victory.
     this.sword = sword;
     this.dissolve = dissolve;
-    this._pull = null;      // sword pull in progress: { phase: 'walk' | 'pull', t } or null
-    this.timeScale = 1;     // slow motion of the pull (SWORD.slow): main.js multiplies dt by this value
+    this._swordScene = false; // cutscene 2 (sword) in progress, duel paused
     this.onMusicCue = null; // (name) => void: music hook, see `_cue`
     this.lastCue = null;    // last music cue (for tests)
-    this.lastPull = null;   // last sword pull { walk, clip, slowMin } (for tests)
     this._chartisteObstacle = [];  // Chartiste's obstacles removed after his dissolve (restored by _resetVictory)
     if (sword) sword.canTake = () => this.swordTakeable;
 
@@ -151,25 +148,47 @@ export class Story {
   get hasNpcs() { return !!(this.npcs.chagicien && this.npcs.chartiste && this.npcs.maman); }
 
   /**
-   * Title screen, at load and after the quit button: the scene behind it is the first shot of the opening, frozen (Maman
-   * and kitten still off screen, no bars: they come with the play button), so the kitten does not play freely before being
-   * carried in. The play button restarts the opening (onReplay).
+   * Title screen, at load and after the quit button: the scene behind it is the opening, frozen (kitten asleep among the
+   * armour pieces, no bars: they come after the arrival cutscene), the very image the game shows once the cutscene is over.
+   * The play button starts the arrival cutscene (onReplay).
    */
   showTitle() {
-    this.start();
+    this._resetRun();
+    this._setUpOpening();
     this.bars.hide(0);
     this._setStep('title');
     this.end.showTitle(); // name field emptied: the name is asked again on every run
     this.minimap.setVisible(false);
   }
 
-  /** Starts (or restarts) the opening. */
+  /** New game (play button): arrival cutscene, then the opening. */
   start() {
+    this._resetRun();
+    if (!this.hasNpcs) { this._setStep('free'); this.minimap.setTarget(null); this.minimap.setVisible(true); return; }
+    this._setUpOpening();
+    this._open.phase = 'video';
+    this.bars.hide(0);
+    this._setStep('arrival');
+    this._playCutscene('arrival', () => this._beginOpening());
+  }
+
+  /**
+   * Plays a cutscene (CutscenePlayer), then calls `then`. `then` is not called if the cutscene was cancelled: the story state
+   * was reset under it (`_resetRun`, `skipTo`). Without a player the cutscene is skipped.
+   */
+  _playCutscene(name, then) {
+    const played = this.cutscene ? this.cutscene.play(name) : Promise.resolve('ended');
+    played.then((outcome) => { if (outcome !== 'cancelled') then(); });
+  }
+
+  /** Everything a new game starts from, shared by the title screen and the play button: the world is back to its first state. */
+  _resetRun() {
+    this.cutscene?.cancel();
     this.crossing.reset();
     this._resetChallenge(); // challenge bubble or defeat in progress: abandoned, music restored
     this._endCombat(); // replay or quit (showTitle): arena and boss removed
     this._resetVictory(); // sword in its stone, Chartiste back
-    this.world.syncZone(OPENING.drop.x); // the run starts in the meadow, wherever the cat comes from
+    this.world.syncZone(OPENING.drop.x); // the opening starts in the meadow, wherever the cat comes from
     this.end.hide();
     this.bubble.close();
     this._talking = null;
@@ -181,38 +200,6 @@ export class Story {
     this.met = { chagicien: false, chartiste: false, maman: false, boss: false, chavalanche: false };
     this.chavalanche?.reset(); // seated at the foot of the mountain, no following or protection
     this._syncProgress(); // gate closed, Chagicien at the ruins, no animation
-    if (!this.hasNpcs) { this._setStep('free'); this.minimap.setTarget(null); this.minimap.setVisible(true); return; }
-    const m = this.npcs.maman, cat = this.cat, O = OPENING;
-    const ll = Math.hypot(O.look.x, O.look.z), lx = O.look.x / ll, lz = O.look.z / ll;
-    // Screen right (rx, rz) = (−lz, lx); Maman starts on the left and walks right.
-    const rx = -lz, rz = lx;
-    const sx = O.drop.x - rx * O.arrive, sz = O.drop.z - rz * O.arrive;
-    const yaw = Math.atan2(rx, rz);
-    // Any hug still running ends (quit via showTitle, play, skipTo('opening')), as in _stay and skipTo: `_hug` back to null,
-    // eyes open, rest pose before carrying.
-    m.endHug();
-    this._placeNpcs();
-    // Maman carries the kitten in the meadow during the opening: at the scene root, visible in this zone, until
-    // `_placeMamanAtSummit`. Her rest pose is in zone 2.
-    this.world.scene.add(m.root);
-    m.setVisible(true);
-    m.setPosition(sx, this._ground(sx, sz), sz, yaw);
-    m.startCarry(0);
-    m.update(0, this.world.camera);
-    cat.carry(null);
-    cat.lookOverride = null;
-    cat.carry(m); // brain in the 'carried' scene
-    this._open = { phase: 'walk', t: 0, yaw, lx, lz, rx, rz };
-    this.lastDrop = null;
-    this.veil.className = 'lost-veil on';
-    this.bars.show();
-    this.minimap.setVisible(false);
-    // Fixed shot: the camera follows `_pin` (main.js, followPoint), gaze `look`, no glide.
-    const fx = O.drop.x + rx * O.focus.right + lx * O.focus.ahead, fz = O.drop.z + rz * O.focus.right + lz * O.focus.ahead;
-    this._pin = new THREE.Vector3(fx, this._ground(fx, fz), fz);
-    this._snapCamera(fx, fz);
-    this._shot(lx, lz, this._closeShot(), true);
-    this._setStep('opening');
   }
 
   /** Point followed by the camera (main.js → world.update): `_pin` during the opening, otherwise null (the cat). */
@@ -222,7 +209,8 @@ export class Story {
   _closeShot() {
     const c = SHOT.close, cam = this.world.camera;
     const tanX = Math.tan(THREE.MathUtils.degToRad(cam.fov) / 2) * cam.aspect;
-    return { ...c, dist: Math.max(c.dist, c.halfWidth / tanX) };
+    const dist = Math.max(c.dist, c.halfWidth / tanX);
+    return { ...c, dist, height: c.height * dist / c.dist }; // same pitch when backed off: the camera clears the tall grass
   }
 
   /** Every frame, before npc.update and cat.update. */
@@ -230,10 +218,10 @@ export class Story {
     if (this._open && this.step !== 'title') this._updateOpening(dt); // frozen behind the title screen
     if (this._combat) this._updateCombat(dt); // before the glide: shot of this frame
     if (this._cam) this._applyShot(dt, false);
-    // Held shots of the run and the victory: the glide lets nothing leave the frame.
-    const kept = this._combat?.phase === 'victory' ? this._combat.v?.hold : this._pull?.hold;
+    // Held shot of the victory: the glide lets nothing leave the frame.
+    const kept = this._combat?.phase === 'victory' ? this._combat.v?.hold : null;
     if (kept) this._holdFrame(kept, dt);
-    const fit = this._combat?.phase === 'fight' && !this._pull; // sword-pull close-up kept
+    const fit = this._combat?.phase === 'fight';
     if (fit) this._fitFight(dt);
     if (this._combat && this.world.inArena) this._keepInArena();
     if (fit) this._markFight();
@@ -243,9 +231,6 @@ export class Story {
     if (s === 'wakeup') {
       const st = this.cat.brain.state;
       if (st !== 'wake' && st !== 'sleep') this._goal('chagicien');
-    } else if (s === 'hug') {
-      this._hugT += dt;
-      if (this._hugT >= HUG.hold) this._finish();
     }
     if (this._shake) this._updateShake(dt);
     if (!this.world.inMountain) this.wizard?.update(dt); // frozen in zone 2, resumed on return
@@ -285,11 +270,20 @@ export class Story {
 
   /**
    * Test access: jumps to a step. 'chagicien' | 'chartiste' | 'maman': cat placed SKIP_DIST m from the NPC, on the origin
-   * side. 'end': hug and end screen at once.
+   * side. 'end': hug and end screen at once, no cutscene. 'arrival': new game, from the cutscene; 'opening': new game, from the
+   * kitten asleep (no cutscene).
    */
   skipTo(step) {
-    if (step === 'opening') { this.start(); return this.step; }
+    if (step === 'arrival') { this.start(); return this.step; }
+    if (step === 'opening') {
+      this._resetRun();
+      if (!this.hasNpcs) return this.step;
+      this._setUpOpening();
+      this._beginOpening();
+      return this.step;
+    }
     if (!this.hasNpcs) return this.step;
+    this.cutscene?.cancel();
     this.crossing.reset();
     this._resetChallenge(); // challenge bubble or defeat in progress: abandoned, no ghost state
     this._endCombat(); // any skip: arena, boss, bar, camera and shadow restored
@@ -332,7 +326,7 @@ export class Story {
       const [mx, mz] = this.places.maman;
       this._placeCat(mx - SKIP_DIST, mz, Math.PI / 2); // at the summit first: the helmet falls up there
       this.cat.root.updateMatrixWorld(true);
-      this._dropHelmet(); this._startHug(); this._finish();
+      this._dropHelmet(); this._setUpHug(); this._finish();
       return this.step;
     }
     // 'combat': as after the first bubble of the Chartiste (step 'maman'), cat placed SKIP_DIST m from him, then the sequence
@@ -350,8 +344,6 @@ export class Story {
     this._goal(step);
     return this.step;
   }
-
-  // ------------------------------------------------------------------ opening
 
   // ------------------------------------------------------------------ steps
 
@@ -402,10 +394,6 @@ export class Story {
 
   _veilAlpha(a) { this.veil.style.background = a > 0 ? `rgba(${LOSS.color}, ${a.toFixed(3)})` : ''; }
 
-  // ------------------------------------------------------------------ sword
-
-  // ------------------------------------------------------------------ victory
-
   /** Combat in progress (phase 'fight') or null: `__combat.duel`, main.js (dodge). */
   get duel() { return this._duel ?? null; }
 
@@ -430,9 +418,7 @@ export class Story {
       losses: this.losses, lastLoss: this.lastLoss, cueLog: this.cueLog.map((e) => e.cue),
       shadow: w.sun.shadow.camera.right, shot: this.lastCombatShot ?? null,
       duel: this._duel?.state ?? null, lastDuel: this.lastDuel ?? null,
-      sword: this.sword?.info ?? null, catSword: !!this.cat.sword, takeable: this.swordTakeable,
-      pull: this._pull ? { ...this._pull, clip: Math.round((this.cat.actions.SwordPull?.time ?? 0) * 100) / 100 } : null,
-      lastPull: this.lastPull, timeScale: Math.round(this.timeScale * 100) / 100,
+      sword: this.sword?.info ?? null, catSword: !!this.cat.sword, takeable: this.swordTakeable, swordScene: !!this._swordScene,
       victory: c?.v ?? null, lastVictory: this.lastVictory ?? null, lastCue: this.lastCue,
       dissolve: this.dissolve?.state ?? null, chartisteVisible: boss ? boss.root.visible : null,
     };
@@ -474,7 +460,6 @@ export class Story {
   /** Places the cat (root on the ground, heading) and recentres the camera on it with no glide (`snap` false: camera left alone). */
   _placeCat(x, z, yaw, snap = true) {
     const cat = this.cat;
-    if (cat.carrier) cat.carry(null);
     this.world.syncZone(x); // whoever calls: the world follows the cat's position
     cat.root.position.set(x, this._ground(x, z), z);
     cat.root.rotation.y = yaw;
@@ -493,16 +478,6 @@ export class Story {
     w.camera.position.add(delta);
     w.controls.update();
   }
-
-  _inView(npc) {
-    const cam = this.world.camera;
-    cam.updateMatrixWorld();
-    _pv.multiplyMatrices(cam.projectionMatrix, cam.matrixWorldInverse);
-    _frustum.setFromProjectionMatrix(_pv);
-    _sphere.center.copy(npc.root.position).y += 0.3;
-    _sphere.radius = 0.7;
-    return _frustum.intersectsSphere(_sphere);
-  }
 }
 
-mixin(Story, dialogueScenes, openingScene, endingScene, fightDirection, swordPullScene, victoryScene);
+mixin(Story, dialogueScenes, openingScene, endingScene, fightDirection, swordCutscene, victoryScene);

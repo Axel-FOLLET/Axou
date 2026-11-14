@@ -5,7 +5,7 @@ import {
 } from './Accessories.js';
 import {
   HAT_SINK, HAT_EAR_FOLD, NPC_SCALE, HAT_BRIM, GLASSES_GUARD, HAT_GUARD, SCARF_UPRIGHT, SCARF_RAISE, SCARF_FUR,
-  SCARF_TOP, SCARF_SAG, SCARF_KNOT, SCARF_TAILS,
+  SCARF_TOP, SCARF_SAG, SCARF_KNOT, SCARF_TAILS, EASEL_TURN, EASEL_FORWARD,
 } from './npcTuning.js';
 import { setWorldQuaternion } from './npcBones.js';
 
@@ -49,10 +49,10 @@ export const accessoryFit = {
       add(buildBeret({ crown, scale: s }), head);
       const scarf = this._scarf();
       if (scarf) this._scarfMesh = add(scarf, this.rig.neck[1] ?? this.rig.neck[0] ?? head);
-      // Easel beside the cat on its right (−X), canvas facing forward like it (a player arriving from the front sees
-      // the picture); palette on the ground in front of the canvas.
-      const pos = new THREE.Vector3(-0.42 * s, 0, 0.1 * s);
-      const m = new THREE.Matrix4().compose(pos, new THREE.Quaternion().setFromEuler(new THREE.Euler(0, Math.PI, 0)), new THREE.Vector3(s, s, s));
+      // Easel beside the cat on its right (−X), canvas turned by EASEL_TURN from straight ahead toward the cat's left,
+      // where the player arrives (the picture shows in the dialogue shot); palette on the ground in front of the canvas.
+      const pos = new THREE.Vector3(-0.42 * s, 0, EASEL_FORWARD * s);
+      const m = new THREE.Matrix4().compose(pos, new THREE.Quaternion().setFromEuler(new THREE.Euler(0, Math.PI + EASEL_TURN, 0)), new THREE.Vector3(s, s, s));
       const easel = buildEaselGroup(m, new THREE.Vector3(-0.12, 0, -0.28));
       this._easel = easel;
       add(easel.mesh, this.root);

@@ -3,8 +3,9 @@
  *   node tools/check/playthrough.mjs
  *
  * Starts the Vite dev server, opens the game in a headless Chromium and plays one fight through the debug
- * handles: title screen, boss music, arena, march at half boss health, victory. Fails on an uncaught
- * exception, a console error, a missing file or a wrong game state. Audio is checked as state only.
+ * handles: title screen, arrival cutscene, boss music, arena, sword cutscene, march at half boss health, victory, hug
+ * cutscene. Fails on an uncaught exception, a console error (a video that cannot be loaded or played logs one), a missing
+ * file or a wrong game state. Audio is checked as state only.
  *
  * No extra dependency: the browser is driven over the DevTools protocol with Node's built-in WebSocket.
  * Browser lookup: CHROME_PATH, then the Playwright cache, then PATH. Exit code 2 means no browser was found.
@@ -141,6 +142,11 @@ async function play(page) {
   await page.waitFor('audio running', () => window.__music.state.context === 'running');
   expect('title screen leads to the game', true);
 
+  const arrival = await page.run(() => ({ step: window.__story.step, cut: window.__cutscene.state, track: window.__music.state.track }));
+  expect('play button starts the arrival cutscene in silence', arrival.step === 'arrival' && arrival.cut.name === 'arrival' && arrival.track === null, arrival);
+  await page.waitFor('arrival video playing', () => window.__cutscene.state.time > 0, 60_000);
+  expect('arrival video plays', true);
+
   await page.run(() => window.__story.skipTo('combat'));
   await page.waitFor('duel started', () => !!window.__combat.duel, 45_000);
   const fight = await page.run(() => {
@@ -152,11 +158,20 @@ async function play(page) {
   expect('arena holds only the floor and the night', fight.arena.join() === 'Arena_disk,Arena_night', fight);
   expect('a combat frame renders without WebGL error', fight.glError === 0, fight);
 
-  const march = await page.run(async () => {
-    const c = window.__combat;
-    c.setHp(c.duel.maxHp * 0.49);
-    await new Promise((r) => setTimeout(r, 500));
-    return { wanted: window.__music.state.wanted, march: window.__music.state.march };
+  await page.waitFor('sword can be taken', () => window.__story.swordTakeable, 45_000);
+  await page.run(() => window.__sword.take());
+  const cut2 = await page.run(() => ({ cut: window.__cutscene.state, paused: window.__combat.duel.paused, track: window.__music.state.track }));
+  expect('clicking the sword starts cutscene 2, duel paused, boss music goes on', cut2.cut.name === 'sword' && cut2.paused && cut2.track === 'boss', cut2);
+  await page.run(() => window.__cutscene.end());
+  const held = await page.run(() => ({ sword: window.__sword.info, catSword: !!window.__cat.sword, paused: window.__combat.duel.paused, cut: window.__cutscene.state }));
+  expect('after cutscene 2 the stone is split, the kitten holds the sword, the duel resumes', held.sword.split && held.sword.state === 'held' && held.catSword && !held.paused && !held.cut.active, held);
+
+  // The march is decided on a game frame: wait for it instead of a fixed delay (a loaded machine can take over 500 ms per frame).
+  await page.run(() => window.__combat.setHp(window.__combat.duel.maxHp * 0.49));
+  await page.waitFor('march music', () => window.__music.state.march, 20_000).catch(() => {});
+  const march = await page.run(() => {
+    const m = window.__music.state;
+    return { wanted: m.wanted, march: m.march, armed: m.armed, fraction: m.bossFraction };
   });
   expect('march starts at half boss health', march.march && march.wanted === 'bossMarch', march);
 
@@ -164,6 +179,13 @@ async function play(page) {
   await page.waitFor('victory cue', () => window.__story.lastCue === 'victory', 20_000);
   await page.waitFor('meadow music is back', () => window.__music.state.track === 'meadow', 20_000);
   expect('victory returns to the meadow music', true);
+
+  await page.run(() => { window.__story.skipTo('maman'); window.__story._startHug(); });
+  const hug = await page.run(() => ({ step: window.__story.step, cut: window.__cutscene.state }));
+  expect('the hug plays as cutscene 3', hug.step === 'hug' && hug.cut.name === 'hug', hug);
+  await page.run(() => window.__cutscene.end());
+  const end = await page.run(() => ({ step: window.__story.step, screen: window.__endScreen.mode }));
+  expect('the end screen follows cutscene 3', end.step === 'end' && end.screen === 'end', end);
 }
 
 async function main() {

@@ -1,0 +1,1189 @@
+/*
+    Styles of the My portfolio page (pages/fr/portfolio.html, pages/en/portfolio.html).
+    Taken from the former portfolio: opening gap (.hero, shared in components/hero.css), AI method (career.css), project wheel and demos (projects.css),
+    adaptations of these blocks to narrow screens (responsive.css).
+    No colour here: only the variables of tokens.css (portfolio theme: --accent-card, --accent-text…).
+    The tags (.tag) are in components/tags.css, the demo fields in components/form.css,
+    the animations in components/motion.css and components/scroll.css.
+*/
+
+
+/* -------------------- OPENING -------------------- */
+
+/*
+    The shared opening is in components/hero.css. Gap specific to My portfolio:
+    the title keeps the shared size of the main titles (--text-h1); if it wraps onto two lines,
+    they stay of similar length (balance) and no wider than 16 characters.
+*/
+.hero__title {
+    max-width: 16ch;
+
+    text-wrap: balance;
+}
+
+
+/* -------------------- AI METHOD -------------------- */
+
+/*
+    A section of its own (anchor #method): the block no longer closes the progression,
+    so it has neither a rule nor a margin above it.
+*/
+.method__title {
+    max-width: 20ch;
+
+    margin: 0 0 28px;
+
+    font-family: var(--font-display);
+    font-size: calc(clamp(1.75rem, 4.5vw, 3.25rem) * 1.15);
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: -0.01em;
+
+    text-wrap: balance;
+}
+
+
+/* Names of the two agents in the accent colour readable on near black (contrast 5.6; threshold for large titles: 3) */
+.method__accent {
+    color: var(--accent-text);
+}
+
+
+/* Six practices in a grid: three columns on desktop, one on phones */
+.method__list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+
+    gap: 40px 48px;
+
+    margin: 0;
+    padding: 0;
+
+    list-style: none;
+}
+
+
+/* The small cube on the left, the name and the text on its right */
+.method__item {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    /* The height of the cube goes to the line of the text, not to that of the name */
+    grid-template-rows: auto 1fr;
+    align-items: start;
+
+    column-gap: 18px;
+
+    padding-top: 20px;
+
+    border-top: 1px solid var(--line);
+}
+
+
+.method__item .cube {
+    grid-row: span 2;
+
+    margin-top: 2px;
+}
+
+
+.method__name {
+    margin: 0 0 8px;
+
+    font-size: var(--text-body);
+    font-weight: 700;
+    letter-spacing: 0;
+}
+
+
+.method__text {
+    margin: 0;
+
+    color: var(--muted);
+}
+
+
+/* Key sentence of each practice: in white, like the key words of the introduction */
+.method__text strong {
+    color: var(--white);
+
+    font-weight: 700;
+}
+
+
+/* -------------------- PROJECTS: WHEEL OF CARDS -------------------- */
+
+/*
+    A wheel of red cards on near black: the centre one is whole and shows its story,
+    its neighbours smaller and darkened on the sides (with their story on desktop), the next ones in the background.
+    project-showcase.js places the cards, handles the arrows, the drag and the widening.
+    Without JavaScript, the cards stay in a strip that scrolls horizontally, with all their text.
+*/
+.showcase {
+    --card-width: clamp(260px, 26vw, 330px);
+
+    position: relative;
+}
+
+
+/*
+    Window too low for the centre card (small screen, zoom): project-showcase.js widens the cards on desktop (updateWidth).
+    Their text takes fewer lines: the card is shorter.
+*/
+.showcase--wide {
+    --card-width: 420px;
+}
+
+
+/*
+    Height of the cards on the wheel (--card-height), by window width: the size the cards had before their media
+    became a large animated area (330 × 585 px on desktop, 420 × 509 px once widened). It is a minimum: a card whose text
+    needs more room still grows (long words, text enlarged by the visitor), and the whole row with it.
+    Inside that height the media takes what the text leaves, up to 230 px (.project-card__media below):
+    the cards keep their size, the text decides the size of the media, never the other way round.
+    The English texts wrap differently: a few widths have their own value (:lang(en)).
+*/
+.showcase--ready {
+    --card-height: 585px;
+}
+
+.showcase--ready.showcase--wide {
+    --card-height: 509px;
+}
+
+.showcase--ready.showcase--wide:lang(en) {
+    --card-height: 495px;
+}
+
+@media (min-width: 1025px) and (max-width: 1249px) {
+
+    .showcase--ready:not(.showcase--wide) {
+        --card-height: 653px;
+    }
+
+}
+
+@media (min-width: 768px) and (max-width: 779px) {
+
+    .showcase--ready:lang(fr) {
+        --card-height: 595px;
+    }
+
+}
+
+@media (max-width: 767px) {
+
+    .showcase--ready {
+        --card-height: 430px;
+    }
+
+}
+
+@media (max-width: 499px) {
+
+    .showcase--ready {
+        --card-height: 467px;
+    }
+
+}
+
+@media (max-width: 449px) {
+
+    .showcase--ready {
+        --card-height: 510px;
+    }
+
+}
+
+@media (max-width: 399px) {
+
+    .showcase--ready {
+        --card-height: 534px;
+    }
+
+    .showcase--ready:lang(en) {
+        --card-height: 530px;
+    }
+
+}
+
+@media (max-width: 369px) {
+
+    .showcase--ready {
+        --card-height: 550px;
+    }
+
+    .showcase--ready:lang(en) {
+        --card-height: 554px;
+    }
+
+}
+
+@media (max-width: 339px) {
+
+    .showcase--ready,
+    .showcase--ready:lang(en) {
+        --card-height: 615px;
+    }
+
+}
+
+
+/*
+    Very light red halo behind the wheel (red of the cards at 14 %).
+    The "Projects" links give the focus to the section (project-showcase.js): no outline around the whole of it.
+*/
+#projects {
+    background-image: radial-gradient(60vw 36vw at 50% 70%, color-mix(in srgb, var(--accent-card) 14%, var(--clear)), var(--clear) 70%);
+}
+
+
+#projects:focus {
+    outline: none;
+}
+
+
+/* -------------------- FILTERS -------------------- */
+
+/* Filter added by project-filter.js above the wheel: one line of pills, one per field */
+.showcase__filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+
+    gap: 8px;
+
+    margin: 0 0 20px;
+}
+
+
+.showcase__filter {
+    min-height: 40px;
+
+    padding: 8px 18px;
+
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-m);
+
+    background-color: var(--clear);
+    color: var(--white);
+
+    font-family: inherit;
+    font-size: 0.875rem;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background-color var(--dur-fast) var(--ease-out),
+        border-color var(--dur-fast) var(--ease-out),
+        color var(--dur-fast) var(--ease-out);
+}
+
+
+.showcase__filter:hover {
+    border-color: var(--white);
+
+    background-color: var(--veil-strong);
+}
+
+
+/* Chosen filter: white pill, near-black text */
+.showcase__filter[aria-pressed="true"] {
+    border-color: var(--white);
+
+    background-color: var(--white);
+    color: var(--ink);
+}
+
+
+/* Project outside the filter: it leaves the wheel (.showcase added: stronger than the display: flex of the cards) */
+.showcase .project-card--filtered {
+    display: none;
+}
+
+
+/* Hint added by project-showcase.js after the filters, set apart from the number of projects */
+.showcase__hint {
+    margin: 0 0 0 16px;
+
+    color: var(--muted);
+
+    font-size: 0.9rem;
+}
+
+
+/* With a finger (tablet, phone), the hint takes its own line, aligned with the filters */
+.showcase--touch .showcase__hint {
+    flex-basis: 100%;
+
+    margin-left: 0;
+}
+
+
+/* -------------------- ARROWS -------------------- */
+
+/* With a finger, the arrows would cover the cards: the wheel is swiped */
+.showcase--touch .showcase__arrow {
+    display: none;
+}
+
+
+/* Frame added around the wheel: reference of the arrows */
+.showcase__frame {
+    position: relative;
+}
+
+
+/*
+    On desktop, the arrows sit in the margin of the section, on either side of the wheel.
+    --arrow-offset takes --gutter in vw (16 px kept for the scroll bar):
+    68 px on large screens, less when the margin is narrow, never sticking out of the page.
+*/
+.showcase__arrow {
+    --arrow-offset: min(68px, max(clamp(20px, 4vw, 56px), (100vw - 1200px) / 2) - 16px);
+
+    position: absolute;
+    top: 50%;
+    z-index: 200;
+
+    translate: 0 -50%;
+
+    display: grid;
+    place-items: center;
+
+    width: 48px;
+    height: 48px;
+
+    padding: 0;
+
+    border: 1px solid var(--line-strong);
+    border-radius: 50%;
+
+    background-color: var(--ink);
+    color: var(--white);
+
+    font-family: inherit;
+    font-size: 1.25rem;
+    line-height: 1;
+
+    cursor: pointer;
+
+    transition:
+        background-color var(--dur-fast) var(--ease-out),
+        border-color var(--dur-fast) var(--ease-out),
+        opacity var(--dur-fast) var(--ease-out),
+        scale calc(var(--dur-fast) / 2) var(--ease-out);
+}
+
+
+/* Arrow drawn in strokes (project-showcase.js), like the symbols of the cards */
+.showcase__arrow-icon {
+    width: 20px;
+    height: 20px;
+
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.75;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+
+.showcase__arrow--previous {
+    left: calc(-1 * var(--arrow-offset));
+}
+
+
+.showcase__arrow--next {
+    right: calc(-1 * var(--arrow-offset));
+}
+
+
+.showcase__arrow:hover:not(:disabled),
+.showcase__arrow:focus-visible {
+    border-color: var(--white);
+
+    background-color: var(--ink-raised);
+}
+
+
+.showcase__arrow:active:not(:disabled) {
+    scale: 0.94;
+}
+
+
+.showcase__arrow:disabled {
+    opacity: 0.35;
+
+    cursor: default;
+}
+
+
+/* A single card kept by the filter: no arrows (project-showcase.js sets hidden; display: flex above would win over it) */
+.showcase__arrow[hidden] {
+    display: none;
+}
+
+
+/* -------------------- STRIP WITHOUT JAVASCRIPT, WHEEL WITH IT -------------------- */
+
+/* Without JavaScript: native horizontal scrolling, one card snapped to the left edge */
+.showcase__track {
+    display: flex;
+    align-items: stretch;
+
+    gap: 24px;
+
+    padding-bottom: 14px;
+
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 16px;
+
+    scrollbar-width: thin;
+    scrollbar-color: var(--line-strong) var(--clear);
+}
+
+
+/*
+    With JavaScript: all the cards take the same grid cell, at the centre.
+    The cell takes the height of the tallest card: the cards all have the same height.
+    project-showcase.js then moves them apart with transform, and sets at the top the room of the back cards (padding-top).
+    clip cuts the background cards that stick out on the sides, without a scroll bar.
+    pan-y: with a finger, a vertical swipe still scrolls the page.
+*/
+.showcase--ready .showcase__track {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+
+    padding: 10px 0 40px;
+
+    overflow-x: clip;
+    overflow-y: visible;
+
+    touch-action: pan-y;
+}
+
+
+.showcase--ready .project-card {
+    grid-area: 1 / 1;
+    justify-self: center;
+
+    width: var(--card-width);
+    min-height: var(--card-height);
+
+    will-change: transform;
+}
+
+
+/*
+    Shade that darkens the distant cards; --shade is set by project-showcase.js.
+    z-index: -1: laid on the red ground of the card, under its content (the card, moved by transform, forms its own stacking context).
+    The red turns dark; the text of the card (title, tags, story on desktop) stays readable.
+    The shade follows the content (--content, --content-rise, set by project-showcase.js), so that a card without text stays dark:
+    - content shown: shade in --dur-base;
+    - content hidden (neighbour sticking out of the edge, card passed behind another one): shade laid at once;
+    - content coming back (--content-rise at 1): the shade waits for the text (--content-wait), then lightens with it.
+*/
+.showcase--ready .project-card::after {
+    content: "";
+
+    position: absolute;
+    inset: -1px;
+    z-index: -1;
+
+    border-radius: inherit;
+
+    background-color: var(--ink);
+
+    opacity: var(--shade, 0);
+
+    pointer-events: none;
+
+    transition: opacity
+        calc(var(--dur-base) * var(--content, 1) * (1 - var(--content-rise, 0)) + var(--dur-fast) * var(--content-rise, 0))
+        var(--ease-out)
+        calc(var(--dur-base) * var(--content-wait, 0.6) * var(--content-rise, 0));
+}
+
+
+/* With the mouse, the wheel can be grabbed */
+@media (pointer: fine) {
+
+    .showcase--ready .showcase__track {
+        cursor: grab;
+    }
+
+}
+
+
+.showcase--dragging .showcase__track {
+    cursor: grabbing;
+    user-select: none;
+}
+
+
+/* During a drag, the cards follow the gesture without delay */
+.showcase--dragging .project-card,
+.showcase--dragging .project-card::after,
+.showcase--instant .project-card,
+.showcase--instant .project-card::after,
+.showcase--instant .project-card__story {
+    transition: none;
+}
+
+
+/* -------------------- PROJECT CARD -------------------- */
+
+/*
+    Opaque ground, red of the cards: stacked cards do not blend.
+    Contrast of the off-white text: 5.5 on this red.
+    On the wheel, no card is cut: they keep their whole height and only change place, size and shade.
+*/
+.project-card {
+    --card-ground: var(--accent-card);
+
+    position: relative;
+
+    flex: 0 0 var(--card-width);
+
+    display: flex;
+
+    border-radius: var(--radius-m);
+
+    background-color: var(--card-ground);
+
+    scroll-snap-align: start;
+
+    transition:
+        transform var(--dur-base) var(--ease-out),
+        opacity var(--dur-base) var(--ease-out),
+        width var(--dur-base) var(--ease-out),
+        background-color var(--dur-fast) var(--ease-out),
+        box-shadow var(--dur-base) var(--ease-out);
+}
+
+
+/* Hover on a neighbour card: a barely lighter red (--accent-card-hover, tokens.css) */
+.project-card:not(.project-card--active):hover {
+    --card-ground: var(--accent-card-hover);
+}
+
+
+/*
+    Under its shade, that lighter red alone was not visible (motion audit M-04): with the mouse, the shade of a hovered
+    neighbour also lightens (0.6 → 0.42), a sign that the card can be clicked to come to the centre.
+    The transition of the shade already exists (.project-card::after); with reduced motion, the change is immediate.
+*/
+@media (hover: hover) and (pointer: fine) {
+
+    .showcase--ready .project-card:not(.project-card--active):hover::after {
+        opacity: calc(var(--shade, 0) * 0.7);
+    }
+
+}
+
+
+/*
+    Centre card: a light rule underlines its edge, a black shadow sets it off the background
+    and a red glow ties it to the halo of the section.
+*/
+.project-card--active {
+    box-shadow:
+        inset 0 0 0 1px color-mix(in srgb, var(--white) 18%, var(--clear)),
+        0 32px 64px var(--shadow-strong),
+        0 16px 48px color-mix(in srgb, var(--accent-card) 35%, var(--clear));
+}
+
+
+/* Fixed part of the card: it keeps its width when the card widens for a game or a demo */
+.project-card__main {
+    flex: 0 0 var(--card-width);
+
+    display: flex;
+    flex-direction: column;
+
+    min-width: 0;
+}
+
+
+/*
+    The content of a card that sticks out of the edge of the wheel (neighbours on phones) or passes behind another card
+    (back card) is hidden: no cut word, no piece of word readable behind another card.
+    --content (0 to 1) is set by project-showcase.js, 1 without JavaScript.
+    --content-rise is 1 when the content comes back: it waits for a share of the move (--content-wait, constant RISE_WAIT
+    of project-showcase.js: 60 % for a side card, already 97 % of the way with --ease-out; 25 % for the card
+    coming to the centre), then fades in. At 0, content that fades leaves at once.
+*/
+.showcase--ready .project-card__main {
+    opacity: var(--content, 1);
+
+    transition: opacity calc(var(--dur-fast) * var(--content-rise, 0)) var(--ease-out) calc(var(--dur-base) * var(--content-wait, 0.6) * var(--content-rise, 0));
+}
+
+
+.showcase--dragging .project-card__main,
+.showcase--instant .project-card__main {
+    transition: none;
+}
+
+
+/*
+    Animated area of the card: that of the former Lost media (330 × 230 px on desktop, the card width when it is narrower).
+    The scene of the card (card-scenes.js) is built inside it; without JavaScript or before its scene, it shows
+    the symbol of the card (or the drawn cat), which the scene hides.
+    max-width: a widened card (.showcase--wide) keeps a media of the same width, centred.
+    The top of the area (about 40 px) stays free for the hover animation (motion.css, data-hover), drawn above the scene.
+    position: relative: the scenes can place their layers from the area itself.
+*/
+.project-card__media {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    align-self: center;
+
+    width: 100%;
+    max-width: 330px;
+    height: 230px;
+
+    padding: 20px 20px 0;
+}
+
+
+/*
+    On the wheel, the card has a set height (--card-height) and the media takes the room the text leaves:
+    230 px when the text is short enough, less otherwise (never under 120 px: below that the card grows instead).
+    flex-basis 0: the media does not push the height of the card; its huge grow factor lets it take the free room
+    before the body, which then gets what is left over 230 px (buttons at the bottom of the card).
+    The scenes are SVGs that fill the area and the 3D cat follows it (ResizeObserver): both scale with it.
+*/
+.showcase--ready .project-card__media {
+    flex: 9999 1 0;
+
+    height: auto;
+    min-height: 120px;
+    max-height: 230px;
+}
+
+
+/* Symbol in white strokes (SVG in the HTML), instead of an image */
+.project-card__icon {
+    width: 112px;
+    height: 112px;
+
+    fill: none;
+    stroke: var(--white);
+    stroke-width: 1;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+
+/*
+    Cat of Lost, drawn by cat.js: a faceted volume, lighter facing the light.
+    --light (0 to 1) is computed for each facet; non-scaling-stroke keeps 1 px edges whatever the size.
+    The facets are opaque (white mixed with the card ground): those behind do not show through.
+    It is turned by dragging it, like the cubes: pan-y leaves vertical scrolling to the browser.
+*/
+.cat-figure {
+    display: block;
+
+    height: 100%;
+
+    touch-action: pan-y;
+    user-select: none;
+
+    cursor: grab;
+}
+
+
+.cat-figure:active {
+    cursor: grabbing;
+}
+
+
+.cat-figure svg {
+    display: block;
+
+    height: 100%;
+    width: auto;
+    aspect-ratio: 400 / 534;
+
+    overflow: visible;
+}
+
+
+.cat-figure polygon {
+    fill: color-mix(in srgb, var(--white) calc(6% + var(--light) * 30%), var(--card-ground));
+
+    stroke: var(--white);
+    stroke-opacity: 0.45;
+    stroke-width: 1px;
+    stroke-linejoin: round;
+
+    vector-effect: non-scaling-stroke;
+}
+
+
+/* Facet turned away from us: hidden behind the volume */
+.cat-figure .cat-figure__away {
+    visibility: hidden;
+}
+
+
+/*
+    flex-direction: column + margin-top: auto on the actions: the buttons line up at the bottom of each card.
+    flex 1 0 auto: the body keeps the height of its text and takes the room the media leaves.
+*/
+.project-card__body {
+    flex: 1 0 auto;
+
+    display: flex;
+    flex-direction: column;
+
+    padding: 20px 24px 24px;
+}
+
+
+.project-card__title {
+    margin: 0 0 12px;
+
+    font-size: 1.375rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+
+/* "Coming soon": states the nature of the card, under its title (label style in base.css) */
+.project-card__badge {
+    align-self: flex-start;
+
+    margin: 0;
+    padding: 4px 12px;
+
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-s);
+}
+
+
+/* Badge followed by tags (Lost): both have no margin, a gap separates them */
+.project-card__badge + .project-card__tags {
+    margin-top: 12px;
+}
+
+
+/* List of tags (.tag, in components/tags.css) */
+.project-card__tags {
+    display: flex;
+    flex-wrap: wrap;
+
+    gap: 6px;
+
+    margin: 0;
+    padding: 0;
+
+    list-style: none;
+}
+
+
+.project-card__story {
+    margin: 20px 0 0;
+}
+
+
+/*
+    On desktop (over 1024 px), the neighbours keep their story under their shade: no large empty block on the side cards.
+    It follows their content (--content): it is only seen if the card is neither cut by the edge nor hidden by another one.
+    On tablets and phones, only the story of the centre card is visible: the neighbours stick out of the edge there or pass
+    behind the centre card. The hidden stories stay in place (the cards keep the same height in the grid,
+    without any cut) and are still read by screen readers: opacity removes nothing from the page.
+*/
+.showcase--ready .project-card__story {
+    transition: opacity var(--dur-base) var(--ease-out);
+}
+
+
+@media (max-width: 1024px) {
+
+    .showcase--ready .project-card:not(.project-card--active) .project-card__story {
+        opacity: 0;
+    }
+
+}
+
+
+.project-card__label {
+    margin: 16px 0 0;
+}
+
+
+.project-card__text {
+    margin: 4px 0 0;
+
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+
+
+/* The story starts directly with its text, without a label */
+.project-card__text:first-child {
+    margin-top: 0;
+}
+
+
+/* Key sentence of the story */
+.project-card__text strong {
+    font-weight: 700;
+}
+
+
+.project-card__actions {
+    display: flex;
+    flex-wrap: wrap;
+
+    gap: 8px;
+
+    margin-top: auto;
+    padding-top: 24px;
+}
+
+
+/* 40 px high: same rounding as the filters; padding reduced for two buttons per line, in English too */
+.project-card__actions .button {
+    flex: 0 1 auto;
+
+    padding: 9px 12px;
+
+    border-radius: var(--radius-m);
+
+    font-size: 0.875rem;
+}
+
+
+/* -------------------- WIDENED CARD: GAME OR DEMO -------------------- */
+
+/* --expanded-width is computed by project-showcase.js: the room left by the neighbours */
+.showcase--ready .project-card--expanded {
+    width: var(--expanded-width, 1040px);
+}
+
+
+/* Area of the game or demo, on the right of the fixed part */
+.project-card__stage {
+    flex: 1 1 auto;
+
+    min-width: 0;
+
+    padding: 24px 26px;
+
+    border-left: 1px solid var(--line-strong);
+
+    animation: stage-in var(--dur-base) var(--ease-out) var(--dur-fast) both;
+}
+
+
+.project-card__stage[hidden] {
+    display: none;
+}
+
+
+/* Fade-in of the game or demo area */
+@keyframes stage-in {
+    from {
+        opacity: 0;
+    }
+}
+
+
+/* The game fills the area up to the rounded corners of the card */
+.project-card__stage--game {
+    display: flex;
+    flex-direction: column;
+
+    padding: 0;
+
+    overflow: hidden;
+
+    border-radius: 0 var(--radius-m) var(--radius-m) 0;
+}
+
+
+/*
+    The iframe (pages/games/) is created when opened; the game fits its canvas to the available height.
+    flex: 1: it fills the card, even when a taller neighbour card stretches it.
+*/
+.project-card__frame {
+    display: block;
+    flex: 1 1 auto;
+
+    width: 100%;
+    min-height: min(72vh, 700px);
+
+    border: none;
+}
+
+
+/* Reduced motion: the cards take their place without sliding, the widened area appears without fading */
+@media (prefers-reduced-motion: reduce) {
+
+    .project-card,
+    .showcase--ready .project-card::after,
+    .showcase--ready .project-card__main,
+    .showcase--ready .project-card__story {
+        transition: none;
+    }
+
+    .project-card__stage {
+        animation: none;
+    }
+
+    /* The press of the arrows stops in layout/responsive.css, with the other presses */
+
+}
+
+
+/* -------------------- PROJECT DEMOS -------------------- */
+
+/* Tool shown in the widened card (.project-card__stage); the fields take the style of the contact form */
+.demo__select {
+    cursor: pointer;
+}
+
+
+/* Without an explicit background, the drop-down list would show white text on a white background */
+.demo__select option {
+    background-color: var(--accent-card);
+    color: var(--white);
+}
+
+
+/* Result of the demo: frame on a light veil */
+.demo__output {
+    display: block;
+
+    min-height: 3.2em;
+
+    padding: 15px 16px;
+
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-s);
+
+    background-color: var(--veil);
+
+    /* Keeps the line breaks of the text and breaks words that are too long */
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+
+/* Permanent hint under a field; the possible error (.form__error) is shown right below */
+.demo__hint {
+    margin: 8px 0 0;
+
+    font-size: 0.9rem;
+}
+
+
+/* Probable language, at the top of the ranking of the detector */
+.demo__verdict {
+    margin: 0;
+
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+
+.demo__ranking {
+    margin: 8px 0 0;
+    padding-left: 1.4em;
+}
+
+
+.demo__note {
+    margin: 12px 0 0;
+
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+
+.demo__actions {
+    display: flex;
+    flex-wrap: wrap;
+
+    gap: 12px;
+
+    margin-top: 20px;
+}
+
+
+/* .button sets display: inline-block, which would win over the hidden attribute */
+.demo__actions [hidden] {
+    display: none;
+}
+
+
+/* -------------------- TABLET + PHONE -------------------- */
+
+@media (max-width: 1024px) {
+
+    .showcase {
+        --card-width: clamp(260px, 42vw, 330px);
+    }
+
+
+    /* The demo opens under the fixed part: the card widens to the whole wheel */
+    .project-card--expanded {
+        flex-direction: column;
+    }
+
+
+    .project-card--expanded .project-card__main {
+        flex-basis: auto;
+    }
+
+
+    .project-card__stage {
+        border-top: 1px solid var(--line-strong);
+        border-left: none;
+    }
+
+}
+
+
+/*
+    The games are played with the keyboard: kept for desktops.
+    Touch screens included, even wide ones (landscape tablets); project-showcase.js follows the same condition.
+*/
+@media (max-width: 1024px), (hover: none) and (pointer: coarse) {
+
+    .project-card__toggle--game,
+    .project-card__stage--game {
+        display: none;
+    }
+
+}
+
+
+/* -------------------- PHONE -------------------- */
+
+@media (max-width: 767px) {
+
+    /*
+        A single whole card: the edge of its neighbours peeks out on each side,
+        a sign that the wheel can be turned.
+    */
+    .showcase {
+        --card-width: 76vw;
+    }
+
+
+    .showcase__track {
+        gap: 12px;
+
+        scroll-padding-inline: 12px;
+    }
+
+
+    /*
+        Tighter filters and hint: the filters fit on one line from 360 px,
+        the number of projects and the hint share the next one when there is room.
+    */
+    .showcase__filters {
+        gap: 6px;
+
+        margin-bottom: 12px;
+    }
+
+
+    .showcase__filter {
+        padding: 8px 12px;
+    }
+
+
+    .showcase--touch .showcase__hint {
+        flex: 1 1 200px;
+
+        font-size: 0.8125rem;
+    }
+
+
+    /*
+        More compact card (margins, tags): the centre card must fit
+        under the header and the filters without cutting or removing any text. The media takes the room the text leaves.
+    */
+    .project-card__media {
+        padding: 12px 16px 0;
+    }
+
+
+    .project-card__body {
+        padding: 14px 16px 16px;
+    }
+
+
+    .project-card__title {
+        margin-bottom: 8px;
+
+        font-size: 1.25rem;
+    }
+
+
+    .project-card__tags {
+        gap: 4px;
+    }
+
+
+    .project-card__tags .tag {
+        padding: 2px 8px;
+
+        font-size: 0.75rem;
+    }
+
+
+    .project-card__story {
+        margin-top: 14px;
+    }
+
+
+    .project-card__label {
+        margin-top: 12px;
+    }
+
+
+    .project-card__text {
+        line-height: 1.45;
+    }
+
+
+    .project-card__actions {
+        gap: 6px;
+
+        padding-top: 16px;
+    }
+
+
+    /*
+        Two buttons per line, of the same width; a single button takes the whole line.
+        nowrap: if the text does not fit in half a line, the button moves whole to the next line.
+    */
+    .project-card__actions .button {
+        flex: 1 1 calc(50% - 3px);
+
+        padding: 9px 8px;
+
+        font-size: 0.8125rem;
+        white-space: nowrap;
+    }
+
+
+    .project-card__stage {
+        padding: 20px 18px;
+    }
+
+}

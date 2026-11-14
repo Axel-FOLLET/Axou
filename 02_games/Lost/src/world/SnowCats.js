@@ -24,8 +24,8 @@ import { getNpcAssets } from '../npc/npcAssets.js';
 import { ZONE2, FOOT, SUMMIT, PATH_SEGMENTS, LEG_KINDS, pathClearance, pathInside } from './zone2.js';
 import { snowballGeometry, snowCatMaterial, impactMarkGeometry, impactMarkMaterial } from './snowCatLook.js';
 
-/** Story steps during which nothing is thrown at the kitten (opening, hug, end screen). */
-const NO_STEPS = new Set(['title', 'opening', 'wakeup', 'hug', 'end']);
+/** Story steps during which nothing is thrown at the kitten (arrival cutscene, opening, hug, end screen). */
+const NO_STEPS = new Set(['title', 'arrival', 'opening', 'wakeup', 'hug', 'end']);
 
 /**
  * Snow bursts at impact (visual only): `count` instances in total, `per` per impact, horizontal `speed` and vertical `up`

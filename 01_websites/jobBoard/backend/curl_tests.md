@@ -1,16 +1,16 @@
-# Tests de l'API
+# API tests
 
-## Cas 1 : GET /api/ads (attendu 200)
+## Case 1: GET /api/ads (expected 200)
 
-Commande :
+Command:
 
 ```bash
 curl -i http://localhost:5000/api/ads
 ```
 
-Code obtenu : 200
+Status code: 200
 
-Réponse :
+Response:
 
 ```json
 [
@@ -37,17 +37,17 @@ Réponse :
 ]
 ```
 
-## Cas 2 : GET /api/ads/1 (attendu 200)
+## Case 2: GET /api/ads/1 (expected 200)
 
-Commande :
+Command:
 
 ```bash
 curl -i http://localhost:5000/api/ads/1
 ```
 
-Code obtenu : 200
+Status code: 200
 
-Réponse :
+Response:
 
 ```json
 {
@@ -67,33 +67,33 @@ Réponse :
 }
 ```
 
-## Cas 3 : GET /api/ads/999 (attendu 404)
+## Case 3: GET /api/ads/999 (expected 404)
 
-Commande :
+Command:
 
 ```bash
 curl -i http://localhost:5000/api/ads/999
 ```
 
-Code obtenu : 404
+Status code: 404
 
-Réponse :
+Response:
 
 ```json
 { "error": "Ad not found" }
 ```
 
-## Cas 4 : GET /api/companies/1/ads (attendu 200)
+## Case 4: GET /api/companies/1/ads (expected 200)
 
-Commande :
+Command:
 
 ```bash
 curl -i http://localhost:5000/api/companies/1/ads
 ```
 
-Code obtenu : 200
+Status code: 200
 
-Réponse :
+Response:
 
 ```json
 [
@@ -120,33 +120,33 @@ Réponse :
 ]
 ```
 
-## Cas 5 : GET /api/companies/999/ads (attendu 404)
+## Case 5: GET /api/companies/999/ads (expected 404)
 
-Commande :
+Command:
 
 ```bash
 curl -i http://localhost:5000/api/companies/999/ads
 ```
 
-Code obtenu : 404
+Status code: 404
 
-Réponse :
+Response:
 
 ```json
 { "error": "Company not found" }
 ```
 
-## Cas 6 : POST /api/ads complet (attendu 201)
+## Case 6: POST /api/ads complete (expected 201)
 
-Commande :
+Command:
 
 ```bash
 curl -i -X POST http://localhost:5000/api/ads -H "Content-Type: application/json" -d '{"title": "Test", "short_description": "Court", "company_id": 1, "category_id": 1}'
 ```
 
-Code obtenu : 201
+Status code: 201
 
-Réponse :
+Response:
 
 ```json
 {
@@ -166,49 +166,49 @@ Réponse :
 }
 ```
 
-## Cas 7 : POST /api/ads sans title (attendu 400)
+## Case 7: POST /api/ads without title (expected 400)
 
-Commande :
+Command:
 
 ```bash
 curl -i -X POST http://localhost:5000/api/ads -H "Content-Type: application/json" -d '{"short_description": "Court", "company_id": 1, "category_id": 1}'
 ```
 
-Code obtenu : 400
+Status code: 400
 
-Réponse :
+Response:
 
 ```json
 { "error": "Missing field: title" }
 ```
 
-## Cas 8 : POST /api/ads avec company_id = 999 (attendu 400)
+## Case 8: POST /api/ads with company_id = 999 (expected 400)
 
-Commande :
+Command:
 
 ```bash
 curl -i -X POST http://localhost:5000/api/ads -H "Content-Type: application/json" -d '{"title": "Test", "short_description": "Court", "company_id": 999, "category_id": 1}'
 ```
 
-Code obtenu : 400
+Status code: 400
 
-Réponse :
+Response:
 
 ```json
 { "error": "Unknown company_id or category_id" }
 ```
 
-## Cas 9 : POST /api/ads/3/applications, personne 3 (attendu 201)
+## Case 9: POST /api/ads/3/applications, person 3 (expected 201)
 
-Commande :
+Command:
 
 ```bash
 curl -i -X POST http://localhost:5000/api/ads/3/applications -H "Content-Type: application/json" -d '{"person_id": 3, "message": "Bonjour !"}'
 ```
 
-Code obtenu : 201
+Status code: 201
 
-Réponse :
+Response:
 
 ```json
 {
@@ -221,86 +221,86 @@ Réponse :
 }
 ```
 
-## Cas 10 : POST /api/ads/3/applications, même envoi (attendu 409)
+## Case 10: POST /api/ads/3/applications, same request (expected 409)
 
-Commande :
+Command:
 
 ```bash
 curl -i -X POST http://localhost:5000/api/ads/3/applications -H "Content-Type: application/json" -d '{"person_id": 3, "message": "Bonjour !"}'
 ```
 
-Code obtenu : 409
+Status code: 409
 
-Réponse :
+Response:
 
 ```json
 { "error": "Already applied" }
 ```
 
-## Cas 11 : POST /api/ads/1/applications sans message (attendu 400)
+## Case 11: POST /api/ads/1/applications without message (expected 400)
 
-Commande :
+Command:
 
 ```bash
 curl -i -X POST http://localhost:5000/api/ads/1/applications -H "Content-Type: application/json" -d '{"person_id": 3}'
 ```
 
-Code obtenu : 400
+Status code: 400
 
-Réponse :
+Response:
 
 ```json
 { "error": "Missing field: message" }
 ```
 
-## Cas 12 : POST /api/ads/999/applications (attendu 404)
+## Case 12: POST /api/ads/999/applications (expected 404)
 
-Commande :
+Command:
 
 ```bash
 curl -i -X POST http://localhost:5000/api/ads/999/applications -H "Content-Type: application/json" -d '{"person_id": 3, "message": "Salut"}'
 ```
 
-Code obtenu : 404
+Status code: 404
 
-Réponse :
+Response:
 
 ```json
 { "error": "Ad not found" }
 ```
 
-# J3 - test de l'API
+# J3 - API test
 
-## Partie 1 : test SQL après avoir tapé --> PRAGMA foreign_keys = ON;
+## Part 1: SQL test after typing --> PRAGMA foreign_keys = ON;
 
 ## Test 1
 
-Commande : UPDATE ads SET status = 'invalide' WHERE id = 1;
-Résultat : Runtime error: CHECK constraint failed: status IN ('open', 'closed') (19)
+Command: UPDATE ads SET status = 'invalide' WHERE id = 1;
+Result: Runtime error: CHECK constraint failed: status IN ('open', 'closed') (19)
 
 ## Test 2
 
-Commande : DELETE FROM companies WHERE id = 1;
-Résultat : Runtime error: FOREIGN KEY constraint failed (19)
+Command: DELETE FROM companies WHERE id = 1;
+Result: Runtime error: FOREIGN KEY constraint failed (19)
 
 ## Test 3
 
-Commande : DELETE FROM ads WHERE id = 1;
-Résultat : Runtime error: FOREIGN KEY constraint failed (19)
+Command: DELETE FROM ads WHERE id = 1;
+Result: Runtime error: FOREIGN KEY constraint failed (19)
 
-## Partie 2 : test http (suite J2)
+## Part 2: http test (continuation of J2)
 
-## Test 13 (attendu : 200, "Cybersécurité")
+## Test 13 (expected: 200, "Cybersécurité")
 
-Commande :
+Command:
 
 ```bash
 curl -i "http://localhost:5000/api/ads?contract_type=CDI&location=Londres"
 ```
 
-Code obtenu : 200
+Status code: 200
 
-Réponse :
+Response:
 
 ```json
 [
@@ -317,33 +317,33 @@ Réponse :
 ]
 ```
 
-## Test 14 (attendu : 200, [])
+## Test 14 (expected: 200, [])
 
-Commande :
+Command:
 
 ```bash
 curl -i http://localhost:5000/api/ads?q=zzzz
 ```
 
-Code obtenu : 200
+Status code: 200
 
-Réponse :
+Response:
 
 ```json
 []
 ```
 
-## Test 15 (attendu : 200, "status": "closed")
+## Test 15 (expected: 200, "status": "closed")
 
-Commande :
+Command:
 
 ```bash
 curl -i http://localhost:5000/api/ads/2
 ```
 
-Code obtenu : 200
+Status code: 200
 
-Réponse :
+Response:
 
 ```json
 {
@@ -363,17 +363,17 @@ Réponse :
 }
 ```
 
-## Test 16 (attendu : 200, ids 3 et 1 seulement)
+## Test 16 (expected: 200, ids 3 and 1 only)
 
-Commande :
+Command:
 
 ```bash
 curl -i http://localhost:5000/api/ads
 ```
 
-Code obtenu : 200
+Status code: 200
 
-Réponse :
+Response:
 
 ```json
 [
@@ -400,33 +400,33 @@ Réponse :
 ]
 ```
 
-## Test 17 (attendu : 200, [])
+## Test 17 (expected: 200, [])
 
-Commande :
+Command:
 
 ```bash
 curl -i http://localhost:5000/api/companies/2/ads
 ```
 
-Code obtenu : 200
+Status code: 200
 
-Réponse :
+Response:
 
 ```json
 []
 ```
 
-## Test 19 (attendu : 201)
+## Test 19 (expected: 201)
 
-Commande :
+Command:
 
 ```bash
 curl -i -X POST http://localhost:5000/api/ads/3/applications -H "Content-Type: application/json" -d '{"person_id": 1, "message": "Bonjour, je suis intéressé."}'
 ```
 
-Code obtenu : 201
+Status code: 201
 
-Réponse :
+Response:
 
 ```json
 {
@@ -441,19 +441,19 @@ Réponse :
 
 ## J4 test
 
-## Partie 1 : test SQL
+## Part 1: SQL test
 
-# Test 1 : inscription d'un nouveau sujet (attendu : 201 CREATED)
+# Test 1: registration of a new user (expected: 201 CREATED)
 
-Commande :
+Command:
 
 ```bash
 curl -i -X POST http://127.0.0.1:5000/api/auth/register -H "Content-Type: application/json" -d '{"first_name":"Bob","last_name":"Test","email":"bob@example.com","password":"password123"}'
 ```
 
-Code obtenu : 201
+Status code: 201
 
-Réponse :
+Response:
 
 ```json
 {
@@ -466,17 +466,17 @@ Réponse :
 }
 ```
 
-# Test 2 : Connexion de cette nouvelle personne (attendu : 200 OK)
+# Test 2: Login of this new person (expected: 200 OK)
 
-Commande :
+Command:
 
 ```bash
 curl -i -c cookies.txt -X POST http://127.0.0.1:5000/api/auth/login -H "Content-Type: application/json" -d '{"email":"bob@example.com","password":"password123"}'
 ```
 
-Code obtenu : 200
+Status code: 200
 
-Réponse :
+Response:
 
 ```json
 {
@@ -489,17 +489,17 @@ Réponse :
 }
 ```
 
-# Test 3 : Route admin sans connexion (attendu : 401 UNAUTHORIZED)
+# Test 3: Admin route without login (expected: 401 UNAUTHORIZED)
 
-Commande :
+Command:
 
 ```bash
 curl -i http://127.0.0.1:5000/api/admin/people
 ```
 
-Code obtenu : 401
+Status code: 401
 
-Réponse :
+Response:
 
 ```json
 {
@@ -507,17 +507,17 @@ Réponse :
 }
 ```
 
-# Test 4 : Route admin avec un user non admin (attendu : 403 FORBIDDEN)
+# Test 4: Admin route with a non-admin user (expected: 403 FORBIDDEN)
 
-Commande :
+Command:
 
 ```bash
 curl -i -b cookies.txt http://127.0.0.1:5000/api/admin/people
 ```
 
-Code obtenu : 403
+Status code: 403
 
-Réponse :
+Response:
 
 ```json
 {
@@ -525,38 +525,38 @@ Réponse :
 }
 ```
 
-# Test 5 : passer le user en admin (attendu : bob@example.com | admin)
+# Test 5: make the user an admin (expected: bob@example.com | admin)
 
-Commande :
+Command:
 
 ```bash
 sqlite3 jobboard.db
 UPDATE people SET role = 'admin' WHERE email = 'bob@example.com';
 ```
 
-```vérification
+```check
 SELECT id, email, role FROM people WHERE email = 'bob@example.com';
 ```
 
-Obtenu : bob@example.com|admin
+Obtained: bob@example.com|admin
 
-Réponse :
+Response:
 
 ```json
 4|bob@example.com|admin
 ```
 
-# Test 6 : reconnection du user en mode admin (attendu : 200 OK)
+# Test 6: log the user in again as an admin (expected: 200 OK)
 
-Commande :
+Command:
 
 ```bash
 curl -i -c cookies.txt -X POST http://127.0.0.1:5000/api/auth/login -H "Content-Type: application/json" -d '{"email":"bob@example.com","password":"password123"}'
 ```
 
-Code obtenu :200
+Status code: 200
 
-Réponse :
+Response:
 
 ```json
 {
@@ -569,17 +569,17 @@ Réponse :
 }
 ```
 
-# Test 7 : GET /api/admin/people (attendu 200 OK)
+# Test 7: GET /api/admin/people (expected 200 OK)
 
-Commande :
+Command:
 
 ```bash
 curl -i -b cookies.txt http://127.0.0.1:5000/api/admin/people
 ```
 
-Code obtenu : 200
+Status code: 200
 
-Réponse :
+Response:
 
 ```json
 [
@@ -618,17 +618,17 @@ Réponse :
 ]
 ```
 
-# Test 8 : GET /api/admin/companies (attendu 200 OK)
+# Test 8: GET /api/admin/companies (expected 200 OK)
 
-Commande :
+Command:
 
 ```bash
 curl -i -b cookies.txt http://127.0.0.1:5000/api/admin/companies
 ```
 
-Code obtenu : 200
+Status code: 200
 
-Réponse :
+Response:
 
 ```json
 [
@@ -649,17 +649,17 @@ Réponse :
 ]
 ```
 
-# Test 9 : GET /api/admin/categories (attendu 200 OK)
+# Test 9: GET /api/admin/categories (expected 200 OK)
 
-Commande :
+Command:
 
 ```bash
 curl -i -b cookies.txt http://127.0.0.1:5000/api/admin/categories
 ```
 
-Code obtenu : 200
+Status code: 200
 
-Réponse :
+Response:
 
 ```json
 [
@@ -678,17 +678,17 @@ Réponse :
 ]
 ```
 
-# Test 10 : GET /api/admin/ads (attendu 200 OK)
+# Test 10: GET /api/admin/ads (expected 200 OK)
 
-Commande :
+Command:
 
 ```bash
 curl -i -b cookies.txt http://127.0.0.1:5000/api/admin/ads
 ```
 
-Code obtenu : 200
+Status code: 200
 
-Réponse :
+Response:
 
 ```json
 [
@@ -740,17 +740,17 @@ Réponse :
 ]
 ```
 
-# Test 11 : GET /api/admin/applications (attendu 200 OK)
+# Test 11: GET /api/admin/applications (expected 200 OK)
 
-Commande :
+Command:
 
 ```bash
 curl -i -b cookies.txt http://127.0.0.1:5000/api/admin/applications
 ```
 
-Code obtenu : 200
+Status code: 200
 
-Réponse :
+Response:
 
 ```json
 [
@@ -789,15 +789,15 @@ Réponse :
 ]
 ```
 
-# Test 12 : POST candidature de l'user (attendu 201 CREATED)
+# Test 12: POST application of the user (expected 201 CREATED)
 
 ```bash
 curl -i -b cookies.txt -X POST http://127.0.0.1:5000/api/ads/3/applications -H "Content-Type: application/json" -d '{"message":"Bonjour"}'
 ```
 
-Code obtenu : 201
+Status code: 201
 
-Réponse :
+Response:
 
 ```json
 {
@@ -810,7 +810,7 @@ Réponse :
 }
 ```
 
-# Test 13 : POST candidature de visiteur / pas de cookie dans ce cas (attendu 201 CREATED)
+# Test 13: POST application of a visitor / no cookie in this case (expected 201 CREATED)
 
 ```bash
 curl -i -X POST http://127.0.0.1:5000/api/ads/3/applications -H "Content-Type: application/json" -d '{
@@ -821,9 +821,9 @@ curl -i -X POST http://127.0.0.1:5000/api/ads/3/applications -H "Content-Type: a
   }'
 ```
 
-Code obtenu : 201
+Status code: 201
 
-Réponse :
+Response:
 
 ```json
 {
@@ -836,15 +836,15 @@ Réponse :
 }
 ```
 
-# Test 14 : POST candidature sans message / pas de cookie dans ce cas (attendu 400 BAD REQUEST)
+# Test 14: POST application without message / no cookie in this case (expected 400 BAD REQUEST)
 
 ```bash
 curl -i -X POST http://127.0.0.1:5000/api/ads/3/applications -H "Content-Type: application/json" -d '{}'
 ```
 
-Code obtenu : 400
+Status code: 400
 
-Réponse :
+Response:
 
 ```json
 {
@@ -852,7 +852,7 @@ Réponse :
 }
 ```
 
-# Test 15 : POST candidature avec email d'un compte protégé (attendu 401 UNAUTHORIZED)
+# Test 15: POST application with the email of a protected account (expected 401 UNAUTHORIZED)
 
 ```bash
 curl -i -X POST http://127.0.0.1:5000/api/ads/3/applications -H "Content-Type: application/json" -d '{
@@ -863,9 +863,9 @@ curl -i -X POST http://127.0.0.1:5000/api/ads/3/applications -H "Content-Type: a
   }'
 ```
 
-Code obtenu : 401
+Status code: 401
 
-Réponse :
+Response:
 
 ```json
 {
@@ -873,15 +873,15 @@ Réponse :
 }
 ```
 
-# Test 16 : fermer l'annonce 3 (attendu : 200 OK)
+# Test 16: close ad 3 (expected: 200 OK)
 
 ```bash
 curl -i -b cookies.txt -X POST http://127.0.0.1:5000/api/ads/3/closure -H "Content-Type: application/json" -d '{"accepted_application_id":5}'
 ```
 
-Code obtenu : 200
+Status code: 200
 
-Réponse :
+Response:
 
 ```json
 {
@@ -901,15 +901,15 @@ Réponse :
 }
 ```
 
-# Test 17 : postuler à l'annonce fermée (attendu : 409 CONFLICT)
+# Test 17: apply to the closed ad (expected: 409 CONFLICT)
 
 ```bash
 curl -i -X POST http://127.0.0.1:5000/api/ads/3/applications -H "Content-Type: application/json" -d '{"first_name":"Charlie","last_name":"Test","email":"charlie@example.com","message":"Bonjour"}'
 ```
 
-Code obtenu : 409
+Status code: 409
 
-Réponse :
+Response:
 
 ```json
 {
@@ -917,15 +917,15 @@ Réponse :
 }
 ```
 
-# Test 18 : essayer de fermer l'annonce déjà fermée (attendu : 409 CONFLICT)
+# Test 18: try to close the already closed ad (expected: 409 CONFLICT)
 
 ```bash
 curl -i -b cookies.txt -X POST http://127.0.0.1:5000/api/ads/3/closure -H "Content-Type: application/json" -d '{"accepted_application_id":1}'
 ```
 
-Code obtenu : 409
+Status code: 409
 
-Réponse :
+Response:
 
 ```json
 {
@@ -933,25 +933,25 @@ Réponse :
 }
 ```
 
-# Test 19 : Fermer une annonce avec des candidatures sans préciser laquelle accepter (attendu : 200 OK)
+# Test 19: Close an ad that has applications without saying which one to accept (expected: 200 OK)
 
-Règle changée le 14/10 : `accepted_application_id` est facultatif. Sans lui, toutes les candidatures de l'annonce passent à `rejected` et l'annonce à `closed` (l'ancien 400 `Missing field: accepted_application_id` n'existe plus). Ce test ferme l'annonce 2 : le rejouer **après** le test 20, qui utilise la même annonce.
+Rule changed on 14/10: `accepted_application_id` is optional. Without it, all the applications of the ad become `rejected` and the ad becomes `closed` (the former 400 `Missing field: accepted_application_id` no longer exists). This test closes ad 2: replay it **after** test 20, which uses the same ad.
 
 ```bash
 curl -i -b cookies.txt -X POST http://127.0.0.1:5000/api/ads/2/closure -H "Content-Type: application/json" -d '{}'
 ```
 
-Code obtenu : non rejoué avec curl depuis le changement (vérifié le 14/10 par un appel direct à `close_ad_in_db` sur une copie de la base : 200, annonce `closed`, candidatures `rejected`).
+Status code: not replayed with curl since the change (checked on 14/10 by a direct call to `close_ad_in_db` on a copy of the database: 200, ad `closed`, applications `rejected`).
 
-# Test 20 : Tester une mauvaise candidature lors de la clôture (attendu : 400 BAD REQUEST)
+# Test 20: Test a wrong application at closure (expected: 400 BAD REQUEST)
 
 ```bash
 curl -i -b cookies.txt -X POST http://127.0.0.1:5000/api/ads/2/closure -H "Content-Type: application/json" -d '{"accepted_application_id":9999}'
 ```
 
-Code obtenu : 400
+Status code: 400
 
-Réponse :
+Response:
 
 ```json
 {
@@ -963,22 +963,22 @@ Réponse :
 
 # Partie 1 : droits admin
 
-# Test 1 : Création d'une annonce par un admin (attendu : 201 CREATED)
+# Test 1: Creation of an ad by an admin (expected: 201 CREATED)
 
-```bash : inscription du sujet test dans le base de donnée et connexion en admin
+```bash : registration of the test user in the database and login as admin
 curl -i -X POST "http://127.0.0.1:5000/api/auth/register" -H "Content-Type: application/json" -d '{"first_name":"Admin","last_name":"Test","email":"admin@example.com","password":"motdepasse8"}'
 sqlite3 jobboard.db "UPDATE people SET role = 'admin' WHERE email = 'admin@example.com';"
 sqlite3 jobboard.db "SELECT email, role FROM people;"
 curl -i -X POST "http://127.0.0.1:5000/api/auth/login" -H "Content-Type: application/json" -c cookies_admin.txt -d '{"email":"admin@example.com","password":"motdepasse8"}'
 ```
 
-```bash : création d'une annonce
+```bash : creation of an ad
 curl -i -X POST "http://127.0.0.1:5000/api/ads" -H "Content-Type: application/json" -b cookies_admin.txt -d '{"title":"Test","short_description":"Desc","company_id":1,"category_id":1}'
 ```
 
-Code obtenu : 201 CREATED
+Status code: 201 CREATED
 
-Réponse :
+Response:
 
 ```json
 {
@@ -998,20 +998,20 @@ Réponse :
 }
 ```
 
-# Test 2 : Création d'une annonce par un user (attendu : 403 FORBIDDEN)
+# Test 2: Creation of an ad by a user (expected: 403 FORBIDDEN)
 
-```bash : inscription du sujet test dans le base de donnée et connexion en user
+```bash : registration of the test user in the database and login as user
 curl -i -X POST "http://127.0.0.1:5000/api/auth/register" -H "Content-Type: application/json" -d '{"first_name":"Bobby","last_name":"Test","email":"bob2@example.com","password":"motdepasse2"}'
 curl -i -X POST "http://127.0.0.1:5000/api/auth/login" -H "Content-Type: application/json" -c cookies_bobby.txt -d '{"email":"bob2@example.com","password":"motdepasse2"}'
 ```
 
-```bash : création d'une annonce
+```bash : creation of an ad
 curl -i -X POST "http://127.0.0.1:5000/api/ads" -H "Content-Type: application/json" -b cookies_admin.txt -d '{"title":"Test","short_description":"Desc","company_id":1,"category_id":1}'
 ```
 
-Code obtenu : 403 FORBIDDEN
+Status code: 403 FORBIDDEN
 
-Réponse :
+Response:
 
 ```json
 {
@@ -1021,16 +1021,16 @@ Réponse :
 
 # Partie 2 : pagination
 
-# Test 1 : test de la pagination pour 1 annonce par page : page 1 (attendu : 200 OK, 1 annonce, X-Total-Count : 2) ---> X-Total-Count = nombre total d'annonces
+# Test 1: pagination test with 1 ad per page: page 1 (expected: 200 OK, 1 ad, X-Total-Count: 2) ---> X-Total-Count = total number of ads
 
 ```bash
 curl -i "http://127.0.0.1:5000/api/ads?page=1&per_page=1"
 ```
 
-Code obtenu : 200
+Status code: 200
 X-Total-Count : 2
 
-Réponse :
+Response:
 
 ```json
 [
@@ -1047,16 +1047,16 @@ Réponse :
 ]
 ```
 
-# Test 2 : test de la pagination pour 1 annonce par page : page 2 (attendu : 200 OK, 1 annonce, X-Total-Count : 2) ---> X-Total-Count = nombre total d'annonces
+# Test 2: pagination test with 1 ad per page: page 2 (expected: 200 OK, 1 ad, X-Total-Count: 2) ---> X-Total-Count = total number of ads
 
 ```bash
 curl -i "http://127.0.0.1:5000/api/ads?page=2&per_page=1"
 ```
 
-Code obtenu : 200
+Status code: 200
 X-Total-Count : 2
 
-Réponse :
+Response:
 
 ```json
 [
@@ -1073,30 +1073,30 @@ Réponse :
 ]
 ```
 
-# Test 3 : cas impossible afficher la page 3 alors qu'il n'y a que 2 annonces (attendu : 200 OK, [], X-Total-Count : 2)
+# Test 3: impossible case, showing page 3 when there are only 2 ads (expected: 200 OK, [], X-Total-Count: 2)
 
 ```bash
 curl -i "http://127.0.0.1:5000/api/ads?page=3&per_page=1"
 ```
 
-Code obtenu : 200
+Status code: 200
 X-Total-Count : 2
 
-Réponse :
+Response:
 
 ```json
 []
 ```
 
-# Test 4 : cas impossible, afficher 0 ads par page (attendu : 400, Invalid pagination)
+# Test 4: impossible case, showing 0 ads per page (expected: 400, Invalid pagination)
 
 ```bash
 curl -i "http://127.0.0.1:5000/api/ads?per_page=0"
 ```
 
-Code obtenu : 400
+Status code: 400
 
-Réponse :
+Response:
 
 ```json
 {
@@ -1104,15 +1104,15 @@ Réponse :
 }
 ```
 
-# Test 5 : cas impossible afficher la page "abc" (attendu : 400, Invalid pagination)
+# Test 5: impossible case, showing page "abc" (expected: 400, Invalid pagination)
 
 ```bash
 curl -i "http://127.0.0.1:5000/api/ads?page=abc"
 ```
 
-Code obtenu : 400
+Status code: 400
 
-Réponse :
+Response:
 
 ```json
 {
@@ -1120,16 +1120,16 @@ Réponse :
 }
 ```
 
-# Test 5 : affichage de toutes les ads ouvertes : point de vue chercheur d'emploi (attendu : 200 OK, 2 annonces, X-Total-Count : 2)
+# Test 5: display of all the open ads: job seeker's point of view (expected: 200 OK, 2 ads, X-Total-Count: 2)
 
 ```bash
 curl -i "http://127.0.0.1:5000/api/ads"
 ```
 
-Code obtenu : 200
+Status code: 200
 X-Total-Count : 2
 
-Réponse :
+Response:
 
 ```json
 [
@@ -1156,16 +1156,16 @@ Réponse :
 ]
 ```
 
-# Test 6 : affichage de toutes les ads ouvertes et fermée : point de vue admin (attendu : 200 OK, 2 annonces, X-Total-Count : 3)
+# Test 6: display of all the open and closed ads: admin's point of view (expected: 200 OK, 2 ads, X-Total-Count: 3)
 
 ```bash
 curl -i -b cookies_admin.txt "http://127.0.0.1:5000/api/admin/ads?page=1&per_page=2"
 ```
 
-Code obtenu : 200
+Status code: 200
 X-Total-Count : 3
 
-Réponse :
+Response:
 
 ```json
 [
@@ -1206,14 +1206,14 @@ Réponse :
 
 # Partie 1 : python
 
-# Test 1 : test de remplissage auto de la database (attendu :companies: 12, categories: 6, people: 13, ads: 53, applications: 4)
+# Test 1: test of the automatic filling of the database (expected: companies: 12, categories: 6, people: 13, ads: 53, applications: 4)
 
 ```bash
 python3 init_db.py
 python3 seed_data.py
 ```
 
-Réponse :
+Response:
 
 ```bash
 companies: 12
@@ -1223,30 +1223,30 @@ ads: 53
 applications: 4
 ```
 
-# Test 2 : test de remplissage auto de la database avec la base déjà pleine (attendu : "Base déjà remplie : 10 entreprise(s) du fichier existe(nt) déjà. Relance python init_db.py avant python seed_data.py.")
+# Test 2: test of the automatic filling of the database with the database already full (expected: "Database already filled: 10 company(ies) of the file already exist. Run python init_db.py again before python seed_data.py.")
 
 ```bash
 python3 seed_data.py
 ```
 
-Réponse :
+Response:
 
 ```bash
-Base déjà remplie : 10 entreprise(s) du fichier existe(nt) déjà. Relance python init_db.py avant python seed_data.py.
+Database already filled: 10 company(ies) of the file already exist. Run python init_db.py again before python seed_data.py.
 ```
 
 # Partie 2 : curl
 
-# Test 1 : affichage des ads (attendu : X-Total-Count: 52, 200 OK, 52 ads)
+# Test 1: display of the ads (expected: X-Total-Count: 52, 200 OK, 52 ads)
 
 ```bash
 curl -i -b cookies_admin.txt "http://127.0.0.1:5000/api/admin/ads"
 ```
 
-Code obtenu : 200
+Status code: 200
 X-Total-Count : 52
 
-Réponse :
+Response:
 
 ```json
 [
@@ -1283,18 +1283,18 @@ Réponse :
 ]
 ```
 
-ect jusqu'à la 52ème...
+etc. up to the 52nd...
 
-# Test 2 : affichage de 4 ads par page (attendu : X-Total-Count: 52, 200 OK, 4 ads)
+# Test 2: display of 4 ads per page (expected: X-Total-Count: 52, 200 OK, 4 ads)
 
 ```bash
 curl -i "http://127.0.0.1:5000/api/ads?per_page=4"
 ```
 
-Code obtenu : 200
+Status code: 200
 X-Total-Count : 52
 
-Réponse :
+Response:
 
 ```json
 [
@@ -1341,15 +1341,15 @@ Réponse :
 ]
 ```
 
-# Test 3 : essayer de voir ses candidatures dans son compte sans se connecter (attendu : Login required, 401)
+# Test 3: try to see one's applications in one's account without logging in (expected: Login required, 401)
 
 ```bash
 curl -i "http://127.0.0.1:5000/api/me/applications"
 ```
 
-Code obtenu : 401
+Status code: 401
 
-Réponse :
+Response:
 
 ```json
 {
@@ -1357,32 +1357,32 @@ Réponse :
 }
 ```
 
-# Test 4 : compte connecté sans candidature (attendu : [], 200)
+# Test 4: logged-in account without applications (expected: [], 200)
 
 ```bash
 curl -i -b cookies_bob.txt "http://127.0.0.1:5000/api/me/applications"
 ```
 
-Code obtenu : 200
+Status code: 200
 
-Réponse :
+Response:
 
 ```json
 []
 ```
 
-# Test 5 : postuler à une offre et la voir dans son espace (attendu : une offre avec 7 champs, 200)
+# Test 5: apply to an offer and see it in one's area (expected: one offer with 7 fields, 200)
 
 ```bash
-## postuler à une candidature
+## apply to an ad
 curl -s -X POST "http://127.0.0.1:5000/api/ads/3/applications" -H "Content-Type: application/json" -b cookies_bob.txt -d '{"message":"Candidature de Bob"}'
 
-## profil de bob espace "mes candidatures"
+## bob's profile, "my applications" area
 curl -i -b cookies_bob.txt "http://127.0.0.1:5000/api/me/applications"
 ```
 
-Réponse du POST :
-Code obtenu : 201
+Response of the POST:
+Status code: 201
 
 ````json
 {
@@ -1394,8 +1394,8 @@ Code obtenu : 201
   "status": "pending"
 }
 
-Réponse du GET :
-Code obtenu : 201
+Response of the GET:
+Status code: 201
 
 ```json
 [
@@ -1411,16 +1411,16 @@ Code obtenu : 201
 ]
 ````
 
-# Test 6 : essayé de repostuler à une candidature (attendu : already applied, 409 conflict)
+# Test 6: try to apply again to an ad (expected: already applied, 409 conflict)
 
 ```bash
-## postuler à une candidature
+## apply to an ad
 curl -s -X POST "http://127.0.0.1:5000/api/ads/3/applications" -H "Content-Type: application/json" -b cookies_bob.txt -d '{"message":"Candidature de Bob"}'
 ```
 
-Code obtenu : 409
+Status code: 409
 
-Réponse :
+Response:
 
 ```json
 {
@@ -1428,21 +1428,21 @@ Réponse :
 }
 ```
 
-# Test 7 : vision de l'espace mes candidature alors que plusieures personnes ont postulé à la même (attendu : une offre avec 7 champs pour chacun, 200)
+# Test 7: view of the "my applications" area when several people applied to the same ad (expected: one offer with 7 fields for each, 200)
 
 ```bash
-## postuler à une candidature
+## apply to an ad
 curl -s -X POST "http://127.0.0.1:5000/api/ads/3/applications" -H "Content-Type: application/json" -b cookies_carla.txt -d '{"message":"Candidature de Carla"}'
 
 
-## profil de bob et carla espace "mes candidatures"
+## bob's and carla's profiles, "my applications" area
 curl -i -b cookies_carla.txt "http://127.0.0.1:5000/api/me/applications"
 curl -i -b cookies_bob.txt "http://127.0.0.1:5000/api/me/applications"
 ```
 
-Code obtenu : 200
+Status code: 200
 
-Réponse :
+Response:
 
 ```json
 HTTP/1.1 200 OK
@@ -1485,20 +1485,20 @@ Connection: close
 ]
 ```
 
-# Test 8 : vision de l'espace mes candidature de bob et carla alors que bob est retenu (attendu : bob = accepted, carla = rejected, une offre avec 7 champs pour chacun, 200)
+# Test 8: view of bob's and carla's "my applications" area when bob is accepted (expected: bob = accepted, carla = rejected, one offer with 7 fields for each, 200)
 
 ```bash
 ## accepter bob
 curl -s -X POST "http://127.0.0.1:5000/api/ads/3/closure" -H "Content-Type: application/json" -b cookies_admin.txt -d '{"accepted_application_id": 5}'
 
-## profil de bob et carla espace "mes candidatures"
+## bob's and carla's profiles, "my applications" area
 curl -i -b cookies_bob.txt "http://127.0.0.1:5000/api/me/applications"
 curl -i -b cookies_carla.txt "http://127.0.0.1:5000/api/me/applications"
 ```
 
-Code obtenu : 200
+Status code: 200
 
-Réponse :
+Response:
 
 ```json
 {
@@ -1556,15 +1556,15 @@ Connection: close
 ]
 ```
 
-# Partie 3 : SIREN des entreprises
+# Part 3: SIREN of the companies
 
-# Test 1 : lecture d'une fiche avec son SIREN (attendu : 200, siren présent)
+# Test 1: reading a record with its SIREN (expected: 200, siren present)
 
 ```bash
 curl -i -b cookies_admin.txt "http://127.0.0.1:5000/api/admin/companies/1"
 ```
 
-Code obtenu : 200
+Status code: 200
 
 ```json
 {
@@ -1577,13 +1577,13 @@ Code obtenu : 200
 }
 ```
 
-# Test 2 : création correcte, espaces retirés (attendu : 201, siren "123456789")
+# Test 2: valid creation, spaces removed (expected: 201, siren "123456789")
 
 ```bash
 curl -i -X POST "http://127.0.0.1:5000/api/admin/companies" -H "Content-Type: application/json" -b cookies_admin.txt -d '{"name":"Test SA","siren":" 123456789 "}'
 ```
 
-Code obtenu : 201
+Status code: 201
 
 ```json
 {
@@ -1596,7 +1596,7 @@ Code obtenu : 201
 }
 ```
 
-# Test 3 : SIREN absent, vide, espaces ou null (attendu : 400, Missing field: siren)
+# Test 3: SIREN missing, empty, spaces or null (expected: 400, Missing field: siren)
 
 ```bash
 curl -i -X POST "http://127.0.0.1:5000/api/admin/companies" -H "Content-Type: application/json" -b cookies_admin.txt -d '{"name":"X"}'
@@ -1605,16 +1605,16 @@ curl -i -X POST "http://127.0.0.1:5000/api/admin/companies" -H "Content-Type: ap
 curl -i -X POST "http://127.0.0.1:5000/api/admin/companies" -H "Content-Type: application/json" -b cookies_admin.txt -d '{"name":"X","siren":null}'
 ```
 
-Code obtenu : 400 (les 4 cas)
+Status code: 400 (the 4 cases)
 
 ```json
 { "error": "Missing field: siren" }
 ```
 
-# Test 4 : format refusé (attendu : 400, Invalid value)
+# Test 4: format refused (expected: 400, Invalid value)
 
 ```bash
-## nombre JSON (pas une chaîne)
+## JSON number (not a string)
 curl -i -X POST "http://127.0.0.1:5000/api/admin/companies" -H "Content-Type: application/json" -b cookies_admin.txt -d '{"name":"X","siren":123456780}'
 ## lettres
 curl -i -X POST "http://127.0.0.1:5000/api/admin/companies" -H "Content-Type: application/json" -b cookies_admin.txt -d '{"name":"X","siren":"12345678A"}'
@@ -1624,13 +1624,13 @@ curl -i -X POST "http://127.0.0.1:5000/api/admin/companies" -H "Content-Type: ap
 curl -i -X POST "http://127.0.0.1:5000/api/admin/companies" -H "Content-Type: application/json" -b cookies_admin.txt -d '{"name":"X","siren":"1234567890"}'
 ```
 
-Code obtenu : 400 (les 4 cas)
+Status code: 400 (the 4 cases)
 
 ```json
 { "error": "Invalid value" }
 ```
 
-# Test 5 : SIREN commençant par zéro (attendu : 201, le zéro est conservé)
+# Test 5: SIREN starting with zero (expected: 201, the zero is kept)
 
 ```bash
 curl -i -X POST "http://127.0.0.1:5000/api/admin/companies" -H "Content-Type: application/json" -b cookies_admin.txt -d '{"name":"Zero SA","siren":"012345678"}'
@@ -1638,7 +1638,7 @@ curl -i -b cookies_admin.txt "http://127.0.0.1:5000/api/admin/companies/14"
 sqlite3 jobboard.db "SELECT quote(siren), typeof(siren) FROM companies WHERE id = 14;"
 ```
 
-Code obtenu : 201 puis 200
+Status code: 201 puis 200
 
 ```json
 {
@@ -1651,45 +1651,45 @@ Code obtenu : 201 puis 200
 }
 ```
 
-En base : `'012345678'|text`
+In the database: `'012345678'|text`
 
-# Test 6 : deux créations avec le même SIREN (attendu : 409, Already exists, pas de nouvelle fiche)
+# Test 6: two creations with the same SIREN (expected: 409, Already exists, no new record)
 
 ```bash
 curl -i -X POST "http://127.0.0.1:5000/api/admin/companies" -H "Content-Type: application/json" -b cookies_admin.txt -d '{"name":"Zero SA","siren":"012345678"}'
 sqlite3 jobboard.db "SELECT quote(siren), typeof(siren) FROM companies WHERE name = 'Zero SA';"
 ```
 
-Code obtenu : 409
+Status code: 409
 
 ```json
 { "error": "Already exists" }
 ```
 
-Nombre de fiches avant / après : 14 / 14.
+Number of records before / after: 14 / 14.
 
-# Test 7 : modification vers le SIREN d'une autre entreprise (attendu : 409, fiche inchangée)
+# Test 7: change to the SIREN of another company (expected: 409, record unchanged)
 
 ```bash
 curl -i -X PATCH "http://127.0.0.1:5000/api/admin/companies/13" -H "Content-Type: application/json" -b cookies_admin.txt -d '{"name":"Renommé","siren":"012345678"}'
 sqlite3 jobboard.db "SELECT name, siren FROM companies WHERE id = 13;"
 ```
 
-Code obtenu : 409
+Status code: 409
 
 ```json
 { "error": "Already exists" }
 ```
 
-Fiche inchangée : `Test SA|123456789` (le nom n'a pas été modifié non plus).
+Record unchanged: `Test SA|123456789` (the name was not modified either).
 
-# Test 10 : modification qui garde son propre SIREN (attendu : 200)
+# Test 10: change that keeps its own SIREN (expected: 200)
 
 ```bash
 curl -i -X PATCH "http://127.0.0.1:5000/api/admin/companies/13" -H "Content-Type: application/json" -b cookies_admin.txt -d '{"siren":"123456789","location":"Paris"}'
 ```
 
-Code obtenu : 200
+Status code: 200
 
 ```json
 {
@@ -1702,7 +1702,7 @@ Code obtenu : 200
 }
 ```
 
-# Test 11 : modification sans siren, puis tentative d'effacement (attendu : 200 SIREN conservé, puis 400)
+# Test 11: change without siren, then attempt to clear it (expected: 200 SIREN kept, then 400)
 
 ```bash
 curl -i -X PATCH "http://127.0.0.1:5000/api/admin/companies/13" -H "Content-Type: application/json" -b cookies_admin.txt -d '{"website":"https://test.example.com"}'
@@ -1710,7 +1710,7 @@ curl -i -X PATCH "http://127.0.0.1:5000/api/admin/companies/13" -H "Content-Type
 curl -i -X PATCH "http://127.0.0.1:5000/api/admin/companies/13" -H "Content-Type: application/json" -b cookies_admin.txt -d '{"siren":""}'
 ```
 
-Code obtenu : 200, puis 400 et 400
+Status code: 200, then 400 and 400
 
 ```json
 {"description":null,"id":13,"location":"Paris","name":"Test SA","siren":"123456789","website":"https://test.example.com"}
@@ -1718,7 +1718,7 @@ Code obtenu : 200, puis 400 et 400
 {"error":"Missing field: siren"}
 ```
 
-# Test 12 : ancienne fiche sans SIREN, lisible puis complétée (attendu : 200 avec null, puis 200 avec le SIREN)
+# Test 12: old record without SIREN, readable then completed (expected: 200 with null, then 200 with the SIREN)
 
 ```bash
 sqlite3 jobboard.db "INSERT INTO companies (name) VALUES ('Ancienne');"
@@ -1726,14 +1726,14 @@ curl -i -b cookies_admin.txt "http://127.0.0.1:5000/api/admin/companies/15"
 curl -i -X PATCH "http://127.0.0.1:5000/api/admin/companies/15" -H "Content-Type: application/json" -b cookies_admin.txt -d '{"siren":"555555555"}'
 ```
 
-Code obtenu : 200 puis 200
+Status code: 200 puis 200
 
 ```json
 {"description":null,"id":15,"location":null,"name":"Ancienne","siren":null,"website":null}
 {"description":null,"id":15,"location":null,"name":"Ancienne","siren":"555555555","website":null}
 ```
 
-# Test 13 : protections et autres tables inchangées (attendu : 401, 403, 201, 400)
+# Test 13: protections and other tables unchanged (expected: 401, 403, 201, 400)
 
 ```bash
 curl -i -X POST "http://127.0.0.1:5000/api/admin/companies" -H "Content-Type: application/json" -d '{"name":"X","siren":"111111111"}'
@@ -1742,7 +1742,7 @@ curl -i -X POST "http://127.0.0.1:5000/api/admin/categories" -H "Content-Type: a
 curl -i -X POST "http://127.0.0.1:5000/api/admin/categories" -H "Content-Type: application/json" -b cookies_admin.txt -d '{"name":"N2","siren":"111111111"}'
 ```
 
-Code obtenu : 401, 403, 201, 400
+Status code: 401, 403, 201, 400
 
 ```json
 {"error":"Login required"}
@@ -1753,25 +1753,25 @@ Code obtenu : 401, 403, 201, 400
 
 ## Test J7
 
-# Test 1 : La colonne existe (attendu: company_id|INTEGER|0|NULL)
+# Test 1: The column exists (expected: company_id|INTEGER|0|NULL)
 
 ```bash
 sqlite3 jobboard.db "SELECT name, type, \"notnull\", quote(dflt_value) FROM pragma_table_info('people') WHERE name = 'company_id';"
 ```
 
-Code obtenu : 401, 403, 201, 400
+Status code: 401, 403, 201, 400
 
 ```json
 company_id|INTEGER|0|NULL
 ```
 
-# Test 2 : L'admin voit le champ (attendu: 200, "company_id": null)
+# Test 2: The admin sees the field (expected: 200, "company_id": null)
 
 ```bash
 curl -i -b cookies_admin.txt "http://127.0.0.1:5000/api/admin/people/15"
 ```
 
-Code obtenu : 200
+Status code: 200
 
 ```json
 {
@@ -1785,28 +1785,28 @@ Code obtenu : 200
 }
 ```
 
-# Test 3 : Entreprise inconnue (attendu: 400 Unknown reference, pour les 2)
+# Test 3: Unknown company (expected: 400 Unknown reference, for both)
 
 ```bash
 curl -i -X PATCH "http://127.0.0.1:5000/api/admin/people/15" -H "Content-Type: application/json" -b cookies_admin.txt -d '{"company_id":999}'
 curl -i -X POST "http://127.0.0.1:5000/api/admin/people" -H "Content-Type: application/json" -b cookies_admin.txt -d '{"first_name":"Rec","last_name":"Test","email":"rec@example.com","company_id":999}'
 ```
 
-Code obtenu : 400 (pour les 2)
+Status code: 400 (for both)
 
-```json (pour les 2)
+```json (for both)
 {
   "error": "Unknown reference"
 }
 ```
 
-# Test 4 : L'admin rattache Bob à une entreprise (attendu: 200, "company_id": 1)
+# Test 4: The admin attaches Bob to a company (expected: 200, "company_id": 1)
 
 ```bash
 curl -i -X PATCH "http://127.0.0.1:5000/api/admin/people/15" -H "Content-Type: application/json" -b cookies_admin.txt -d '{"company_id":1}'
 ```
 
-Code obtenu : 200
+Status code: 200
 
 ```json
 {
@@ -1820,13 +1820,13 @@ Code obtenu : 200
 }
 ```
 
-# Test 5 : Bob ne peut pas se l'attribuer lui-même (attendu: 400 Unknown field: company_id)
+# Test 5: Bob cannot assign it to himself (expected: 400 Unknown field: company_id)
 
 ```bash
 curl -i -X PATCH "http://127.0.0.1:5000/api/auth/me" -H "Content-Type: application/json" -b cookies_bob.txt -d '{"company_id":2}'
 ```
 
-Code obtenu : 400
+Status code: 400
 
 ```json
 {
@@ -1834,14 +1834,14 @@ Code obtenu : 400
 }
 ```
 
-# Test 6 : Connexion d'un user qui essait de se faire passer pour un recruteur (attendu: 201, puis NULL en base, la personne s'inscrit mais n'est pas recruteuse, le code recruteur est ignoré)
+# Test 6: Registration of a user who tries to pass as a recruiter (expected: 201, then NULL in the database, the person registers but is not a recruiter, the recruiter code is ignored)
 
 ```bash
 curl -i -X POST "http://127.0.0.1:5000/api/auth/register" -H "Content-Type: application/json" -d '{"first_name":"Eve","last_name":"Test","email":"eve@example.com","password":"motdepasse8","company_id":1}'
 sqlite3 jobboard.db "SELECT email, quote(company_id) FROM people WHERE email = 'eve@example.com';"
 ```
 
-Code obtenu : 201 puis NULL
+Status code: 201 puis NULL
 
 ```json register
 {
@@ -1854,18 +1854,18 @@ Code obtenu : 201 puis NULL
 }
 ```
 
-```json le code
+```json the code
 eve@example.com|NULL
 ```
 
-# Test 6 : GET /api/categories, publique (attendu: 200, 6 catégories par ordre alphabétique)
+# Test 6: GET /api/categories, public (expected: 200, 6 categories in alphabetical order)
 
 ```bash
 curl -i "http://127.0.0.1:5000/api/categories"
 
 ```
 
-Code obtenu : 200
+Status code: 200
 
 ```json
 [
@@ -1896,53 +1896,53 @@ Code obtenu : 200
 ]
 ```
 
-# Test 7 : Les refus (le décorateur recruteur_required)
+# Test 7: The refusals (the recruiter_required decorator)
 
 ```bash
-# sans session -> attendu : 401 Login required
+# no session -> expected: 401 Login required
 curl -i "http://127.0.0.1:5000/api/recruiter/company"
 curl -i "http://127.0.0.1:5000/api/recruiter/ads"
 
-# utilisateur ordinaire -> attendu : 403 Recruiter only
+# ordinary user -> expected: 403 Recruiter only
 curl -i -b cookies_bob.txt "http://127.0.0.1:5000/api/recruiter/company"
 curl -i -b cookies_bob.txt "http://127.0.0.1:5000/api/recruiter/ads"
 
-# admin sans entreprise -> attendu : 403 Recruiter only
+# admin without a company -> expected: 403 Recruiter only
 curl -i -b cookies_admin.txt "http://127.0.0.1:5000/api/recruiter/company"
 ```
 
-Code obtenu : 401 (pour les 2)
+Status code: 401 (for both)
 
-```json sans sessions (pour les 2)
+```json no session (for both)
 {
   "error": "Login required"
 }
 ```
 
-Code obtenu : 403 (pour les 2)
+Status code: 403 (for both)
 
-```json utilisateur ordinaire (pour les 2)
+```json ordinary user (for both)
 {
   "error": "Recruiter only"
 }
 ```
 
-Code obtenu : 403
+Status code: 403
 
-```json admin sans entreprise
+```json admin without a company
 {
   "error": "Recruiter only"
 }
 ```
 
-# Test 8 : GET /api/recruiter/company (attendu: 200, TechNova pour Rec1, avec son siren)
+# Test 8: GET /api/recruiter/company (expected: 200, TechNova for Rec1, with its siren)
 
 ```bash
 curl -i -b cookies_rec1.txt "http://127.0.0.1:5000/api/recruiter/company"
 
 ```
 
-Code obtenu : 200
+Status code: 200
 
 ```json
 {
@@ -1955,29 +1955,29 @@ Code obtenu : 200
 }
 ```
 
-# Test 9 : PATCH /api/recruiter/company
+# Test 9: PATCH /api/recruiter/company
 
 ```bash
-# corps vide -> attendu : 400 No fields to update
+# corps vide -> expected: 400 No fields to update
 curl -i -X PATCH "http://127.0.0.1:5000/api/recruiter/company" -H "Content-Type: application/json" -b cookies_rec1.txt -d '{}'
 
-# siren -> attendu : 400 Unknown field: siren
+# siren -> expected: 400 Unknown field: siren
 curl -i -X PATCH "http://127.0.0.1:5000/api/recruiter/company" -H "Content-Type: application/json" -b cookies_rec1.txt -d '{"siren":"111111111"}'
 
-# id -> attendu : 400 Unknown field: id
+# id -> expected: 400 Unknown field: id
 curl -i -X PATCH "http://127.0.0.1:5000/api/recruiter/company" -H "Content-Type: application/json" -b cookies_rec1.txt -d '{"id":5}'
 
-# name vide -> attendu : 400 Missing field: name
+# name vide -> expected: 400 Missing field: name
 curl -i -X PATCH "http://127.0.0.1:5000/api/recruiter/company" -H "Content-Type: application/json" -b cookies_rec1.txt -d '{"name":"   "}'
 
-# correct -> attendu : 200, name "TechNova SA" (espaces retirés) et location modifiée
+# valid -> expected: 200, name "TechNova SA" (spaces removed) and location changed
 curl -i -X PATCH "http://127.0.0.1:5000/api/recruiter/company" -H "Content-Type: application/json" -b cookies_rec1.txt -d '{"name":" TechNova SA ","location":"Paris 9e"}'
 
-# l'autre entreprise n'a pas bougé -> attendu : GreenWorks|Lyon
+# the other company did not change -> expected: GreenWorks|Lyon
 sqlite3 jobboard.db "SELECT name, location FROM companies WHERE id = 2;"
 ```
 
-Code obtenu corps vide : 400
+Status code, empty body: 400
 
 ```json
 {
@@ -1985,7 +1985,7 @@ Code obtenu corps vide : 400
 }
 ```
 
-Code obtenu siren vide : 400
+Status code, empty siren: 400
 
 ```json
 {
@@ -1993,7 +1993,7 @@ Code obtenu siren vide : 400
 }
 ```
 
-Code obtenu id vide : 400
+Status code, empty id: 400
 
 ```json
 {
@@ -2001,7 +2001,7 @@ Code obtenu id vide : 400
 }
 ```
 
-Code obtenu name vide : 400
+Status code, empty name: 400
 
 ```json
 {
@@ -2009,7 +2009,7 @@ Code obtenu name vide : 400
 }
 ```
 
-Code obtenu cas correct : 200
+Status code, valid case: 200
 
 ```json
 {
@@ -2022,24 +2022,24 @@ Code obtenu cas correct : 200
 }
 ```
 
-Obtenu l'entreprise n'a pas bougé
+Obtained: the company did not change
 
 ```json
 GreenWorks|Lyon
 ```
 
-# Test 10 : GET /api/recruiter/ads: chacun ne voit que les siennes
+# Test 10: GET /api/recruiter/ads: each one sees only their own
 
 ```bash
-#Rec1 (TechNova): les annonces 3 (applications_count: 0, oldest_unanswered_at: null) et 1 (applications_count: 2, oldest_unanswered_at: "2025-01-10 09:00:00").
+# Rec1 (TechNova): ads 3 (applications_count: 0, oldest_unanswered_at: null) and 1 (applications_count: 2, oldest_unanswered_at: "2025-01-10 09:00:00").
 curl -i -b cookies_rec1.txt "http://127.0.0.1:5000/api/recruiter/ads"
 
-#Rec2 (GreenWorks): l'annonce 2, fermée (applications_count: 2, oldest_unanswered_at: null, car ses candidatures sont accepted et rejected, aucune pending).
+# Rec2 (GreenWorks): ad 2, closed (applications_count: 2, oldest_unanswered_at: null, because its applications are accepted and rejected, none pending).
 curl -i -b cookies_rec2.txt "http://127.0.0.1:5000/api/recruiter/ads"
 
 ```
 
-Code obtenu cas correct : 200 pour les 2
+Status code, valid case: 200 for both
 
 ```json Rec1
 [
@@ -2084,34 +2084,34 @@ Code obtenu cas correct : 200 pour les 2
 ]
 ```
 
-# Test 11 : POST /api/recruiter/ads (attendu : 400 pour company_id, contact_id, title absent et catégorie inconnue ; 201 pour une annonce correcte, qui porte l'entreprise du recruteur)
+# Test 11: POST /api/recruiter/ads (expected: 400 for company_id, contact_id, missing title and unknown category; 201 for a valid ad, which carries the recruiter's company)
 
 ```bash
-# company_id envoyé -> attendu : 400 Unknown field: company_id
+# company_id sent -> expected: 400 Unknown field: company_id
 curl -i -X POST "http://127.0.0.1:5000/api/recruiter/ads" -H "Content-Type: application/json" -b cookies_rec1.txt -d '{"title":"T","short_description":"S","category_id":1,"company_id":2}'
 
-# contact_id envoyé -> attendu : 400 Unknown field: contact_id
+# contact_id sent -> expected: 400 Unknown field: contact_id
 curl -i -X POST "http://127.0.0.1:5000/api/recruiter/ads" -H "Content-Type: application/json" -b cookies_rec1.txt -d '{"title":"T","short_description":"S","category_id":1,"contact_id":2}'
 
-# title absent -> attendu : 400 Missing field: title
+# title absent -> expected: 400 Missing field: title
 curl -i -X POST "http://127.0.0.1:5000/api/recruiter/ads" -H "Content-Type: application/json" -b cookies_rec1.txt -d '{"short_description":"S","category_id":1}'
 
-# catégorie inconnue -> attendu : 400 Unknown category_id
+# unknown category -> expected: 400 Unknown category_id
 curl -i -X POST "http://127.0.0.1:5000/api/recruiter/ads" -H "Content-Type: application/json" -b cookies_rec1.txt -d '{"title":"T","short_description":"S","category_id":999}'
 
-# correct -> attendu : 201, "company": "GreenWorks", "category": "Design", contact_id = id de Rec2
+# valid -> expected: 201, "company": "GreenWorks", "category": "Design", contact_id = id of Rec2
 curl -i -X POST "http://127.0.0.1:5000/api/recruiter/ads" -H "Content-Type: application/json" -b cookies_rec2.txt -d '{"title":"Designer","short_description":"UX","category_id":2,"salary":40000,"contract_type":"CDI"}'
 
-# vérification en base : entreprise 2, contact = Rec2, statut open
+# check in the database: company 2, contact = Rec2, status open
 sqlite3 jobboard.db "SELECT company_id, contact_id, status FROM ads ORDER BY id DESC LIMIT 1;"
 sqlite3 jobboard.db "SELECT id FROM people WHERE email = 'rec2@example.com';"
 
-# l'annonce apparaît dans la liste de Rec2, pas dans celle de Rec1
+# the ad appears in Rec2's list, not in Rec1's
 curl -s -b cookies_rec2.txt "http://127.0.0.1:5000/api/recruiter/ads"
 curl -s -b cookies_rec1.txt "http://127.0.0.1:5000/api/recruiter/ads"
 ```
 
-Code obtenu company_id envoyé : 400
+Status code, company_id sent: 400
 
 ```json
 {
@@ -2119,7 +2119,7 @@ Code obtenu company_id envoyé : 400
 }
 ```
 
-Code obtenu contact_id envoyé : 400
+Status code, contact_id sent: 400
 
 ```json
 {
@@ -2127,7 +2127,7 @@ Code obtenu contact_id envoyé : 400
 }
 ```
 
-Code obtenu title absent : 400
+Status code, title missing: 400
 
 ```json
 {
@@ -2135,7 +2135,7 @@ Code obtenu title absent : 400
 }
 ```
 
-Code obtenu catégorie inconnue : 400
+Status code, unknown category: 400
 
 ```json
 {
@@ -2143,7 +2143,7 @@ Code obtenu catégorie inconnue : 400
 }
 ```
 
-Code obtenu cas correct : 201
+Status code, valid case: 201
 
 ```json
 {
@@ -2163,14 +2163,14 @@ Code obtenu cas correct : 201
 }
 ```
 
-Obtenu en base : l'annonce porte l'entreprise de Rec2 (2), Rec2 comme contact (17) et le statut open
+Obtained in the database: the ad carries Rec2's company (2), Rec2 as contact (17) and the status open
 
 ```json
 2|17|open
 17
 ```
 
-Code obtenu liste de Rec2 : 200, la nouvelle annonce apparaît en premier
+Status code, Rec2's list: 200, the new ad appears first
 
 ```json Rec2
 [
@@ -2199,7 +2199,7 @@ Code obtenu liste de Rec2 : 200, la nouvelle annonce apparaît en premier
 ]
 ```
 
-Code obtenu liste de Rec1 : 200, la nouvelle annonce n'y est pas (identique au test 10)
+Status code, Rec1's list: 200, the new ad is not there (identical to test 10)
 
 ```json Rec1
 [
@@ -2228,27 +2228,27 @@ Code obtenu liste de Rec1 : 200, la nouvelle annonce n'y est pas (identique au t
 ]
 ```
 
-# Test 12 : seed_data.py rattache les 10 contacts du fichier à l'entreprise de leurs annonces (attendu : 10, puis chaque contact avec son entreprise)
+# Test 12: seed_data.py attaches the 10 contacts of the file to the company of their ads (expected: 10, then each contact with their company)
 
 ```bash
-# base neuve et remplissage
+# fresh database and seeding
 python3 init_db.py
 python3 seed_data.py
 
-# nombre de recruteurs -> attendu : 10
+# number of recruiters -> expected: 10
 sqlite3 jobboard.db "SELECT COUNT(*) FROM people WHERE company_id IS NOT NULL;"
 
-# qui est rattaché à quelle entreprise -> attendu : les 10 contacts, chacun avec l'entreprise de ses annonces
+# who is attached to which company -> expected: the 10 contacts, each with the company of their ads
 sqlite3 -header -column jobboard.db "SELECT people.email, companies.name AS entreprise FROM people JOIN companies ON companies.id = people.company_id;"
 ```
 
-Obtenu nombre de recruteurs : 10
+Obtained, number of recruiters: 10
 
 ```bash
 10
 ```
 
-Obtenu rattachement : chaque contact est rattaché à l'entreprise de ses annonces (Alice, Bruno et Chloé de seed.sql restent sans entreprise)
+Obtained, attachment: each contact is attached to the company of their ads (Alice, Bruno and Chloé from seed.sql stay without a company)
 
 ```bash
 email                          entreprise
@@ -2267,106 +2267,106 @@ camille.lesterval@example.com  Caldrivane
 
 ## Test J9
 
-# Test 1 : POST /api/recruiter/ads/<id>/applications/<application_id>/rejection, refus d'une seule candidature
+# Test 1: POST /api/recruiter/ads/<id>/applications/<application_id>/rejection, rejection of a single application
 
-Base neuve (`init_db.py` puis `seed_data.py`), `MAIL_ENABLED=0`. Rec1 (TechNova, entreprise 1), Rec2 (GreenWorks, entreprise 2) et Bob (compte ordinaire) : mêmes comptes et mêmes cookies que les tests J7. Annonce 1 : TechNova, ouverte, candidatures 1 et 2 de `seed.sql` (`pending`). Annonce 2 : GreenWorks, fermée, candidatures 3 et 4.
+Fresh database (`init_db.py` then `seed_data.py`), `MAIL_ENABLED=0`. Rec1 (TechNova, company 1), Rec2 (GreenWorks, company 2) and Bob (ordinary account): same accounts and same cookies as the J7 tests. Ad 1: TechNova, open, applications 1 and 2 from `seed.sql` (`pending`). Ad 2: GreenWorks, closed, applications 3 and 4.
 
 ```bash
-# refus de la candidature 1 -> attendu : 200, la candidature avec "status": "rejected" ; l'annonce 1 reste ouverte
+# rejection of application 1 -> expected: 200, the application with "status": "rejected"; ad 1 stays open
 curl -i -X POST -b cookies_rec1.txt "http://127.0.0.1:5000/api/recruiter/ads/1/applications/1/rejection"
 
-# même refus une 2e fois -> attendu : 409 Application already processed
+# same rejection a 2nd time -> expected: 409 Application already processed
 curl -i -X POST -b cookies_rec1.txt "http://127.0.0.1:5000/api/recruiter/ads/1/applications/1/rejection"
 
-# candidature d'une autre annonce, ou inexistante -> attendu : 404 Application not found (pour les 2)
+# application of another ad, or nonexistent -> expected: 404 Application not found (for both)
 curl -i -X POST -b cookies_rec1.txt "http://127.0.0.1:5000/api/recruiter/ads/1/applications/3/rejection"
 curl -i -X POST -b cookies_rec1.txt "http://127.0.0.1:5000/api/recruiter/ads/1/applications/999/rejection"
 
-# annonce d'une autre entreprise -> attendu : 404 Ad not found
+# ad of another company -> expected: 404 Ad not found
 curl -i -X POST -b cookies_rec1.txt "http://127.0.0.1:5000/api/recruiter/ads/2/applications/3/rejection"
 
-# annonce fermée -> attendu : 409 Ad already closed
+# closed ad -> expected: 409 Ad already closed
 curl -i -X POST -b cookies_rec2.txt "http://127.0.0.1:5000/api/recruiter/ads/2/applications/3/rejection"
 
-# sans session -> attendu : 401 Login required ; compte ordinaire -> attendu : 403 Recruiter only
+# no session -> expected: 401 Login required; ordinary account -> expected: 403 Recruiter only
 curl -i -X POST "http://127.0.0.1:5000/api/recruiter/ads/1/applications/2/rejection"
 curl -i -X POST -b cookies_bob.txt "http://127.0.0.1:5000/api/recruiter/ads/1/applications/2/rejection"
 
-# vérification en base -> attendu : annonce 1 open, candidature 1 rejected, candidature 2 toujours pending
+# check in the database -> expected: ad 1 open, application 1 rejected, application 2 still pending
 sqlite3 jobboard.db "SELECT id, status FROM ads WHERE id = 1; SELECT id, status FROM applications WHERE id IN (1, 2);"
 ```
 
-Code obtenu : non rejoué avec curl. Vérifié le 14/10 par le client de test Flask sur une base neuve dans `/tmp` (comptes créés par `register`, `company_id` posé en base, e-mails simulés) : 200 (`"status": "rejected"`, mêmes clés que la liste des candidatures), 409 `Application already processed`, 404 `Application not found` (pour les 2), 404 `Ad not found`, 409 `Ad already closed`, 401 `Login required`, 403 `Recruiter only`. En base : annonce 1 `open`, candidature 1 `rejected`, candidature 2 `pending`.
+Status code: not replayed with curl. Checked on 14/10 with the Flask test client on a fresh database in `/tmp` (accounts created by `register`, `company_id` set in the database, emails simulated): 200 (`"status": "rejected"`, same keys as the list of applications), 409 `Application already processed`, 404 `Application not found` (for both), 404 `Ad not found`, 409 `Ad already closed`, 401 `Login required`, 403 `Recruiter only`. In the database: ad 1 `open`, application 1 `rejected`, application 2 `pending`.
 
-# Test 2 : la clôture n'écrit pas une 2e fois au candidat déjà refusé
+# Test 2: the closure does not write a 2nd time to the candidate already rejected
 
-Après le test 1, avec un envoi d'e-mails qui réussit : la candidature 1 a son `decision_email_sent_at` rempli.
+After test 1, with a successful sending of emails: application 1 has its `decision_email_sent_at` filled in.
 
 ```bash
-# clôture sans candidat retenu -> attendu : 200 "status": "closed", un e-mail pour chaque candidature sauf la 1
+# closure without an accepted candidate -> expected: 200 "status": "closed", one email for each application except the 1st
 curl -i -X POST -b cookies_rec1.txt "http://127.0.0.1:5000/api/recruiter/ads/1/closure" -H "Content-Type: application/json" -d '{}'
 ```
 
-Code obtenu : non rejoué avec curl. Vérifié le 14/10 par le client de test Flask (envoi simulé, qui réussit) : le refus de la candidature 1 envoie 1 e-mail « n'a pas donné suite » ; la clôture de l'annonce 1 (40 candidatures) renvoie 200 `closed` et envoie 39 e-mails, aucun à la candidature 1.
+Status code: not replayed with curl. Checked on 14/10 with the Flask test client (simulated sending, which succeeds): the rejection of application 1 sends 1 "not selected" email (the French text contains "n'a pas donné suite"); the closure of ad 1 (40 applications) returns 200 `closed` and sends 39 emails, none to application 1.
 
-# Test 3 : GET /api/admin/<table>?order=asc|desc, tri des tableaux admin
+# Test 3: GET /api/admin/<table>?order=asc|desc, sorting of the admin tables
 
-Base neuve (`init_db.py` puis `seed_data.py`), administrateur connecté avec `cookies_admin.txt` (même compte que les tests J5), Bob connecté avec `cookies_bob.txt`.
+Fresh database (`init_db.py` then `seed_data.py`), administrator logged in with `cookies_admin.txt` (same account as the J5 tests), Bob logged in with `cookies_bob.txt`.
 
 ```bash
-# plus récentes d'abord -> attendu : 200, created_at décroissant, X-Total-Count inchangé
+# most recent first -> expected: 200, created_at descending, X-Total-Count unchanged
 curl -i -b cookies_admin.txt "http://127.0.0.1:5000/api/admin/applications?order=desc&page=1&per_page=5"
 curl -i -b cookies_admin.txt "http://127.0.0.1:5000/api/admin/ads?order=desc&page=1&per_page=5"
 
-# plus anciennes d'abord -> attendu : 200, created_at croissant
+# oldest first -> expected: 200, created_at ascending
 curl -i -b cookies_admin.txt "http://127.0.0.1:5000/api/admin/applications?order=asc&page=1&per_page=5"
 
-# table sans created_at -> attendu : 200, id décroissant
+# table without created_at -> expected: 200, id descending
 curl -i -b cookies_admin.txt "http://127.0.0.1:5000/api/admin/people?order=desc&page=1&per_page=5"
 
-# sans order -> attendu : 200, id croissant comme avant (ids 1 à 5)
+# without order -> expected: 200, id ascending as before (ids 1 to 5)
 curl -i -b cookies_admin.txt "http://127.0.0.1:5000/api/admin/ads?page=1&per_page=5"
 
-# valeur inconnue, en majuscules ou vide -> attendu : 400 Invalid order (pour les 3)
+# unknown value, in capitals or empty -> expected: 400 Invalid order (for the 3)
 curl -i -b cookies_admin.txt "http://127.0.0.1:5000/api/admin/ads?order=up"
 curl -i -b cookies_admin.txt "http://127.0.0.1:5000/api/admin/ads?order=DESC"
 curl -i -b cookies_admin.txt "http://127.0.0.1:5000/api/admin/ads?order="
 
-# sans session -> attendu : 401 Login required ; compte ordinaire -> attendu : 403 Admin only
+# no session -> expected: 401 Login required; ordinary account -> expected: 403 Admin only
 curl -i "http://127.0.0.1:5000/api/admin/ads?order=desc"
 curl -i -b cookies_bob.txt "http://127.0.0.1:5000/api/admin/ads?order=desc"
 ```
 
-Code obtenu : non rejoué avec curl. Vérifié le 14/10 par le client de test Flask sur une base neuve dans `/tmp` (admin créé par `register` puis `role` posé en base) : 15 contrôles sur 15. `applications?order=desc` : ids 1360 à 1356 ; `asc` : ids 1, 2, 3, 4, 513 (created_at croissant, pas l'id) ; `ads?order=desc` : 53, 52, 39, 45, 41 ; `people?order=desc` : 115 à 111 ; sans `order` : 1 à 5 ; la page 2 en `desc` suit la page 1 ; 400 `Invalid order` pour `up`, `DESC`, vide et `id;DROP` ; 401 `Login required` ; 403 `Admin only`.
+Status code: not replayed with curl. Checked on 14/10 with the Flask test client on a fresh database in `/tmp` (admin created by `register` then `role` set in the database): 15 checks out of 15. `applications?order=desc`: ids 1360 to 1356; `asc`: ids 1, 2, 3, 4, 513 (created_at ascending, not the id); `ads?order=desc`: 53, 52, 39, 45, 41; `people?order=desc`: 115 to 111; without `order`: 1 to 5; page 2 in `desc` follows page 1; 400 `Invalid order` for `up`, `DESC`, empty and `id;DROP`; 401 `Login required`; 403 `Admin only`.
 
-## Test J8 et J9
+## Tests J8 and J9
 
-Tests rejoués avec curl le 15/10, dans l'ordre ci-dessous, sur une base neuve. Les tests se suivent : l'annonce 1 est fermée au test 3, puis sert au 409 des tests 4 et 7 ; l'annonce `$AD` est supprimée à la fin du test 7.
+Tests replayed with curl on 15/10, in the order below, on a fresh database. The tests follow one another: ad 1 is closed in test 3, then serves for the 409 of tests 4 and 7; the ad `$AD` is deleted at the end of test 7.
 
-# Mise en place : base neuve, deux recruteurs, un compte ordinaire, deux annonces sans candidature
+# Setup: fresh database, two recruiters, one ordinary account, two ads without applications
 
 ```bash
-# base neuve, puis serveur avec les e-mails désactivés (les lignes [mail désactivé] s'affichent dans ce terminal)
+# fresh database, then server with emails disabled (the [mail disabled] lines are printed in this terminal)
 python3 init_db.py
 python3 seed_data.py
 MAIL_ENABLED=0 python3 app.py
 
-# dans un 2e terminal : inscription (attendu : 201, la session s'ouvre)
+# in a 2nd terminal: registration (expected: 201, the session opens)
 curl -s -c cookies_rec1.txt -X POST "http://127.0.0.1:5000/api/auth/register" -H "Content-Type: application/json" -d '{"first_name":"Rec","last_name":"Un","email":"rec1.test@example.com","password":"password123"}'
 curl -s -c cookies_rec2.txt -X POST "http://127.0.0.1:5000/api/auth/register" -H "Content-Type: application/json" -d '{"first_name":"Rec","last_name":"Deux","email":"rec2.test@example.com","password":"password123"}'
 curl -s -c cookies_bob.txt -X POST "http://127.0.0.1:5000/api/auth/register" -H "Content-Type: application/json" -d '{"first_name":"Bob","last_name":"Test","email":"bob.test@example.com","password":"password123"}'
 
-# Rec1 -> TechNova (1), Rec2 -> GreenWorks (2), Bob reste un compte ordinaire
+# Rec1 -> TechNova (1), Rec2 -> GreenWorks (2), Bob stays an ordinary account
 sqlite3 jobboard.db "UPDATE people SET company_id = 1 WHERE email = 'rec1.test@example.com'; UPDATE people SET company_id = 2 WHERE email = 'rec2.test@example.com';"
 sqlite3 jobboard.db "SELECT id, email, company_id FROM people WHERE email LIKE '%.test@example.com';"
 
-# deux annonces de Rec1 sans candidature : $AD (modification, suppression) et $AD2 (e-mails)
+# two ads of Rec1 without applications: $AD (edit, deletion) and $AD2 (emails)
 AD=$(curl -s -b cookies_rec1.txt -X POST "http://127.0.0.1:5000/api/recruiter/ads" -H "Content-Type: application/json" -d '{"title":"Dev Python","short_description":"Back Flask","category_id":1,"location":"Paris"}' | python3 -c "import sys, json; print(json.load(sys.stdin)['id'])")
 AD2=$(curl -s -b cookies_rec1.txt -X POST "http://127.0.0.1:5000/api/recruiter/ads" -H "Content-Type: application/json" -d '{"title":"Stage data","short_description":"SQL et Python","category_id":1}' | python3 -c "import sys, json; print(json.load(sys.stdin)['id'])")
 echo "AD=$AD AD2=$AD2"
 ```
 
-Obtenu : 201 pour les 3 inscriptions, puis en base
+Obtained: 201 for the 3 registrations, then in the database
 
 ```bash
 114|rec1.test@example.com|1
@@ -2375,22 +2375,22 @@ Obtenu : 201 pour les 3 inscriptions, puis en base
 AD=54 AD2=55
 ```
 
-Annonces du seed utilisées : 1 (TechNova, ouverte, 40 candidatures dont 1 et 2 de `seed.sql`), 2 (GreenWorks, fermée), 3 (TechNova, ouverte, 16 candidatures).
+Seed ads used: 1 (TechNova, open, 40 applications including 1 and 2 from `seed.sql`), 2 (GreenWorks, closed), 3 (TechNova, open, 16 applications).
 
-# Test 1 : E-mails, une candidature puis une clôture (attendu : 201 puis 200, et une ligne [mail désactivé] dans le terminal du serveur à chaque fois)
+# Test 1: Emails, an application then a closure (expected: 201 then 200, and a [mail disabled] line in the server terminal each time)
 
 ```bash
-# Bob postule à $AD2 -> attendu : 201 ; terminal : [mail désactivé] ... Sujet : Candidature reçue : Stage data
+# Bob applies to $AD2 -> expected: 201; terminal: [mail disabled] ... Subject: Candidature reçue : Stage data
 curl -i -X POST -b cookies_bob.txt "http://127.0.0.1:5000/api/ads/$AD2/applications" -H "Content-Type: application/json" -d '{"message":"Bonjour, je suis intéressé."}'
 
-# Rec1 clôture $AD2 sans candidat retenu -> attendu : 200 "status": "closed" ; terminal : [mail désactivé] ... Sujet : Information concernant votre candidature : Stage data
+# Rec1 closes $AD2 without an accepted candidate -> expected: 200 "status": "closed"; terminal: [mail disabled] ... Subject: Information concernant votre candidature : Stage data
 curl -i -X POST -b cookies_rec1.txt "http://127.0.0.1:5000/api/recruiter/ads/$AD2/closure" -H "Content-Type: application/json" -d '{}'
 
-# vérification en base -> attendu : la candidature de Bob est rejected
+# check in the database -> expected: Bob's application is rejected
 sqlite3 jobboard.db "SELECT applications.id, people.email, applications.status FROM applications JOIN people ON people.id = applications.person_id WHERE ad_id = $AD2;"
 ```
 
-Code obtenu candidature : 201
+Status code, application: 201
 
 ```json
 {
@@ -2403,7 +2403,7 @@ Code obtenu candidature : 201
 }
 ```
 
-Code obtenu clôture : 200
+Status code, closure: 200
 
 ```json
 {
@@ -2423,33 +2423,33 @@ Code obtenu clôture : 200
 }
 ```
 
-Obtenu dans le terminal du serveur : une ligne après la candidature, une ligne après la clôture
+Obtained in the server terminal: one line after the application, one line after the closure
 
 ```bash
-[mail désactivé] À : bob.test@example.com | Sujet : Candidature reçue : Stage data
-[mail désactivé] À : bob.test@example.com | Sujet : Information concernant votre candidature : Stage data
+[mail disabled] To: bob.test@example.com | Subject: Candidature reçue : Stage data
+[mail disabled] To: bob.test@example.com | Subject: Information concernant votre candidature : Stage data
 ```
 
-Obtenu en base
+Obtained in the database
 
 ```bash
 1361|bob.test@example.com|rejected
 ```
 
-# Test 2 : GET /api/recruiter/ads/<id>/applications, candidatures d'une annonce (attendu : 200 avec les clés du contrat, [] pour une annonce sans candidature, 404 pour l'annonce d'une autre entreprise)
+# Test 2: GET /api/recruiter/ads/<id>/applications, applications of an ad (expected: 200 with the keys of the contract, [] for an ad without applications, 404 for the ad of another company)
 
 ```bash
-# annonce 1 (TechNova) -> attendu : 200, 40 candidatures, de la plus ancienne à la plus récente
+# ad 1 (TechNova) -> expected: 200, 40 applications, from the oldest to the most recent
 curl -i -b cookies_rec1.txt "http://127.0.0.1:5000/api/recruiter/ads/1/applications"
 
-# annonce sans candidature -> attendu : 200, []
+# ad without applications -> expected: 200, []
 curl -i -b cookies_rec1.txt "http://127.0.0.1:5000/api/recruiter/ads/$AD/applications"
 
-# annonce 2 (GreenWorks) lue par Rec1 -> attendu : 404 Ad not found
+# ad 2 (GreenWorks) read by Rec1 -> expected: 404 Ad not found
 curl -i -b cookies_rec1.txt "http://127.0.0.1:5000/api/recruiter/ads/2/applications"
 ```
 
-Code obtenu annonce 1 : 200, 40 candidatures, chacune avec les 8 clés du contrat (la première ci-dessous)
+Status code, ad 1: 200, 40 applications, each with the 8 keys of the contract (the first one below)
 
 ```json
 [
@@ -2467,13 +2467,13 @@ Code obtenu annonce 1 : 200, 40 candidatures, chacune avec les 8 clés du contra
 ]
 ```
 
-Code obtenu annonce sans candidature : 200
+Status code, ad without applications: 200
 
 ```json
 []
 ```
 
-Code obtenu annonce d'une autre entreprise : 404
+Status code, ad of another company: 404
 
 ```json
 {
@@ -2481,22 +2481,22 @@ Code obtenu annonce d'une autre entreprise : 404
 }
 ```
 
-# Test 3 : POST /api/recruiter/ads/<id>/closure, clôture recruteur (attendu : 200 avec accepted_application_id, 200 avec {}, 409 si déjà fermée)
+# Test 3: POST /api/recruiter/ads/<id>/closure, recruiter closure (expected: 200 with accepted_application_id, 200 with {}, 409 if already closed)
 
 ```bash
-# annonce 1, candidature 1 retenue -> attendu : 200 "status": "closed" ; en base 1 accepted, 39 rejected ; terminal : 40 lignes [mail désactivé]
+# ad 1, application 1 accepted -> expected: 200 "status": "closed"; in the database 1 accepted, 39 rejected; terminal: 40 [mail disabled] lines
 curl -i -X POST -b cookies_rec1.txt "http://127.0.0.1:5000/api/recruiter/ads/1/closure" -H "Content-Type: application/json" -d '{"accepted_application_id": 1}'
 sqlite3 jobboard.db "SELECT status, COUNT(*) FROM applications WHERE ad_id = 1 GROUP BY status; SELECT id, status FROM applications WHERE id = 1;"
 
-# annonce 3, aucun candidat retenu -> attendu : 200 "status": "closed" ; en base les 16 candidatures rejected
+# ad 3, no accepted candidate -> expected: 200 "status": "closed"; in the database the 16 applications rejected
 curl -i -X POST -b cookies_rec1.txt "http://127.0.0.1:5000/api/recruiter/ads/3/closure" -H "Content-Type: application/json" -d '{}'
 sqlite3 jobboard.db "SELECT status, COUNT(*) FROM applications WHERE ad_id = 3 GROUP BY status;"
 
-# annonce 1 une 2e fois -> attendu : 409 Ad already closed
+# ad 1 a 2nd time -> expected: 409 Ad already closed
 curl -i -X POST -b cookies_rec1.txt "http://127.0.0.1:5000/api/recruiter/ads/1/closure" -H "Content-Type: application/json" -d '{}'
 ```
 
-Code obtenu avec accepted_application_id : 200
+Status code, with accepted_application_id: 200
 
 ```json
 {
@@ -2516,7 +2516,7 @@ Code obtenu avec accepted_application_id : 200
 }
 ```
 
-Obtenu en base : 1 candidature retenue (la 1), les 39 autres refusées ; 40 lignes `[mail désactivé]` dans le terminal (sujet « Information concernant votre candidature : Développeur Python »)
+Obtained in the database: 1 accepted application (the 1st), the 39 others rejected; 40 `[mail disabled]` lines in the terminal (subject "Information concernant votre candidature : Développeur Python")
 
 ```bash
 accepted|1
@@ -2524,7 +2524,7 @@ rejected|39
 1|accepted
 ```
 
-Code obtenu avec {} : 200
+Status code, with {}: 200
 
 ```json
 {
@@ -2544,13 +2544,13 @@ Code obtenu avec {} : 200
 }
 ```
 
-Obtenu en base : les 16 candidatures sont refusées ; 16 lignes `[mail désactivé]` dans le terminal
+Obtained in the database: the 16 applications are rejected; 16 `[mail disabled]` lines in the terminal
 
 ```bash
 rejected|16
 ```
 
-Code obtenu déjà fermée : 409
+Status code, already closed: 409
 
 ```json
 {
@@ -2558,46 +2558,46 @@ Code obtenu déjà fermée : 409
 }
 ```
 
-# Test 4 : PATCH /api/recruiter/ads/<id>, modification (attendu : 200 ; 400 No fields to update, Unknown field, Missing field, Unknown category_id ; 404 ; 409 sur une annonce fermée)
+# Test 4: PATCH /api/recruiter/ads/<id>, edit (expected: 200; 400 No fields to update, Unknown field, Missing field, Unknown category_id; 404; 409 on a closed ad)
 
 ```bash
-# 2 champs -> attendu : 200, title et salary changés, location toujours "Paris"
+# 2 fields -> expected: 200, title and salary changed, location still "Paris"
 curl -i -X PATCH "http://127.0.0.1:5000/api/recruiter/ads/$AD" -H "Content-Type: application/json" -b cookies_rec1.txt -d '{"title":"Dev Python senior","salary":45000}'
 
-# catégorie -> attendu : 200, "category": "Design", le titre modifié juste avant est conservé
+# category -> expected: 200, "category": "Design", the title changed just before is kept
 curl -i -X PATCH "http://127.0.0.1:5000/api/recruiter/ads/$AD" -H "Content-Type: application/json" -b cookies_rec1.txt -d '{"category_id":2}'
 
-# corps vide, ou pas de corps -> attendu : 400 No fields to update (pour les 2)
+# empty body, or no body -> expected: 400 No fields to update (for both)
 curl -i -X PATCH "http://127.0.0.1:5000/api/recruiter/ads/$AD" -H "Content-Type: application/json" -b cookies_rec1.txt -d '{}'
 curl -i -X PATCH "http://127.0.0.1:5000/api/recruiter/ads/$AD" -b cookies_rec1.txt
 
-# champs interdits -> attendu : 400 Unknown field: company_id / status / contact_id
+# champs interdits -> expected: 400 Unknown field: company_id / status / contact_id
 curl -i -X PATCH "http://127.0.0.1:5000/api/recruiter/ads/$AD" -H "Content-Type: application/json" -b cookies_rec1.txt -d '{"company_id":2}'
 curl -i -X PATCH "http://127.0.0.1:5000/api/recruiter/ads/$AD" -H "Content-Type: application/json" -b cookies_rec1.txt -d '{"status":"closed"}'
 curl -i -X PATCH "http://127.0.0.1:5000/api/recruiter/ads/$AD" -H "Content-Type: application/json" -b cookies_rec1.txt -d '{"contact_id":1}'
 
-# champ obligatoire envoyé vide ou null -> attendu : 400 Missing field: title / short_description
+# required field sent empty or null -> expected: 400 Missing field: title / short_description
 curl -i -X PATCH "http://127.0.0.1:5000/api/recruiter/ads/$AD" -H "Content-Type: application/json" -b cookies_rec1.txt -d '{"title":""}'
 curl -i -X PATCH "http://127.0.0.1:5000/api/recruiter/ads/$AD" -H "Content-Type: application/json" -b cookies_rec1.txt -d '{"short_description":null}'
 
-# catégorie inconnue ou de mauvais type -> attendu : 400 Unknown category_id (pour les 2)
+# unknown category or wrong type -> expected: 400 Unknown category_id (for both)
 curl -i -X PATCH "http://127.0.0.1:5000/api/recruiter/ads/$AD" -H "Content-Type: application/json" -b cookies_rec1.txt -d '{"category_id":999}'
 curl -i -X PATCH "http://127.0.0.1:5000/api/recruiter/ads/$AD" -H "Content-Type: application/json" -b cookies_rec1.txt -d '{"category_id":true}'
 
-# annonce inexistante -> attendu : 404 Ad not found
+# nonexistent ad -> expected: 404 Ad not found
 curl -i -X PATCH "http://127.0.0.1:5000/api/recruiter/ads/999" -H "Content-Type: application/json" -b cookies_rec1.txt -d '{"title":"X"}'
 
-# ordre du contrat : le corps est vérifié avant l'annonce -> attendu : 400 Missing field: title (pas 404)
+# order of the contract: the body is checked before the ad -> expected: 400 Missing field: title (not 404)
 curl -i -X PATCH "http://127.0.0.1:5000/api/recruiter/ads/999" -H "Content-Type: application/json" -b cookies_rec1.txt -d '{"title":""}'
 
-# annonce 1, fermée au test 3 -> attendu : 409 Ad is closed
+# ad 1, closed in test 3 -> expected: 409 Ad is closed
 curl -i -X PATCH "http://127.0.0.1:5000/api/recruiter/ads/1" -H "Content-Type: application/json" -b cookies_rec1.txt -d '{"title":"Nouveau titre"}'
 
-# vérification en base -> attendu : $AD modifiée, entreprise et contact inchangés ; annonce 1 inchangée
+# check in the database -> expected: $AD changed, company and contact unchanged; ad 1 unchanged
 sqlite3 jobboard.db "SELECT id, title, salary, category_id, company_id, contact_id, status FROM ads WHERE id IN (1, $AD);"
 ```
 
-Code obtenu 2 champs : 200
+Status code, 2 fields: 200
 
 ```json
 {
@@ -2617,7 +2617,7 @@ Code obtenu 2 champs : 200
 }
 ```
 
-Code obtenu catégorie : 200
+Status code, category: 200
 
 ```json
 {
@@ -2637,7 +2637,7 @@ Code obtenu catégorie : 200
 }
 ```
 
-Code obtenu corps vide, pas de corps : 400 (pour les 2)
+Status code, empty body, no body: 400 (for both)
 
 ```json
 {
@@ -2645,7 +2645,7 @@ Code obtenu corps vide, pas de corps : 400 (pour les 2)
 }
 ```
 
-Code obtenu champs interdits : 400 (pour les 3)
+Status code, forbidden fields: 400 (for the 3)
 
 ```json
 {
@@ -2659,7 +2659,7 @@ Code obtenu champs interdits : 400 (pour les 3)
 }
 ```
 
-Code obtenu champ obligatoire vide ou null : 400 (pour les 2)
+Status code, required field empty or null: 400 (for both)
 
 ```json
 {
@@ -2670,7 +2670,7 @@ Code obtenu champ obligatoire vide ou null : 400 (pour les 2)
 }
 ```
 
-Code obtenu catégorie 999, catégorie true : 400 (pour les 2)
+Status code, category 999, category true: 400 (for both)
 
 ```json
 {
@@ -2678,7 +2678,7 @@ Code obtenu catégorie 999, catégorie true : 400 (pour les 2)
 }
 ```
 
-Code obtenu annonce inexistante : 404
+Status code, nonexistent ad: 404
 
 ```json
 {
@@ -2686,7 +2686,7 @@ Code obtenu annonce inexistante : 404
 }
 ```
 
-Code obtenu annonce inexistante avec un titre vide : 400
+Status code, nonexistent ad with an empty title: 400
 
 ```json
 {
@@ -2694,7 +2694,7 @@ Code obtenu annonce inexistante avec un titre vide : 400
 }
 ```
 
-Code obtenu annonce fermée : 409
+Status code, closed ad: 409
 
 ```json
 {
@@ -2702,34 +2702,34 @@ Code obtenu annonce fermée : 409
 }
 ```
 
-Obtenu en base
+Obtained in the database
 
 ```bash
 1|Développeur Python|42000|1|1|1|closed
 54|Dev Python senior|45000|2|1|114|open
 ```
 
-# Test 5 : deux recruteurs de deux entreprises (attendu : 404 Ad not found sur PATCH et DELETE appliqués à l'annonce de l'autre, base inchangée)
+# Test 5: two recruiters of two companies (expected: 404 Ad not found on PATCH and DELETE applied to the other's ad, database unchanged)
 
-Les trois autres routes (candidatures, clôture, refus) sont déjà vérifiées : test 2 ci-dessus et Test J9.
+The three other routes (applications, closure, rejection) are already checked: test 2 above and Test J9.
 
 ```bash
-# avant -> les deux annonces
+# before -> the two ads
 sqlite3 jobboard.db "SELECT id, title, salary, company_id, status FROM ads WHERE id IN (2, $AD);"
 
-# Rec2 (GreenWorks) sur l'annonce $AD de TechNova -> attendu : 404 Ad not found (pour les 2)
+# Rec2 (GreenWorks) on the ad $AD of TechNova -> expected: 404 Ad not found (for both)
 curl -i -X PATCH "http://127.0.0.1:5000/api/recruiter/ads/$AD" -H "Content-Type: application/json" -b cookies_rec2.txt -d '{"title":"Piraté"}'
 curl -i -X DELETE "http://127.0.0.1:5000/api/recruiter/ads/$AD" -b cookies_rec2.txt
 
-# Rec1 (TechNova) sur l'annonce 2 de GreenWorks -> attendu : 404 Ad not found (pour les 2)
+# Rec1 (TechNova) on ad 2 of GreenWorks -> expected: 404 Ad not found (for both)
 curl -i -X PATCH "http://127.0.0.1:5000/api/recruiter/ads/2" -H "Content-Type: application/json" -b cookies_rec1.txt -d '{"title":"Piraté"}'
 curl -i -X DELETE "http://127.0.0.1:5000/api/recruiter/ads/2" -b cookies_rec1.txt
 
-# après -> attendu : identique à avant
+# after -> expected: identical to before
 sqlite3 jobboard.db "SELECT id, title, salary, company_id, status FROM ads WHERE id IN (2, $AD);"
 ```
 
-Code obtenu : 404 (pour les 4)
+Status code: 404 (for the 4)
 
 ```json
 {
@@ -2737,35 +2737,35 @@ Code obtenu : 404 (pour les 4)
 }
 ```
 
-Obtenu en base, avant et après : identique
+Obtained in the database, before and after: identical
 
 ```bash
 2|Data analyst|52000|2|closed
 54|Dev Python senior|45000|1|open
 ```
 
-# Test 6 : Accès aux cinq routes recruteur (attendu : 401 sans session, 403 avec un compte ordinaire)
+# Test 6: Access to the five recruiter routes (expected: 401 without session, 403 with an ordinary account)
 
 ```bash
-# sans session -> attendu : 401 Login required (pour les 5)
+# no session -> expected: 401 Login required (for the 5)
 curl -i "http://127.0.0.1:5000/api/recruiter/ads/1/applications"
 curl -i -X POST "http://127.0.0.1:5000/api/recruiter/ads/$AD/closure" -H "Content-Type: application/json" -d '{}'
 curl -i -X POST "http://127.0.0.1:5000/api/recruiter/ads/1/applications/2/rejection"
 curl -i -X PATCH "http://127.0.0.1:5000/api/recruiter/ads/$AD" -H "Content-Type: application/json" -d '{"title":"X"}'
 curl -i -X DELETE "http://127.0.0.1:5000/api/recruiter/ads/$AD"
 
-# compte ordinaire (Bob) -> attendu : 403 Recruiter only (pour les 5)
+# ordinary account (Bob) -> expected: 403 Recruiter only (for the 5)
 curl -i -b cookies_bob.txt "http://127.0.0.1:5000/api/recruiter/ads/1/applications"
 curl -i -X POST -b cookies_bob.txt "http://127.0.0.1:5000/api/recruiter/ads/$AD/closure" -H "Content-Type: application/json" -d '{}'
 curl -i -X POST -b cookies_bob.txt "http://127.0.0.1:5000/api/recruiter/ads/1/applications/2/rejection"
 curl -i -X PATCH -b cookies_bob.txt "http://127.0.0.1:5000/api/recruiter/ads/$AD" -H "Content-Type: application/json" -d '{"title":"X"}'
 curl -i -X DELETE -b cookies_bob.txt "http://127.0.0.1:5000/api/recruiter/ads/$AD"
 
-# l'annonce $AD n'a pas été touchée -> attendu : toujours ouverte, même titre
+# the ad $AD was not touched -> expected: still open, same title
 sqlite3 jobboard.db "SELECT id, title, status FROM ads WHERE id = $AD;"
 ```
 
-Code obtenu sans session : 401 (pour les 5)
+Status code, no session: 401 (for the 5)
 
 ```json
 {
@@ -2773,7 +2773,7 @@ Code obtenu sans session : 401 (pour les 5)
 }
 ```
 
-Code obtenu compte ordinaire : 403 (pour les 5)
+Status code, ordinary account: 403 (for the 5)
 
 ```json
 {
@@ -2781,31 +2781,31 @@ Code obtenu compte ordinaire : 403 (pour les 5)
 }
 ```
 
-Obtenu en base
+Obtained in the database
 
 ```bash
 54|Dev Python senior|open
 ```
 
-# Test 7 : DELETE /api/recruiter/ads/<id>, suppression (attendu : 409 avec candidatures, 404, puis 204 sans corps)
+# Test 7: DELETE /api/recruiter/ads/<id>, deletion (expected: 409 with applications, 404, then 204 without body)
 
 ```bash
-# annonce 1, qui a des candidatures -> attendu : 409 Ad has applications
+# ad 1, which has applications -> expected: 409 Ad has applications
 curl -i -X DELETE "http://127.0.0.1:5000/api/recruiter/ads/1" -b cookies_rec1.txt
 
-# annonce inexistante -> attendu : 404 Ad not found
+# nonexistent ad -> expected: 404 Ad not found
 curl -i -X DELETE "http://127.0.0.1:5000/api/recruiter/ads/999" -b cookies_rec1.txt
 
-# $AD, sans candidature -> attendu : 204, sans corps
+# $AD, without applications -> expected: 204, without body
 curl -i -X DELETE "http://127.0.0.1:5000/api/recruiter/ads/$AD" -b cookies_rec1.txt
 
-# elle a disparu -> attendu : 404 Ad not found, puis aucune ligne en base ; l'annonce 1 existe toujours
+# it is gone -> expected: 404 Ad not found, then no row in the database; ad 1 still exists
 curl -i "http://127.0.0.1:5000/api/ads/$AD"
 sqlite3 jobboard.db "SELECT id FROM ads WHERE id = $AD;"
 sqlite3 jobboard.db "SELECT COUNT(*) FROM ads WHERE id = 1;"
 ```
 
-Code obtenu annonce avec candidatures : 409
+Status code, ad with applications: 409
 
 ```json
 {
@@ -2813,7 +2813,7 @@ Code obtenu annonce avec candidatures : 409
 }
 ```
 
-Code obtenu annonce inexistante : 404
+Status code, nonexistent ad: 404
 
 ```json
 {
@@ -2821,7 +2821,7 @@ Code obtenu annonce inexistante : 404
 }
 ```
 
-Code obtenu suppression : 204, aucun corps
+Status code, deletion: 204, no body
 
 ```bash
 HTTP/1.1 204 NO CONTENT
@@ -2831,7 +2831,7 @@ Vary: Cookie
 Connection: close
 ```
 
-Code obtenu lecture après suppression : 404
+Status code, read after deletion: 404
 
 ```json
 {
@@ -2839,7 +2839,7 @@ Code obtenu lecture après suppression : 404
 }
 ```
 
-Obtenu en base : aucune ligne pour `$AD`, l'annonce 1 est toujours là
+Obtained in the database: no row for `$AD`, ad 1 is still there
 
 ```bash
 1

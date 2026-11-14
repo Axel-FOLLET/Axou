@@ -1,21 +1,21 @@
-"""Inscriptions en attente de vérification de l'email.
+"""Registrations waiting for email verification.
 
-Cas visé : une personne déjà enregistrée dans people n'a pas de mot de passe (elle a
-candidaté sans compte, ou une entreprise l'a saisie). Connaître son email ne doit jamais
-suffire à prendre la main sur sa fiche ni à voir ses candidatures : l'inscription est
-gardée de côté ici, et n'est appliquée qu'après le clic sur le lien envoyé à l'adresse.
+Target case: a person already recorded in people has no password (they applied without
+an account, or a company entered them). Knowing their email must never be enough to
+take over their record or to see their applications: the registration is set aside
+here, and is applied only after the click on the link sent to the address.
 
-Le jeton n'est jamais enregistré en clair : seule son empreinte SHA-256 est stockée,
-comme pour un mot de passe. Le lien envoyé par email est la seule copie du jeton.
+The token is never stored in plain text: only its SHA-256 fingerprint is stored, as
+for a password. The link sent by email is the only copy of the token.
 """
 import hashlib
 import secrets
 
-VALIDITY = "+1 day"  # durée de vie du lien, lue telle quelle par SQLite
+VALIDITY = "+1 day"  # lifetime of the link, read as is by SQLite
 
 
 def ensure_table(conn):
-    """Crée la table si elle manque : une base déjà en place n'a pas besoin d'être refaite."""
+    """Creates the table if it is missing: an existing database does not need to be rebuilt."""
     conn.execute(
         """
         CREATE TABLE IF NOT EXISTS pending_registrations (
@@ -35,15 +35,15 @@ def ensure_table(conn):
 
 
 def _fingerprint(token):
-    """Empreinte du jeton : c'est elle qui va en base, jamais le jeton lui-même."""
+    """Fingerprint of the token: it is what goes into the database, never the token itself."""
     return hashlib.sha256(token.encode("utf-8")).hexdigest()
 
 
 def create(conn, person_id, first_name, last_name, phone, password_hash):
-    """Enregistre l'inscription en attente et renvoie le jeton en clair, pour le lien.
+    """Saves the pending registration and returns the plain token, for the link.
 
-    Une seule attente par personne : une nouvelle demande remplace la précédente, donc
-    le lien précédent ne fonctionne plus.
+    One pending registration per person: a new request replaces the previous one, so
+    the previous link no longer works.
     """
     ensure_table(conn)
 
@@ -75,10 +75,10 @@ def create(conn, person_id, first_name, last_name, phone, password_hash):
 
 
 def take(conn, token):
-    """Lit l'inscription en attente correspondant au jeton, puis la supprime.
+    """Reads the pending registration matching the token, then deletes it.
 
-    Renvoie la ligne, ou None si le jeton est inconnu, déjà utilisé ou expiré.
-    La suppression fait qu'un lien ne sert qu'une seule fois.
+    Returns the row, or None if the token is unknown, already used or expired.
+    The deletion makes a link usable only once.
     """
     ensure_table(conn)
 

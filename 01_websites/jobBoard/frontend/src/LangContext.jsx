@@ -1,6 +1,6 @@
-// Le contexte de langue seul, dans son propre fichier (comme AuthContext) : LangProvider le remplit,
-// les pages le lisent par useLang() (lang.js).
+// The language context alone, in its own file (like AuthContext): LangProvider fills it,
+// the pages read it through useLang() (lang.js).
 import { createContext } from 'react'
 
-// Français par défaut : valeur reçue par un composant qui lirait le contexte hors du Provider.
+// French by default: the value received by a component that reads the context outside the Provider.
 export const LangContext = createContext({ lang: 'fr', setLang: () => {} })

@@ -62,13 +62,14 @@ export const TEXTS = {
     pages: ['Ne t’attarde pas, {name}, devant ma toile :\nla montagne t’attend, suis ton étoile.'],
   },
   // Draft: second visit, before Maman: the Chartiste starts the fight (Story._startCombat when the speech bubble
-  // closes). Replaces chartisteAgain in that case. The third page, the poem of the choice, carries three buttons
+  // closes). Replaces chartisteAgain in that case. The last page, the poem of the choice, carries three buttons
   // (Bubble.js, `choices`); the clicked button sets `story.level` and closes the bubble, which starts the fight.
   // Labels are read from the difficulty table (difficulty.js): changing a `label` changes the button.
   chartisteChallenge: {
     draft: true, speaker: 'Chartiste',
     pages: [
       'Encore toi, {name} ? Tu reviens sans cesse,\net ma toile s’impatiente de ta paresse.',
+      'Ta mère courait trop vite pour mon pinceau.\nIl ne manque que toi à mon tableau.',
       'Puisque tu restes, voyons ce que tu vaux :\nmon pinceau va peindre un tout autre tableau !',
       'Dis-moi, {name}, quel trait tu veux braver :\ndoux, juste ou fier, je saurai t’éprouver.',
     ],
@@ -162,4 +163,10 @@ export const END = {
       "Modifications : le modèle a été converti au format glTF/GLB pour le web, son rig et ses animations ont été retravaillés (cycles ajoutés, clips de marche, d'affût et de bond), la fourrure et les matériaux ont été recréés côté web.",
     ],
   },
+};
+
+/** Text of the cutscene player (src/ui/CutscenePlayer.js). `draft: true` marks text still to be reviewed. */
+export const CUTSCENE = {
+  // Draft: button that skips the first cutscene, shown from the second playthrough.
+  skip: { draft: true, text: 'Passer' },
 };

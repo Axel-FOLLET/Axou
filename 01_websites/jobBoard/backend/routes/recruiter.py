@@ -8,10 +8,10 @@ import application_cvs
 
 recruiter = Blueprint("recruiter", __name__)
 
-# Champs que le recruteur peut modifier sur son entreprise (pas le siren)
+# Fields the recruiter can edit on their company (not the siren)
 COMPANY_FIELDS = ["name", "description", "location", "website"]
 
-# Champs acceptés pour une nouvelle annonce (company_id et contact_id : remplis par le serveur)
+# Fields accepted for a new ad (company_id and contact_id: filled in by the server)
 AD_FIELDS = [
     "title",
     "short_description",
@@ -24,7 +24,7 @@ AD_FIELDS = [
 ]
 AD_REQUIRED = ["title", "short_description", "category_id"]
 
-# Une candidature avec son candidat, au format du contrat (liste et refus)
+# An application with its candidate, in the contract format (list and rejection)
 APPLICATION_SELECT = """SELECT applications.id, people.first_name, people.last_name, people.email,
                   people.phone, applications.message, applications.status, applications.created_at,
                   EXISTS (SELECT 1 FROM application_cvs
@@ -34,31 +34,31 @@ APPLICATION_SELECT = """SELECT applications.id, people.first_name, people.last_n
 
 
 def application_json(row):
-    """Une ligne de APPLICATION_SELECT au format du contrat : has_cv en vrai ou faux."""
+    """A row of APPLICATION_SELECT in the contract format: has_cv as true or false."""
     application = dict(row)
     application["has_cv"] = bool(application["has_cv"])
     return application
 
-# l'annonce, seulement si elle appartient à l'entreprise du recruteur ; sinon None
+# the ad, only if it belongs to the recruiter's company; otherwise None
 def fetch_own_ad(conn, ad_id, company_id):
     return conn.execute(
         "SELECT id, status FROM ads WHERE id = ? AND company_id = ?",
         (ad_id, company_id),
     ).fetchone()
 
-# Vérifier que la personne connectée est recruteur.
-# Le company_id vient toujours de la fiche de la personne connectée, jamais du client :
-# il est transmis à la route en argument (def ma_route(company_id): ...).
+# Check that the logged-in person is a recruiter.
+# The company_id always comes from the logged-in person's record, never from the client:
+# it is passed to the route as an argument (def my_route(company_id): ...).
 def recruiter_required(view):
     @wraps(view)
     def wrapped_view(*args, **kwargs):
         user = current_user()
 
-        # 1. pas de session -> 401 Login required
+        # 1. no session -> 401 Login required
         if user is None:
             return jsonify({"error": "Login required"}), 401
 
-        # current_user() ne renvoie pas company_id : on le lit dans la base
+        # current_user() does not return company_id: read it from the database
         conn = get_db()
         row = conn.execute(
             "SELECT company_id FROM people WHERE id = ?",
@@ -66,17 +66,17 @@ def recruiter_required(view):
         ).fetchone()
         conn.close()
 
-        # 2. pas de company_id -> 403 Recruiter only (même pour un admin)
+        # 2. no company_id -> 403 Recruiter only (even for an admin)
         if row is None or row["company_id"] is None:
             return jsonify({"error": "Recruiter only"}), 403
 
-        # 3. sinon : appeler la vraie route, avec l'entreprise du recruteur
+        # 3. otherwise: call the real route, with the recruiter's company
         return view(*args, company_id=row["company_id"], **kwargs)
 
     return wrapped_view
 
 
-# Lire l'entreprise dans le format du contrat
+# Read the company in the contract format
 def fetch_company(conn, company_id):
     return conn.execute(
         """SELECT id, name, description, location, website, siren
@@ -86,7 +86,7 @@ def fetch_company(conn, company_id):
     ).fetchone()
 
 
-#------------------- GET /api/categories (publique) -------------------
+#------------------- GET /api/categories (public) -------------------
 
 @recruiter.route("/categories", methods=["GET"])
 def list_categories():
@@ -104,12 +104,12 @@ def close_company_ad(ad_id, company_id):
     data = request.get_json(silent=True) or {}
     conn = get_db()
 
-    # annonce d'une autre entreprise ou inexistante : même 404, rien n'est modifié
+    # ad of another company or nonexistent: same 404, nothing is modified
     if fetch_own_ad(conn, ad_id, company_id) is None:
         conn.close()
         return jsonify({"error": "Ad not found"}), 404
 
-    # mêmes règles que la clôture admin : la fonction est partagée
+    # same rules as the admin closure: the function is shared
     return close_ad_in_db(conn, ad_id, data)
 
 
@@ -136,12 +136,12 @@ def update_company(company_id):
     if not data:
         return jsonify({"error": "No fields to update"}), 400
 
-    # siren, id ou tout autre champ : refusé
+    # siren, id or any other field: refused
     for field in data:
         if field not in COMPANY_FIELDS:
             return jsonify({"error": f"Unknown field: {field}"}), 400
 
-    # name ne peut pas être vidé
+    # name cannot be emptied
     if "name" in data:
         name = data["name"]
         if not isinstance(name, str) or not name.strip():
@@ -149,11 +149,11 @@ def update_company(company_id):
         data["name"] = name.strip()
 
     fields = list(data.keys())
-    assignments = ", ".join(f"{field} = ?" for field in fields)  # noms tirés de COMPANY_FIELDS
+    assignments = ", ".join(f"{field} = ?" for field in fields)  # names taken from COMPANY_FIELDS
     values = [data[field] for field in fields]
 
     conn = get_db()
-    # WHERE id = l'entreprise du recruteur : il ne peut modifier que la sienne
+    # WHERE id = the recruiter's company: they can only edit their own
     conn.execute(
         f"UPDATE companies SET {assignments} WHERE id = ?",
         values + [company_id],
@@ -170,7 +170,7 @@ def update_company(company_id):
 @recruiter_required
 def list_company_ads(company_id):
     conn = get_db()
-    # LEFT JOIN : garde les annonces sans candidature (applications_count = 0)
+    # LEFT JOIN: keeps the ads without applications (applications_count = 0)
     rows = conn.execute(
         """SELECT ads.id, ads.title, ads.short_description, ads.location,
                   ads.contract_type, ads.status, ads.created_at,
@@ -197,7 +197,7 @@ def create_company_ad(company_id):
     if not isinstance(data, dict):
         data = {}
 
-    # company_id, contact_id ou tout autre champ : refusé
+    # company_id, contact_id or any other field: refused
     for field in data:
         if field not in AD_FIELDS:
             return jsonify({"error": f"Unknown field: {field}"}), 400
@@ -206,7 +206,7 @@ def create_company_ad(company_id):
         if data.get(field) in (None, ""):
             return jsonify({"error": f"Missing field: {field}"}), 400
 
-    # category_id doit être un identifiant (pas une liste, pas true/false)
+    # category_id must be an identifier (not a list, not true/false)
     category_id = data["category_id"]
     if isinstance(category_id, bool) or not isinstance(category_id, (int, str)):
         return jsonify({"error": "Unknown category_id"}), 400
@@ -221,7 +221,7 @@ def create_company_ad(company_id):
         conn.close()
         return jsonify({"error": "Unknown category_id"}), 400
 
-    # le serveur remplit l'entreprise (celle du recruteur) et le contact (le recruteur)
+    # the server fills in the company (the recruiter's) and the contact (the recruiter)
     contact_id = current_user()["id"]
 
     cur = conn.execute(
@@ -258,7 +258,7 @@ def list_ad_applications(ad_id, company_id):
         conn.close()
         return jsonify({"error": "Ad not found"}), 404
 
-    # les candidatures de l'annonce, avec le candidat, de la plus ancienne à la plus récente
+    # the ad's applications, with the candidate, from the oldest to the most recent
     rows = conn.execute(
         f"""{APPLICATION_SELECT}
            WHERE applications.ad_id = ?
@@ -278,12 +278,12 @@ def download_application_cv(ad_id, application_id, company_id):
     conn = get_db()
     application_cvs.ensure_tables(conn)
 
-    # annonce d'une autre entreprise ou inexistante : même 404
+    # ad of another company or nonexistent: same 404
     if fetch_own_ad(conn, ad_id, company_id) is None:
         conn.close()
         return jsonify({"error": "Ad not found"}), 404
 
-    # la candidature doit appartenir à cette annonce
+    # the application must belong to this ad
     application = conn.execute(
         "SELECT id FROM applications WHERE id = ? AND ad_id = ?",
         (application_id, ad_id),
@@ -307,7 +307,7 @@ def reject_application(ad_id, application_id, company_id):
     conn = get_db()
     application_cvs.ensure_tables(conn)
 
-    # annonce d'une autre entreprise ou inexistante : même 404, rien n'est modifié
+    # ad of another company or nonexistent: same 404, nothing is modified
     ad = fetch_own_ad(conn, ad_id, company_id)
     if ad is None:
         conn.close()
@@ -317,7 +317,7 @@ def reject_application(ad_id, application_id, company_id):
         conn.close()
         return jsonify({"error": "Ad already closed"}), 409
 
-    # la candidature doit appartenir à cette annonce
+    # the application must belong to this ad
     application = conn.execute(
         "SELECT status FROM applications WHERE id = ? AND ad_id = ?",
         (application_id, ad_id),
@@ -326,19 +326,19 @@ def reject_application(ad_id, application_id, company_id):
         conn.close()
         return jsonify({"error": "Application not found"}), 404
 
-    # seule une candidature en attente se refuse
+    # only a pending application can be rejected
     if application["status"] != "pending":
         conn.close()
         return jsonify({"error": "Application already processed"}), 409
 
-    # l'annonce reste ouverte, les autres candidatures ne changent pas
+    # the ad stays open, the other applications do not change
     conn.execute(
         "UPDATE applications SET status = 'rejected' WHERE id = ?",
         (application_id,),
     )
     conn.commit()
 
-    # e-mail après la validation : un échec d'envoi ne change pas la réponse
+    # email after the commit: a sending failure does not change the response
     notify_rejection(conn, application_id)
 
     row = conn.execute(
@@ -380,7 +380,7 @@ def update_company_ad(ad_id, company_id):
         conn.close()
         return jsonify({"error": "Ad is closed"}), 409
 
-    # category_id vérifié seulement s'il est envoyé
+    # category_id is checked only if it is sent
     if "category_id" in data:
         category_id = data["category_id"]
         if isinstance(category_id, bool) or not isinstance(category_id, (int, str)):
@@ -395,9 +395,9 @@ def update_company_ad(ad_id, company_id):
             conn.close()
             return jsonify({"error": "Unknown category_id"}), 400
 
-    # seuls les champs envoyés changent
+    # only the fields sent are changed
     fields = list(data.keys())
-    assignments = ", ".join(f"{field} = ?" for field in fields)  # noms tirés de AD_FIELDS
+    assignments = ", ".join(f"{field} = ?" for field in fields)  # names taken from AD_FIELDS
     values = [data[field] for field in fields]
 
     conn.execute(

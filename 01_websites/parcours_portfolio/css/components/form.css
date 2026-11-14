@@ -1,0 +1,320 @@
+/* -------------------- FORM -------------------- */
+
+/*
+    Fields of the contact form and states of the send button, taken from the contact.css of the portfolio
+    (the CV had the same rules). Classes set by contact.js: form__input--valid, form__error,
+    form__status--success / --error, button--loading / --sent / --shake.
+    The layout of the contact page (.contact, .contact__main, .contact__resume) is in pages/contact.css.
+*/
+
+/* Two fields side by side (first name, surname); one under the other on phones (responsive.css) */
+.form__row {
+    display: flex;
+
+    gap: 20px;
+}
+
+
+.form__row .form__field {
+    flex: 1;
+}
+
+
+.form__field {
+    display: flex;
+    flex-direction: column;
+
+    margin-bottom: 25px;
+}
+
+
+.form__label {
+    margin-bottom: 8px;
+
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+
+.form__input {
+    width: 100%;
+
+    min-height: 56px;
+
+    padding: 14px 16px;
+
+    border: 1px solid var(--line-field);
+    border-radius: var(--radius-s);
+
+    background-color: var(--veil);
+    color: var(--white);
+
+    font-family: inherit;
+    font-size: 1rem;
+
+    transition:
+        background-color var(--dur-fast) var(--ease-out),
+        border-color var(--dur-fast) var(--ease-out);
+}
+
+
+.form__input:hover {
+    border-color: var(--white);
+}
+
+
+.form__input:focus {
+    border-color: var(--white);
+
+    background-color: var(--veil-strong);
+}
+
+
+/*
+    Hint text of the demo fields, on the red cards: off-white like the typed text (4.7:1 on the lightest red);
+    the browser default grey only reaches 1.1:1 there. opacity: 1 cancels the fading some browsers add.
+*/
+.demo__input::placeholder {
+    color: var(--white);
+    opacity: 1;
+}
+
+
+/*
+    Field in error: thick left border, recognisable without relying on colour.
+    The padding compensates the 5 px added so that the text does not move.
+*/
+.form__input[aria-invalid="true"] {
+    border-left-width: 6px;
+
+    padding-left: 11px;
+}
+
+
+/* Message created by contact.js under the field concerned */
+.form__error {
+    margin: 8px 0 0;
+
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+
+/*
+    Valid, filled field: a white tick on the right (SVG image written in the URL).
+    The right padding keeps the text from going under the tick.
+*/
+.form__input--valid {
+    padding-right: 44px;
+
+    background-image: var(--sprite-check);
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    background-size: 16px;
+}
+
+
+.form__input--area {
+    resize: vertical;
+}
+
+
+/* Message area: the tick stays at the top, near the first line */
+.form__input--area.form__input--valid {
+    background-position: right 16px top 18px;
+}
+
+
+/* Anti-spam field: invisible to humans */
+.form__trap {
+    position: absolute;
+
+    left: -9999px;
+}
+
+
+/* Notice under the button: required fields and link to the data usage (legal notice) */
+.form__notice {
+    max-width: 60ch;
+
+    margin: 16px 0 0;
+
+    /* Off-white rather than --muted: --muted only reaches 2.8:1 on red and 4.1 on the blue of the cards */
+    color: var(--white);
+
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+
+
+.form__notice a {
+    color: var(--white);
+
+    text-underline-offset: 3px;
+}
+
+
+.form__status {
+    min-height: 1.6em;
+
+    margin: 20px 0 0;
+
+    font-weight: bold;
+}
+
+
+/* Result of the sending: a box that appears while rising, with a tick or ! before the text */
+.form__status--success,
+.form__status--error {
+    display: flex;
+    align-items: center;
+
+    gap: 14px;
+
+    padding: 14px 18px;
+
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-s);
+
+    background-color: var(--veil-strong);
+
+    animation: status-in var(--dur-base) var(--ease-out);
+}
+
+
+.form__status--success::before,
+.form__status--error::before {
+    flex: 0 0 auto;
+
+    display: grid;
+    place-items: center;
+
+    width: 28px;
+    height: 28px;
+
+    border-radius: 50%;
+
+    background-color: var(--white);
+    color: var(--accent);
+}
+
+
+/* After "/", the text read by screen readers: empty, the symbol is decorative */
+.form__status--success::before {
+    content: "✓";
+    content: "✓" / "";
+}
+
+
+.form__status--error::before {
+    content: "!";
+    content: "!" / "";
+}
+
+
+@keyframes status-in {
+    from {
+        opacity: 0;
+        translate: 0 8px;
+    }
+}
+
+
+/* Spinner displayed in the button while sending */
+.button--loading::after {
+    content: "";
+
+    display: inline-block;
+
+    width: 14px;
+    height: 14px;
+
+    margin-left: 10px;
+
+    border: 2px solid currentColor;
+    border-right-color: var(--clear);
+    border-radius: 50%;
+
+    vertical-align: -2px;
+
+    animation: spin var(--dur-slow) linear infinite;
+}
+
+
+@keyframes spin {
+    to {
+        rotate: 360deg;
+    }
+}
+
+
+/* Success: the button bounces once and a tick appears after the "sent" label */
+.button--sent {
+    animation: button-pop var(--dur-base) var(--ease-out);
+}
+
+
+.button--sent::after {
+    content: "";
+
+    display: inline-block;
+
+    width: 12px;
+    height: 7px;
+
+    margin-left: 10px;
+
+    border-bottom: 3px solid currentColor;
+    border-left: 3px solid currentColor;
+
+    rotate: -45deg;
+    translate: 0 -2px;
+
+    animation: button-tick var(--dur-base) var(--ease-out);
+}
+
+
+/* Failure: a horizontal shake that dies down */
+.button--shake {
+    animation: button-shake var(--dur-base) var(--ease-in-out);
+}
+
+
+@keyframes button-pop {
+    40% {
+        scale: 1.05;
+    }
+}
+
+
+@keyframes button-tick {
+    from {
+        opacity: 0;
+        scale: 0;
+    }
+}
+
+
+@keyframes button-shake {
+    20%, 60% {
+        translate: -7px 0;
+    }
+
+    40%, 80% {
+        translate: 7px 0;
+    }
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+
+    .form__status--success,
+    .form__status--error,
+    .button--loading::after,
+    .button--sent,
+    .button--sent::after,
+    .button--shake {
+        animation: none;
+    }
+
+}

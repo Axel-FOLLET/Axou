@@ -1,0 +1,20 @@
+/* -------------------- TAGS -------------------- */
+
+/*
+    Technology or skill tag, the same in the two former sites
+    (projects.css of the portfolio, experience.css of the CV): projects, jobs of the timeline.
+    The list that holds them (flex, gap) belongs to the parent block (.timeline__tags, .project-card__tags...).
+*/
+
+/* Pill on a light veil (off-white text at a contrast of 5.1) */
+.tag {
+    padding: 4px 10px;
+
+    border-radius: var(--radius-s);
+
+    background-color: var(--veil);
+
+    font-size: 0.8125rem;
+    font-weight: 500;
+    line-height: 1.5;
+}

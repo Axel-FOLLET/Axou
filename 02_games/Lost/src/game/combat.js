@@ -10,7 +10,7 @@ export { LEVELS } from './difficulty.js';
 /**
  * Settings and rules of the fight against the Chartiste: arena and transformation (`BOSS`, `COMBAT_CAM`), the kitten's
  * claw, the boss's brush strike, knockback, heal and provisional ending (`FIGHT`, class `Duel`, created by Story._fight
- * and advanced by Story.update), sword (`FIGHT.sword`, `Duel._weapon`, pause during the pull) and defeat signal
+ * and advanced by Story.update), sword (`FIGHT.sword`, `Duel._weapon`, pause during the sword cutscene) and defeat signal
  * (`onDefeat`). The full victory is played by Story._victory.
  * Single source of the boss's red: `BOSS.red`, passed to `Npc.startBoss({ coat })` (Story.js) and to
  * `new BossBar({ color })` (main.js). Read by Story.js (sequence), main.js (bar) and the debug handles (`__combat`).
@@ -57,8 +57,7 @@ export const BOSS = {
  *   - `pushRate` (1/s), `push` (m/s): the back-off reaches the wanted distance with an exponential glide, at most
  *     `push`. Without them, the start of a knockback (0.32 m on the first frame) made the camera jump by 1.19 m at once.
  *     8/s and 10 m/s: the knocked-back kitten (3 m in 0.45 s) stays in frame, in the margin between `yMin` and the
- *     screen edge. The exit from the sword-pull close-up is a cut, not a glide (Story._cutToFight); these two settings
- *     serve the duel's back-off and Story._holdFrame.
+ *     screen edge. These two settings serve the duel's back-off and Story._holdFrame.
  *   - `behind`: camera held on the kitten's side, behind it relative to the boss. The azimuth around the aimed point
  *     between the camera and the boss-to-kitten axis is held under `max` rad; beyond it, gentle rotation towards the axis
  *     at `gain` × the excess rad/s, capped at `rate` rad/s. Otherwise the camera could pass behind the boss, the kitten
@@ -71,15 +70,13 @@ export const BOSS = {
  *   on leaving).
  * - `inside`: camera kept above the disc (Story._keepInArena), at most `margin` m from the edge (radius 11 in World.js,
  *   pillars at 11.45), raised to keep its distance, pitch at most `maxPitch` below the horizontal. `fightPitch` replaces
- *   `maxPitch` in the `fight` phase (outside the sword-pull close-up) and in `victory`: at 1.1 rad, a kitten on the edge
+ *   `maxPitch` in the `fight` phase and in `victory`: at 1.1 rad, a kitten on the edge
  *   of the disc ended up below the camera, which could neither back off (edge) nor climb enough. 1.45 rad: almost
  *   vertical, the wanted back-off is fully held and kitten and boss stay in frame; 22 m back is 21.8 m high, below the
  *   night ceiling (80 m, NIGHT.height in Arena.js). In `victory`, without it the 1.1 rad limit would return at once when
  *   the victory shot brings the camera towards the edge.
- * - `plan` (Story._planShot): search for a framed shot for the sword-pull cuts and the victory. `pitchStep` 0.05 rad and
- *   `turnStep` 0.3 rad: finer does not visibly change the shot, coarser would pick it too high. `run`: limits of the run
- *   towards the stone, between the bars (top and bottom: SWORD.run.bars minus `margin` 0.04), x 0.85 like the duel.
- *   `catR`, `focusR` (m): half-widths of the kitten and of the stone with its sword.
+ * - `plan` (Story._planShot): search for a framed shot for the victory. `pitchStep` 0.05 rad and
+ *   `turnStep` 0.3 rad: finer does not visibly change the shot, coarser would pick it too high.
  */
 export const COMBAT_CAM = {
   narrowAspect: 0.75,
@@ -93,7 +90,7 @@ export const COMBAT_CAM = {
   },
   shadow: 7,
   inside: { margin: 1.5, maxPitch: 1.1, fightPitch: 1.45 },
-  plan: { pitchStep: 0.05, turnStep: 0.3, run: { x: 0.85, margin: 0.04, catR: 0.5, focusR: 0.6 } },
+  plan: { pitchStep: 0.05, turnStep: 0.3 },
 };
 
 /**
@@ -121,7 +118,7 @@ export const COMBAT_CAM = {
  *   - `cooldown` (s): from the start of one claw to the start of the next; 1.2 s: the clip lasts 0.96 s, plus 0.24 s of
  *     recovery (a click during the claw is kept and fires at the end).
  *   - `damage` (HP): damage of one hit; 1, deliberately low.
- * - `sword`: sword (`Duel._weapon`, taken by the pull in src/world/Sword.js). Replaces `claw` as soon as the kitten
+ * - `sword`: sword (`Duel._weapon`, taken during cutscene 2, src/game/story/swordCutscene.js). Replaces `claw` as soon as the kitten
  *   holds it (Cat.sword).
  *   - `cooldown` (s): 1.25, measured length of the `SwordSwing` clip (no recovery: the player chains attacks).
  *     `damage` is derived from `swordTime` and `swordPace` (4.19 HP).
@@ -130,8 +127,8 @@ export const COMBAT_CAM = {
  *     across the mouth reaches about 0.25 m further than the paw: `hitReach` 1.2 (claw 0.95 + 0.25), `reach` 1.05 and
  *     `stand` 0.5 (contact threshold under `hitReach`, as for the claw). Cone of ± 1.05 rad, as for the claw (the sweep
  *     covers more, but the kitten faces the boss during the wind-up). `turn` 10 rad/s, as for the claw.
- *   - `resume` (s): minimum delay before the next boss strike at the end of the sword-pull cinematic (the boss does not
- *     strike during it, Story._updatePull); 1.5 s: the player regains control and sees the announcement before the strike.
+ *   - `resume` (s): minimum delay before the next boss strike at the end of the sword cutscene (the boss does not
+ *     strike during it, Duel.pause); 1.5 s: the player regains control and sees the announcement before the strike.
  * - `boss`: brush strike (`BrushSwing` clip, 1.75 s).
  *   - First strike delay, cadence, announcement and heal are per-level values (`first`, `cadence`, `announce`, `heal`) of
  *     `LEVELS` (difficulty.js), read by `Duel` and bossMoves.js.
@@ -191,7 +188,7 @@ export const FIGHT = {
 };
 // Real pace of a played fight: fight time excluding dodges per strike given. One strike per cooldown (1.2 s / 1.25 s)
 // does not hold: the kitten returns to contact after each dodge, the boss moves it away with his strike and the flinch
-// breaks the chain. Measured on a played fight (duel clock, sword-pull cinematic excluded since the duel is paused):
+// breaks the chain. Measured on a played fight (duel clock, sword cutscene excluded since the duel is paused):
 // claw 1.70 s per strike, sword 1.77 s per strike.
 // HP = 120 s / 1.70 s × 1 = 71; sword: 71 × 1.77 s / 30 s = 4.19 HP per strike (17 strikes).
 FIGHT.clawPace = 1.70;
@@ -214,7 +211,7 @@ const angleTo = (from, to) => Math.atan2(Math.sin(to - from), Math.cos(to - from
  * - HP at 0: `onDefeat` (Story: victory music cue), `Defeat` to the end, pose held for `FIGHT.defeatHold` s, then `onWin`
  *   (Story._victory: shrink, dissolve, scenery restored).
  * - Sword held (Cat.sword): `FIGHT.sword` replaces `FIGHT.claw` (`_weapon`), `SwordSwing` clip.
- * - `pause(true)` during the sword-pull cinematic: nothing advances, current strike cancelled. `pause(false)`: next boss
+ * - `pause(true)` during the sword cutscene: nothing advances, current strike cancelled. `pause(false)`: next boss
  *   strike in at least `FIGHT.sword.resume` s.
  */
 export class Duel {
@@ -243,7 +240,7 @@ export class Duel {
     this.stats = { swipes: 0, given: 0, missed: 0, swings: 0, taken: 0, dodged: 0, healed: 0, swordHits: 0 };
     this.lastGiven = null; this.lastTaken = null;
     this.over = false;
-    this.paused = false;                   // sword-pull cinematic (pause)
+    this.paused = false;                   // sword cutscene (pause)
     this.onWin = null;
     this.onDefeat = null;                  // HP at 0, at the start of the `Defeat` clip
     this.obstacle = world.ruins?.obstacles.find((o) => o.name === 'npc_boss') ?? null;
@@ -262,7 +259,7 @@ export class Duel {
   _weapon() { return this.cat.sword ? FIGHT.sword : FIGHT.claw; }
 
   /**
-   * Sword-pull cinematic (Story): `on` true freezes the duel (clocks, strikes) and cancels the boss's current strike (back
+   * Sword cutscene (Story): `on` true freezes the duel (clocks, strikes) and cancels the boss's current strike (back
    * to guard); false: the next strike fires in at least `FIGHT.sword.resume` s.
    */
   pause(on) {

@@ -1,7 +1,7 @@
-/* Boutons du site, et liens présentés comme des boutons : bleu profond qui fonce au survol,
-   ou blancs à contour pour l'action secondaire. */
+/* Site buttons, and links presented as buttons: deep blue that darkens on hover,
+   or white with an outline for the secondary action. */
 
-/* Boutons communs du site. */
+/* Common site buttons. */
 button {
   font: inherit;
   font-size: 15px;
@@ -15,17 +15,17 @@ button {
   transition: background-color .2s, color .2s, transform .2s;
 }
 
-/* Survol des boutons disponibles : le même bleu, plus foncé, pour ne pas changer de registre. */
+/* Hover of available buttons: the same blue, darker, so as not to change register. */
 button:hover:not(:disabled) {
   background-color: var(--color-primary-hover);
 }
 
-/* Léger enfoncement au clic. */
+/* Slight press effect on click. */
 button:active:not(:disabled) {
   transform: translateY(1px);
 }
 
-/* Actions indisponibles : gris neutre plutôt qu'un bleu délavé, pour lire « indisponible » d'un coup d'œil. */
+/* Unavailable actions: neutral grey rather than a washed-out blue, to read "unavailable" at a glance. */
 button:disabled {
   color: var(--color-text-secondary);
   background: var(--color-neutral);
@@ -33,7 +33,7 @@ button:disabled {
   cursor: not-allowed;
 }
 
-/* Envoi en cours ou réussi (spinner, coche) : le bouton est verrouillé mais garde son bleu, ce n'est pas une indisponibilité. */
+/* Sending in progress or done (spinner, check mark): the button is locked but keeps its blue, it is not an unavailability. */
 button:disabled:has(.spinner, .checkmark) {
   color: var(--color-on-primary);
   background: var(--color-primary);
@@ -41,7 +41,7 @@ button:disabled:has(.spinner, .checkmark) {
   cursor: progress;
 }
 
-/* Action secondaire : blanche, à fine bordure. */
+/* Secondary action: white, with a thin border. */
 .button-secondary {
   color: var(--color-text);
   background: var(--color-surface);
@@ -52,7 +52,7 @@ button:disabled:has(.spinner, .checkmark) {
   background-color: var(--color-surface-blue);
 }
 
-/* Action qui supprime ou efface (admin, filtres de recherche) : différenciée par son texte et sa couleur. */
+/* Action that deletes or clears (admin, search filters): set apart by its text and its color. */
 .button-danger {
   color: var(--color-danger);
   background: var(--color-danger-bg);
@@ -63,7 +63,7 @@ button:disabled:has(.spinner, .checkmark) {
   background-color: var(--color-danger-hover);
 }
 
-/* Lien d'appel à l'action présenté comme un bouton, sans soulignement. */
+/* Call-to-action link presented as a button, without underline. */
 a.button-link {
   display: inline-flex;
   align-items: center;

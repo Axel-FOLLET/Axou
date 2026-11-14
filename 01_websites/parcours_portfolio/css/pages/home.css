@@ -1,0 +1,162 @@
+/* -------------------- HOME PAGE -------------------- */
+
+/*
+    Styles specific to the home page (index.html, home theme set on <body>): the two entrance doors.
+    The shared opening is in components/hero.css; this sheet only writes its differences.
+    No hard-coded colour: only the variables of tokens.css.
+    No motion amplitude set here: those of the portfolio apply (scroll.css, motion.css).
+*/
+
+
+/* -------------------- LIGHT -------------------- */
+
+/*
+    No white glow behind the title here: the home page is lit by the blue and red glows of the black pages,
+    set on <body> (base.css), which the opening lets through.
+*/
+[data-theme="home"] .hero {
+    background: none;
+}
+
+
+/* -------------------- ENTRANCE DOORS -------------------- */
+
+/*
+    Two links side by side in the figure of the opening: a cube, then its label alone, without subtitle.
+    The red cube is lower than the blue one: the two doors read diagonally, like the cubes of the other pages.
+    No underline (no underlined link on the site): on hover or with the keyboard, the cube lights up.
+*/
+/*
+    On desktop, the doors are pushed to the right of the figure, inset by 64 px:
+    while rotating, a 170 px cube overflows its cell by about 60 px; the inset keeps it inside the column.
+*/
+.doors {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-end;
+
+    gap: clamp(40px, 6vw, 96px);
+
+    padding-top: 40px;
+    padding-right: 64px;
+}
+
+
+.door {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    gap: 64px;
+
+    color: var(--white);
+
+    text-align: center;
+    text-decoration: none;
+}
+
+
+/* Opposite directions in the mouse parallax (scroll.css reads --depth) */
+.door--parcours {
+    --depth: -24;
+}
+
+
+.door--portfolio {
+    --depth: 32;
+
+    margin-top: 140px;
+}
+
+
+/* Label in the display serif, like the big headings */
+.door__label {
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 1.4rem + 1vw, 2.25rem);
+    line-height: 1;
+}
+
+
+/* With the keyboard, the cube lights up as on hover (cubes.css, .cube:hover) */
+.door:hover .cube__face,
+.door:focus-visible .cube__face {
+    background-color: var(--cube-hover);
+
+    box-shadow: 0 0 28px var(--cube-glow);
+}
+
+
+/* -------------------- TABLET -------------------- */
+
+@media (max-width: 1024px) {
+
+    /* Figure under the text, over the full width: the doors come back to the centre; its height follows the doors */
+    .doors {
+        justify-content: center;
+
+        height: auto;
+
+        padding: 40px 0 24px;
+    }
+
+
+    .door--portfolio {
+        margin-top: 96px;
+    }
+
+}
+
+
+/* -------------------- PHONE -------------------- */
+
+@media (max-width: 767px) {
+
+    /*
+        Opening of the home page over the whole first screen, as on desktop (hero.css leaves it at its height
+        on phones): the footer starts below the screen. 76 px: height of the header, as in hero.css.
+        The text stays at the top, the doors go down to the bottom of the screen.
+    */
+    [data-theme="home"] .hero {
+        min-height: calc(100svh - 76px);
+    }
+
+
+    /* Smaller, more spaced cubes: while rotating, the two cubes no longer touch */
+    .doors {
+        gap: 48px;
+
+        padding-top: 32px;
+    }
+
+
+    .door {
+        gap: 40px;
+    }
+
+
+    .hero__visual .door .cube {
+        --cube-size: 96px;
+    }
+
+
+    .door--portfolio {
+        margin-top: 80px;
+    }
+
+}
+
+
+/* Small phone: the two doors still fit side by side in the column */
+@media (max-width: 374px) {
+
+    .doors {
+        gap: 32px;
+    }
+
+
+    .hero__visual .door .cube {
+        --cube-size: 80px;
+    }
+
+}
+

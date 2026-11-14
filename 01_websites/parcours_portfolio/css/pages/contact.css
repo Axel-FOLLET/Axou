@@ -1,0 +1,160 @@
+/* -------------------- CONTACT ME PAGE -------------------- */
+
+/*
+    Styles specific to the Contact me page (contact theme set on <body>): layout of the #contact section, the only section of the page.
+    Taken from contact.css and responsive.css of the two former sites, identical on this point.
+    No shared opening (components/hero.css) on this page; the link cards are in components/cards.css,
+    the fields and the send button in components/form.css.
+    The CV button is under the section title (.contact__resume).
+    No hard-coded colour: only the variables of tokens.css.
+    No motion amplitude set here: those of the portfolio apply (scroll.css, motion.css).
+*/
+
+
+
+/* -------------------- TOP OF PAGE -------------------- */
+
+/*
+    No home screen: the form section opens the page, with the title, a sentence and the CV.
+    The top of the section is reduced to the margin of an opening (48 px): the form rises into the first screen.
+*/
+#contact {
+    padding-top: 48px;
+}
+
+
+/*
+    The title of the section is the main title of the page (<h1>): it takes the common size of h1 (--text-h1, base.css),
+    instead of that of the section titles. Tight line height of the opening titles (0.95).
+*/
+#contact .section__title {
+    font-size: var(--text-h1);
+    line-height: 0.95;
+}
+
+
+.contact__resume {
+    margin: 28px 0 40px;
+}
+
+
+/* The form on a column of 800 px at most, like the link cards */
+.contact {
+    display: flex;
+    align-items: flex-start;
+}
+
+
+.contact__main {
+    flex: 0 1 800px;
+
+    width: 800px;
+    max-width: 800px;
+    min-width: 0;
+}
+
+
+/* -------------------- POSTMAN CUBE -------------------- */
+
+/*
+    Place of the postman cube (components/postman-cube.css, js/modules/postman-cube.js).
+    isolation: the section becomes a stacking context, and z-index: -1 keeps the cube and its halo under the texts.
+*/
+#contact {
+    isolation: isolate;
+}
+
+
+.postman {
+    position: relative;
+
+    z-index: -1;
+}
+
+
+/*
+    Wide screens (1024 px and more): a column in the right half of the section, from the title down to the end of the form.
+    The cube stays in the middle of the screen while the page scrolls (sticky): it is on the first screen,
+    then next to the form when the visitor fills it.
+*/
+@media (min-width: 1024px) {
+
+    .postman {
+        /* Read by postman-cube.js: the cube leaves through the top of the screen */
+        --postman-exit: up;
+        /*
+            Low windows (less than about 480 px high): the cube gets smaller so that its bottom stays above the bottom
+            of the window. Under the header (88 px), the cube needs about 1.7 times its edge.
+        */
+        --postman-size: min(clamp(132px, 15vw, 220px), max(96px, calc((100vh - 96px) / 1.75)));
+
+        position: absolute;
+
+        top: 48px;
+        right: var(--gutter);
+        bottom: var(--space-section);
+
+        /* What the 800 px of the form and a 48 px gap leave free; never less than 300 px (the form then gets narrower) */
+        width: max(300px, calc(100% - 2 * var(--gutter) - 848px));
+    }
+
+
+    /* Centred between the header (76 px) and the bottom of the screen */
+    .postman__stage {
+        position: sticky;
+
+        top: max(88px, calc(76px + (100vh - 76px - var(--postman-stage)) / 2));
+    }
+
+
+    /* The link cards and the form leave the column of the cube free: 300 px and a 48 px gap */
+    #contact .link-list,
+    .contact__main {
+        max-width: min(800px, calc(100% - 348px));
+    }
+
+}
+
+
+/* -------------------- TABLET -------------------- */
+
+@media (max-width: 1023px) {
+
+    /* The form takes the full width */
+    .contact {
+        flex-direction: column;
+    }
+
+
+    /*
+        flex: none: in a column, the 800 px of the wide layout would become a height
+        and leave an empty band between a shorter form (tablet) and the cube.
+    */
+    .contact__main {
+        flex: none;
+
+        width: 100%;
+        max-width: none;
+    }
+
+
+    /*
+        The cube goes under the form, in the flow of the page, on the full width of the screen:
+        the negative margins cancel those of the section, and overflow-x: clip cuts the cube at the edge of the screen
+        when it leaves with the message, without creating a horizontal scroll.
+        The 24 px above are the room the cube uses to land when a message of the form pushes it down (postman-cube.js).
+    */
+    .postman {
+        --postman-size: clamp(112px, 34vw, 160px);
+        /* Read by postman-cube.js: the cube leaves through the right side of the screen */
+        --postman-exit: side;
+
+        align-self: stretch;
+
+        margin: 24px calc(-1 * clamp(20px, 4vw, 56px)) 0;
+
+        overflow-x: clip;
+    }
+
+}
+

@@ -94,6 +94,7 @@ export const BOSS_SHEEN_HSL = [10.3, 1, 0.829]; // relative hue; absolute satura
  * sit rebuilt on the frozen pose of the clip (see _sitCat); `SitNpc` is the NPC clip (rump on the ground, hock under
  * the thigh), `Sit` remains the kitten's. `plump`: widened body (fractions: sides, belly, back). `furLength`: hair
  * length factor of the instance. `belly`: belly colour (Fur.js option). `furStep`: keep one fur shell in N, at best.
+ * `paintMark`: carries the dried paint mark of PAINT_MARK.
  */
 export const NPC_KINDS = {
   chagicien: {
@@ -108,8 +109,8 @@ export const NPC_KINDS = {
   },
   maman: {
     displayName: NPC_NAMES.maman, scale: NPC_SCALE, pose: 'Lie',
-    // Hero's black coat; rounder and fluffier.
-    plump: { side: 0.15, belly: 0.15, back: 0.05 }, furLength: 1.15,
+    // Hero's black coat; rounder and fluffier. Dried purple paint mark on a flank (PAINT_MARK).
+    plump: { side: 0.15, belly: 0.15, back: 0.05 }, furLength: 1.15, paintMark: true,
   },
   // Mountain guide: sits at the foot of the mountain, then stands and follows the kitten (src/game/Chavalanche.js).
   // Beige coat with a white belly; helmet, ski mask, pack and poles from buildGuideGear (Accessories.js). `furStep`:
@@ -129,6 +130,45 @@ export const NPC_KINDS = {
     furStep: 3,
   },
 };
+
+/**
+ * Dried purple paint mark on a flank (npcPaintMark.js). Maman has it from the start (`paintMark: true` in NPC_KINDS):
+ * she was hit by the Chartiste's paint during the chase (roadmap session 11 B).
+ * - `side`: flank carrying the mark, +1 = the cat's left (+X at rest), −1 = its right. −1: this flank is the one the game camera sees in
+ *   the final pose of the hug (Sleep clip); the left one is hidden there.
+ * - `along`: position along the trunk, 0 = hips, 1 = shoulders. `height`: 0 = belly line, 1 = spine. Just behind the
+ *   shoulder, at mid height, is where a splash lands on a running cat.
+ * - `size`: half-axes of the main blob [along the body, up] (m, 1.0 m cat, × the NPC size): about 14 × 11 cm in all, a
+ *   hand's width, readable at the 3 m of a dialogue shot without covering the flank.
+ * - `depth`: thickness of the slab that carries the mark (m): keeps the splash off the far flank.
+ * - `color`, `edge`: sRGB hex of the faded violet and of its darker dried rim. Dull and greyed: a dried paint, never
+ *   the saturated violet of fresh paint, and not a dark red that could pass for blood.
+ * - `wobble`: [large, small] amplitude of the irregular edge (share of the radius). `drip`: [x, length, radius]
+ *   of the run below the blob (shares of the radii).
+ * - `roots`: darkening of the paint at the hair roots (0 = black, 1 = none), as for the coat.
+ * - `emissive`: share of the coat rim light and tint removed under the paint, so that it stays matte.
+ */
+export const PAINT_MARK = {
+  side: -1, along: 0.45, height: 0.55,
+  size: [0.07, 0.055], depth: 0.04,
+  color: 0x9478b8, edge: 0x66508a,
+  wobble: [0.7, 0.28], drip: [0.35, 1.7, 0.16],
+  roots: 0.8, emissive: 0.55,
+};
+
+/**
+ * Turn of the Chartiste's easel about its vertical axis (rad, toward the cat's left; 0 = canvas straight ahead). The
+ * player arrives from the meadow, on the cat's left side: straight ahead the canvas is edge-on and hidden behind the
+ * Chartiste in the dialogue shot, turned it shows the portrait of Maman.
+ */
+export const EASEL_TURN = 1.0;
+
+/**
+ * Forward position of the easel foot beside the Chartiste (m, 0.8 m cat, × the size). Level with his chest or beyond:
+ * seen from the arrival side, the easel then stands beside him and no longer behind his body. It is the zone already
+ * reserved for the easel in the footprint of npcPlacement.js (local box centred at z 0.62 m).
+ */
+export const EASEL_FORWARD = 0.5;
 
 export const NOOP = () => {};
 
@@ -154,14 +194,6 @@ export const SIT = { body: 0.35, rear: 0.25, reach: 0.95, frontX: 0.045, frontZ:
  *   of the 180° turn.
  */
 export const SIT_NPC = { ...SIT, body: 0.2, rear: 0, hind: false, clipGround: true, frontZ: 0.03, tailH: -0.02, wrapGap: 0, wrapC: 0.4 };
-
-/**
- * Total head lowering at k = 1 (rad, about 74°) and share of Neck, Neck.001 and Head. With Maman in `Idle`, the
- * bottom of the carried kitten (`Carried`) ends up 0 to 5 cm from the ground at k = 1.
- */
-export const HEAD_DIP = 1.3;
-
-export const HEAD_DIP_SHARE = [0.4, 0.35, 0.25];
 
 /**
  * Hug settings. `at`: frozen time of the `Sleep` clip (s; side at 2.6, curl at 3.8). `spot`: kitten placement

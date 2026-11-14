@@ -1,4 +1,4 @@
-// Page d'administration : un seul écran CRUD pour les cinq tables de l'API.
+// Administration page: a single CRUD screen for the five API tables.
 import { AuthContext } from "../AuthContext";
 import { useContext, useState, useEffect, Fragment } from "react";
 import { Link } from "react-router";
@@ -6,36 +6,36 @@ import { apiFetch } from "../api.js";
 import { tables } from "../adminTables.js";
 import { useLang } from "../lang.js";
 
-// Textes longs : zone de texte dans le panneau, une seule ligne coupée dans le tableau.
+// Long texts: text area in the panel, a single truncated line in the table.
 const LONG_FIELDS = ["description", "short_description", "message"];
-// Chiffres seuls : clavier numérique sur téléphone.
+// Digits only: numeric keyboard on phones.
 const NUMERIC_FIELDS = ["siren", "salary", "company_id", "category_id", "contact_id", "ad_id", "person_id"];
 
 export default function AdminPage() {
   const { user } = useContext(AuthContext);
   const { t, lang } = useLang();
-  // Table affichée et pagination : tout changement relance l'appel réseau ci-dessous.
+  // Displayed table and pagination: any change restarts the network call below.
   const [selectedTable, setSelectedTable] = useState("companies");
   const [rows, setRows] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [perPage, setPerPage] = useState(10);
-  // Sens du tri fait par l'API (paramètre order) : "asc" = plus anciens d'abord, "desc" = plus récents d'abord.
+  // Sort direction done by the API (order parameter): "asc" = oldest first, "desc" = most recent first.
   const [order, setOrder] = useState("asc");
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
-  // refresh : incrémenté à la main pour forcer un rechargement après une suppression ou un ajout.
+  // refresh: incremented by hand to force a reload after a deletion or an addition.
   const [refresh, setRefresh] = useState(0);
-  // editingRow = la ligne en cours de modification (null si aucune) ; isCreating = formulaire d'ajout.
+  // editingRow = the row being edited (null if none); isCreating = add form.
   const [editingRow, setEditingRow] = useState(null);
   const [editValues, setEditValues] = useState({});
   const [editError, setEditError] = useState(null);
   const [editSaving, setEditSaving] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
 
-  // Un seul appel réseau, relancé dès qu'une des dépendances listées en bas change.
+  // A single network call, restarted as soon as one of the dependencies listed at the bottom changes.
   useEffect(() => {
-    // Page réservée : on ne demande rien à l'API si la personne n'est pas administratrice.
+    // Reserved page: nothing is requested from the API if the person is not an administrator.
     if (!user || user.role !== 'admin') {
       return;
     }
@@ -48,16 +48,16 @@ export default function AdminPage() {
           `/api/admin/${selectedTable}?page=${currentPage}&per_page=${perPage}&order=${order}`
         );
         if (!ok) {
-          throw new Error(`Erreur HTTP ! statut : ${status}`);
+          throw new Error(`HTTP error! status: ${status}`);
         }
         setRows(data);
-        // Nombre de pages déduit de l'en-tête X-Total-Count renvoyé par l'API.
+        // Number of pages derived from the X-Total-Count header returned by the API.
         setTotalPages(Math.ceil(Number(total) / perPage));
       } catch (err) {
-        // Message pour l'écran ; le détail technique reste dans la console.
-        // "load" : texte choisi à l'affichage, dans la langue courante.
+        // Message for the screen; the technical detail stays in the console.
+        // "load": text chosen at display time, in the current language.
         setError("load");
-        console.error("Erreur lors de la récupération des données :", err);
+        console.error("Error fetching data:", err);
       } finally {
         setLoading(false);
       }
@@ -65,7 +65,7 @@ export default function AdminPage() {
     fetchData();
   }, [selectedTable, user, currentPage, perPage, order, refresh]);
 
-  // Panneau ouvert : la touche Échap le ferme, sauf pendant un envoi.
+  // Panel open: the Escape key closes it, except during a save.
   const formOpen = isCreating || editingRow !== null;
   useEffect(() => {
     if (!formOpen) return;
@@ -79,25 +79,25 @@ export default function AdminPage() {
     return () => document.removeEventListener("keydown", handleKey);
   }, [formOpen, editSaving]);
 
-  // --- Suppression ---
+  // --- Deletion ---
   async function handleDelete(id) {
-    // Confirmation avant tout appel : la suppression est définitive côté API.
+    // Confirmation before any call: deletion is definitive on the API side.
     if (!window.confirm(t("Supprimer cette ligne ?", "Delete this row?"))) { return; }
     setError(null);
     try {
       const { status, error: apiError } = await apiFetch(`/api/admin/${selectedTable}/${id}`, { method: 'DELETE' });
-      // 204 : succès sans contenu, il n'y a rien à lire dans la réponse.
+      // 204: success with no content, there is nothing to read in the response.
       if (status === 204) {
-        // Dernière ligne d'une page au-delà de la première : on recule pour ne pas afficher une page vide.
+        // Last row of a page beyond the first: go back so as not to show an empty page.
         if (rows.length === 1 && currentPage > 1) {
           setCurrentPage((prev) => prev - 1);
         }
         setRefresh((prev) => prev + 1);
         return;
       }
-      // Un message français par code de l'API ; 409 = ligne encore utilisée ailleurs.
+      // One message per API code; 409 = row still used elsewhere.
       const messages = {
-        // 0 : serveur injoignable, signalé par apiFetch au lieu d'une exception.
+        // 0: server unreachable, reported by apiFetch instead of an exception.
         0: t("Le serveur est injoignable. La suppression n'a pas pu être confirmée.", "The server cannot be reached. The deletion could not be confirmed."),
         401: t("Votre session a expiré. Merci de vous reconnecter.", "Your session has expired. Please log in again."),
         403: t("Cette action est réservée à l'administration.", "This action is restricted to administrators."),
@@ -105,21 +105,21 @@ export default function AdminPage() {
         409: t("Impossible de supprimer : cette ligne est utilisée ailleurs.", "Cannot delete: this row is used elsewhere."),
       };
       setError(messages[status] || t("La suppression a échoué. Merci de réessayer.", "The deletion failed. Please try again."));
-      console.error("Suppression refusée :", status, apiError);
+      console.error("Deletion refused:", status, apiError);
     } catch (err) {
       setError(t("Le serveur est injoignable. La suppression n'a pas pu être confirmée.", "The server cannot be reached. The deletion could not be confirmed."));
-      console.error("Erreur lors de la suppression :", err);
+      console.error("Error while deleting:", err);
     }
   }
 
-  // --- Ajout et modification : le même formulaire sert aux deux ---
+  // --- Add and edit: the same form serves both ---
   async function handleUpdate(e) {
     e.preventDefault();
-    // Envoi déjà en cours, ou aucune ligne ni création en cours : on ignore.
+    // Sending already in progress, or no row or creation in progress: ignore.
     if (editSaving || (!isCreating && !editingRow)) return;
     setEditError(null);
 
-    // SIREN contrôlé avant l'envoi, et seulement s'il change : neuf chiffres exactement.
+    // SIREN checked before sending, and only if it changes: exactly nine digits.
     if (selectedTable === "companies") {
       const siren = String(editValues.siren ?? "").trim();
       const previousSiren = String(editingRow?.siren ?? "").trim();
@@ -135,17 +135,17 @@ export default function AdminPage() {
       }
     }
 
-    // changes = ce qui partira réellement à l'API.
+    // changes = what will really be sent to the API.
     const changes = {};
-    // Ces champs sont des nombres pour l'API, alors qu'un <input> renvoie toujours du texte.
+    // These fields are numbers for the API, whereas an <input> always returns text.
     const numericFields = ["salary", "company_id", "category_id", "contact_id", "ad_id", "person_id"];
     for (const field of tables[selectedTable].editableFields) {
-      // Création : un champ laissé vide n'est pas envoyé.
+      // Creation: a field left empty is not sent.
       if (isCreating && String(editValues[field] ?? "").trim() === "") {
         continue;
       }
 
-      // Modification : un champ inchangé n'est pas envoyé, le PATCH reste partiel.
+      // Edit: an unchanged field is not sent, the PATCH stays partial.
       if (
         !isCreating &&
         String(editValues[field] ?? "") === String(editingRow[field] ?? "")
@@ -154,14 +154,14 @@ export default function AdminPage() {
       }
 
       let value = editValues[field];
-      // SIREN envoyé en texte pour conserver un éventuel zéro initial.
+      // SIREN sent as text to keep a possible leading zero.
       if (field === "siren") value = String(value).trim();
       if (numericFields.includes(field)) {
-        // Salaire et contact facultatifs : vide devient null.
+        // Salary and contact are optional: empty becomes null.
         if (String(value).trim() === "" && ["salary", "contact_id"].includes(field)) {
           value = null;
         } else {
-          // Les autres champs numériques doivent être des entiers.
+          // The other numeric fields must be integers.
           if (String(value).trim() === "" || !Number.isInteger(Number(value))) {
             setEditError(t("Valeur refusée pour ce champ.", "Value rejected for this field."));
             return;
@@ -172,7 +172,7 @@ export default function AdminPage() {
       changes[field] = value;
     }
 
-    // Rien n'a changé : on le dit sans appeler l'API.
+    // Nothing changed: say so without calling the API.
     if (!isCreating && Object.keys(changes).length === 0) {
       setEditError(t("Aucune modification à enregistrer.", "No changes to save."));
       return;
@@ -180,7 +180,7 @@ export default function AdminPage() {
 
     setEditSaving(true);
     try {
-      // Même formulaire, deux routes : POST pour créer, PATCH pour modifier.
+      // Same form, two routes: POST to create, PATCH to edit.
       const { ok, status, data, error: apiError } = await apiFetch(
         isCreating
           ? `/api/admin/${selectedTable}`
@@ -190,7 +190,7 @@ export default function AdminPage() {
           body: changes,
         }
       );
-      // Succès : un ajout recharge la page, une modification remplace la ligne sur place.
+      // Success: an addition reloads the page, an edit replaces the row in place.
       if (ok) {
         const savedRow = data;
         if (isCreating) {
@@ -205,7 +205,7 @@ export default function AdminPage() {
         return;
       }
 
-      // « Missing field: <nom> » renvoyé par l'API, traduit champ par champ.
+      // "Missing field: <name>" returned by the API, translated field by field.
       if (status === 400 && apiError.startsWith("Missing field: ")) {
         const field = apiError.slice("Missing field: ".length);
         const requiredMessages = {
@@ -223,10 +223,10 @@ export default function AdminPage() {
           message: t("Le message est obligatoire.", "The message is required."),
         };
         setEditError(requiredMessages[field] || t("Un champ obligatoire manque.", "A required field is missing."));
-        console.error("Champ obligatoire manquant :", data);
+        console.error("Missing required field:", data);
         return;
       }
-      // Autres refus : d'abord le message de l'API, puis le code HTTP, puis un message générique.
+      // Other refusals: first the API message, then the HTTP code, then a generic message.
       const messages = {
         "No fields to update": t("Aucune modification à enregistrer.", "No changes to save."),
         "Already exists": t("Cette valeur est déjà utilisée.", "This value is already in use."),
@@ -234,25 +234,25 @@ export default function AdminPage() {
         "Invalid value": t("Valeur refusée pour ce champ.", "Value rejected for this field."),
       };
       const statusMessages = {
-        // 0 : serveur injoignable, signalé par apiFetch au lieu d'une exception.
+        // 0: server unreachable, reported by apiFetch instead of an exception.
         0: t("L'enregistrement n'a pas pu être confirmé. Merci de réessayer.", "Saving could not be confirmed. Please try again."),
         401: t("Votre session a expiré. Merci de vous reconnecter.", "Your session has expired. Please log in again."),
         403: t("Cette action est réservée à l'administration.", "This action is restricted to administrators."),
         404: t("Cette ligne n'existe plus.", "This row no longer exists."),
       };
       setEditError(messages[apiError] || statusMessages[status] || t("L'enregistrement a échoué. Merci de réessayer.", "Saving failed. Please try again."));
-      console.error("Modification refusée :", status, apiError);
+      console.error("Update refused:", status, apiError);
     } catch (err) {
       setEditError(t("L'enregistrement n'a pas pu être confirmé. Merci de réessayer.", "Saving could not be confirmed. Please try again."));
-      console.error("Erreur lors de la modification :", err);
+      console.error("Error while updating:", err);
     } finally {
       setEditSaving(false);
     }
   }
 
-  // --- Formulaire ---
+  // --- Form ---
   function handleCreate() {
-    // « Ajouter » ouvre le même formulaire, tous les champs vides.
+    // "Add" opens the same form, all fields empty.
     const emptyValues = {};
 
     for (const field of tables[selectedTable].editableFields) {
@@ -265,19 +265,19 @@ export default function AdminPage() {
     setIsCreating(true);
   }
 
-  // Fermer le panneau d'ajout ou de modification, sauf pendant un envoi.
+  // Close the add or edit panel, except during a save.
   function closeForm() {
     if (editSaving) return;
     setEditingRow(null);
     setIsCreating(false);
   }
 
-  // Un seul formulaire pour l'ajout et la modification, construit depuis editableFields.
-  // Il s'ouvre dans un panneau à droite : le tableau reste visible derrière, les boutons restent en bas du panneau.
+  // A single form for adding and editing, built from editableFields.
+  // It opens in a panel on the right: the table stays visible behind it, the buttons stay at the bottom of the panel.
   function renderForm() {
     return (
       <div className="admin-drawer-backdrop" onClick={closeForm}>
-        {/* stopPropagation : un clic dans le panneau ne doit pas le fermer, seul un clic sur le fond le fait. */}
+        {/* stopPropagation: a click inside the panel must not close it, only a click on the backdrop does. */}
         <aside
           className="admin-drawer"
           role="dialog"
@@ -293,7 +293,7 @@ export default function AdminPage() {
             </h2>
 
             <div className="admin-drawer-fields">
-              {/* Un champ par entrée de editableFields ; le libellé vient de columns. Les textes longs ont une zone de texte. */}
+              {/* One field per entry of editableFields; the label comes from columns. Long texts get a text area. */}
               {tables[selectedTable].editableFields.map((field, index) => {
                 const column = tables[selectedTable].columns.find(
                   (column) => column.key === field
@@ -342,7 +342,7 @@ export default function AdminPage() {
     );
   }
 
-  // Garde-fou d'affichage : sans rôle admin, la page ne montre aucune donnée.
+  // Display guard: without the admin role, the page shows no data.
   if (!user || user.role !== 'admin') {
     return (
       <div className="page">
@@ -354,10 +354,10 @@ export default function AdminPage() {
   return (
     <div className="page admin-page">
       <h1>{t("Administration", "Admin")}</h1>
-      {/* tab-bar (tabs.css) : le choix des tables reste collé sous l'en-tête pendant le défilement. */}
+      {/* tab-bar (tabs.css): the table choice stays stuck under the header while scrolling. */}
       <div className="tab-bar">
         <div className="admin-tabs">
-          {/* Un bouton par table ; changer de table remet la pagination et ferme le formulaire. */}
+          {/* One button per table; changing table resets the pagination and closes the form. */}
           {Object.keys(tables).map((table) => (
             <button key={table} type="button" aria-pressed={selectedTable === table} disabled={editSaving} onClick={() => {
               setSelectedTable(table);
@@ -386,7 +386,7 @@ export default function AdminPage() {
           <option value={50}>{t("50 par page", "50 per page")}</option>
         </select>
       </label>
-      {/* Flèche du tri : tout le tableau est retrié par l'API, on repart donc de la page 1. */}
+      {/* Sort arrow: the whole table is re-sorted by the API, so start again from page 1. */}
       <button type="button" className="button-secondary" onClick={() => {
         setOrder(order === "asc" ? "desc" : "asc");
         setCurrentPage(1);
@@ -403,9 +403,9 @@ export default function AdminPage() {
           {tables[selectedTable].addLabel[lang]}
         </button>
       </div>
-      {/* Ajout ou modification : un seul panneau latéral, au-dessus de la page. */}
+      {/* Add or edit: a single side panel, above the page. */}
       {formOpen && renderForm()}
-      {/* Quatre affichages possibles : chargement, erreur, tableau vide, puis les données. */}
+      {/* Four possible displays: loading, error, empty table, then the data. */}
       {loading ? (
         <p>{t("Chargement…", "Loading…")}</p>
       ) : error ? (
@@ -418,7 +418,7 @@ export default function AdminPage() {
         <table>
           <thead>
             <tr>
-              {/* Un en-tête par colonne ; celui des boutons n'est lu que par les lecteurs d'écran. */}
+              {/* One header per column; the one of the buttons is read only by screen readers. */}
               {tables[selectedTable].columns.map((column) => (
                 <th key={column.key}>{column.label[lang]}</th>
               ))}
@@ -429,13 +429,13 @@ export default function AdminPage() {
             {rows.map((row) => (
               <Fragment key={row.id}>
                 <tr>
-                  {/* Textes longs coupés sur une ligne ; le texte entier s'affiche au survol et dans le panneau. */}
+                  {/* Long texts truncated to one line; the whole text shows on hover and in the panel. */}
                   {tables[selectedTable].columns.map((column) => (
                     LONG_FIELDS.includes(column.key)
                       ? <td key={column.key} className="cell-clip" title={row[column.key] ?? ""}>{row[column.key]}</td>
                       : <td key={column.key}>{row[column.key]}</td>
                   ))}
-                  {/* Actions groupées dans une seule cellule, la modification d'abord ; colonne collée à droite (admin.css). */}
+                  {/* Actions grouped in a single cell, edit first; column stuck to the right (admin.css). */}
                   <td className="col-actions">
                     <div className="row-actions">
                       <button type="button" className="button-secondary" disabled={editSaving} onClick={() => {
@@ -453,7 +453,7 @@ export default function AdminPage() {
           </tbody>
         </table>
         </div>
-        {/* Pagination centrée sous le tableau, masquée tant que le nombre de pages est inconnu. */}
+        {/* Pagination centered under the table, hidden while the number of pages is unknown. */}
         {totalPages > 0 && (
           <div className="pagination-buttons">
             <button className="button-secondary" type="button" onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1}>

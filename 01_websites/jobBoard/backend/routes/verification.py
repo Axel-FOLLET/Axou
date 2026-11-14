@@ -1,9 +1,9 @@
-"""Vérification de l'adresse email après une inscription mise en attente.
+"""Email address verification after a pending registration.
 
-Deuxième moitié du parcours écrit dans docs/contrat_api.md : register met l'inscription
-de côté et envoie un lien, cette route applique l'inscription quand le lien est ouvert.
-La route vit dans son propre fichier, comme login_limit pour la limite de connexion :
-routes/auth.py n'a ainsi qu'un ajout de quelques lignes.
+Second half of the flow described in docs/contrat_api.md: register sets the registration
+aside and sends a link, this route applies the registration when the link is opened.
+The route lives in its own file, like login_limit for the login limit:
+routes/auth.py therefore only gets an addition of a few lines.
 """
 from flask import Blueprint, jsonify
 
@@ -30,15 +30,15 @@ def verify():
     conn = get_db()
     pending = pending_registrations.take(conn, data["token"].strip())
 
-    # Jeton inconnu, déjà utilisé ou expiré : même refus dans les trois cas, pour ne rien
-    # apprendre à quelqu'un qui essaierait des jetons au hasard.
+    # Unknown, already used or expired token: same refusal in all three cases, so as to
+    # teach nothing to someone trying random tokens.
     if pending is None:
         conn.close()
         return jsonify({"error": "Invalid value"}), 400
 
-    # Le mot de passe choisi à l'inscription n'est posé qu'ici. La condition sur
-    # password_hash protège le cas où la fiche aurait reçu un compte entre-temps :
-    # un lien en attente ne peut pas écraser un mot de passe déjà en place.
+    # The password chosen at registration is set only here. The condition on
+    # password_hash covers the case where the record got an account in the meantime:
+    # a pending link cannot overwrite a password that is already in place.
     cursor = conn.execute(
         """
         UPDATE people
@@ -73,6 +73,6 @@ def verify():
 
     conn.close()
 
-    # Aucune session n'est ouverte ici : la personne se connecte avec le mot de passe
-    # qu'elle vient de confirmer, et ses candidatures redeviennent visibles à ce moment-là.
+    # No session is opened here: the person logs in with the password they just
+    # confirmed, and their applications become visible again at that point.
     return jsonify(dict(row)), 200

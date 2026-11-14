@@ -1,11 +1,11 @@
-// Fournit la langue de l'interface (fr ou en) à toute l'application.
+// Provides the interface language (fr or en) to the whole application.
 import { useEffect, useState } from 'react'
 import { LangContext } from './LangContext'
 
 const STORAGE_KEY = 'yia-lang'
 
-// Langue au chargement : ?lang= dans l'adresse (liens de démo du portfolio anglais),
-// sinon le dernier choix de ce navigateur, sinon le français.
+// Language at load: ?lang= in the address (demo links from the English portfolio),
+// otherwise this browser's last choice, otherwise French.
 function initialLang() {
   const fromUrl = new URLSearchParams(window.location.search).get('lang')
   if (fromUrl === 'fr' || fromUrl === 'en') return fromUrl
@@ -19,13 +19,13 @@ function initialLang() {
 export default function LangProvider({ children }) {
   const [lang, setLang] = useState(initialLang)
 
-  // À chaque changement : attribut lang de la page (lecteurs d'écran, api.js) et choix mémorisé.
+  // On every change: the page's lang attribute (screen readers, api.js) and the remembered choice.
   useEffect(() => {
     document.documentElement.lang = lang
     try {
       localStorage.setItem(STORAGE_KEY, lang)
     } catch {
-      // Stockage indisponible (navigation privée) : la langue vaut pour cette visite seulement.
+      // Storage unavailable (private browsing): the language only applies to this visit.
     }
   }, [lang])
 

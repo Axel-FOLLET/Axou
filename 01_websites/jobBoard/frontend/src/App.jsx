@@ -1,4 +1,4 @@
-// Table des routes : une URL, un composant de page.
+// Route table: one URL, one page component.
 import { Routes, Route } from 'react-router'
 
 import Layout from './components/Layout.jsx'
@@ -24,23 +24,23 @@ import RecruiterApplicationsPage from './pages/RecruiterApplicationsPage.jsx'
 export default function App() {
   return (
     <Routes>
-      {/* Route sans path : Layout encadre toutes les pages listées en dessous. */}
+      {/* Route without path: Layout wraps every page listed below it. */}
       <Route element={<Layout />}>
         <Route path="/" element={<HomePage />} />
         <Route path="/offres" element={<JobBoardPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/account" element={<AccountPage />} />
-        {/* Cible du lien envoyé par email quand l'adresse était déjà enregistrée sans compte. */}
+        {/* Target of the link emailed when the address was already registered without an account. */}
         <Route path="/verification" element={<VerifyPage />} />
-        {/* Cible du lien envoyé à la nouvelle adresse lors d'un changement d'e-mail. */}
+        {/* Target of the link sent to the new address when the email address is changed. */}
         <Route path="/confirmation-email" element={<EmailChangePage />} />
         <Route path="/admin" element={<AdminPage />} />
-        {/* Espace candidat : les informations du compte et les candidatures sous un seul onglet. */}
+        {/* Candidate area: the account details and the applications as tabs of a single layout. */}
         <Route path="/espace-candidat" element={<CandidateLayout />}>
           <Route index element={<ApplicationsPage />} />
           <Route path="informations" element={<CandidateAccountPage />} />
         </Route>
-        {/* Espace recruteur : RecruiterLayout encadre ses trois sous-pages. */}
+        {/* Recruiter area: RecruiterLayout wraps its sub-pages. */}
         <Route path="/recruteur" element={<RecruiterLayout />}>
           <Route index element={<RecruiterPage />} />
           <Route path="entreprise" element={<RecruiterCompanyPage />} />
@@ -49,7 +49,7 @@ export default function App() {
           <Route path="nouvelle-offre" element={<RecruiterNewOfferPage />} />
           <Route path="postes/:id/modifier" element={<RecruiterEditOfferPage />} />
         </Route>
-        {/* Attrape toute URL qui ne correspond à aucune route ci-dessus. */}
+        {/* Catches any URL that matches none of the routes above. */}
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>

@@ -13,7 +13,7 @@ admin_password = os.environ.get("ADMIN_PASSWORD")
 
 if not admin_email or not admin_password:
     raise RuntimeError(
-        "ADMIN_EMAIL et ADMIN_PASSWORD doivent être définis dans le fichier .env"
+        "ADMIN_EMAIL and ADMIN_PASSWORD must be set in the .env file"
     )
 
 admin_email = admin_email.strip().lower()
@@ -27,7 +27,7 @@ try:
     ).fetchone()
 
     if existing_admin:
-        print("Admin déjà existant")
+        print("Admin already exists")
     else:
         create_person(
             conn,
@@ -38,7 +38,7 @@ try:
             role="admin",
         )
 
-        print(f"Admin créé : {admin_email}")
+        print(f"Admin created: {admin_email}")
 
 finally:
     conn.close()

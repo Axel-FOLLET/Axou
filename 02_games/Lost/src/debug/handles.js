@@ -26,7 +26,7 @@ function throwYarn({ world, yarn, cat }, x, z) {
 export function installDebugHandles(game) {
   const {
     cat, world, butterflies, yarn, story, music, hugPurrs, npcs, launchers, minimap, endScreen, bossBar, catBar,
-    sword, dissolve, occlusion, quality, snowSteps, combatSfx, snowfall, footprints, snowCats, chavalanche,
+    sword, dissolve, occlusion, quality, snowSteps, combatSfx, snowfall, footprints, snowCats, chavalanche, cutscene,
   } = game;
 
   Object.assign(window, {
@@ -89,6 +89,14 @@ export function installDebugHandles(game) {
     dissolve,
   };
 
+  // Video cutscenes (src/ui/CutscenePlayer.js): `state` { active, name, time, duration, skippable }; `end()` plays the one in
+  // progress to its end at once, the story goes on as after a watched cutscene.
+  window.__cutscene = {
+    get state() { return cutscene.state; },
+    end: () => cutscene.end(),
+    player: cutscene,
+  };
+
   window.__chavalanche = chavalanche && {
     get info() { return chavalanche.info; },
     protect: (on) => chavalanche.protect(on),
@@ -120,4 +128,7 @@ export function installDebugHandles(game) {
     },
     ZONE2, ZONE2_ENTRY, SUMMIT,
   };
+
+  // Cutscene capture (tools/cutscenes/harness.js): frozen at its highest level while the video frames are drawn.
+  window.__quality = quality;
 }

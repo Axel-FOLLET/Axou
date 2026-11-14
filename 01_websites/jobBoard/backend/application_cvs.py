@@ -1,24 +1,24 @@
-"""CV en PDF : celui du profil d'une personne et celui joint à une candidature.
+"""PDF CVs: the one on a person's profile and the one attached to an application.
 
-Deux tables, toutes deux dans la base (pas de dossier de fichiers à gérer) :
-- person_cvs : le CV enregistré dans l'espace candidat, un seul par personne, remplaçable ;
-- application_cvs : le CV joint à une candidature. C'est une copie : si le candidat change
-  ensuite le CV de son profil, le recruteur garde celui qu'il a reçu.
+Two tables, both in the database (no folder of files to manage):
+- person_cvs: the CV saved in the candidate area, one per person, replaceable;
+- application_cvs: the CV attached to an application. It is a copy: if the candidate
+  later changes the CV on their profile, the recruiter keeps the one they received.
 
-Un fichier n'est accepté que s'il commence par la signature d'un PDF (%PDF-) et pèse au plus
-2 Mo : le serveur ne se fie ni au nom du fichier ni au type annoncé par le navigateur.
+A file is accepted only if it starts with the PDF signature (%PDF-) and weighs at most
+2 MB: the server trusts neither the file name nor the type announced by the browser.
 """
 import io
 import os
 
 from flask import send_file
 
-MAX_SIZE = 2 * 1024 * 1024  # 2 Mo
+MAX_SIZE = 2 * 1024 * 1024  # 2 MB
 PDF_SIGNATURE = b"%PDF-"
 
 
 def ensure_tables(conn):
-    """Crée les tables si elles manquent : une base déjà en place n'a pas besoin d'être refaite."""
+    """Creates the tables if they are missing: an existing database does not need to be rebuilt."""
     conn.execute(
         """
         CREATE TABLE IF NOT EXISTS person_cvs (
@@ -43,7 +43,7 @@ def ensure_tables(conn):
 
 
 def read_upload(file):
-    """Lit le fichier envoyé (champ cv) ; renvoie (nom, contenu), ou None s'il est refusé."""
+    """Reads the uploaded file (cv field); returns (name, content), or None if it is refused."""
     content = file.read(MAX_SIZE + 1)
     if not content or len(content) > MAX_SIZE or not content.startswith(PDF_SIGNATURE):
         return None
@@ -51,7 +51,7 @@ def read_upload(file):
 
 
 def clean_filename(filename):
-    """Nom affiché au téléchargement : sans dossier ni caractère de contrôle, terminé par .pdf."""
+    """Name shown on download: no folder or control character, ending with .pdf."""
     name = os.path.basename((filename or "").replace("\\", "/"))
     name = "".join(c for c in name if c.isprintable()).strip()[:100]
     if not name.lower().endswith(".pdf"):
@@ -60,7 +60,7 @@ def clean_filename(filename):
 
 
 def save_profile(conn, person_id, filename, content):
-    """Enregistre ou remplace le CV du profil."""
+    """Saves or replaces the profile CV."""
     conn.execute(
         """INSERT INTO person_cvs (person_id, filename, content) VALUES (?, ?, ?)
            ON CONFLICT (person_id) DO UPDATE SET filename = excluded.filename,
@@ -71,7 +71,7 @@ def save_profile(conn, person_id, filename, content):
 
 
 def profile_info(conn, person_id):
-    """Nom et date du CV du profil, sans le contenu ; None s'il n'y en a pas."""
+    """Name and date of the profile CV, without the content; None if there is none."""
     return conn.execute(
         "SELECT filename, uploaded_at FROM person_cvs WHERE person_id = ?",
         (person_id,),
@@ -86,14 +86,14 @@ def profile_file(conn, person_id):
 
 
 def delete_profile(conn, person_id):
-    """Supprime le CV du profil ; renvoie False s'il n'y en avait pas. Les CV déjà joints restent."""
+    """Deletes the profile CV; returns False if there was none. CVs already attached stay."""
     cur = conn.execute("DELETE FROM person_cvs WHERE person_id = ?", (person_id,))
     conn.commit()
     return cur.rowcount > 0
 
 
 def attach(conn, application_id, filename, content):
-    """Joint un CV à une candidature, dans la transaction en cours (pas de commit ici)."""
+    """Attaches a CV to an application, in the current transaction (no commit here)."""
     conn.execute(
         "INSERT INTO application_cvs (application_id, filename, content) VALUES (?, ?, ?)",
         (application_id, filename, content),
@@ -101,7 +101,7 @@ def attach(conn, application_id, filename, content):
 
 
 def attach_profile(conn, application_id, person_id):
-    """Copie le CV du profil sur la candidature (pas de commit ici) ; False si le profil n'en a pas."""
+    """Copies the profile CV onto the application (no commit here); False if the profile has none."""
     cur = conn.execute(
         """INSERT INTO application_cvs (application_id, filename, content)
            SELECT ?, filename, content FROM person_cvs WHERE person_id = ?""",
@@ -118,7 +118,7 @@ def application_file(conn, application_id):
 
 
 def send_pdf(row):
-    """Réponse de téléchargement : le PDF, avec son nom d'origine."""
+    """Download response: the PDF, with its original name."""
     return send_file(
         io.BytesIO(row["content"]),
         mimetype="application/pdf",

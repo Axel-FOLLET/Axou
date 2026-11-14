@@ -7,10 +7,10 @@ import unicodedata
 
 from db import get_db
 
-DATA_FILE = "data/annonces.json"
+DATA_FILE = "data/ads.json"
 TABLES = ("companies", "categories", "people", "ads", "applications")
 
-# Candidats de démonstration (étape 4 quater) : noms tirés au hasard, sans compte (pas de mot de passe)
+# Demonstration candidates (step 4 quater): names drawn at random, without an account (no password)
 CANDIDATES_COUNT = 100
 FIRST_NAMES = (
     "Léa", "Hugo", "Chloé", "Lucas", "Emma", "Nathan", "Inès", "Théo", "Manon", "Louis",
@@ -24,6 +24,7 @@ LAST_NAMES = (
     "Morel", "Girard", "André", "Mercier", "Dupont", "Lambert", "Bonnet", "François", "Martinez", "Legrand",
     "Garnier", "Faure", "Rousseau", "Blanc", "Guérin", "Muller", "Henry", "Roussel", "Nicolas", "Perrin",
 )
+# Application messages are demo data shown in the app, so they stay in French.
 MESSAGES = (
     "Bonjour, votre annonce correspond à mon parcours et je serais ravi(e) d'en discuter avec vous.",
     "Bonjour, je vous adresse ma candidature : ce poste correspond à ce que je recherche.",
@@ -34,17 +35,17 @@ MESSAGES = (
 
 
 def email_part(text):
-    """« Léa » -> « lea » : sans accent ni espace, pour l'adresse e-mail."""
+    """"Léa" -> "lea": no accent or space, for the email address."""
     ascii_text = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode()
     return re.sub(r"[^a-z]", "", ascii_text.lower())
 
-# Lire le fichier de données (4 listes : companies, categories, contacts, ads)
+# Read the data file (4 lists: companies, categories, contacts, ads)
 with open(DATA_FILE, encoding="utf-8") as f:
     data = json.load(f)
 
 # --------------------------------------------------
-# 0. SIREN du fichier : texte de 9 chiffres, sans doublon
-#    (vérifié avant d'ouvrir la base : en cas d'erreur, rien n'est inséré)
+# 0. SIRENs of the file: 9-digit text, no duplicates
+#    (checked before opening the database: on error, nothing is inserted)
 # --------------------------------------------------
 seen_sirens = set()
 
@@ -52,17 +53,17 @@ for company in data["companies"]:
     siren = company.get("siren")
 
     if siren is None:
-        continue  # SIREN absent : l'entreprise sera retrouvée par son nom
+        continue  # no SIREN: the company will be found by its name
 
     if not isinstance(siren, str) or not re.fullmatch(r"[0-9]{9}", siren.strip()):
         sys.exit(
-            f"SIREN invalide pour {company['name']} : {siren!r} "
-            "(attendu : une chaîne de 9 chiffres). À signaler à Axel."
+            f"Invalid SIREN for {company['name']}: {siren!r} "
+            "(expected: a string of 9 digits). Report this to Axel."
         )
 
     siren = siren.strip()
     if siren in seen_sirens:
-        sys.exit(f"SIREN en double dans le fichier : {siren}. À signaler à Axel.")
+        sys.exit(f"Duplicate SIREN in the file: {siren}. Report this to Axel.")
 
     seen_sirens.add(siren)
     company["siren"] = siren
@@ -70,8 +71,8 @@ for company in data["companies"]:
 conn = get_db()
 
 # --------------------------------------------------
-# 0 bis. Deuxième lancement : on s'arrête sans rien insérer
-#        Une entreprise est retrouvée par son SIREN s'il est présent, sinon par son nom.
+# 0 bis. Second run: stop without inserting anything
+#        A company is found by its SIREN if present, otherwise by its name.
 # --------------------------------------------------
 already = []
 
@@ -93,15 +94,15 @@ for company in data["companies"]:
 if already:
     conn.close()
     sys.exit(
-        f"Base déjà remplie : {len(already)} entreprise(s) du fichier existe(nt) déjà "
-        f"({', '.join(already)}). Rien n'a été inséré. "
-        "Relance python init_db.py avant python seed_data.py."
+        f"Database already filled: {len(already)} company(ies) of the file already exist "
+        f"({', '.join(already)}). Nothing was inserted. "
+        "Run python init_db.py again before python seed_data.py."
     )
 
 try:
     # --------------------------------------------------
-    # 1. Entreprises : insérer et garder nom -> id
-    #    (les annonces du fichier désignent toujours l'entreprise par son nom)
+    # 1. Companies: insert and keep name -> id
+    #    (the ads in the file always designate the company by its name)
     # --------------------------------------------------
     company_ids = {}
 
@@ -117,11 +118,11 @@ try:
                 company.get("siren"),
             ),
         )
-        # lastrowid : l'id que la base vient d'attribuer à cette entreprise
+        # lastrowid: the id the database has just assigned to this company
         company_ids[company["name"]] = cur.lastrowid
 
     # --------------------------------------------------
-    # 2. Catégories : chercher d'abord (name est UNIQUE), insérer si absente
+    # 2. Categories: look first (name is UNIQUE), insert if absent
     # --------------------------------------------------
     category_ids = {}
 
@@ -132,7 +133,7 @@ try:
         ).fetchone()
 
         if row is not None:
-            # déjà dans seed.sql (Développement, Design, Data) : on reprend son id
+            # already in seed.sql (Développement, Design, Data): reuse its id
             category_ids[category["name"]] = row["id"]
         else:
             cur = conn.execute(
@@ -142,13 +143,13 @@ try:
             category_ids[category["name"]] = cur.lastrowid
 
     # --------------------------------------------------
-    # 3. Recruteurs : insérer dans people et garder email -> id
-    #    (pas de password_hash, role vaut 'user' par défaut)
+    # 3. Recruiters: insert into people and keep email -> id
+    #    (no password_hash, role is 'user' by default)
     # --------------------------------------------------
     contact_ids = {}
 
     for contact in data["contacts"]:
-        email = contact["email"].strip().lower()  # même normalisation que l'inscription
+        email = contact["email"].strip().lower()  # same normalization as registration
 
         cur = conn.execute(
             """INSERT INTO people (first_name, last_name, email, phone)
@@ -163,27 +164,27 @@ try:
         contact_ids[email] = cur.lastrowid
 
     # --------------------------------------------------
-    # 4. Annonces : retrouver les 3 id à partir des noms et de l'email
-    #    (ni status ni created_at : la base met 'open' et la date du moment)
+    # 4. Ads: find the 3 ids from the names and the email
+    #    (neither status nor created_at: the database sets 'open' and the current date)
     # --------------------------------------------------
-    contact_companies = {}  # id du contact -> id de l'entreprise de ses annonces
+    contact_companies = {}  # contact id -> id of the company of their ads
 
     for ad in data["ads"]:
         company_id = company_ids[ad["company"]]
         category_id = category_ids[ad["category"]]
         contact_id = contact_ids[ad["contact_email"].strip().lower()]
 
-        # un recruteur appartient à une seule entreprise
+        # a recruiter belongs to a single company
         if contact_companies.get(contact_id, company_id) != company_id:
             conn.rollback()
             conn.close()
             sys.exit(
-                f"{ad['contact_email']} publie pour deux entreprises différentes. "
-                "Rien n'a été inséré. À signaler à Axel."
+                f"{ad['contact_email']} publishes for two different companies. "
+                "Nothing was inserted. Report this to Axel."
             )
         contact_companies[contact_id] = company_id
 
-        # salary : converti en entier (la colonne est un INTEGER)
+        # salary: converted to an integer (the column is an INTEGER)
         salary = ad.get("salary")
         if salary is not None:
             salary = int(salary)
@@ -208,8 +209,8 @@ try:
         )
 
     # --------------------------------------------------
-    # 4 bis. Recruteurs : rattacher chaque contact à l'entreprise de ses annonces
-    #        (sans mot de passe : ils ne peuvent pas se connecter)
+    # 4 bis. Recruiters: attach each contact to the company of their ads
+    #        (no password: they cannot log in)
     # --------------------------------------------------
     for contact_id, company_id in contact_companies.items():
         conn.execute(
@@ -217,12 +218,12 @@ try:
             (company_id, contact_id),
         )
 
-    # Tirage fixe : la même base à chaque lancement
+    # Fixed draw: the same database at every run
     rng = random.Random(14)
 
     # --------------------------------------------------
-    # 4 ter. Vieillir les annonces : seules les 2 dernières gardent la date du moment
-    #        (badge « Nouveau » à moins de 7 jours) ; les autres datent de 8 à 57 jours
+    # 4 ter. Age the ads: only the last 2 keep the current date
+    #        ("New" badge under 7 days); the others are 8 to 57 days old
     # --------------------------------------------------
     ad_ids = [row["id"] for row in conn.execute("SELECT id FROM ads ORDER BY id")]
 
@@ -233,12 +234,12 @@ try:
         )
 
     # --------------------------------------------------
-    # 4 quater. 100 candidats sans compte, et 10 à 40 candidatures par annonce ouverte
-    #           (statut pending ou rejected : accepted n'arrive que par la clôture)
+    # 4 quater. 100 candidates without an account, and 10 to 40 applications per open ad
+    #           (status pending or rejected: accepted only happens through the closure)
     # --------------------------------------------------
     candidate_ids = []
     names = rng.sample([(first, last) for first in FIRST_NAMES for last in LAST_NAMES], CANDIDATES_COUNT)
-    # email est UNIQUE : adresses déjà prises (seed.sql, recruteurs), pour ajouter un numéro si besoin
+    # email is UNIQUE: addresses already taken (seed.sql, recruiters), so a number is added if needed
     used_emails = {row["email"] for row in conn.execute("SELECT email FROM people")}
 
     for first_name, last_name in names:
@@ -262,7 +263,7 @@ try:
         )
         candidate_ids.append(cur.lastrowid)
 
-    # age_minutes : âge de l'annonce, pour dater chaque candidature après sa publication
+    # age_minutes: age of the ad, to date each application after its publication
     open_ads = conn.execute(
         """SELECT id, created_at,
                   CAST((julianday('now') - julianday(created_at)) * 1440 AS INTEGER) AS age_minutes
@@ -285,13 +286,13 @@ try:
             )
 
 except sqlite3.Error as error:
-    # erreur de la base (ex. SIREN déjà pris) : on annule tout, rien n'est enregistré
+    # database error (e.g. SIREN already taken): cancel everything, nothing is saved
     conn.rollback()
     conn.close()
-    sys.exit(f"Remplissage annulé, base inchangée : {error}")
+    sys.exit(f"Seeding cancelled, database unchanged: {error}")
 
 # --------------------------------------------------
-# 5. Un seul commit : tout est enregistré, ou rien si le script s'arrête avant
+# 5. A single commit: everything is saved, or nothing if the script stops before
 # --------------------------------------------------
 conn.commit()
 

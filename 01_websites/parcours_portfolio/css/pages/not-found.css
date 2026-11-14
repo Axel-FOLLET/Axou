@@ -1,0 +1,156 @@
+/* -------------------- 404 PAGE -------------------- */
+
+/*
+    Error page (404.html, contact theme set on <body>): the code, a sentence in French
+    then in English, the two doors of the home page, two back buttons. Taken from the not-found.css
+    of the two former sites (identical), plus the doors. No hard-coded colour: only the variables of tokens.css.
+*/
+
+/* Content centred over the whole screen height: the page has neither header nor footer */
+.not-found {
+    min-height: 100vh;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    padding: var(--space-section) var(--gutter);
+
+    text-align: center;
+}
+
+
+/*
+    The two doors under the sentence, side by side and aligned: a cube, its label, its translation.
+    No underline (no underlined link on the site): on hover or with the keyboard, the cube lights up.
+*/
+.not-found__doors {
+    display: flex;
+    justify-content: center;
+
+    gap: clamp(48px, 8vw, 120px);
+
+    margin-top: 48px;
+}
+
+
+.not-found__door {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    color: var(--white);
+
+    text-decoration: none;
+}
+
+
+/* Cube smaller than on the home page (cube--large sets 170 px on the cube itself) */
+.not-found__door .cube {
+    --cube-size: 120px;
+}
+
+
+/* Label in the display serif, like on the home page; room left under the rotating cube */
+.not-found__door-label {
+    margin-top: 40px;
+
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 1.2rem + 0.8vw, 2rem);
+    line-height: 1;
+}
+
+
+.not-found__door-label-en {
+    margin-top: 6px;
+
+    font-size: 0.9rem;
+
+    opacity: 0.8;
+}
+
+
+/* With the keyboard, the cube lights up as on hover (cubes.css, .cube:hover) */
+.not-found__door:hover .cube__face,
+.not-found__door:focus-visible .cube__face {
+    background-color: var(--cube-hover);
+
+    box-shadow: 0 0 28px var(--cube-glow);
+}
+
+
+/* Big error code in the display serif, enlarged by 15% like the other serif titles */
+.not-found__code {
+    margin: 0 0 20px;
+
+    font-family: var(--font-display);
+    font-size: calc(clamp(6rem, 22vw, 14rem) * 1.15);
+    font-weight: 400;
+    line-height: 0.95;
+    letter-spacing: -0.01em;
+}
+
+
+.not-found__text {
+    max-width: 40ch;
+
+    margin: 0;
+
+    font-size: 1.2rem;
+}
+
+
+/* English translation: smaller and more discreet, just under the French sentence */
+.not-found__text--en {
+    margin-top: 6px;
+
+    font-size: 1rem;
+
+    opacity: 0.8;
+}
+
+
+.not-found__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+
+    gap: 16px;
+
+    margin-top: 40px;
+}
+
+
+/* On phones, smaller cubes: the two doors stay side by side */
+@media (max-width: 767px) {
+
+    .not-found__doors {
+        gap: 40px;
+
+        margin-top: 36px;
+    }
+
+
+    .not-found__door .cube {
+        --cube-size: 88px;
+    }
+
+
+    .not-found__door-label {
+        margin-top: 28px;
+    }
+
+}
+
+
+/*
+    Reduced motion: smooth scrolling removed, as on the other pages (responsive.css, which this page does not load).
+*/
+@media (prefers-reduced-motion: reduce) {
+
+    html {
+        scroll-behavior: auto;
+    }
+
+}

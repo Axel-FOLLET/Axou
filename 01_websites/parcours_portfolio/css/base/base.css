@@ -1,0 +1,385 @@
+/*
+    Base shared by all pages: fonts, sizes, spacing, styles of the HTML elements.
+    The colours are in tokens.css (the only file that contains any); this file only uses them.
+*/
+
+
+/* -------------------- FONT -------------------- */
+
+/*
+    Manrope, variable font (weights 400 to 800), hosted with the site: no request to a third-party service.
+    Two files: latin (French, English) and extended latin, loaded only if the page needs it.
+    swap: the text shows at once in the fallback font, then switches to Manrope.
+    Licence: assets/fonts/OFL-Manrope.txt (SIL Open Font License 1.1).
+    Paths relative to this file (css/base/): two levels up to reach the site root.
+*/
+@font-face {
+    font-family: "Manrope";
+    font-style: normal;
+    font-weight: 400 800;
+    font-display: swap;
+    src: url("../../assets/fonts/manrope-latin.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+
+@font-face {
+    font-family: "Manrope";
+    font-style: normal;
+    font-weight: 400 800;
+    font-display: swap;
+    src: url("../../assets/fonts/manrope-latin-ext.woff2") format("woff2");
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+
+/*
+    Instrument Serif, display serif for the big headings (name, sections, last call, 404): roman and italic.
+    A single weight (400). The latin subset alone is enough for French and English. Manrope stays the text font.
+    Licence: assets/fonts/OFL-InstrumentSerif.txt (SIL Open Font License 1.1).
+*/
+@font-face {
+    font-family: "Instrument Serif";
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url("../../assets/fonts/instrument-serif-latin.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+
+@font-face {
+    font-family: "Instrument Serif";
+    font-style: italic;
+    font-weight: 400;
+    font-display: swap;
+    src: url("../../assets/fonts/instrument-serif-italic-latin.woff2") format("woff2");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+
+/* -------------------- SIZES AND SPACING -------------------- */
+
+:root {
+    /* Serif of the big headings; serif fallback fonts while it loads */
+    --font-display: "Instrument Serif", Georgia, "Times New Roman", serif;
+
+    /* Three radii for the whole site: small elements (labels, fields), cards and pills, buttons */
+    --radius-s: 10px;
+    --radius-m: 16px;
+    --radius-l: 20px;
+
+    /*
+        Four text sizes for the whole site, plus the label:
+        display (name), title (sections), lead (introductions, tagline), body.
+    */
+    --text-display: clamp(3.5rem, 10vw, 7.5rem);
+    --text-title: clamp(2.5rem, 6vw, 4.5rem);
+    --text-lead: clamp(1.125rem, 1.6vw, 1.375rem);
+    --text-body: 1rem;
+    --text-label: 0.8125rem;
+
+    /*
+        Main heading (the <h1>), same size on every page: home, My background, My portfolio and Contact me.
+        Display size; on phones, 20% larger (rule further down): the narrow serif looks small at the floor.
+    */
+    --text-h1: var(--text-display);
+
+    /*
+        Same rhythm on every page: each section, the home page and the footer
+        use these two values.
+        --gutter: margin from 20 to 56 px depending on the screen, and beyond 1200 px of content,
+        the margin grows to centre a 1200 px column. The % is computed on the width of the section.
+    */
+    /* Vertical space of a section: 88px on phones, 160px on large screens */
+    --space-section: clamp(88px, 12vw, 160px);
+    --gutter: max(clamp(20px, 4vw, 56px), (100% - 1200px) / 2);
+}
+
+
+@media (max-width: 767px) {
+
+    :root {
+        --text-h1: calc(var(--text-display) * 1.2);
+    }
+
+}
+
+
+/* -------------------- BASE -------------------- */
+
+* {
+    box-sizing: border-box;
+}
+
+
+/*
+    The theme is set on <body>: <html> does not see it and keeps the shared near-black,
+    visible only beyond the edges of the page (elastic scrolling).
+*/
+html {
+    background-color: var(--ink);
+
+    scroll-behavior: smooth;
+    /* Page anchors stop below the sticky header instead of going under it */
+    scroll-padding-top: 76px;
+}
+
+
+/*
+    Black pages (home, Contact me, 404): the near-black is lit by the two colours of the site, a blue glow that comes
+    from the top left and a red one from the right, one screen lower, instead of a white glow.
+    Sizes and places in viewport units: the glows keep their place whatever the length of the page.
+    Their sections stay transparent to let the light through (sections.css, home.css).
+*/
+body:is([data-theme="home"], [data-theme="contact"]) {
+    background-image:
+        radial-gradient(80vw 80svh at 0% 0%, var(--light-blue), var(--clear) 70%),
+        radial-gradient(75vw 85svh at 100% 70svh, var(--light-red), var(--clear) 70%);
+}
+
+
+/*
+    Page change (tab, language): a curtain in the colour of the destination instead of a hard reload.
+    Browsers that do not know this rule simply change page.
+*/
+@view-transition {
+    navigation: auto;
+}
+
+
+/* The header has a name: it stays in place while the content changes. */
+.header {
+    view-transition-name: site-header;
+}
+
+
+/*
+    Page content: the page being left is wiped away from the bottom up and uncovers the colour of the page that comes
+    (blue for My background, red for My portfolio, near-black for the home page and Contact me); the new page then
+    appears on that colour, which is the colour of its own first screen. The colour is the background of the group
+    that holds the two images of the page: it is written by the page that arrives, so it is always the colour
+    of the destination.
+    The header, for its part, blends in place above the curtain: the active tab changes without moving.
+    The theme is set on <body>; :has() reads it from <html>, where the transition lives.
+*/
+::view-transition-group(root) {
+    background-color: var(--ink);
+}
+
+
+:root:has(body[data-theme="parcours"])::view-transition-group(root) {
+    background-color: var(--blue);
+}
+
+
+:root:has(body[data-theme="portfolio"])::view-transition-group(root) {
+    background-color: var(--red);
+}
+
+
+/* The two images do not blend: the old one is cut by its wipe, the new one comes over the colour */
+::view-transition-image-pair(root) {
+    isolation: auto;
+}
+
+
+::view-transition-old(root) {
+    animation: var(--dur-page-out) var(--ease-page) both page-wipe-out;
+
+    mix-blend-mode: normal;
+}
+
+
+::view-transition-new(root) {
+    animation: var(--dur-page-in) var(--ease-out) var(--dur-page-wait) both page-arrive;
+
+    mix-blend-mode: normal;
+}
+
+
+/* The old page leaves upwards, cut from the bottom: the colour rises behind it */
+@keyframes page-wipe-out {
+    to {
+        clip-path: inset(0 0 100% 0);
+        translate: 0 -4vh;
+    }
+}
+
+
+/* The new page appears on the colour and settles: a fade and a short rise */
+@keyframes page-arrive {
+    from {
+        opacity: 0;
+        translate: 0 3vh;
+    }
+}
+
+
+/* Reduced motion: a plain cross-fade, nothing moves */
+@media (prefers-reduced-motion: reduce) {
+
+    ::view-transition-group(root) {
+        background-color: var(--clear);
+    }
+
+
+    ::view-transition-old(root) {
+        animation: var(--dur-fast) var(--ease-in-out) both page-fade-out;
+    }
+
+
+    ::view-transition-new(root) {
+        animation: var(--dur-base) var(--ease-out) calc(var(--dur-fast) / 2) both page-fade-in;
+    }
+
+}
+
+
+@keyframes page-fade-out {
+    to {
+        opacity: 0;
+    }
+}
+
+
+@keyframes page-fade-in {
+    from {
+        opacity: 0;
+    }
+}
+
+
+/* Page background according to its theme (tokens.css); fallback fonts close to Manrope while it loads */
+body {
+    margin: 0;
+
+    background-color: var(--accent);
+    background-repeat: no-repeat;
+    color: var(--white);
+
+    font-family: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    font-size: var(--text-body);
+    line-height: 1.6;
+
+    -webkit-font-smoothing: antialiased;
+
+    overflow-x: hidden;
+}
+
+
+img {
+    max-width: 100%;
+}
+
+
+/*
+    Big headings (h1, h2): the display serif has a single weight, 400; every heading of the site already sets it.
+    Small headings (h3, h4) in bold Manrope.
+*/
+h1,
+h2,
+h3,
+h4 {
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+}
+
+
+h1,
+h2 {
+    font-weight: 400;
+}
+
+
+h3,
+h4 {
+    font-weight: 700;
+}
+
+
+/* A <button> or a field does not inherit the font: inherit aligns it with the text. */
+button,
+input,
+textarea,
+select {
+    font: inherit;
+}
+
+
+/* White links; each component removes the underline (no underlined link on the site) */
+a {
+    color: var(--white);
+}
+
+
+/*
+    Label: a single small-caps style for the whole site
+    (eyebrows, goal label, card labels and badges, footer titles).
+*/
+.section__eyebrow,
+.career__goal-label,
+.project-card__label,
+.project-card__badge,
+.footer__title {
+    font-size: var(--text-label);
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    line-height: 1.4;
+
+    text-transform: uppercase;
+}
+
+
+/* Visible with the keyboard on all interactive elements: white outline */
+a:focus-visible,
+button:focus-visible,
+select:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+summary:focus-visible {
+    outline: 3px solid var(--white);
+    outline-offset: 4px;
+}
+
+
+/* Hidden link that appears on the first press of Tab */
+.skip-link {
+    position: absolute;
+
+    top: -60px;
+    left: 16px;
+
+    z-index: 2000;
+
+    padding: 10px 16px;
+
+    background-color: var(--ink);
+    color: var(--white);
+
+    text-decoration: none;
+
+    transition: top var(--dur-fast) var(--ease-out);
+}
+
+
+.skip-link:focus {
+    top: 12px;
+}
+
+
+/* Text read by screen readers only (the "new tab" notice of external links, for example) */
+.visually-hidden {
+    position: absolute;
+
+    width: 1px;
+    height: 1px;
+
+    margin: -1px;
+    padding: 0;
+
+    overflow: hidden;
+    clip-path: inset(50%);
+
+    white-space: nowrap;
+}

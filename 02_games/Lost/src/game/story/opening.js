@@ -3,101 +3,53 @@ import { currentAudioContext } from '../../audio/context.js';
 import { meow } from '../../audio/Meow.js';
 import { OPENING, SHOT } from './tuning.js';
 
-/** Story methods for the opening: Maman carries the kitten in, sets it down and leaves; the kitten wakes up. */
-
-/** Local point (x, z) rotated by `yaw` around Y (three.js convention): world offset [x, z]. */
-const rotY = (x, z, yaw) => [x * Math.cos(yaw) + z * Math.sin(yaw), -x * Math.sin(yaw) + z * Math.cos(yaw)];
+/**
+ * Story methods for the opening: after the arrival cutscene the kitten lies asleep among the scattered armour, wakes up,
+ * looks around, sits and yawns; the shot widens and the player gets control. Also set up (frozen) behind the title screen.
+ */
 
 export const openingScene = {
+  /**
+   * Scene of the opening, ready and frozen: Maman at the summit, kitten asleep on the ground at `OPENING.drop` facing the
+   * camera, fixed close shot on it (`_pin`), clicks ignored (veil), minimap hidden. `_open.phase` is 'sleep'; the arrival
+   * cutscene sets it to 'video' while it plays. Nothing without NPCs.
+   */
+  _setUpOpening() {
+    if (!this.hasNpcs) return;
+    const cat = this.cat, O = OPENING;
+    const ll = Math.hypot(O.look.x, O.look.z), lx = O.look.x / ll, lz = O.look.z / ll;
+    this.npcs.maman.endHug();
+    this._placeNpcs();
+    this._placeMamanAtSummit();
+    cat.lookOverride = null;
+    this._placeCat(O.drop.x, O.drop.z, Math.atan2(-lx, -lz), false); // heading towards the camera
+    if (cat.brain.scripted) cat.brain.setScripted(null, 'idle');
+    cat.dropAsleep(); // lying on its side, as if it had just fallen asleep
+    // Screen right (rx, rz) = (−lz, lx).
+    this._open = { phase: 'sleep', t: 0, lx, lz, rx: -lz, rz: lx };
+    this.veil.className = 'lost-veil on';
+    this.minimap.setVisible(false);
+    // Fixed shot: the camera follows `_pin` (main.js, followPoint), gaze `look`, no glide.
+    this._pin = new THREE.Vector3(O.drop.x, this._ground(O.drop.x, O.drop.z), O.drop.z);
+    this._snapCamera(O.drop.x, O.drop.z);
+    this._shot(lx, lz, this._closeShot(), true);
+  },
+
+  /** The kitten is shown asleep (after the arrival cutscene): bars in, step 'opening', the waking sequence runs. */
+  _beginOpening() {
+    if (!this._open) return;
+    this._open.phase = 'sleep';
+    this._open.t = 0;
+    this.bars.show();
+    this._setStep('opening');
+  },
+
   _updateOpening(dt) {
-    const o = this._open, m = this.npcs.maman, O = OPENING, brain = this.cat.brain;
+    const o = this._open, O = OPENING, brain = this.cat.brain;
+    if (o.phase === 'video') return; // arrival cutscene playing
     o.t += dt;
-    const p = m.root.position;
-    if (o.phase === 'walk') {
-      const dx = O.drop.x - p.x, dz = O.drop.z - p.z, d = Math.hypot(dx, dz);
-      const step = m.walkSpeed * dt;
-      if (d <= step) {
-        m.setPosition(O.drop.x, this._ground(O.drop.x, O.drop.z), O.drop.z, o.yaw);
-        m.setPose('Idle', { loop: true, fade: 0.35 });
-        o.phase = 'pause'; o.t = 0;
-      } else {
-        const x = p.x + (dx / d) * step, z = p.z + (dz / d) * step;
-        m.setPosition(x, this._ground(x, z), z, o.yaw);
-      }
-    } else if (o.phase === 'pause') {
-      if (o.t >= O.pause) { o.phase = 'dip'; o.t = 0; o.k = 0; }
-    } else if (o.phase === 'dip') {
-      // Maman lowers her head; the kitten is released when its lowest point touches the ground (pose of the displayed frame),
-      // asleep without getting up (Cat.dropAsleep).
-      const cat = this.cat, r = cat.root.position;
-      const gap = cat._lowestVertexY() - this._ground(r.x, r.z);
-      if (gap <= O.dropAt || o.t >= O.dipMax) {
-        cat.carry(null);
-        cat.dropAsleep(undefined, O.dropFade);
-        this.lastDrop = { t: o.t, gap, k: o.k, fallback: gap > O.dropAt };
-        o.phase = 'hold'; o.t = 0;
-      } else {
-        o.k = THREE.MathUtils.smoothstep(o.t / O.dip, 0, 1);
-        m.setHeadDip(o.k);
-      }
-    } else if (o.phase === 'hold' || o.phase === 'rise' || o.phase === 'settle') {
-      // Backing off (kitten already released, `lastDrop` already set): from the frame after the release, Maman backs off by
-      // `sidestep` (local frame) at the pace of the `StepBack` clip, head still down (`hold`), then raising it (`rise`); her front
-      // paws leave the kitten before it spreads.
-      const len = Math.hypot(O.sidestep.x, O.sidestep.z);
-      if (!o.backing) {
-        o.backing = { x: p.x, z: p.z, yaw: m.root.rotation.y, t: 0, d: 0, speed: len / O.backTime };
-        if (m.setPose(O.sidestepClip, { loop: true, fade: O.sidestepFade, timeScale: O.sidestepRate })) {
-          o.backing.speed = O.stepBackSpeed * O.sidestepRate; // clip's stride: supporting foot fixed
-          m.action.time = O.sidestepFrom;
-        } else if (m.setPose('Walk', { loop: true, fade: O.sidestepFade, timeScale: -0.83 })) {
-          m.action.time = 0.1; // fallback: Walk played backwards
-        }
-      }
-      const b = o.backing;
-      b.t += dt;
-      // No stop at |sidestep|: the clip runs until the start of `leave` and the root follows it (one more frame at most, 7 mm)
-      // instead of stopping under a supporting foot that would slide.
-      b.d += b.speed * dt;
-      const back = b.d / len;
-      const [sx, sz] = rotY(O.sidestep.x * back, O.sidestep.z * back, b.yaw);
-      m.setPosition(b.x + sx, this._ground(b.x + sx, b.z + sz), b.z + sz, b.yaw);
-      if (o.phase === 'hold') {
-        if (o.t >= O.hold) { o.phase = 'rise'; o.t = 0; }
-      } else if (o.phase === 'rise') {
-        const u = Math.min(1, o.t / O.rise);
-        m.setHeadDip(o.k * (1 - THREE.MathUtils.smoothstep(u, 0, 1)));
-        if (u >= 1) { o.phase = 'settle'; o.t = 0; }
-      } else if (back >= 1 && o.t >= O.settle) {
-        m.startCarry(0.35); // walk (same clip as carrying), mouth empty
-        o.phase = 'leave'; o.t = 0; o.turned = 0;
-        // Half-turn past the camera (face seen): direction where the heading goes towards −look first.
-        const toCam = Math.atan2(-o.lx, -o.lz) - o.yaw;
-        o.turnSign = Math.sign(Math.atan2(Math.sin(toCam), Math.cos(toCam))) || 1;
-        // Pivot of the half-turn in world coordinates (three.js Y rotation: local → world).
-        o.yaw0 = m.root.rotation.y;
-        const [wx, wz] = rotY(O.pivot.x, O.pivot.z, o.yaw0);
-        o.pivot = { x: p.x + wx, z: p.z + wz };
-      }
-    } else if (o.phase === 'leave') {
-      // Half-turn (π) around the fixed pivot, then a straight walk towards the left of the screen.
-      if (o.turned < Math.PI) {
-        o.turned += Math.min(Math.PI - o.turned, O.pivotRate * dt);
-        const yaw = o.yaw0 + o.turnSign * o.turned;
-        const [wx, wz] = rotY(O.pivot.x, O.pivot.z, yaw);
-        const x = o.pivot.x - wx, z = o.pivot.z - wz;
-        m.setPosition(x, this._ground(x, z), z, yaw);
-      } else {
-        const yaw = m.root.rotation.y, step = m.walkSpeed * dt;
-        const x = p.x + Math.sin(yaw) * step, z = p.z + Math.cos(yaw) * step;
-        m.setPosition(x, this._ground(x, z), z, yaw);
-      }
-      if ((o.turned >= Math.PI && !this._inView(m)) || o.t >= O.leaveMax) {
-        this._placeMamanAtSummit();
-        o.phase = 'alone'; o.t = 0;
-      }
-    } else if (o.phase === 'alone') {
-      if (o.t >= O.alone) { brain.setScripted('wake'); o.phase = 'wake'; o.t = 0; }
+    if (o.phase === 'sleep') {
+      if (o.t >= O.sleep) { brain.setScripted('wake'); o.phase = 'wake'; o.t = 0; }
     } else if (o.phase === 'wake') {
       if (o.t >= this.cat.duration('Wake')) { brain.setScripted('look'); o.phase = 'look'; o.t = 0; }
     } else if (o.phase === 'look') {
@@ -124,7 +76,7 @@ export const openingScene = {
 
   /**
    * Gaze of the awake kitten (Cat.lookOverride): straight ahead, except in phase 'look' where the head first looks towards
-   * the left of the screen (where Maman left), then right. Nothing before waking (gaze with no weight: carried, asleep).
+   * the left of the screen, then right. Nothing before waking (gaze with no weight: asleep).
    */
   _lookAround(o) {
     const cat = this.cat;
@@ -153,7 +105,7 @@ export const openingScene = {
     this._goal('chagicien');
   },
 
-  /** Ends the opening wherever it is (Maman at the summit, kitten on the ground). */
+  /** Ends the opening wherever it is (step skip, new game); Maman stays at the summit. */
   _endOpening() {
     if (!this._open) return;
     this._open = null;
@@ -162,8 +114,6 @@ export const openingScene = {
     this._cam = null;
     this.veil.className = 'lost-veil';
     this.bars.hide(0);
-    if (this.cat.carrier) this.cat.carry(null);
-    if (this.hasNpcs) this._placeMamanAtSummit();
   },
 
   /** Maman lying on the summit ledge (zone 2), in that zone's group. */

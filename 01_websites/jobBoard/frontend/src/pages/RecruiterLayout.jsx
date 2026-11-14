@@ -1,5 +1,5 @@
-// Habillage de l'espace recruteur : ses onglets, puis la sous-page courante.
-// Un seul appel vérifie l'accès : 401 → connexion, 403 → pas recruteur ; aucun onglet dans ces deux cas.
+// Layout of the recruiter area: its tabs, then the current sub-page.
+// A single call checks access: 401 → login, 403 → not a recruiter; no tabs in these two cases.
 import { useContext, useEffect, useState } from 'react'
 import { Link, NavLink, Outlet } from 'react-router'
 import { AuthContext } from '../AuthContext'
@@ -9,7 +9,7 @@ import { useLang } from '../lang.js'
 export default function RecruiterLayout() {
   const { user } = useContext(AuthContext)
   const { t } = useLang()
-  // null tant que le serveur n'a pas répondu, puis le code reçu (200, 401, 403…).
+  // null until the server has answered, then the code received (200, 401, 403…).
   const [accessStatus, setAccessStatus] = useState(null)
 
   useEffect(() => {
@@ -38,13 +38,13 @@ export default function RecruiterLayout() {
     )
   }
 
-  // Rien tant que la vérification n'est pas finie : pas d'onglets qui apparaissent puis disparaissent.
+  // Nothing until the check is finished: no tabs that appear then disappear.
   if (accessStatus === null) return null
 
   return (
     <div className="page">
-      {/* Onglets en pastilles, comme le choix des tables en administration.
-          tab-bar (tabs.css) : bande collée sous l'en-tête pendant le défilement. */}
+      {/* Tabs as pills, like the table choice in administration.
+          tab-bar (tabs.css): strip stuck under the header while scrolling. */}
       <div className="tab-bar">
         <nav className="tab-switch" aria-label={t('Espace recruteur', 'Recruiter area')}>
           <NavLink to="/recruteur" end>{t("Vue d'ensemble", 'Overview')}</NavLink>
@@ -54,7 +54,7 @@ export default function RecruiterLayout() {
         </nav>
       </div>
 
-      {/* Outlet : la sous-page correspondant à l'URL s'affiche ici. */}
+      {/* Outlet: the sub-page matching the URL is displayed here. */}
       <Outlet />
     </div>
   )

@@ -15,7 +15,7 @@ export const victoryScene = {
   _victory() {
     const c = this._combat, boss = this.npcs.chartiste, cat = this.cat, V = VICTORY;
     this.lastDuel = this._duel?.state ?? null;
-    this._abortPull();
+    this._abortSwordScene();
     if (!c || !boss) { this._endCombat(); this.met.boss = true; this._goalAfterVictory(); return; }
     c.phase = 'victory'; c.t = 0;
     c.v = { dissolve: false, drop: false, hide: false, unbuild: false, unbuilt: false, sword: cat.sword };
@@ -132,12 +132,11 @@ export const victoryScene = {
   },
 
   /**
-   * Reset of the sword and the victory (start, skipTo): sword in its stone and taken from the kitten, Chartiste visible, his
-   * obstacles restored, dissolve cleared, slow motion cancelled.
+   * Reset of the sword and the victory (start, skipTo): sword back in its whole stone and taken from the kitten, Chartiste
+   * visible, his obstacles restored, dissolve cleared.
    */
   _resetVictory() {
-    this._abortPull();
-    this.timeScale = 1;
+    this._abortSwordScene();
     this.sword?.reset();
     if (this.cat.sword) this.cat.setSword(false);
     this.dissolve?.clear();
@@ -161,7 +160,7 @@ export const victoryScene = {
     const obs = w.ruins?.obstacles ?? [];
     const bossObs = obs.findIndex((o) => o.name === 'npc_boss');
     const inArena = w.inArena;
-    this._abortPull(); // before dispose: duel still there for pause(false)
+    this._abortSwordScene(); // before dispose: duel still there for pause(false)
     if (this._duel) { this._duel.dispose(); this._duel = null; }
     if (!c && !inArena && bossObs < 0 && !boss?._boss) return;
     this._combat = null;

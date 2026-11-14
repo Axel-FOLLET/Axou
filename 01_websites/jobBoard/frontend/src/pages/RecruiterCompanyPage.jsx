@@ -1,12 +1,12 @@
-// Onglet « Mon entreprise » : modification des informations de l'entreprise.
-// Champs repris du contrat d'API (table companies) ; l'enregistrement passe par PATCH /api/recruiter/company.
+// "My company" tab: editing the company information.
+// Fields taken from the API contract (companies table); saving goes through PATCH /api/recruiter/company.
 import { useEffect, useState } from 'react'
 import { apiFetch } from '../api.js'
 import { useLang } from '../lang.js'
 
 export default function RecruiterCompanyPage() {
   const { t } = useLang()
-  // company : la fiche reçue du serveur ; form : ce que le recruteur est en train de saisir.
+  // company: the record received from the server; form: what the recruiter is typing.
   const [company, setCompany] = useState(null)
   const [form, setForm] = useState({ name: '', description: '', location: '', website: '' })
   const [loadError, setLoadError] = useState(false)
@@ -35,7 +35,7 @@ export default function RecruiterCompanyPage() {
 
   async function handleSubmit(event) {
     event.preventDefault()
-    // Seuls les champs modifiés partent ; le SIREN n'est jamais envoyé (le serveur répondrait 400).
+    // Only the modified fields are sent; the SIREN is never sent (the server would answer 400).
     const changes = {}
     for (const field of Object.keys(form)) {
       if (form[field] !== (company[field] ?? '')) changes[field] = form[field]
@@ -62,8 +62,8 @@ export default function RecruiterCompanyPage() {
       <p>{t('Modifiez ici les informations vues par les candidats.', 'Edit the information candidates see here.')}</p>
       {loadError && <p>{t('Impossible de charger votre entreprise pour le moment.', 'Unable to load your company right now.')}</p>}
 
-      {/* noValidate : les messages du navigateur seront remplacés par les nôtres, en français.
-          form-columns (forms.css) : champs courts par paires, description sur toute la ligne. */}
+      {/* noValidate: the browser's messages will be replaced by our own, in the chosen language.
+          form-columns (forms.css): short fields in pairs, description on the whole line. */}
       <form className="form-columns" noValidate onSubmit={handleSubmit}>
         <label>
           {t('Nom', 'Name')}
@@ -93,7 +93,7 @@ export default function RecruiterCompanyPage() {
         {saveError && <p role="alert" className="field-wide">{saveError}</p>}
         {saved && <p role="status" className="field-wide">{t('Modifications enregistrées.', 'Changes saved.')}</p>}
 
-        {/* Désactivé tant que la fiche n'est pas chargée : sans elle, impossible de savoir ce qui a changé. */}
+        {/* Disabled until the record is loaded: without it, there is no way to know what changed. */}
         <div className="form-actions">
           <button type="submit" disabled={company === null || saving}>{t('Enregistrer', 'Save')}</button>
         </div>

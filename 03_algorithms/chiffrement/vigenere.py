@@ -1,32 +1,32 @@
 #!/usr/bin/env python3
 
-from cesar import ALPHABET, decaler_lettre, enlever_accents
+from caesar import ALPHABET, shift_letter, remove_accents
 
 
-def clef_valide(clef):
-    #Une clef de Vigenère est un mot : uniquement des lettres, sans accents.
-    return clef != "" and all(lettre in ALPHABET for lettre in clef.lower())
+def is_valid_key(key):
+    # A Vigenère key is a word: letters only, without accents.
+    return key != "" and all(letter in ALPHABET for letter in key.lower())
 
 
-def appliquer_vigenere(texte, clef, sens):
-    #Chaque lettre est décalée selon une lettre de la clef ("a" = 0, "b" = 1...), prise tour à tour.
-    #La clef n'avance que sur les lettres : espaces et ponctuation ne la consomment pas.
-    #sens vaut 1 pour chiffrer, -1 pour déchiffrer.
-    decalages = [ALPHABET.index(lettre) for lettre in clef.lower()]
-    resultat = ""
+def apply_vigenere(text, key, direction):
+    # Each letter is shifted according to a letter of the key ("a" = 0, "b" = 1...), taken in turn.
+    # The key only advances on letters: spaces and punctuation do not consume it.
+    # direction is 1 to encrypt, -1 to decrypt.
+    shifts = [ALPHABET.index(letter) for letter in key.lower()]
+    result = ""
     position = 0
-    for caractere in enlever_accents(texte):
-        if caractere.lower() in ALPHABET:
-            resultat += decaler_lettre(caractere, sens * decalages[position % len(decalages)])
+    for char in remove_accents(text):
+        if char.lower() in ALPHABET:
+            result += shift_letter(char, direction * shifts[position % len(shifts)])
             position += 1
         else:
-            resultat += caractere
-    return resultat
+            result += char
+    return result
 
 
-def chiffrer_vigenere(texte, clef):
-    return appliquer_vigenere(texte, clef, 1)
+def encrypt_vigenere(text, key):
+    return apply_vigenere(text, key, 1)
 
 
-def dechiffrer_vigenere(texte, clef):
-    return appliquer_vigenere(texte, clef, -1)
+def decrypt_vigenere(text, key):
+    return apply_vigenere(text, key, -1)

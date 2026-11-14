@@ -1,24 +1,24 @@
 /*
- * Appelle l'API et renvoie toujours la même forme de résultat, sans jamais lever
- * d'exception :
- *   ok     : true si le code HTTP est un succès
- *   status : le code HTTP, ou 0 si le serveur est injoignable
- *   data   : le corps JSON, ou null s'il n'y en a pas
- *   error  : le message renvoyé par l'API en cas de refus, sinon ''
- *   total  : l'en-tête X-Total-Count, ou null s'il est absent
+ * Calls the API and always returns the same result shape, never throwing
+ * an exception:
+ *   ok     : true if the HTTP status is a success
+ *   status : the HTTP status, or 0 if the server is unreachable
+ *   data   : the JSON body, or null if there is none
+ *   error  : the message returned by the API on a refusal, otherwise ''
+ *   total  : the X-Total-Count header, or null if absent
  */
 
-// api.js n'est pas un composant : il lit la langue sur l'attribut lang de la page, tenu à jour par LangProvider.
+// api.js is not a component: it reads the language from the page's lang attribute, kept up to date by LangProvider.
 function inEnglish() {
   return document.documentElement.lang === 'en'
 }
 
 export async function apiFetch(path, { body, headers, ...options } = {}) {
-  // credentials : le cookie de session accompagne chaque appel, y compris côté administration.
+  // credentials: the session cookie goes with every call, administration included.
   const init = { credentials: 'include', ...options, headers: { ...headers } }
 
-  // Un FormData (envoi d'un fichier, comme le CV) part tel quel : le navigateur écrit lui-même
-  // l'en-tête multipart. Un autre corps JavaScript est converti en JSON ; sans corps, aucun en-tête de type.
+  // A FormData (a file upload, like the CV) is sent as is: the browser writes the multipart
+  // header itself. Any other JavaScript body is converted to JSON; with no body, no content-type header.
   if (body instanceof FormData) {
     init.body = body
   } else if (body !== undefined) {
@@ -30,11 +30,11 @@ export async function apiFetch(path, { body, headers, ...options } = {}) {
   try {
     response = await fetch(path, init)
   } catch {
-    // Serveur arrêté ou coupure réseau : status 0 distingue ce cas d'un refus de l'API.
+    // Server stopped or network cut: status 0 tells this apart from a refusal by the API.
     return { ok: false, status: 0, data: null, error: inEnglish() ? 'Server unreachable.' : 'Serveur injoignable.', total: null, retryAfter: null }
   }
 
-  // 204 : succès sans contenu (suppression réussie), il n'y a rien à lire dans la réponse.
+  // 204: success with no content (deletion succeeded), there is nothing to read in the response.
   if (response.status === 204) {
     return { ok: true, status: 204, data: null, error: '', total: null, retryAfter: null }
   }
@@ -43,14 +43,14 @@ export async function apiFetch(path, { body, headers, ...options } = {}) {
   try {
     data = await response.json()
   } catch {
-    // Réponse vide ou illisible : data reste null, le code appelant se fie à status.
+    // Empty or unreadable response: data stays null, the calling code relies on status.
   }
 
-  // En cas de refus, l'API renvoie toujours {"error": "..."}.
+  // On a refusal, the API always returns {"error": "..."}.
   const message = typeof data?.error === 'string' ? data.error : `${inEnglish() ? 'Error' : 'Erreur'} ${response.status}`
-  // X-Total-Count : nombre total de lignes, utilisé par la pagination de l'administration.
+  // X-Total-Count: total number of rows, used by the administration pagination.
   const totalHeader = response.headers.get('X-Total-Count')
-  // Retry-After : secondes d'attente renvoyées avec un 429 (trop de tentatives de connexion).
+  // Retry-After: seconds to wait, returned with a 429 (too many login attempts).
   const retryAfterHeader = response.headers.get('Retry-After')
 
   return {

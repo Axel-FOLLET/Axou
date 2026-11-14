@@ -392,9 +392,9 @@ export class BossMoves {
   // ---------------------------------------------------------------- Duel
 
   /**
-   * Sword-pull cinematic (Duel.pause); `on` false: resume. During the pause nothing hurts and nothing starts: on entry,
-   * strike, combo and all paint on the ground are removed (the kitten is moved to the sword, and a puddle still there
-   * would hit it on resuming). On resuming, the next strike comes from Duel's delay (`FIGHT.sword.resume`) and the next
+   * Sword cutscene (Duel.pause); `on` false: resume. During the pause nothing hurts and nothing starts: on entry,
+   * strike, combo and all paint on the ground are removed (a puddle still there would hit the kitten on resuming,
+   * before the player has seen it again). On resuming, the next strike comes from Duel's delay (`FIGHT.sword.resume`) and the next
    * paint 2.5 s later.
    */
   pause(on) {

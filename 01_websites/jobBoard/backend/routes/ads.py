@@ -25,43 +25,43 @@ def fetch_ad(conn, ad_id):
 
 #--------------------list_ads----------------
 
-#C'est un décorateur. Il dit à Flask : « quand quelqu'un envoie une requête GET à l'URL /ads, exécute la fonction juste en dessous.
+# This is a decorator. It tells Flask: "when someone sends a GET request to the URL /ads, run the function just below."
 @bp.route("/ads", methods=["GET"])
 def list_ads():
-    # Pagination facultative : None, (page, per_page) ou "invalid"
+    # Optional pagination: None, (page, per_page) or "invalid"
     pagination = read_pagination()
     if pagination == "invalid":
         return jsonify({"error": "Invalid pagination"}), 400
 
-    # Condition toujours présente : seulement les annonces ouvertes
+    # Condition always present: only open ads
     conditions = ["ads.status = 'open'"]
     params = []
 
-    # Filtre q : texte dans le titre ou la description courte
+    # q filter: text in the title or the short description
     q = request.args.get("q")
     if q:
         conditions.append("(ads.title LIKE ? OR ads.short_description LIKE ?)")
         params.extend([f"%{q}%", f"%{q}%"])
 
-    # Filtre category : nom de catégorie exact
+    # category filter: exact category name
     category = request.args.get("category")
     if category:
         conditions.append("categories.name = ?")
         params.append(category)
 
-    # Filtre contract_type : type de contrat exact
+    # contract_type filter: exact contract type
     contract_type = request.args.get("contract_type")
     if contract_type:
         conditions.append("ads.contract_type = ?")
         params.append(contract_type)
 
-    # Filtre location : lieu exact
+    # location filter: exact place
     location = request.args.get("location")
     if location:
         conditions.append("ads.location = ?")
         params.append(location)
 
-    # Assemblage : nos fragments SQL seulement, jamais une valeur reçue
+    # Assembly: only our own SQL fragments, never a received value
     sql = (
         """SELECT ads.id, ads.title, ads.short_description,
                   companies.name AS company, ads.location, ads.contract_type,
@@ -76,7 +76,7 @@ def list_ads():
 
     conn = get_db()
 
-    # Total des lignes (filtres compris), avant LIMIT/OFFSET
+    # Total number of rows (filters included), before LIMIT/OFFSET
     total = conn.execute(
         """SELECT COUNT(*)
            FROM ads
@@ -87,7 +87,7 @@ def list_ads():
         params,
     ).fetchone()[0]
 
-    # Pagination demandée : seulement les lignes de la page
+    # Pagination requested: only the rows of the page
     if pagination is not None:
         page, per_page = pagination
         sql += " LIMIT ? OFFSET ?"
@@ -184,7 +184,7 @@ def create_ad():
 
 @bp.route("/ads/<int:ad_id>/applications", methods=["POST"])
 def create_application(ad_id):
-    # Deux formats : JSON, ou formulaire multipart quand un CV est joint (champ fichier « cv »).
+    # Two formats: JSON, or a multipart form when a CV is attached (file field "cv").
     if request.mimetype == "multipart/form-data":
         data = request.form.to_dict()
     else:
@@ -192,7 +192,7 @@ def create_application(ad_id):
 
     user = current_user()
 
-    # CV joint : vérifié avant toute écriture (PDF de 2 Mo maximum).
+    # Attached CV: checked before any write (PDF of 2 MB at most).
     cv = None
     cv_file = request.files.get("cv")
     if cv_file is not None and cv_file.filename:
@@ -200,11 +200,11 @@ def create_application(ad_id):
         if cv is None:
             return jsonify({"error": "Invalid field: cv"}), 400
 
-    # Personne connectée sans nouveau fichier : elle peut joindre le CV de son profil.
+    # Logged-in person without a new file: they can attach the CV of their profile.
     use_profile_cv = user is not None and cv is None and data.get("use_profile_cv") in (True, "1", "true")
 
     # --------------------------------------------------
-    # Utilisateur connecté
+    # Logged-in user
     # --------------------------------------------------
     if user is not None:
         if not isinstance(data.get("message"), str) or not data["message"].strip():
@@ -213,7 +213,7 @@ def create_application(ad_id):
         person_id = user["id"]
 
     # --------------------------------------------------
-    # Visiteur non connecté
+    # Visitor not logged in
     # --------------------------------------------------
     else:
         for field in ("first_name", "last_name", "email", "message"):
@@ -229,13 +229,13 @@ def create_application(ad_id):
     conn = get_db()
     application_cvs.ensure_tables(conn)
 
-    # CV du profil demandé, mais le profil n'en a pas
+    # Profile CV requested, but the profile has none
     if use_profile_cv and application_cvs.profile_info(conn, person_id) is None:
         conn.close()
         return jsonify({"error": "Invalid field: cv"}), 400
 
     # --------------------------------------------------
-    # Vérifier que l'annonce existe
+    # Check that the ad exists
     # --------------------------------------------------
     ad = conn.execute(
         "SELECT id, status FROM ads WHERE id = ?",
@@ -247,14 +247,14 @@ def create_application(ad_id):
         return jsonify({"error": "Ad not found"}), 404
 
     # --------------------------------------------------
-    # Vérifier que l'annonce est ouverte
+    # Check that the ad is open
     # --------------------------------------------------
     if ad["status"] == "closed":
         conn.close()
         return jsonify({"error": "Ad is closed"}), 409
 
     # --------------------------------------------------
-    # Visiteur : trouver ou créer la personne
+    # Visitor: find or create the person
     # --------------------------------------------------
     if user is None:
         person = conn.execute(
@@ -289,7 +289,7 @@ def create_application(ad_id):
             person_id = person["id"]
 
     # --------------------------------------------------
-    # Vérifier si la personne a déjà candidaté
+    # Check whether the person has already applied
     # --------------------------------------------------
     existing_application = conn.execute(
         """
@@ -306,7 +306,7 @@ def create_application(ad_id):
         return jsonify({"error": "Already applied"}), 409
 
     # --------------------------------------------------
-    # Créer la candidature
+    # Create the application
     # --------------------------------------------------
     try:
         cur = conn.execute(
@@ -322,13 +322,13 @@ def create_application(ad_id):
             )
         )
 
-        # CV joint ou copie du CV du profil, dans la même transaction que la candidature
+        # Attached CV or copy of the profile CV, in the same transaction as the application
         if cv is not None:
             application_cvs.attach(conn, cur.lastrowid, *cv)
         elif use_profile_cv:
             application_cvs.attach_profile(conn, cur.lastrowid, person_id)
 
-        # Une seule transaction
+        # A single transaction
         conn.commit()
 
     except sqlite3.IntegrityError:
@@ -339,7 +339,7 @@ def create_application(ad_id):
     notify_application_received(conn, cur.lastrowid)
     
     # --------------------------------------------------
-    # Renvoyer la candidature créée
+    # Return the application that was created
     # --------------------------------------------------
     row = conn.execute(
         """
@@ -378,8 +378,8 @@ def my_applications():
     return jsonify([dict(r) for r in rows])
 
 
-#-------------------- CV du profil (espace candidat) --------------------
-# La personne est toujours celle de la session : chacun ne voit et ne change que son propre CV.
+#-------------------- Profile CV (candidate area) --------------------
+# The person is always the one in the session: everyone sees and changes only their own CV.
 
 @bp.route("/me/cv", methods=["GET"])
 @login_required
@@ -444,10 +444,10 @@ def close_ad(ad_id):
     return close_ad_in_db(conn, ad_id, data)
 
 
-# Clôture partagée par l'admin (close_ad ci-dessus) et le recruteur (routes/recruiter.py).
-# Les vérifications de droits sont faites avant l'appel. Ferme conn dans tous les cas.
+# Closure shared by the admin (close_ad above) and the recruiter (routes/recruiter.py).
+# The permission checks are done before the call. Closes conn in every case.
 def close_ad_in_db(conn, ad_id, data):
-    # Vérifier que l'annonce existe
+    # Check that the ad exists
     ad = conn.execute(
         "SELECT id, status FROM ads WHERE id = ?",
         (ad_id,)
@@ -457,31 +457,31 @@ def close_ad_in_db(conn, ad_id, data):
         conn.close()
         return jsonify({"error": "Ad not found"}), 404
 
-    # Vérifier que l'annonce n'est pas déjà fermée
+    # Check that the ad is not already closed
     if ad["status"] == "closed":
         conn.close()
         return jsonify({"error": "Ad already closed"}), 409
 
-    # Vérifier si l'annonce possède des candidatures
+    # Check whether the ad has applications
     application = conn.execute(
         "SELECT id FROM applications WHERE ad_id = ?",
         (ad_id,)
     ).fetchone()
 
-    # accepted_application_id est facultatif : absent ou null, aucun candidat n'est retenu
+    # accepted_application_id is optional: when absent or null, no candidate is accepted
     accepted_application_id = data.get("accepted_application_id")
 
-    # Des candidatures, mais aucun candidat retenu : toutes sont refusées
+    # Applications exist, but no candidate is accepted: all are rejected
     if application is not None and accepted_application_id is None:
         conn.execute(
             "UPDATE applications SET status = 'rejected' WHERE ad_id = ?",
             (ad_id,)
         )
 
-    # Des candidatures et un candidat retenu (sans candidature, on ferme simplement l'annonce)
+    # Applications and an accepted candidate (with no application, the ad is simply closed)
     elif application is not None:
 
-        # Vérifier que la candidature appartient bien à cette annonce
+        # Check that the application really belongs to this ad
         accepted_application = conn.execute(
             "SELECT id FROM applications WHERE id = ? AND ad_id = ?",
             (accepted_application_id, ad_id)
@@ -493,31 +493,31 @@ def close_ad_in_db(conn, ad_id, data):
                 {"error": "Application does not belong to this ad"}
             ), 400
 
-        # Accepter la candidature choisie
+        # Accept the chosen application
         conn.execute(
             "UPDATE applications SET status = 'accepted' "
             "WHERE id = ?",
             (accepted_application_id,)
         )
 
-        # Refuser toutes les autres candidatures
+        # Reject all the other applications
         conn.execute(
             "UPDATE applications SET status = 'rejected' "
             "WHERE ad_id = ? AND id != ?",
             (ad_id, accepted_application_id)
         )
 
-    # Fermer l'annonce
+    # Close the ad
     conn.execute(
         "UPDATE ads SET status = 'closed' WHERE id = ?",
         (ad_id,)
     )
 
-    # Une seule validation de la transaction
+    # A single commit of the transaction
     conn.commit()
     notify_closure(conn, ad_id)
 
-    # Récupérer l'annonce dans le même format que GET /api/ads/<id>
+    # Fetch the ad in the same format as GET /api/ads/<id>
     row = fetch_ad(conn, ad_id)
 
     conn.close()
@@ -526,32 +526,32 @@ def close_ad_in_db(conn, ad_id, data):
 
 #------------------read_pagination----------------
 
-# Renvoie None (pas de pagination), (page, per_page) (valide) ou "invalid"
+# Returns None (no pagination), (page, per_page) (valid) or "invalid"
 def read_pagination():
     page_raw = request.args.get("page")
     per_page_raw = request.args.get("per_page")
 
-    # pas de pagination demandée
+    # no pagination requested
     if page_raw is None and per_page_raw is None:
         return None
 
-    # une seule valeur donnée : on complète avec une valeur par défaut
+    # only one value given: complete it with a default value
     if page_raw is None:
         page_raw = "1"
     if per_page_raw is None:
         per_page_raw = "10"
 
-    # les deux doivent être des entiers
+    # both must be integers
     try:
         page = int(page_raw)
         per_page = int(per_page_raw)
     except ValueError:
-        # numéro de page ou taille de page non entier
+        # page number or page size is not an integer
         return "invalid"
 
-    # page >= 1 et 1 <= per_page <= 50
+    # page >= 1 and 1 <= per_page <= 50
     if page < 1 or per_page < 1 or per_page > 50:
-        # plage invalide
+        # invalid range
         return "invalid"
 
     return page, per_page

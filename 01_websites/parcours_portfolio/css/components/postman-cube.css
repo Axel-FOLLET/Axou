@@ -1,0 +1,434 @@
+/* -------------------- POSTMAN CUBE -------------------- */
+
+/*
+    Large cube of the Contact me page: it carries the message of the form (js/modules/postman-cube.js).
+    One face lights up for each filled field, the cube leaves with the message once it is sent,
+    and shakes its head when the form is refused. Its place on the page is in pages/contact.css.
+
+    Decorative (aria-hidden in the HTML): it takes neither the focus nor the pointer.
+    Two colours, like the site: the edges run from the accent blue (top left front corner)
+    to the accent red (opposite corner); the faces are dark glass, the light behind shows through.
+    No hard-coded colour: only the variables of tokens.css, mixed with color-mix().
+
+    One wrapper per movement, from the outside in, so that no movement replaces another:
+    .postman__stage      entrance of the page (fade); soft landing when a message of the form pushes the cube down
+                         (narrow screens; a landing that comes during the entrance takes its place)
+    .postman__flight     departure with the message, arrival of the new cube (perspective set here)
+    .postman__float      slow life at rest
+    .postman__tilt       view from above: the top face stays visible, whatever the cube does below
+    .postman__turntable  spin while sending, "no" shake: both around the vertical axis of the cube
+    .postman__heading    three-quarter view, a little more frontal while a field has the focus
+    .postman__cube       quarter turns, one per filled field
+    Only transform and opacity are animated.
+*/
+.postman {
+    --postman-size: clamp(132px, 15vw, 220px);
+    /* Height kept for the cube, its turns and the light under it */
+    --postman-stage: calc(var(--postman-size) * 2.1);
+
+    --postman-tilt-x: -24deg;
+    --postman-tilt-y: -34deg;
+
+    /* Dark glass of the faces */
+    --postman-glass: color-mix(in srgb, var(--ink) 46%, var(--clear));
+
+    /* Share of lit faces, from 0 to 1, written by postman-cube.js: the halo follows it */
+    --postman-charge: 0;
+
+    pointer-events: none;
+    user-select: none;
+}
+
+
+/* Box of the cube: everything is centred in it */
+.postman__stage {
+    display: grid;
+    place-items: center;
+
+    position: relative;
+
+    width: 100%;
+    height: var(--postman-stage);
+
+    animation: postman-enter var(--dur-slow) var(--ease-out) var(--dur-fast) both;
+}
+
+
+@keyframes postman-enter {
+    from {
+        opacity: 0;
+        transform: translate3d(0, 24px, 0) scale(0.92);
+    }
+}
+
+
+/* -------------------- LIGHTS AROUND THE CUBE -------------------- */
+
+/*
+    Halo behind the cube: blue on the left, red on the right; it grows stronger as the faces light up.
+    Never wider than the place of the cube plus 8 px on each side: on wide screens the halo, even enlarged while sending,
+    stays inside the margin of the page and adds no width to it.
+*/
+.postman__halo {
+    position: absolute;
+
+    top: 46%;
+    left: 50%;
+
+    width: min(calc(var(--postman-size) * 2.3), calc(100% + 16px));
+    aspect-ratio: 1;
+
+    background:
+        radial-gradient(closest-side at 38% 44%, color-mix(in srgb, var(--blue-accent) 30%, var(--clear)), var(--clear)),
+        radial-gradient(closest-side at 62% 56%, color-mix(in srgb, var(--red-accent) 26%, var(--clear)), var(--clear));
+
+    opacity: calc(0.45 + 0.55 * var(--postman-charge));
+    transform: translate(-50%, -50%);
+
+    transition: opacity var(--dur-slow) var(--ease-out);
+}
+
+
+/* Pool of light under the cube: it tells that the cube floats, and breathes with it */
+.postman__ground {
+    position: absolute;
+
+    top: calc(46% + var(--postman-size) * 0.9);
+    left: 50%;
+
+    width: min(calc(var(--postman-size) * 1.5), 100%);
+    height: calc(var(--postman-size) * 0.2);
+
+    background:
+        radial-gradient(closest-side at 40% 50%, color-mix(in srgb, var(--blue-accent) 55%, var(--clear)), var(--clear)),
+        radial-gradient(closest-side at 60% 50%, color-mix(in srgb, var(--red-accent) 50%, var(--clear)), var(--clear));
+
+    opacity: 0.85;
+    transform: translate(-50%, -50%);
+
+    transition: opacity var(--dur-base) var(--ease-out);
+
+    animation: postman-ground 9s ease-in-out infinite;
+}
+
+
+/*
+    Same rhythm as postman-float: the light tightens when the cube rises, spreads when it comes down.
+    Only the size is animated: the opacity stays free for the departure of the cube (.postman--away).
+*/
+@keyframes postman-ground {
+    0%, 100% {
+        transform: translate(-50%, -50%) scale(1);
+    }
+
+    25% {
+        transform: translate(-50%, -50%) scale(0.8);
+    }
+
+    50% {
+        transform: translate(-50%, -50%) scale(0.94);
+    }
+
+    75% {
+        transform: translate(-50%, -50%) scale(1.1);
+    }
+}
+
+
+/* The cube has left with the message: no light around an empty place */
+.postman--away :is(.postman__ground, .postman__halo) {
+    opacity: 0;
+}
+
+
+/* The message is being sent: the halo beats while the cube spins (postman-cube.js) */
+.postman--waiting .postman__halo {
+    animation: postman-wait var(--dur-slow) ease-in-out infinite alternate;
+}
+
+
+@keyframes postman-wait {
+    to {
+        transform: translate(-50%, -50%) scale(1.1);
+    }
+}
+
+
+/* -------------------- WRAPPERS -------------------- */
+
+/*
+    Departure and arrival (postman-cube.js). The perspective is set here, not on the stage:
+    the cube keeps its shape while it flies, and the fade of this wrapper does not flatten it.
+*/
+.postman__flight {
+    display: block;
+
+    position: absolute;
+
+    top: 46%;
+    left: 50%;
+
+    width: var(--postman-size);
+    height: var(--postman-size);
+
+    margin: calc(var(--postman-size) / -2) 0 0 calc(var(--postman-size) / -2);
+
+    perspective: calc(var(--postman-size) * 4.5);
+
+    will-change: transform;
+}
+
+
+.postman__float,
+.postman__tilt,
+.postman__turntable,
+.postman__heading,
+.postman__cube {
+    display: block;
+
+    position: absolute;
+
+    inset: 0;
+
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+}
+
+
+/* Life at rest: a slow rise and fall, with a slight sway */
+.postman__float {
+    animation: postman-float 9s ease-in-out infinite;
+}
+
+
+@keyframes postman-float {
+    0%, 100% {
+        transform: translate3d(0, 0, 0) rotateX(0deg) rotateY(0deg);
+    }
+
+    25% {
+        transform: translate3d(0, -10px, 0) rotateX(3deg) rotateY(-9deg);
+    }
+
+    50% {
+        transform: translate3d(0, -3px, 0) rotateX(-1deg) rotateY(0deg);
+    }
+
+    75% {
+        transform: translate3d(0, 8px, 0) rotateX(-3deg) rotateY(9deg);
+    }
+}
+
+
+/*
+    Three-quarter view: the front, top and right faces are visible.
+    The view from above (tilt) is outside the turntable and the turn to the side (heading) inside it:
+    the cube spins like an object on a turntable, with no roll.
+*/
+.postman__tilt {
+    transform: rotateX(var(--postman-tilt-x));
+
+    transition: transform var(--dur-slow) var(--ease-out);
+}
+
+
+.postman__heading {
+    transform: rotateY(var(--postman-tilt-y));
+
+    transition: transform var(--dur-slow) var(--ease-out);
+}
+
+
+/* A field has the focus: the cube straightens up and turns its front face a little more toward the visitor, it listens */
+.postman--listening .postman__tilt {
+    transform: rotateX(calc(var(--postman-tilt-x) + 6deg));
+}
+
+
+.postman--listening .postman__heading {
+    transform: rotateY(calc(var(--postman-tilt-y) + 10deg));
+}
+
+
+/* Off screen or hidden tab (class set by postman-cube.js): nothing runs */
+.postman--paused :is(.postman__stage, .postman__halo, .postman__ground, .postman__float) {
+    animation-play-state: paused;
+}
+
+
+/* -------------------- FACES -------------------- */
+
+/*
+    Each face: dark glass, an edge drawn by a gradient (border-image) and a light kept off (::before).
+    --postman-ridge is the slice of the blue-to-red diagonal seen by the face;
+    --postman-aura is the colour of its glow, blue or red according to the nearest corner.
+*/
+.postman__face {
+    display: grid;
+    place-items: center;
+
+    position: absolute;
+
+    inset: 0;
+
+    border: 2px solid;
+    border-image: var(--postman-ridge) 1;
+
+    background-color: var(--postman-glass);
+
+    /*
+        Glow of the edges, on the inside only: an outer shadow would widen the layer of each face beyond the cube,
+        the widened layers would cross one another and the browser would then draw strips of a back face over a front one.
+    */
+    box-shadow:
+        inset 0 0 calc(var(--postman-size) * 0.04) color-mix(in srgb, var(--postman-aura) 70%, var(--clear)),
+        inset 0 0 calc(var(--postman-size) * 0.2) color-mix(in srgb, var(--postman-aura) 26%, var(--clear));
+}
+
+
+/* Light of a loaded face: a white heart on the colours of the face */
+.postman__face::before {
+    content: "";
+
+    position: absolute;
+
+    inset: 0;
+
+    background:
+        radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--white) 55%, var(--clear)) 0%, var(--clear) 66%),
+        var(--postman-ridge);
+
+    opacity: 0;
+
+    transition: opacity var(--dur-base) var(--ease-out) var(--postman-light-delay, 0s);
+}
+
+
+.postman__face--lit::before {
+    opacity: 0.6;
+}
+
+
+/* Position of the six faces (half the size of the cube) and slice of the diagonal seen by each one */
+.postman__face--front {
+    --postman-ridge: linear-gradient(135deg, var(--blue-accent) 0%, var(--red-accent) 150%);
+    --postman-aura: var(--blue-accent);
+
+    transform: translateZ(calc(var(--postman-size) / 2));
+}
+
+
+.postman__face--back {
+    --postman-ridge: linear-gradient(225deg, var(--blue-accent) -50%, var(--red-accent) 100%);
+    --postman-aura: var(--red-accent);
+
+    transform:
+        rotateY(180deg)
+        translateZ(calc(var(--postman-size) / 2));
+}
+
+
+.postman__face--right {
+    --postman-ridge: linear-gradient(135deg, var(--blue-accent) -50%, var(--red-accent) 100%);
+    --postman-aura: var(--red-accent);
+
+    transform:
+        rotateY(90deg)
+        translateZ(calc(var(--postman-size) / 2));
+}
+
+
+.postman__face--left {
+    --postman-ridge: linear-gradient(225deg, var(--blue-accent) 0%, var(--red-accent) 150%);
+    --postman-aura: var(--blue-accent);
+
+    transform:
+        rotateY(-90deg)
+        translateZ(calc(var(--postman-size) / 2));
+}
+
+
+.postman__face--top {
+    --postman-ridge: linear-gradient(45deg, var(--blue-accent) 0%, var(--red-accent) 150%);
+    --postman-aura: var(--blue-accent);
+
+    transform:
+        rotateX(90deg)
+        translateZ(calc(var(--postman-size) / 2));
+}
+
+
+.postman__face--bottom {
+    --postman-ridge: linear-gradient(135deg, var(--blue-accent) -50%, var(--red-accent) 100%);
+    --postman-aura: var(--red-accent);
+
+    transform:
+        rotateX(-90deg)
+        translateZ(calc(var(--postman-size) / 2));
+}
+
+
+/*
+    Envelope drawn on the front face, the one shown at rest: the cube is a postman.
+    Line drawing like the other symbols of the site; it brightens when the cube closes on the message.
+*/
+.postman__seal {
+    position: relative;
+
+    width: 46%;
+    height: 46%;
+
+    fill: none;
+    stroke: var(--white);
+    stroke-width: 1.1;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+
+    opacity: 0.55;
+
+    transition: opacity var(--dur-base) var(--ease-out);
+}
+
+
+.postman--sealed .postman__seal {
+    opacity: 1;
+}
+
+
+/* -------------------- REDUCED MOTION -------------------- */
+
+/*
+    The cube stays still: no entrance, no life at rest, no turn toward the form.
+    postman-cube.js then starts no movement; the faces light up at once, with no fade.
+*/
+@media (prefers-reduced-motion: reduce) {
+
+    .postman__stage,
+    .postman__halo,
+    .postman--waiting .postman__halo,
+    .postman__ground,
+    .postman__float {
+        animation: none;
+    }
+
+
+    .postman__tilt,
+    .postman__heading,
+    .postman__halo,
+    .postman__ground,
+    .postman__seal,
+    .postman__face::before {
+        transition: none;
+    }
+
+
+    .postman--listening .postman__tilt {
+        transform: rotateX(var(--postman-tilt-x));
+    }
+
+
+    .postman--listening .postman__heading {
+        transform: rotateY(var(--postman-tilt-y));
+    }
+
+}

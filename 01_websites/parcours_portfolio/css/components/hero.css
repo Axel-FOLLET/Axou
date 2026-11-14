@@ -1,0 +1,211 @@
+/* -------------------- PAGE OPENING (.hero) -------------------- */
+
+/*
+    Single version of the opening, shared by the 4 pages: title and texts on the left, cube figure on the right.
+    Taken from home.css and responsive.css of the portfolio, and from the openings of My background and My portfolio.
+    Loaded on every page just before the page sheet: a page writes only its differences there, commented.
+    The animations of the opening are elsewhere: title entrance and glow in motion.css,
+    depth on scroll in scroll.css, cube parallax in scroll-motion.js.
+    No hard-coded colour: only the variables of tokens.css (theme set on <body>).
+
+    Elements:
+    - .hero: the opening section, first section of <main>;
+    - .hero__text: text column; .hero__title (the <h1>), then as needed .hero__role, .hero__catchphrase, .hero__intro;
+      no button: the rest is discovered by scrolling;
+    - .hero__visual: the right column. On My background and My portfolio, decorative cube figure (aria-hidden="true",
+      cubes .cube--hero, .cube--pos-1, .cube--pos-2); on the home page, menu of the doors to the pages (nav.hero__visual.doors, home.css).
+*/
+
+
+/*
+    Page colour lit by a glow at the top left, behind the title (--hero-glow):
+    the readable accent of the theme at 30%, the value of the two former sites.
+    svh: the mobile address bar is not counted; 76 px: height of the header.
+*/
+.hero {
+    --hero-glow: color-mix(in srgb, var(--accent-text) 30%, var(--clear));
+
+    min-height: calc(100svh - 76px);
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 48px var(--gutter) var(--space-section);
+
+    background: radial-gradient(70vw 50vw at 15% 0%, var(--hero-glow), var(--clear) 70%);
+}
+
+
+/*
+    Coloured pages (My background in blue, My portfolio in red): at the end of the first screen the colour melts into
+    the near-black of the sections that follow, instead of stopping on a straight edge.
+    A second background layer, over the glow: clear on the upper half, then darker and darker down to --ink.
+    The white text stays readable all the way (contrast 12.3 on the blue, 6.4 on the red, 17.7 on the near-black).
+    body in the selector: this rule wins over the background of a page sheet (parcours.css).
+*/
+body:is([data-theme="parcours"], [data-theme="portfolio"]) .hero {
+    background-image:
+        linear-gradient(
+            to bottom,
+            var(--clear) 48%,
+            color-mix(in srgb, var(--ink) 30%, var(--clear)) 66%,
+            color-mix(in srgb, var(--ink) 74%, var(--clear)) 84%,
+            var(--ink)
+        ),
+        radial-gradient(70vw 50vw at 15% 0%, var(--hero-glow), var(--clear) 70%);
+}
+
+
+/* My background: the blue glow takes --accent-glow (35%), slightly stronger than the common 30% */
+body[data-theme="parcours"] .hero {
+    --hero-glow: var(--accent-glow);
+}
+
+
+.hero__text {
+    width: 58%;
+}
+
+
+/*
+    Title in the display serif, at the shared size of the main headings (--text-h1, base.css, enlarged on phones);
+    em (sections.css) turns it italic
+*/
+.hero__title {
+    margin: 0;
+
+    font-family: var(--font-display);
+    font-size: var(--text-h1);
+    font-weight: 400;
+    line-height: 0.95;
+    /* em follows the size of the title: the tightening stays proportional */
+    letter-spacing: -0.02em;
+}
+
+
+/* Role, under the name */
+.hero__role {
+    margin: 28px 0 0;
+
+    font-weight: 500;
+}
+
+
+/* Tagline: balanced lines, 26 characters per line at most */
+.hero__catchphrase {
+    max-width: 26ch;
+
+    margin: 28px 0 0;
+
+    font-size: var(--text-lead);
+    font-weight: 500;
+    line-height: 1.4;
+
+    text-wrap: balance;
+}
+
+
+/* Under a role, the tagline moves closer to it: the two lines read together */
+.hero__role + .hero__catchphrase {
+    margin-top: 20px;
+}
+
+
+/* Introduction longer than a tagline: comfortable reading length, key words in bold */
+.hero__intro {
+    max-width: 56ch;
+
+    margin: 28px 0 0;
+
+    font-size: var(--text-lead);
+    line-height: 1.55;
+}
+
+
+.hero__intro strong {
+    font-weight: 700;
+}
+
+
+/* Cube figure: reference for the absolutely placed cubes and for the glow (::before, motion.css) */
+.hero__visual {
+    width: 38%;
+    height: 520px;
+
+    position: relative;
+}
+
+
+/* -------------------- TABLET -------------------- */
+
+@media (max-width: 1024px) {
+
+    /* The cubes move under the text */
+    .hero {
+        flex-direction: column;
+        align-items: flex-start;
+
+        padding-top: 56px;
+    }
+
+
+    .hero__text,
+    .hero__visual {
+        width: 100%;
+    }
+
+
+    .hero__visual {
+        height: 420px;
+
+        margin-top: 40px;
+    }
+
+}
+
+
+/* -------------------- PHONE -------------------- */
+
+@media (max-width: 767px) {
+
+    /* Cube figure shorter and closer to the text */
+    .hero {
+        min-height: auto;
+
+        padding-bottom: 48px;
+    }
+
+
+    .hero__visual {
+        height: 280px;
+
+        margin-top: 24px;
+    }
+
+
+    /* Lower figure: its big cube shrinks in the same proportion */
+    .hero__visual .cube--huge {
+        --cube-size: 120px;
+    }
+
+
+    /* Small cubes reduced and placed diagonally, away from the big cube: while rotating, they no longer overlap it */
+    .hero__visual .cube--small {
+        --cube-size: 44px;
+    }
+
+
+    .hero__visual .cube--pos-1 {
+        top: 6%;
+        left: 4%;
+    }
+
+
+    .hero__visual .cube--pos-2 {
+        top: auto;
+        right: 6%;
+        bottom: 8%;
+    }
+
+}

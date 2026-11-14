@@ -1,0 +1,272 @@
+/* -------------------- 3D CUBES -------------------- */
+
+/*
+    Cubes shared by the two former sites (portfolio base, sizes and transition cube of the CV).
+    Colours: .cube--white on all pages; .cube--blue and .cube--red on the home and 404 pages,
+    and .cube--blue for the cube that follows the timeline thread of the My background page (timeline.js).
+    All the cubes use the same system.
+    JavaScript drives their rotation directly.
+
+    The cubes are decorative (aria-hidden): they do not take keyboard focus.
+    On the home page, each cube sits inside a link (entrance door, home.css): the link takes the focus.
+    With a mouse or a finger, a cube can be grabbed and thrown (drag-cube.js).
+    pan-y: on a touch screen, dragging vertically always scrolls the page;
+    dragging horizontally rotates the cube.
+*/
+.cube {
+    display: block;
+
+    width: var(--cube-size);
+    height: var(--cube-size);
+
+    touch-action: pan-y;
+    user-select: none;
+
+    cursor: grab;
+
+    perspective: 900px;
+
+    -webkit-tap-highlight-color: var(--clear);
+
+    /* scale is independent of transform: it does not replace the translate() placement of the cubes. */
+    transition: scale calc(var(--dur-fast) / 2) var(--ease-out);
+}
+
+
+/* Immediate feedback on press, even before release */
+.cube:active {
+    scale: 0.92;
+
+    cursor: grabbing;
+}
+
+
+/* Cube sizes */
+.cube--huge {
+    --cube-size: 240px;
+}
+
+
+.cube--large {
+    --cube-size: 170px;
+}
+
+
+/* Cube of the skills of the career change (CV) */
+.cube--medium {
+    --cube-size: 90px;
+}
+
+
+.cube--small {
+    --cube-size: 65px;
+}
+
+
+/* Small cube that marks each practice of the AI section: edges and halo refined for its size */
+.cube--tiny {
+    --cube-size: 26px;
+}
+
+
+/*
+    Transition cube of the CV (cube--tiny cube--transition): it keeps its original 45 px.
+    Placed after .cube--tiny, this size wins over the 26 px of the small cube of the method.
+*/
+.cube--transition {
+    --cube-size: 45px;
+}
+
+
+/* Cube of a link card, in place of an icon */
+.cube--card {
+    --cube-size: 33px;
+}
+
+
+.cube--tiny .cube__face,
+.cube--card .cube__face {
+    border-width: 1.5px;
+
+    box-shadow: 0 0 8px var(--cube-glow);
+}
+
+
+.cube--tiny:hover .cube__face,
+.cube--card:hover .cube__face {
+    box-shadow: 0 0 14px var(--cube-glow);
+}
+
+
+/* White cube (all pages): white edges and light veil, on blue, red and near-black */
+.cube--white {
+    --cube-border: var(--white);
+
+    --cube-fill: var(--cube-white-fill);
+    --cube-hover: var(--cube-white-fill-hover);
+
+    --cube-glow: var(--cube-white-glow);
+}
+
+
+/* Blue cube (home page, 404 page, timeline thread of the My background page): edges in the accent blue, readable on the near-black (contrast 5.6) */
+.cube--blue {
+    --cube-border: var(--blue-accent);
+
+    --cube-fill: var(--cube-blue-fill);
+    --cube-hover: var(--cube-blue-fill-hover);
+
+    --cube-glow: var(--cube-blue-glow);
+}
+
+
+/* Red cube (home and 404 page only): edges in the accent red, readable on the near-black (contrast 5.6) */
+.cube--red {
+    --cube-border: var(--red-accent);
+
+    --cube-fill: var(--cube-red-fill);
+    --cube-hover: var(--cube-red-fill-hover);
+
+    --cube-glow: var(--cube-red-glow);
+}
+
+
+/* Object that holds the six faces */
+.cube__object {
+    display: block;
+
+    position: relative;
+
+    width: 100%;
+    height: 100%;
+
+    transform-origin: center center;
+
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+
+    will-change: transform;
+}
+
+
+.cube__face {
+    position: absolute;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+
+    border: 2px solid var(--cube-border);
+
+    background-color: var(--cube-fill);
+
+    box-shadow: 0 0 18px var(--cube-glow);
+
+    transition:
+        background-color var(--dur-fast) var(--ease-out),
+        box-shadow var(--dur-fast) var(--ease-out);
+}
+
+
+.cube:hover .cube__face {
+    background-color: var(--cube-hover);
+
+    box-shadow: 0 0 28px var(--cube-glow);
+}
+
+
+/* Position of the six faces: half the size of the cube */
+.cube__face--front {
+    transform: translateZ(calc(var(--cube-size) / 2));
+}
+
+
+.cube__face--back {
+    transform:
+        rotateY(180deg)
+        translateZ(calc(var(--cube-size) / 2));
+}
+
+
+.cube__face--right {
+    transform:
+        rotateY(90deg)
+        translateZ(calc(var(--cube-size) / 2));
+}
+
+
+.cube__face--left {
+    transform:
+        rotateY(-90deg)
+        translateZ(calc(var(--cube-size) / 2));
+}
+
+
+.cube__face--top {
+    transform:
+        rotateX(90deg)
+        translateZ(calc(var(--cube-size) / 2));
+}
+
+
+.cube__face--bottom {
+    transform:
+        rotateX(-90deg)
+        translateZ(calc(var(--cube-size) / 2));
+}
+
+
+/* -------------------- CUBE POSITIONS -------------------- */
+
+/* Small cubes around the big cube of the openings (hero.css) */
+.cube--pos-1 {
+    position: absolute;
+
+    top: 4%;
+    left: 6%;
+}
+
+
+.cube--pos-2 {
+    position: absolute;
+
+    top: 8%;
+    right: 4%;
+}
+
+
+/*
+    Transition cube: placed at the bottom left of each section, it marks the passage to the next one.
+    Left edge on the margin of the column (--gutter, base.css; its % is computed here on the width of the section).
+    z-index keeps it above the background of the next section when it overflows.
+*/
+.cube--transition {
+    position: absolute;
+
+    left: var(--gutter);
+    bottom: 24px;
+
+    z-index: 5;
+}
+
+
+@media (max-width: 767px) {
+
+    .cube--transition {
+        bottom: 16px;
+    }
+
+}
+
+
+/* Big cube at the centre of the home page */
+.cube--hero {
+    position: absolute;
+
+    top: 50%;
+    left: 50%;
+
+    transform: translate(-50%, -50%);
+}

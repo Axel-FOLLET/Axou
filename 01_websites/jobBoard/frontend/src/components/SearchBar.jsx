@@ -1,21 +1,21 @@
-// Barre de recherche des offres (accueil et page des offres) : texte libre, et filtres repliés sous un bouton hamburger placé dans le cadre.
-// La recherche ouvre /offres avec les champs remplis dans l'adresse ; les valeurs déjà cherchées y sont reprises.
+// Job search bar (home and offers page): free text, and filters folded under a hamburger button placed inside the frame.
+// The search opens /offres with the fields filled in the address; values already searched are taken back from it.
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useSearchParams } from 'react-router'
 import { apiFetch } from '../api.js'
 import { useLang, dataLabel } from '../lang.js'
 
-// Filtres de GET /api/ads proposés ici (docs/contrat_api.md). Le filtre par catégorie de l'API n'est pas proposé dans la barre.
+// Filters of GET /api/ads offered here (docs/contrat_api.md). The API's category filter is not offered in the bar.
 const FILTERS = [
   { name: 'contract_type', label: { fr: 'Type de contrat', en: 'Contract type' } },
   { name: 'location', label: { fr: 'Lieu', en: 'Location' } },
 ]
 
-// Choix de « Salaire minimum » (salaire annuel brut, en euros). Ce filtre va dans l'adresse (min_salary)
-// mais pas à l'API : JobBoardPage.jsx trie la liste déjà reçue.
+// Choices of "Minimum salary" (gross annual salary, in euros). This filter goes into the address (min_salary)
+// but not to the API: JobBoardPage.jsx filters the list already received.
 const SALARY_STEPS = [20000, 30000, 40000, 50000]
 
-// La zone de saisie suit la hauteur du texte : height à auto, puis la hauteur réelle du contenu.
+// The input area follows the height of the text: height to auto, then the real height of the content.
 function resize(textarea) {
   textarea.style.height = 'auto'
   textarea.style.height = `${textarea.scrollHeight}px`
@@ -24,7 +24,7 @@ function resize(textarea) {
 export default function SearchBar() {
   const { t, lang, locale } = useLang()
   const navigate = useNavigate()
-  // Valeurs de départ lues dans l'adresse : une recherche déjà faite reste affichée.
+  // Initial values read from the address: a search already made stays displayed.
   const [searchParams] = useSearchParams()
   const [query, setQuery] = useState(searchParams.get('q') ?? '')
   const [filters, setFilters] = useState({
@@ -33,22 +33,22 @@ export default function SearchBar() {
     min_salary: searchParams.get('min_salary') ?? '',
   })
   const [filtersOpen, setFiltersOpen] = useState(false)
-  // Choix des listes : les valeurs présentes dans les annonces ouvertes.
+  // Choices of the lists: the values present in the open job offers.
   const [options, setOptions] = useState({ contract_type: [], location: [] })
   const textareaRef = useRef(null)
 
-  // Champ déjà rempli à l'arrivée : on l'ajuste tout de suite à la hauteur de son texte.
+  // Field already filled on arrival: adjust it right away to the height of its text.
   useEffect(() => {
     resize(textareaRef.current)
   }, [])
 
-  // Une fois : toutes les annonces ouvertes, pour lister les contrats et les lieux qui existent.
+  // Once: all the open job offers, to list the contracts and locations that exist.
   useEffect(() => {
     async function loadOptions() {
       const { ok, data } = await apiFetch('/api/ads')
-      // Sans réponse, les listes gardent seulement « Tous » : la recherche par texte reste possible.
+      // Without a response, the lists only keep "All": the text search remains possible.
       if (!ok) return
-      // Set retire les doublons, filter(Boolean) les valeurs vides ; tri alphabétique français.
+      // Set removes duplicates, filter(Boolean) removes empty values; French alphabetical sort.
       const values = (key) => [...new Set(data.map((ad) => ad[key]).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'fr'))
       setOptions({ contract_type: values('contract_type'), location: values('location') })
     }
@@ -57,7 +57,7 @@ export default function SearchBar() {
 
   function handleSearch(event) {
     event.preventDefault()
-    // Seuls les champs remplis vont dans l'adresse : /offres sans rien affiche toutes les offres.
+    // Only the filled fields go into the address: /offres with nothing shows all the offers.
     const params = new URLSearchParams()
     const text = query.trim()
     if (text !== '') params.set('q', text)
@@ -75,14 +75,14 @@ export default function SearchBar() {
     resize(event.target)
   }
 
-  // Entrée lance la recherche, Maj+Entrée laisse écrire sur une deuxième ligne.
+  // Enter starts the search, Shift+Enter allows writing on a second line.
   function handleKeyDown(event) {
     if (event.key === 'Enter' && !event.shiftKey) {
       handleSearch(event)
     }
   }
 
-  // Valeur venue de l'adresse mais absente des annonces : on la garde dans la liste pour qu'elle reste affichée.
+  // Value coming from the address but absent from the job offers: keep it in the list so that it stays displayed.
   function choices(name) {
     const value = filters[name]
     return value === '' || options[name].includes(value) ? options[name] : [value, ...options[name]]
@@ -91,10 +91,10 @@ export default function SearchBar() {
   const activeCount = FILTERS.filter(({ name }) => filters[name] !== '').length + (filters.min_salary !== '' ? 1 : 0)
 
   return (
-    // noValidate : un champ vide ouvre simplement la liste complète, sans message du navigateur.
+    // noValidate: an empty field simply opens the full list, with no browser message.
     <form className="home-search" onSubmit={handleSearch} noValidate role="search">
       <label htmlFor="home-search-input">{t('Quel poste recherchez-vous ?', 'What position are you looking for?')}</label>
-      {/* Le cadre entoure le champ et la flèche : il grandit avec le texte, comme une zone de composition. */}
+      {/* The frame surrounds the field and the arrow: it grows with the text, like a compose box. */}
       <div className="home-search-box">
         <textarea
           ref={textareaRef}
@@ -106,7 +106,7 @@ export default function SearchBar() {
           onChange={handleChange}
           onKeyDown={handleKeyDown}
         />
-        {/* Bouton hamburger dans le cadre, à gauche de la flèche ; le nombre de filtres actifs s'affiche sur son coin. */}
+        {/* Hamburger button inside the frame, left of the arrow; the number of active filters is shown on its corner. */}
         <button
           type="button"
           className="filters-toggle"
@@ -115,16 +115,16 @@ export default function SearchBar() {
           aria-label={t(`Filtres${activeCount > 0 ? `, ${activeCount} actif${activeCount > 1 ? 's' : ''}` : ''}`, `Filters${activeCount > 0 ? `, ${activeCount} active` : ''}`)}
           onClick={() => setFiltersOpen(!filtersOpen)}
         >
-          {/* Hamburger dessiné du même trait que la flèche. */}
+          {/* Hamburger drawn with the same stroke as the arrow. */}
           <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
             <path d="M4 6h12M4 10h12M4 14h12" />
           </svg>
           {activeCount > 0 && <span className="filters-count" aria-hidden="true">{activeCount}</span>}
         </button>
 
-        {/* Flèche vers la droite : le libellé reste lisible par un lecteur d'écran grâce à aria-label. */}
+        {/* Right arrow: the label stays readable by a screen reader thanks to aria-label. */}
         <button type="submit" className="home-search-submit" aria-label={t('Lancer la recherche', 'Search')}>
-          {/* Icône dessinée plutôt que le caractère →, dont la position dépend de la police : elle reste centrée. */}
+          {/* Drawn icon rather than the → character, whose position depends on the font: it stays centered. */}
           <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
             <path d="M4 10h12M11 5l5 5-5 5" />
           </svg>
@@ -136,7 +136,7 @@ export default function SearchBar() {
           {FILTERS.map(({ name, label }) => (
             <label key={name}>
               {label[lang]}
-              {/* Clé calculée [name] : seul le filtre modifié change, les autres sont recopiés. */}
+              {/* Computed key [name]: only the modified filter changes, the others are copied. */}
               <select name={name} value={filters[name]} onChange={(event) => setFilters({ ...filters, [name]: event.target.value })}>
                 <option value="">{t('Tous', 'All')}</option>
                 {choices(name).map((value) => (

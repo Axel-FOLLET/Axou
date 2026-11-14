@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <!--
+        Base of the relative addresses, written in the HTML before any style sheet or image.
+        GitHub Pages shows this file for any missing address of the site, whatever the folder
+        (for example /parcours_portfolio/a/b/c): plain relative paths would start from that missing folder.
+        Written in the HTML, the base is also read by the browser's preloader, which requests the style sheets,
+        the fonts and the modules before any script runs: each file is requested only once,
+        at the right address (https://axel-follet.github.io/parcours_portfolio/, or the site served under /parcours_portfolio/ locally).
+    -->
+    <base href="/parcours_portfolio/">
+    <!--
+        Fallback for the other ways of opening the page: the base becomes the address up to and including "/parcours_portfolio/",
+        wherever that folder is in the address (server started in a parent folder, file opened from the disk),
+        or "/" without that folder (server started in the site folder, http://localhost:8080/404.html).
+        The script runs before the rest of <head>: the links that follow are read with this base.
+        In these cases only, the files already requested by the preloader with the written base fail, then are requested again.
+    -->
+    <script>
+        {
+            const base = document.querySelector("base");
+            const folder = "/parcours_portfolio/";
+            const index = location.pathname.indexOf(folder);
+            const href = index >= 0 ? location.pathname.slice(0, index + folder.length) : "/";
+            if (href !== folder) base.setAttribute("href", href);
+        }
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Colour of the browser bar on mobile: the page background colour -->
+    <meta name="theme-color" content="#0B0B0F">
+
+    <title>Page introuvable — Axel FOLLET</title>
+    <meta name="author" content="Axel FOLLET">
+    <!-- Error page: it must not appear in search engines -->
+    <meta name="robots" content="noindex">
+    <meta name="description" content="Page introuvable : cette page n'existe pas ou a été déplacée.">
+    <link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml">
+
+    <!-- Fonts loaded from the start: "404" is displayed straight away in the display serif -->
+    <link rel="preload" href="assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="assets/fonts/instrument-serif-latin.woff2" as="font" type="font/woff2" crossorigin>
+
+    <!-- Shared style sheets needed by this page, in cascade order, then the page's sheet -->
+    <link rel="stylesheet" href="css/base/tokens.css">
+    <link rel="stylesheet" href="css/base/base.css">
+    <link rel="stylesheet" href="css/layout/sections.css">
+    <link rel="stylesheet" href="css/components/buttons.css">
+    <link rel="stylesheet" href="css/components/cubes.css">
+    <link rel="stylesheet" href="css/components/motion.css">
+    <link rel="stylesheet" href="css/pages/not-found.css">
+
+    <!-- Modules imported upfront by main.js and their own imports, all requested together: without this list,
+         the browser discovers them level by level (main.js, then its imports, then theirs) and the first paint waits longer. -->
+    <link rel="modulepreload" href="js/modules/navigation.js">
+    <link rel="modulepreload" href="js/modules/navigation-menu.js">
+    <link rel="modulepreload" href="js/modules/reveal.js">
+    <link rel="modulepreload" href="js/modules/motion.js">
+    <link rel="modulepreload" href="js/modules/scroll-motion.js">
+    <link rel="modulepreload" href="js/modules/cubes/init-cubes.js">
+    <link rel="modulepreload" href="js/modules/cubes/create-cube.js">
+    <link rel="modulepreload" href="js/modules/cubes/update-cube.js">
+    <link rel="modulepreload" href="js/modules/cubes/drag-cube.js">
+    <!--
+        Shared entry point: it turns the cubes (init-cubes.js); it loads no module on demand,
+        as this page holds none of their elements. It is also read with the base set above.
+    -->
+    <script type="module" src="js/main.js" blocking="render"></script>
+</head>
+
+<!-- Contact theme: black background; the blue and red cubes are the two doors of the home page -->
+<body class="page" data-theme="contact">
+
+    <main class="not-found">
+
+        <p class="section__eyebrow">ERREUR 404</p>
+
+        <h1 class="not-found__code">404</h1>
+
+        <p class="not-found__text">
+            Cette page n'existe pas ou a été déplacée.
+        </p>
+
+        <p class="not-found__text not-found__text--en" lang="en">
+            This page does not exist or has been moved.
+        </p>
+
+        <!--
+            The two doors of the home page to start again: blue cube to My background, red cube to My portfolio.
+            French label, then the English one in smaller type; the links lead to the French pages.
+            The cube is clicked like the rest of the link and can be turned with the mouse or a finger;
+            a drag does not open the page (init-cubes.js). draggable="false": the browser does not drag the link.
+        -->
+        <nav class="not-found__doors" aria-label="Repartir">
+            <a class="not-found__door" href="pages/fr/parcours.html" draggable="false">
+                <span class="cube cube--large cube--blue" data-speed="14" data-phase="60" aria-hidden="true"></span>
+                <span class="not-found__door-label">Mon parcours</span>
+                <span class="not-found__door-label-en" lang="en">My background</span>
+            </a>
+            <a class="not-found__door" href="pages/fr/portfolio.html" draggable="false">
+                <span class="cube cube--large cube--red" data-speed="18" data-phase="140" aria-hidden="true"></span>
+                <span class="not-found__door-label">Mon portfolio</span>
+                <span class="not-found__door-label-en" lang="en">My portfolio</span>
+            </a>
+        </nav>
+
+        <!-- Back to the home page of each language -->
+        <div class="not-found__actions">
+            <a class="button" href="index.html">Retour à l'accueil</a>
+            <a class="button" href="pages/en/index.html" hreflang="en" lang="en">Back to home</a>
+        </div>
+
+    </main>
+
+</body>
+
+</html>

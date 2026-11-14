@@ -1,0 +1,90 @@
+/*
+    Adaptations shared by narrow screens and reduced motion: sections, cubes, form, press effects.
+    Taken from the portfolio responsive.css, completed by the CV (medium cube).
+    The opening (.hero) and its adaptations are in components/hero.css. The adaptations specific to a page
+    (contact layout, progress timeline, arrows of the projects wheel) go in the sheet of that page
+    (css/pages/), except the removal of the arrows' press effect with reduced motion, grouped here with the other press effects.
+*/
+
+
+/* -------------------- PHONE -------------------- */
+@media (max-width: 767px) {
+
+    /* -------------------- SECTIONS -------------------- */
+    .section__intro {
+        margin-bottom: 40px;
+    }
+
+
+    /* -------------------- CUBES -------------------- */
+    .cube--huge {
+        --cube-size: 170px;
+    }
+
+
+    .cube--large {
+        --cube-size: 120px;
+    }
+
+
+    /* Medium cube of the CV (transition between two sections) reduced in the same proportion */
+    .cube--medium {
+        --cube-size: 64px;
+    }
+
+
+    /* -------------------- FORM -------------------- */
+    /* First name and surname one under the other */
+    .form__row {
+        flex-direction: column;
+
+        gap: 0;
+    }
+
+}
+
+
+/* -------------------- SMALL PHONE -------------------- */
+
+/* Under 360 px, the longest French heading word would no longer fit on one line at the heading size */
+@media (max-width: 359px) {
+
+    :root {
+        --text-title: 2.125rem;
+    }
+
+}
+
+
+/* -------------------- REDUCED MOTION -------------------- */
+
+/*
+    If the visitor asked their system for fewer animations,
+    smooth scrolling is removed (JavaScript also stops the cubes).
+    Colour changes remain to confirm hover and click.
+*/
+@media (prefers-reduced-motion: reduce) {
+
+    html {
+        scroll-behavior: auto;
+    }
+
+
+    /* Press effects shrink the element: they stop too */
+    .button:active,
+    .cube:active,
+    .header__toggle:active,
+    .link-card:active {
+        scale: none;
+    }
+
+
+    /*
+        Arrows of the projects wheel (My portfolio). .showcase__frame is added to the selector:
+        portfolio.css, loaded after this sheet, sets the same press effect with the same specificity and would otherwise win.
+    */
+    .showcase__frame .showcase__arrow:active:not(:disabled) {
+        scale: none;
+    }
+
+}

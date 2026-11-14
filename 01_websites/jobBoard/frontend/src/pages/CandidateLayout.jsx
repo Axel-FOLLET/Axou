@@ -1,4 +1,4 @@
-// Habillage de l'espace candidat : ses deux onglets, puis la sous-page courante.
+// Layout of the candidate area: its two tabs, then the current sub-page.
 import { NavLink, Outlet } from 'react-router'
 import { useLang } from '../lang.js'
 
@@ -7,8 +7,8 @@ export default function CandidateLayout() {
 
   return (
     <div className="page">
-      {/* Onglets en pastilles, comme le choix des tables en administration.
-          tab-bar (tabs.css) : bande collée sous l'en-tête pendant le défilement. */}
+      {/* Tabs as pills, like the table choice in administration.
+          tab-bar (tabs.css): strip stuck under the header while scrolling. */}
       <div className="tab-bar">
         <nav className="tab-switch" aria-label={t('Espace candidat', 'Candidate area')}>
           <NavLink to="/espace-candidat" end>{t('Mes candidatures', 'My applications')}</NavLink>
@@ -16,7 +16,7 @@ export default function CandidateLayout() {
         </nav>
       </div>
 
-      {/* Outlet : la sous-page correspondant à l'URL s'affiche ici. */}
+      {/* Outlet: the sub-page matching the URL is displayed here. */}
       <Outlet />
     </div>
   )

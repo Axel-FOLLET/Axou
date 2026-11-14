@@ -1,5 +1,5 @@
 /**
- * Cinematic black bars: one at the top and one at the bottom, for the whole opening. Used by Story.
+ * Cinematic black bars: one at the top and one at the bottom, for the whole opening (the kitten waking up). Used by Story.
  * `show()` sets them at once. `hide(s)` slides them off screen in `s` seconds (soft retreat when the shot has
  * widened and the player regains control, Story._release). `hide(0)` removes them at once.
  * Above the canvas and the minimap (5, hidden during the opening), below the speech bubble (20), the veil (25) and

@@ -4,12 +4,12 @@ import { AuthContext } from "../AuthContext";
 import { apiFetch } from "../api.js";
 import { useLang } from "../lang.js";
 
-// "2026-10-08 18:15:02" (UTC, comme le renvoie SQLite) -> "8 octobre 2026" (locale vient de useLang).
+// "2026-10-08 18:15:02" (UTC, as returned by SQLite) -> "8 October 2026" (locale comes from useLang).
 function formatDate(value, locale) {
     return new Date(value.replace(" ", "T") + "Z").toLocaleDateString(locale, { day: "numeric", month: "long", year: "numeric" });
 }
 
-// Page « Mes candidatures » : réservée au visiteur connecté.
+// "My applications" page: reserved for the logged-in visitor.
 export default function ApplicationsPage() {
     const { user } = useContext(AuthContext);
     const { t, locale } = useLang();
@@ -19,13 +19,13 @@ export default function ApplicationsPage() {
     useEffect(() => {
         if (user === null) return;
             async function fetchApplications() {
-                  // Lit l'API /api/me/applications.
+                  // Reads the /api/me/applications endpoint.
                 const { ok, status, data, error } = await apiFetch('/api/me/applications');
                 if (ok) {
                     setApplications(data);
                     setErrorStatus(null);
                 } else {
-                    // 401 = session expirée, autre code ou 0 = API indisponible : géré dans l'affichage.
+                    // 401 = session expired, other code or 0 = API unavailable: handled in the display.
                     setErrorStatus(status);
                     console.error('Error fetching applications:', status, error);
                 }
@@ -36,7 +36,7 @@ export default function ApplicationsPage() {
     return (
         <div className="applications-page">
             <h1>{t("Mes candidatures", "My applications")}</h1>
-            {/* user à null = visiteur non connecté : on propose la connexion plutôt que la liste. */}
+            {/* user at null = visitor not logged in: offer to log in rather than the list. */}
             {user === null || errorStatus === 401 ? (
                 <Link to="/login">{t("Connectez-vous pour voir vos candidatures.", "Log in to see your applications.")}</Link>
             ) : errorStatus !== null ? (
@@ -52,7 +52,7 @@ export default function ApplicationsPage() {
                                     <h3>{application.title}</h3>
                                     <p>{t("Entreprise :", "Company:")} {application.company}</p>
                                     <p>{t("Envoyée le", "Sent on")} {formatDate(application.created_at, locale)}</p>
-                                    {/* Statuts de l'API traduits pour l'écran : pending, accepted, sinon refusée. */}
+                                    {/* API statuses translated for the screen: pending, accepted, otherwise rejected. */}
                                     <p className={`application-status status-${application.status}`}>{t("Statut :", "Status:")} {application.status === 'pending' ? t('En attente', 'Pending') : application.status === 'accepted' ? t('Retenue', 'Accepted') : t('Refusée', 'Rejected')}</p>
                                 </li>
                             ))}

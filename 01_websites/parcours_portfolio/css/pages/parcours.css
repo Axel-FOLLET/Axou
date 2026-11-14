@@ -1,0 +1,715 @@
+/* -------------------- MY BACKGROUND PAGE -------------------- */
+
+/*
+    Styles specific to the My background page: differences of the opening (.hero, shared in components/hero.css), education, career change with its skills,
+    then the rows of the fields. Taken from home.css, education.css, career.css and responsive.css of the CV;
+    the timeline (.timeline), the tags (.tag) and the motion come from the shared sheets.
+    No hard-coded colour: only the variables of tokens.css (background theme, set on <body>).
+    No motion amplitude set here: those of the portfolio apply (scroll.css, motion.css).
+*/
+
+
+/* -------------------- OPENING -------------------- */
+
+/*
+    The shared opening is in components/hero.css, background and blue glow included (--hero-glow, 35% on this page).
+    Only difference specific to My background: position: relative serves as the reference for the transition cube, placed at the bottom left.
+*/
+.hero {
+    position: relative;
+}
+
+
+/* Name on two tight lines: line height 0.9 instead of 0.95 */
+.hero__title {
+    line-height: 0.9;
+}
+
+
+/* -------------------- EDUCATION -------------------- */
+
+/*
+    Education: two columns open side by side, in an editorial layout.
+    minmax(0, 1fr) lets a column shrink below the width of its content.
+*/
+.education__list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: clamp(32px, 5vw, 72px);
+
+    margin-top: 48px;
+}
+
+
+/*
+    No box and no background: a hairline at the top of each column is enough to separate them.
+    No hover: they are not links.
+*/
+.education__card {
+    padding-top: 28px;
+
+    border-top: 1px solid var(--line-strong);
+}
+
+
+/* Years in the accent readable on the near-black; same-width digits (tabular-nums), aligned from one column to the other */
+.education__date {
+    margin: 0;
+
+    color: var(--accent-text);
+
+    font-size: var(--text-body);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    font-variant-numeric: tabular-nums;
+}
+
+
+.education__school {
+    margin: 16px 0 0;
+
+    font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem);
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+}
+
+
+.education__degree {
+    margin: 12px 0 0;
+
+    font-size: 1.0625rem;
+    font-weight: 600;
+    line-height: 1.45;
+}
+
+
+.education__text {
+    max-width: 60ch;
+
+    margin: 12px 0 0;
+
+    color: var(--muted);
+
+    line-height: 1.65;
+}
+
+
+.education__degree + .education__text {
+    margin-top: 20px;
+}
+
+
+/* Two lines reserved for the degree (2 x 1.0625rem x 1.45): the descriptions start at the same height */
+@media (min-width: 768px) {
+
+    .education__degree {
+        min-height: 3.08125rem;
+    }
+
+}
+
+
+/* -------------------- EXPERIENCE -------------------- */
+
+/*
+ * The jobs of the timeline start 24 to 32 px on the right before sliding in (timeline.css, scroll.css):
+ * the section cuts them at its edge, so they do not widen the page. Only the width is cut:
+ * the thread of the timeline goes out through the bottom of the section, down to the career-change banner.
+ */
+#experience {
+    overflow-x: clip;
+}
+
+
+/* -------------------- IT CAREER CHANGE -------------------- */
+
+/*
+ * A single surface of the card blue (--accent-card) on the near-black, the highlight of the page.
+ * All the texts laid on this blue are white (contrast 9.4): --muted is never placed on it.
+ * position: relative is the reference of the line of light on its top edge.
+ */
+.career__banner {
+    position: relative;
+
+    padding: clamp(28px, 4vw, 56px);
+
+    border-radius: var(--radius-m);
+
+    background-color: var(--accent-card);
+}
+
+
+/*
+ * Line of light on the top edge of the banner, between its rounded corners: the thread of the timeline arrives on its left end,
+ * in its blue, and the line runs to the right while turning white. Drawn from the start without JavaScript or with reduced motion;
+ * career-shift.js folds it (career__banner--live), then lets it run when the thread touches the banner (career__banner--docked).
+ */
+.career__banner::before {
+    content: "";
+
+    position: absolute;
+    top: 0;
+    right: var(--radius-m);
+    left: var(--radius-m);
+
+    height: 2px;
+
+    background: linear-gradient(90deg, var(--accent-text), var(--white) 35%, var(--white) 65%, var(--clear));
+
+    box-shadow: 0 0 14px var(--cube-white-glow);
+
+    transform-origin: 0 50%;
+
+    pointer-events: none;
+}
+
+
+.career__banner--live::before {
+    opacity: 0;
+    scale: 0 1;
+}
+
+
+.career__banner--live.career__banner--docked::before {
+    opacity: 1;
+    scale: 1 1;
+}
+
+
+.career__banner--ready::before {
+    transition:
+        scale var(--dur-slow) var(--ease-in-out),
+        opacity var(--dur-fast) var(--ease-out);
+}
+
+
+/* -------------------- CAREER-CHANGE SCENE -------------------- */
+
+/*
+ * Decorative board at the top of the banner (aria-hidden), the highlight of the page: two large tiles spell RH (HR in English),
+ * the small ones carry words of the HR jobs. As the page scrolls, each tile flips over, one after the other, and shows its IT side:
+ * the large ones spell IT, the small ones the skills of the list below (career-shift.js).
+ * The words are in the attributes of the tiles (data-from, data-to) and drawn by ::before and ::after: the text of the page does not change.
+ * Without JavaScript or with reduced motion, the tiles show their IT side, the final state.
+ * --tile-letter: side of a large tile; --tile-word: height of a small one.
+ */
+.shift {
+    --tile-letter: clamp(48px, 15vw, 88px);
+    --tile-word: 40px;
+
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+
+    gap: clamp(12px, 3vw, 40px);
+
+    margin-bottom: clamp(32px, 4.5vw, 56px);
+}
+
+
+/* The two large tiles side by side */
+.shift__sign {
+    display: flex;
+
+    gap: clamp(6px, 1vw, 10px);
+}
+
+
+/* The small tiles in a regular grid, like a departure board: four columns from 960 px */
+.shift__words {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+
+    gap: 10px;
+}
+
+
+/* A tile: its two sides share the same cell, so it takes the width of the longer word */
+.shift__tile {
+    display: grid;
+}
+
+
+/*
+ * The two sides of a tile. backface-visibility: a side turned away is not drawn.
+ * Each side carries its own perspective: every tile flips the same way, wherever it is on the board.
+ */
+.shift__tile::before,
+.shift__tile::after {
+    grid-area: 1 / 1;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 0;
+    height: var(--tile-word);
+    padding: 0 12px;
+
+    border-radius: var(--radius-s);
+
+    font-size: var(--text-label);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    line-height: 1;
+    white-space: nowrap;
+
+    text-transform: uppercase;
+
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+
+
+/* HR side: a dark tile, the blue of the banner deepened with the near-black, outlined in white */
+.shift__tile::before {
+    content: attr(data-from);
+
+    background-color: color-mix(in srgb, var(--ink) 55%, var(--accent-card));
+
+    box-shadow: inset 0 0 0 1px var(--line-strong);
+
+    transform: perspective(520px) rotateX(180deg);
+}
+
+
+/* IT side: a lit tile, white with the page blue for the text (contrast 12.3), haloed in white */
+.shift__tile::after {
+    content: attr(data-to);
+
+    background-color: var(--white);
+
+    box-shadow: 0 0 22px var(--cube-white-glow);
+
+    color: var(--accent);
+
+    transform: perspective(520px) rotateX(0deg);
+}
+
+
+/* Large tiles: a square, one letter in the serif of the titles; the IT side in italic, like the title of the banner */
+.shift__tile--letter::before,
+.shift__tile--letter::after {
+    width: var(--tile-letter);
+    height: var(--tile-letter);
+    padding: 0;
+
+    font-family: var(--font-display);
+    font-size: calc(var(--tile-letter) * 0.72);
+    font-weight: 400;
+    letter-spacing: 0;
+
+    text-transform: none;
+}
+
+
+.shift__tile--letter::after {
+    font-style: italic;
+}
+
+
+/*
+ * Scene armed by career-shift.js (career__banner--live): every tile shows its HR side, then flips when it gets shift__tile--on.
+ * Both sides turn by half a turn in the same direction, around the horizontal axis.
+ * --flip-delay (career-shift.js): tiles that flip in the same frame, after a fast scroll, still go one after the other.
+ * The transition only exists once the first state is drawn (career__banner--ready): arriving in the middle of the page shows the right state at once.
+ */
+.career__banner--live .shift__tile::before {
+    transform: perspective(520px) rotateX(0deg);
+}
+
+
+.career__banner--live .shift__tile::after {
+    transform: perspective(520px) rotateX(-180deg);
+}
+
+
+.career__banner--live .shift__tile--on::before {
+    transform: perspective(520px) rotateX(180deg);
+}
+
+
+.career__banner--live .shift__tile--on::after {
+    transform: perspective(520px) rotateX(0deg);
+}
+
+
+.career__banner--ready .shift__tile::before,
+.career__banner--ready .shift__tile::after {
+    transition: transform var(--dur-reveal) var(--ease-in-out) var(--flip-delay, 0s);
+}
+
+
+/* Under 960 px, four columns no longer hold the longest words: two columns of small tiles next to the sign */
+@media (max-width: 959px) {
+
+    .shift__words {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+
+/* Phone: a single column of four small tiles, lower and written smaller; the last four are not shown */
+@media (max-width: 599px) {
+
+    .shift {
+        --tile-word: 32px;
+    }
+
+
+    .shift__words {
+        grid-template-columns: minmax(0, 1fr);
+
+        gap: 6px;
+    }
+
+
+    .shift__tile:nth-child(n + 5) {
+        display: none;
+    }
+
+
+    .shift__words .shift__tile::before,
+    .shift__words .shift__tile::after {
+        padding: 0 8px;
+
+        font-size: 0.6875rem;
+        letter-spacing: 0.06em;
+    }
+
+}
+
+
+/* The eyebrow stays white on the card blue: the light accent would only reach 2.9 there */
+.section--dark .career__number {
+    color: var(--white);
+}
+
+
+/*
+ * Two columns: the background (3 parts), the goal (2 parts), aligned at the bottom.
+ * A single column on tablet and phone.
+ */
+.career__intro {
+    display: grid;
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    align-items: end;
+
+    gap: 48px;
+}
+
+
+/* Title one step below those of the sections: it shares the banner with the goal (words rising: motion.js) */
+.career__intro h2 {
+    max-width: 20ch;
+
+    margin: 0 0 24px;
+
+    /* Serif of the titles, 15% larger like them */
+    font-family: var(--font-display);
+    font-size: clamp(2.3rem, 1.61rem + 2.875vw, 3.45rem);
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: -0.01em;
+
+    text-wrap: balance;
+}
+
+
+.career__intro p {
+    max-width: 64ch;
+
+    margin: 20px 0 0;
+
+    line-height: 1.55;
+}
+
+
+/* "The starting point": same label style as the goal label (base.css), above its paragraph */
+.career__start-title {
+    margin: 32px 0 0;
+
+    font-size: var(--text-label);
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    line-height: 1.4;
+
+    text-transform: uppercase;
+}
+
+
+.career__intro .career__start-title + p {
+    margin-top: 12px;
+}
+
+
+/*
+ * Goal: separated from the background by a white hairline, large.
+ * scroll.css makes this hairline transparent and redraws it stroke by stroke; its branches are 24 px:
+ * the margin of the text (32 px) stays wider, they never touch it.
+ */
+.career__goal {
+    padding-left: 32px;
+
+    border-left: 1px solid var(--white);
+}
+
+
+/* .career__intro first wins over the rule of the paragraphs; label style in base.css */
+.career__intro .career__goal-label {
+    margin: 0;
+}
+
+
+.career__intro .career__goal-text {
+    margin: 12px 0 0;
+
+    font-size: var(--text-lead);
+    font-weight: 600;
+    line-height: 1.35;
+    letter-spacing: -0.02em;
+}
+
+
+/* -------------------- SKILLS -------------------- */
+
+/* Skills over the full width of the banner, without hairline: the space is enough to separate them */
+.career__skills {
+    position: relative;
+
+    margin-top: 40px;
+    padding-top: 32px;
+}
+
+
+.career__skills h3 {
+    margin: 0 0 20px;
+    padding-right: 120px;
+
+    font-size: 1.375rem;
+    font-weight: 600;
+}
+
+
+/* White cube, top right corner of the block */
+.career__cube {
+    position: absolute;
+    top: 22px;
+    right: 0;
+}
+
+
+/* Tags outlined in white; solid white: the card blue is lighter than the background */
+.skills__list {
+    display: flex;
+    flex-wrap: wrap;
+
+    gap: 10px;
+
+    margin: 0;
+    padding: 0;
+
+    list-style: none;
+}
+
+
+.skills__list li {
+    padding: 8px 16px;
+
+    border: 1px solid var(--white);
+    border-radius: var(--radius-s);
+
+    font-size: 0.9375rem;
+    font-weight: 600;
+}
+
+
+/*
+ * From 768 px the cube stays in that corner (on phones it moves under the tags, see below): the tags keep clear of it.
+ * 132 px: the 90 px of the cube, plus what its corners sweep while it turns (about 33 px), plus a small gap.
+ * On wide screens the tags fit on one row anyway; on tablets they wrap before reaching the cube instead of sliding under it.
+ */
+@media (min-width: 768px) {
+
+    .skills__list {
+        padding-right: 132px;
+    }
+
+}
+
+
+/* -------------------- WHAT EACH FIELD TAUGHT ME -------------------- */
+
+/* Under the banner, on the near-black of the section: a title, then a row per field */
+.domains {
+    margin-top: clamp(56px, 8vw, 96px);
+}
+
+
+.domains__title {
+    margin: 0 0 32px;
+
+    font-size: 1.375rem;
+    font-weight: 600;
+}
+
+
+/* Rows one under the other, closed by a hairline under the last one */
+.domains__list {
+    margin: 0;
+    padding: 0;
+
+    border-bottom: 1px solid var(--line);
+
+    list-style: none;
+}
+
+
+/*
+ * A row per field, like the practices of the portfolio method: a hairline above,
+ * the name on the left, what was learned on the right. The hairline draws itself then the content descends (motion.css, motion-bar).
+ */
+.domains__item {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    align-items: start;
+
+    column-gap: clamp(24px, 5vw, 72px);
+
+    padding: clamp(28px, 3.5vw, 40px) 0;
+
+    border-top: 1px solid var(--line);
+}
+
+
+/* Name of the field in the display serif, like the big headings */
+.domains__name {
+    margin: 0;
+
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 1.6rem + 1.5vw, 2.75rem);
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: -0.01em;
+}
+
+
+/* Portfolio step reused as a subtitle, in the accent readable on the near-black */
+.domains__step {
+    margin: 0;
+
+    color: var(--accent-text);
+
+    font-size: var(--text-label);
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    line-height: 1.4;
+
+    text-transform: uppercase;
+}
+
+
+/* What was learned, in grey */
+.domains__text {
+    max-width: 62ch;
+
+    margin: 14px 0 0;
+
+    color: var(--muted);
+
+    line-height: 1.65;
+}
+
+
+/* Challenge met: a short line under the text, its label in the accent (like the progress of the portfolio) */
+.domains__challenge {
+    max-width: 62ch;
+
+    margin: 14px 0 0;
+
+    line-height: 1.55;
+}
+
+
+.domains__challenge strong {
+    color: var(--accent-text);
+}
+
+
+/* Only link of the section, to My portfolio: secondary button (buttons.css) under the rows */
+.domains__more {
+    margin-top: 36px;
+}
+
+
+/* -------------------- TABLET -------------------- */
+
+@media (max-width: 1024px) {
+
+    /* Career change: the background, then the goal, on a single column */
+    .career__intro {
+        grid-template-columns: minmax(0, 1fr);
+
+        gap: 28px;
+    }
+
+}
+
+
+/* -------------------- PHONE -------------------- */
+
+@media (max-width: 767px) {
+
+    /* Education: the two cards one under the other */
+    .education__list {
+        grid-template-columns: minmax(0, 1fr);
+
+        gap: 40px;
+
+        margin-top: 32px;
+    }
+
+
+    /* Career change: goal margin reduced; its branches go to 12 px (scroll.css), it stays wider */
+    .career__goal {
+        padding-left: 20px;
+    }
+
+
+    /* The cube moves under the tags (order), pushed right: the title regains the full width */
+    .career__skills {
+        display: flex;
+        flex-direction: column;
+
+        margin-top: 32px;
+    }
+
+
+    .career__skills h3 {
+        padding-right: 0;
+    }
+
+
+    .career__cube {
+        position: relative;
+        top: auto;
+        right: auto;
+
+        order: 1;
+
+        align-self: flex-end;
+
+        margin: 28px 12px 0 0;
+    }
+
+
+    /* Fields: the name above its text */
+    .domains__item {
+        grid-template-columns: minmax(0, 1fr);
+
+        row-gap: 16px;
+    }
+
+}

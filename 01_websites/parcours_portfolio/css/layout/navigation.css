@@ -1,0 +1,509 @@
+/* -------------------- NAVIGATION -------------------- */
+
+/*
+ * Header shared by all pages, taken from the portfolio (proportions of the CV):
+ * identity on the left (photo, Home, language), three tabs on the right (My background, My portfolio, Contact me).
+ * The tab of the current page (aria-current="page") is lit by a light white veil, without outline;
+ * on hover, a light white veil, the same for the three tabs: no colour in the menu.
+ * Translucent near-black on every page: the colours stay with the pages and the accents.
+ * Under 1024 px, the tabs move into a drop-down menu opened by the burger button (navigation-menu.js).
+ */
+.header {
+    width: 100%;
+
+    position: sticky;
+    top: 0;
+
+    z-index: 1000;
+
+    border-bottom: 1px solid var(--line);
+
+    /*
+     * Semi-transparent near-black: the content scrolls underneath, blurred by backdrop-filter.
+     * The -webkit- prefix covers Safari.
+     */
+    background-color: var(--header-veil);
+
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    backdrop-filter: blur(20px) saturate(160%);
+}
+
+
+/*
+ * Solid background if the browser cannot blur,
+ * or if the visitor asks for less transparency or more contrast.
+ */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .header {
+        background-color: var(--ink);
+    }
+}
+
+
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+    .header {
+        background-color: var(--ink);
+
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+    }
+}
+
+
+/* Increased contrast: the hairline under the header turns white (taken from the CV) */
+@media (prefers-contrast: more) {
+    .header {
+        border-bottom-color: var(--white);
+    }
+}
+
+
+/*
+ * Edges aligned on the column of the sections (--gutter, base.css);
+ * 76 px high on desktop, 60 px once the header is compact, as on the CV.
+ */
+.header__nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    min-height: 76px;
+
+    padding: 0 var(--gutter);
+
+    transition:
+        min-height var(--dur-fast) var(--ease-out),
+        padding var(--dur-fast) var(--ease-out);
+}
+
+
+.header__identity {
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+}
+
+
+.header__avatar {
+    display: block;
+
+    width: 36px;
+    height: 36px;
+
+    overflow: hidden;
+
+    border-radius: 50%;
+
+    transition:
+        width var(--dur-fast) var(--ease-out),
+        height var(--dur-fast) var(--ease-out);
+}
+
+
+/* Photo already cropped on the face (80 x 80 px): it simply fills the circle */
+.header__photo {
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+}
+
+
+/* Initials: 44 px target, like the other clickable elements of the header */
+.header__logo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 44px;
+    min-height: 44px;
+
+    font-size: 1.125rem;
+    font-weight: bold;
+
+    text-decoration: none;
+}
+
+
+/*
+ * Compact header, added by navigation.js after a few pixels of scrolling:
+ * lower bar and smaller photo, more room for the content.
+ */
+.header--compact .header__nav {
+    min-height: 60px;
+}
+
+
+.header--compact .header__avatar {
+    width: 30px;
+    height: 30px;
+}
+
+
+/* -------------------- LANGUAGE CHOICE -------------------- */
+
+/*
+    Two links side by side, the active language in solid white.
+    They are real links to the same page in the other language: no JavaScript needed.
+*/
+.language-switch {
+    display: inline-flex;
+    align-items: center;
+
+    gap: 2px;
+
+    padding: 3px;
+
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-m);
+}
+
+
+.language-switch .language-switch__option {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 40px;
+    min-height: 36px;
+
+    padding: 0 10px;
+
+    /* Radius of the frame minus its 3 px inset: the two curves stay parallel */
+    border-radius: calc(var(--radius-m) - 3px);
+
+    color: var(--white);
+
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-decoration: none;
+
+    transition:
+        background-color var(--dur-fast) var(--ease-out),
+        color var(--dur-fast) var(--ease-out);
+}
+
+
+@media (hover: hover) {
+
+    .language-switch a.language-switch__option:hover {
+        background-color: var(--veil-strong);
+    }
+
+}
+
+
+/* Current language: white pill, near-black text */
+.language-switch .language-switch__option--active {
+    background-color: var(--white);
+    color: var(--ink);
+}
+
+
+/* -------------------- LINKS -------------------- */
+
+/* Name of the current page (written in the HTML), shown on tablet and phone only (collapsed menu) */
+.header__current {
+    display: none;
+}
+
+
+.header__links {
+    display: flex;
+
+    gap: 4px;
+
+    margin: 0;
+    padding: 0;
+
+    list-style: none;
+}
+
+
+/* Plain links without underline, in pure white on the near-black; 44 px high target */
+.header__link {
+    position: relative;
+
+    display: inline-flex;
+    align-items: center;
+
+    min-height: 44px;
+
+    padding: 10px 16px;
+
+    border-radius: var(--radius-m);
+
+    color: var(--white);
+
+    font-weight: 500;
+    text-decoration: none;
+
+    transition:
+        background-color var(--dur-fast) var(--ease-out),
+        color var(--dur-fast) var(--ease-out);
+}
+
+
+/* Hover: light white veil, more discreet than the one of the current tab */
+.header__link:hover {
+    background-color: var(--veil-hover);
+}
+
+
+/*
+ * Tab of the current page, recognisable without relying on colour: light white veil and bold text, without outline.
+ */
+.header__link[aria-current="page"] {
+    background-color: var(--veil-strong);
+    color: var(--white);
+
+    font-weight: 600;
+}
+
+
+/* -------------------- MENU BUTTON -------------------- */
+
+/* Visible on tablet and phone only */
+.header__toggle {
+    display: none;
+    align-items: center;
+    justify-content: center;
+
+    width: 44px;
+    height: 44px;
+
+    padding: 0;
+
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-m);
+
+    background: var(--clear);
+    color: var(--white);
+
+    cursor: pointer;
+
+    transition: scale calc(var(--dur-fast) / 2) var(--ease-out);
+}
+
+
+.header__toggle:active {
+    scale: 0.94;
+}
+
+
+.header__toggle-icon {
+    display: flex;
+    flex-direction: column;
+
+    gap: 5px;
+}
+
+
+.header__toggle-icon span {
+    display: block;
+
+    width: 22px;
+    height: 2px;
+
+    background: currentColor;
+}
+
+
+/* Hover: the frame turns white; keyboard focus keeps the common outline of the site (base.css) */
+.header__toggle:hover {
+    border-color: var(--white);
+}
+
+
+/* -------------------- TABLET AND PHONE -------------------- */
+
+@media (max-width: 1024px) {
+
+    .header__nav {
+        position: relative;
+
+        flex-wrap: wrap;
+
+        gap: 12px 20px;
+
+        min-height: 0;
+
+        padding-block: 16px;
+    }
+
+
+    .header--compact .header__nav {
+        min-height: 0;
+
+        padding-block: 10px;
+    }
+
+
+    .header__toggle {
+        display: inline-flex;
+        flex: 0 0 44px;
+    }
+
+
+    .header__current {
+        display: block;
+        flex-basis: 100%;
+
+        /* One line reserved even when empty: the header keeps its height (taken from the CV) */
+        min-height: 1lh;
+
+        margin: 0;
+
+        font-size: 0.9rem;
+    }
+
+
+    /*
+     * Closed menu: display: none removes it from the display and from the keyboard.
+     * Opening and closing fade (--dur-fast, 0.2s): allow-discrete makes display wait for the end of the fade
+     * on closing; @starting-style gives the starting opacity when the menu has just appeared.
+     * A browser that does not know these two rules opens and closes the menu without a fade.
+     */
+    .header__links {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+
+        display: none;
+        flex-direction: column;
+
+        gap: 0;
+
+        max-height: calc(100dvh - 130px);
+
+        padding: 10px var(--gutter) 20px;
+
+        overflow-y: auto;
+
+        background-color: var(--ink);
+
+        box-shadow: 0 12px 18px var(--shadow);
+
+        opacity: 0;
+
+        transition:
+            opacity var(--dur-fast) var(--ease-out),
+            display var(--dur-fast) var(--ease-out) allow-discrete;
+    }
+
+
+    .header__nav--open .header__links {
+        display: flex;
+
+        opacity: 1;
+    }
+
+
+    @starting-style {
+        .header__nav--open .header__links {
+            opacity: 0;
+        }
+    }
+
+
+    /* Full-width links, separated by a hairline; the current page shifts its text from its frame */
+    .header__link {
+        display: flex;
+
+        padding: 13px 0;
+
+        border-top: 1px solid var(--line);
+        border-radius: 0;
+    }
+
+
+    .header__link[aria-current="page"] {
+        padding-left: 14px;
+    }
+
+}
+
+
+/*
+ * From 375 px, the header keeps a single row and leaves more height to the content:
+ * menu button, then the whole identity (photo, Home, language), then the page name.
+ * The name takes only the space that remains and is never cut: when it does not fit on one line
+ * (narrow phone, text spacing enlarged by the visitor), it wraps inside the row, which is 44 px high
+ * (menu button): two lines of name do not make the header taller. The language choice is never clipped.
+ * Under 375 px, the name keeps its own line.
+ */
+@media (min-width: 375px) and (max-width: 1024px) {
+
+    .header__nav {
+        flex-wrap: nowrap;
+
+        column-gap: 12px;
+    }
+
+
+    .header__identity {
+        flex: 0 0 auto;
+    }
+
+
+    /*
+     * min-width: 0 allows shrinking below the text width; the text is aligned to the right, at the end of the row.
+     * overflow-wrap: anywhere breaks a word too long for the space left, instead of letting it overflow.
+     */
+    .header__current {
+        flex: 1 1 0;
+        min-width: 0;
+
+        line-height: 1.2;
+        text-align: end;
+        overflow-wrap: anywhere;
+    }
+
+}
+
+
+/* Phone: smaller page name (12 px), so that it fits on one line next to the identity at 390 px */
+@media (min-width: 375px) and (max-width: 480px) {
+
+    .header__current {
+        font-size: 0.75rem;
+    }
+
+}
+
+
+@media (max-width: 767px) {
+
+    .header__identity {
+        gap: 8px;
+    }
+
+}
+
+
+/* -------------------- REDUCED MOTION -------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .header__nav,
+    .header__avatar {
+        transition: none;
+    }
+
+}
+
+
+/* The menu opens and closes at once, without a fade */
+@media (max-width: 1024px) and (prefers-reduced-motion: reduce) {
+
+    .header__links,
+    .header__nav--open .header__links {
+        transition: none;
+    }
+
+}

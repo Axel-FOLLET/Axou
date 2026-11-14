@@ -1,6 +1,6 @@
-/* En-tête du site : barre de navigation, logo, liens et menu mobile (components/Layout.jsx). */
+/* Site header: navigation bar, logo, links and mobile menu (components/Layout.jsx). */
 
-/* En-tête fixe translucide et blanc. */
+/* Fixed translucent white header. */
 header {
   position: sticky;
   top: 0;
@@ -10,7 +10,7 @@ header {
   border-bottom: 1px solid var(--color-line);
 }
 
-/* Barre de navigation centrée. */
+/* Centered navigation bar. */
 nav {
   display: flex;
   flex-wrap: wrap;
@@ -22,7 +22,7 @@ nav {
   padding: 0 24px;
 }
 
-/* Logo semi-gras, séparé des liens par l'espace disponible. */
+/* Semi-bold logo, separated from the links by the available space. */
 .logo {
   color: var(--color-text);
   font-size: 22px;
@@ -32,19 +32,19 @@ nav {
   white-space: nowrap;
 }
 
-/* Seul le o du logo porte la couleur : en bleu profond, il se lit comme une signature et non comme un défaut d'affichage. */
+/* Only the o of the logo carries the color: in deep blue, it reads as a signature and not as a display glitch. */
 .logo-o {
   color: var(--color-blue-deep);
 }
 
-/* Liens du menu regroupés sur ordinateur. */
+/* Menu links grouped on desktop. */
 .nav-links {
   display: flex;
   align-items: center;
   gap: 24px;
 }
 
-/* Liens sobres de la navigation, en gris pour que la page courante ressorte. */
+/* Plain navigation links, in grey so that the current page stands out. */
 nav a {
   color: var(--color-text-secondary);
   font-size: 15px;
@@ -52,19 +52,19 @@ nav a {
   transition: color .2s;
 }
 
-/* Survol des liens du menu. */
+/* Hover of the menu links. */
 nav a:hover {
   color: var(--color-link);
 }
 
-/* Focus clavier des liens du menu. */
+/* Keyboard focus of the menu links. */
 nav a:focus-visible {
   outline: 2px solid var(--color-text);
   outline-offset: 3px;
   border-radius: 6px;
 }
 
-/* Page active : trois repères (couleur, graisse, trait fin), comme le conseille NN/g pour les onglets. */
+/* Active page: three markers (color, weight, thin line), as NN/g advises for tabs. */
 nav a.active {
   color: var(--color-blue-deep);
   font-weight: 600;
@@ -74,7 +74,7 @@ nav a.active {
   text-underline-offset: 6px;
 }
 
-/* Bouton secondaire de déconnexion et commande mobile. */
+/* Secondary logout button and mobile control. */
 nav button {
   font: inherit;
   font-size: 15px;
@@ -88,30 +88,30 @@ nav button {
   transition: background-color 0.2s;
 }
 
-/* Survol des boutons du menu. */
+/* Hover of the menu buttons. */
 nav button:hover:not(:disabled) {
   background-color: var(--color-surface-blue);
 }
 
-/* Focus clavier des boutons du menu. */
+/* Keyboard focus of the menu buttons. */
 nav button:focus-visible {
   outline: 2px solid var(--color-text);
   outline-offset: 3px;
 }
 
-/* Bouton du menu réservé aux petits écrans. */
+/* Menu button reserved for small screens. */
 nav .menu-toggle {
   display: none;
 }
 
-/* Menu mobile : bouton visible, liens repliés, barre plus serrée. */
+/* Mobile menu: visible button, folded links, tighter bar. */
 @media (max-width: 900px) {
-  /* Afficher la commande du menu mobile. */
+  /* Show the mobile menu control. */
   nav .menu-toggle {
     display: inline-block;
   }
 
-  /* Masquer les liens fermés, y compris pour le clavier. */
+  /* Hide the closed links, including from the keyboard. */
   .nav-links {
     display: none;
     width: 100%;
@@ -121,24 +121,24 @@ nav .menu-toggle {
     padding: 12px 0;
   }
 
-  /* Ouvrir le menu à la demande. */
+  /* Open the menu on demand. */
   .nav-links.is-open {
     display: flex;
   }
 
-  /* Agrandir la surface des liens mobiles. */
+  /* Enlarge the area of the mobile links. */
   .nav-links a {
     padding: 10px 0;
   }
 
-  /* Espacement de la barre mobile. */
+  /* Spacing of the mobile bar. */
   nav {
     padding: 12px 16px;
     gap: 16px;
   }
 }
 
-/* Pied de page (components/Footer.jsx) : trait fin, texte discret, deux colonnes puis le copyright. */
+/* Footer (components/Footer.jsx): thin line, discreet text, two columns then the copyright. */
 .site-footer {
   max-width: 1100px;
   margin: 0 auto;
@@ -148,7 +148,7 @@ nav .menu-toggle {
   font-size: 14px;
 }
 
-/* Navigation à gauche, mentions légales à droite, plus larges. */
+/* Navigation on the left, legal notice on the right, wider. */
 .footer-columns {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
@@ -156,7 +156,7 @@ nav .menu-toggle {
   gap: 48px;
 }
 
-/* La navigation du pied de page ne reprend pas la barre de l'en-tête (règles nav ci-dessus). */
+/* The footer navigation does not take the header bar's styling (nav rules above). */
 .site-footer nav {
   display: block;
   max-width: none;
@@ -165,7 +165,7 @@ nav .menu-toggle {
   padding: 0;
 }
 
-/* Titres des deux colonnes, petits et semi-gras. */
+/* Titles of the two columns, small and semi-bold. */
 .footer-title {
   margin: 0 0 12px;
   color: var(--color-text);
@@ -174,7 +174,7 @@ nav .menu-toggle {
   letter-spacing: 0;
 }
 
-/* Liens de navigation empilés, sans puces. */
+/* Stacked navigation links, without bullets. */
 .footer-links {
   display: flex;
   flex-direction: column;
@@ -188,12 +188,12 @@ nav .menu-toggle {
   font-size: 14px;
 }
 
-/* Mentions légales repliées : le titre de colonne reste seul tant qu'on ne clique pas. */
+/* Folded legal notice: the column title stays alone until it is clicked. */
 .legal {
   max-width: 720px;
 }
 
-/* Le triangle du navigateur est remplacé par + / −. */
+/* The browser's triangle is replaced by + / −. */
 .legal summary {
   display: inline-flex;
   align-items: center;
@@ -220,7 +220,7 @@ nav .menu-toggle {
   border-radius: var(--radius-control);
 }
 
-/* Intertitres des mentions, petits et proches de leur texte. */
+/* Subheadings of the legal notice, small and close to their text. */
 .legal h3 {
   margin: 20px 0 4px;
   color: var(--color-text);
@@ -236,12 +236,12 @@ nav .menu-toggle {
   color: var(--color-link);
 }
 
-/* Copyright sur toute la largeur, sous les deux colonnes. */
+/* Copyright across the full width, under the two columns. */
 .site-footer .copyright {
   margin: 32px 0 0;
 }
 
-/* Pied de page sur téléphone : colonnes empilées, marges réduites. */
+/* Footer on phones: stacked columns, reduced margins. */
 @media (max-width: 600px) {
   .site-footer {
     padding: 32px 16px 40px;

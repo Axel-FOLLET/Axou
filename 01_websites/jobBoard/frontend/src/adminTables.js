@@ -1,8 +1,8 @@
-// --- Description des tables ---
-// Une entrée par table de l'API. columns = ce qui s'affiche, editableFields = ce que
-// l'API accepte en écriture (source : docs/contrat_api.md). Tout le reste de la page
-// se construit depuis cet objet, sans code propre à une table.
-// Textes affichés en deux langues : { fr, en }, lus par AdminPage avec la langue courante.
+// --- Table descriptions ---
+// One entry per API table. columns = what is displayed, editableFields = what the
+// API accepts for writing (source: docs/contrat_api.md). The rest of the page
+// is built from this object, with no code specific to a table.
+// Texts displayed in two languages: { fr, en }, read by AdminPage with the current language.
 export const tables = {
   companies: {
     title: { fr: "Entreprises", en: "Companies" },
@@ -30,7 +30,7 @@ export const tables = {
     addLabel: { fr: "Ajouter une annonce", en: "Add a job offer" },
     editTitle: (row, lang) => lang === "en" ? `Edit ${row.title}` : `Modifier ${row.title}`,
     editableFields: ["title", "short_description", "description", "salary", "location", "working_time", "contract_type", "company_id", "category_id", "contact_id"],
-    // status et created_at sont affichés mais absents de editableFields : l'API les refuse en écriture.
+    // status and created_at are displayed but absent from editableFields: the API refuses them for writing.
     columns: [{ key: "id", label: { fr: "Identifiant", en: "ID" } }, { key: "title", label: { fr: "Titre", en: "Title" } }, { key: "short_description", label: { fr: "Description courte", en: "Short description" } }, { key: "description", label: { fr: "Description", en: "Description" } }, { key: "salary", label: { fr: "Salaire", en: "Salary" } }, { key: "location", label: { fr: "Lieu", en: "Location" } }, { key: "working_time", label: { fr: "Temps de travail", en: "Working time" } }, { key: "contract_type", label: { fr: "Type de contrat", en: "Contract type" } }, { key: "status", label: { fr: "Statut", en: "Status" } }, { key: "created_at", label: { fr: "Date de création", en: "Creation date" } }, { key: "company_id", label: { fr: "Identifiant de l'entreprise", en: "Company ID" } }, { key: "category_id", label: { fr: "Identifiant de la catégorie", en: "Category ID" } }, { key: "contact_id", label: { fr: "Identifiant du contact", en: "Contact ID" } }],
   },
   applications: {

@@ -1,5 +1,5 @@
-// Page ouverte depuis le lien reçu à la nouvelle adresse : elle confirme le changement d'adresse e-mail.
-// Même modèle que VerifyPage.jsx, verrou useRef compris.
+// Page opened from the link received at the new address: it confirms the email address change.
+// Same model as VerifyPage.jsx, useRef lock included.
 import { useContext, useEffect, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router'
 import { AuthContext } from '../AuthContext'
@@ -10,15 +10,15 @@ export default function EmailChangePage() {
   const { t } = useLang()
   const [searchParams] = useSearchParams()
   const token = searchParams.get('token') ?? ''
-  // Lien tronqué ou recopié sans le jeton : l'état part directement sur le refus, sans appel.
+  // Truncated link or copied without the token: the state goes straight to the refusal, without a call.
   const [status, setStatus] = useState(token === '' ? 'invalid' : 'checking')
-  // Le lien ne sert qu'une fois : ce verrou empêche le second appel du double montage
-  // de StrictMode, qui arriverait après la consommation du jeton et répondrait 400.
+  // The link works only once: this lock prevents the second call of the StrictMode
+  // double mount, which would come after the token was consumed and answer 400.
   const started = useRef(false)
   const { setUser } = useContext(AuthContext)
 
   useEffect(() => {
-    // Sans jeton, il n'y a rien à envoyer au serveur ; le verrou coupe le second appel.
+    // Without a token there is nothing to send to the server; the lock cuts the second call.
     if (token === '' || started.current) {
       return
     }
@@ -31,18 +31,18 @@ export default function EmailChangePage() {
       })
 
       if (httpStatus === 200) {
-        // Personne connectée sur ce compte : l'en-tête et « Mes informations » affichent tout de suite la nouvelle adresse.
-        // Lien ouvert sans session, ou sur un autre compte : rien ne change à l'écran.
+        // Person logged in on this account: the header and "My details" immediately show the new address.
+        // Link opened without a session, or on another account: nothing changes on screen.
         setUser((current) => (current && current.id === data.id ? data : current))
         setStatus('done')
       } else if (httpStatus === 409) {
-        // L'adresse a été prise par une autre fiche entre la demande et le clic.
+        // The address was taken by another record between the request and the click.
         setStatus('taken')
       } else if (httpStatus === 400) {
-        // Jeton inconnu, déjà utilisé ou périmé : un seul message, comme côté serveur.
+        // Unknown, already used or expired token: a single message, as on the server side.
         setStatus('invalid')
       } else {
-        // Serveur injoignable ou réponse inattendue.
+        // Server unreachable or unexpected response.
         setStatus('error')
       }
     }

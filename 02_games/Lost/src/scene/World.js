@@ -7,6 +7,7 @@ import { ZONE2 } from '../world/zone2.js';
 import { Mountains, ZONE2_HORIZON } from '../world/Mountains.js';
 import { Ruins } from '../world/Ruins.js';
 import { Forest, CLEARING } from '../world/Forest.js';
+import { ArmorScatter } from '../world/ArmorScatter.js';
 import { Rampart } from '../world/Rampart.js';
 import { Arena, BUILD_TIME as ARENA_BUILD_TIME, HIDE_MARGIN as ARENA_HIDE_MARGIN, NIGHT } from '../world/Arena.js';
 import { FOG, LIGHT, RENDER, SHADOW, color } from '../style/palette.js';
@@ -116,6 +117,9 @@ export class World {
     // Meadow: tall grass in the wind and flowers (src/world/). No grass on wall footprints, short grass at their foot
     // (`ruins.obstacles` footprints). Never hit by Picker.js (meadow meshes ignore the Raycaster).
     this.meadow = new Meadow(this.meadowGroup, { exclusions: [...this.ruins.obstacles] });
+
+    // Pieces of the kitten's armour lying around its drop point: scenery only, no obstacle (src/world/ArmorScatter.js).
+    this.armorScatter = new ArmorScatter(this.meadowGroup, { heightAt: (x, z) => this.terrain.heightAt(x, z) });
 
     // Click targets (Picker.js): the ground and the walkable tops of the ruins (invisible `RuinsWalkable` proxy). The
     // Raycaster sorts hits by distance: the top of a low wall comes before the ground it hides.

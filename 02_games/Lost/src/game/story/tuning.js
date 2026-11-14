@@ -1,53 +1,15 @@
 /** Tuning tables of the story scenes: shots, timings and distances (m, s, rad). */
 
 /**
- * Opening: positions on the ground (m), durations (s). The camera looks at `look` (towards the foothill and the fog).
- * Maman starts `arrive` m left of the screen, walks right to `drop` (her root), sets the kitten down, backs off, turns
- * around passing in front of the camera and leaves by the left. The shot stays fixed on the point `focus.right` m right
- * of `drop` and `focus.ahead` m further from the camera (root of the kitten once set down).
+ * Opening: the kitten lies asleep on the ground at `drop` (m), among the armour pieces scattered around it
+ * (src/world/ArmorScatter.js places them from this point), then wakes up. Maman is already at the summit. The camera looks
+ * along `look` (towards the foothill and the fog), in a fixed shot centred on the kitten. Durations in s.
  */
 export const OPENING = {
   drop: { x: -0.35, z: -0.35 },
   look: { x: 1, z: 0.12 },
-  focus: { right: 0.48, ahead: 0.21 },
-  // Waits are kept short so the opening does not drag; the drop (dip, hold, rise, settle, leave) and the waking (full
-  // Wake and Yawn clips) set its pace.
-  // arrive (m): Maman starts off screen (sphere of _inView, 0.7 m radius, out of frame on the first frame in 16:9, 21:9
-  // and portrait).
-  arrive: 2.2,
-  pause: 0.25,                   // s: stop (Idle) before lowering the head
-  dip: 0.9,                      // s: head lowered (Npc.setHeadDip 0 → 1, smoothed)
-  // dipMax (s): safety, release even without contact (`lastDrop.fallback`). Head down (k = 1) from `dip`; the bottom of the
-  // kitten rises and falls with the Carried clip (2 s loop), 0.002 to 0.05 m above the ground. 3.0 = dip + a whole loop
-  // + 0.1, so the real contact always comes first.
-  dipMax: 3.0,                   // s
-  dropAt: 0.01,                  // m: bottom of the kitten above the ground for the release (contact)
-  dropFade: 1.4,                 // s: fade Carried → Sleep of the set-down kitten (Cat.dropAsleep, default 0.6)
-  hold: 0.25,                    // s: head held down after the release; Maman is already backing off
-  rise: 0.6,                     // s: head rises while backing off
-  settle: 0.2,                   // s: head up, end of the backing off before leaving
-  // Backing off after the release. Lying on its side (Sleep clip), the kitten spreads towards Maman (edge of its box 30 cm
-  // closer) and would pass under her front paws. Three settings together: fade of the lying kitten (`dropFade`); backing off
-  // from the frame after the release (`hold`), over `backTime` s, longer and further back; `StepBack` clip (sidestep while
-  // backing off, in place, heading within 0.07° of `sidestep`), taken at `sidestepFrom` s, rate `sidestepRate`. The root
-  // advances at the clip's stride speed (`stepBackSpeed` × `sidestepRate`) during the whole backing off, so the supporting
-  // foot stays fixed on the ground. Fallback: Walk played backwards (−0.83) if the clip is missing.
-  sidestep: { x: -0.2, z: -0.4 }, // m, Maman's local frame (+x to her left, +z forward)
-  backTime: 1.05,                  // s: duration of the backing off (hold + rise + settle) = |sidestep| / speed
-  sidestepClip: 'StepBack',
-  stepBackSpeed: 0.3984,           // m/s at rate 1, Maman's scale (measured stride)
-  sidestepRate: 1.069,             // |sidestep| / backTime / stepBackSpeed
-  // Clip start time: 0.38 keeps the front paws at least 0.03 m from the kitten; 0.3 slid slightly less during the fade, but
-  // a left front toe came within 0.018 m of the kitten.
-  sidestepFrom: 0.38,              // s: clip time at the start of the backing off
-  sidestepFade: 0.1,               // s: fade Idle → StepBack (0 gives a 0.12 m pose jump on one paw)
-  // Half-turn on the hindquarters, so Maman does not walk on the kitten set down between her front paws. Pivot fixed on the
-  // ground, in Maman's local frame at the start of the exit (+x to her left, +z forward): near the hocks, slightly right;
-  // the front paws describe the arc and leave the kitten from the first frames. Straight walk once the half-turn is done.
-  pivot: { x: -0.08, z: -0.45 }, // m
-  pivotRate: 1.4,                // rad/s: half-turn (π in 2.2 s)
-  leaveMax: 10,                  // s: disappears anyway
-  alone: 1.0,                    // s: kitten alone and asleep before waking; Maman has just left the frame, 1 s is enough to read it
+  // Waits are kept short so the opening does not drag; the full Wake and Yawn clips set its pace.
+  sleep: 2.0,                    // s: kitten asleep, alone, before waking: long enough to read the scattered armour
   search: 2.4,                   // s: standing, looks around (screen left, then right): one sine period, 1.2 s per side
   searchYaw: 1.0,                // rad: gaze amplitude
   sit: 1.3,                      // s: sitting (Sit held at 1.2 s) before the yawn; the seated yawn prolongs the pose
@@ -77,13 +39,13 @@ export const SHOT = {
 export const TALK = { approach: 1.8, approachMaman: 2.2, leave: 4.5 };
 
 /**
- * Hug: held `hold` s before the end screen (3.8 s until the curled-up pose of the `Sleep` clip, then the purrs). `side`:
- * fallback without a `Sleep` clip on Maman (kitten `side` m from her flank). Belly-side camera (`_hugShot`): at least
+ * Hug set up behind the hug cutscene, which stays until the end screen. `side`: fallback without a `Sleep` clip on Maman
+ * (kitten `side` m from her flank). Belly-side camera (`_hugShot`): at least
  * `dist` m, tilt `tilt` rad, `half` (m) kept on each side, angles tried `angles` (rad, 0 = facing the belly, positive
  * towards the front of the heads), glide `rate`.
  */
 export const HUG = {
-  side: 0.62, hold: 7.0, dist: 1.9, tilt: 0.44, half: 0.45, angles: [0.5, 0.2, 0.8, -0.2, 1.1], rate: 1.5,
+  side: 0.62, dist: 1.9, tilt: 0.44, half: 0.45, angles: [0.5, 0.2, 0.8, -0.2, 1.1], rate: 1.5,
   /**
    * Before the hug: head shake (`HeadShake` clip). The helmet comes off at `drop` s (strongest shake of the clip), thrown
    * away from Maman at `toss` = [sideways, up] m/s with a roll of `spin` rad/s (Helmet.detach). Hug `after` s after the end

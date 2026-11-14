@@ -1,23 +1,23 @@
-"""Changements d'adresse e-mail en attente de confirmation.
+"""Email address changes waiting for confirmation.
 
-Cas visé : une personne connectée veut une nouvelle adresse. L'adresse de sa fiche ne
-change pas ici : la demande est gardée de côté, et n'est appliquée qu'après le clic sur
-le lien envoyé à la NOUVELLE adresse. Ainsi une faute de frappe ne coupe jamais la
-personne de ses e-mails, et une session laissée ouverte ne suffit pas à détourner le
-compte : il faut aussi le mot de passe (vérifié par la route) et l'accès à la boîte.
+Target case: a logged-in person wants a new address. The address on their record does
+not change here: the request is set aside, and is applied only after the click on the
+link sent to the NEW address. This way a typo never cuts the person off from their
+emails, and a session left open is not enough to hijack the account: the password
+(checked by the route) and access to the mailbox are needed too.
 
-Même construction que pending_registrations.py : le jeton n'est jamais enregistré en
-clair, seule son empreinte SHA-256 est stockée. Le lien envoyé par e-mail est la seule
-copie du jeton.
+Same construction as pending_registrations.py: the token is never stored in plain
+text, only its SHA-256 fingerprint is stored. The link sent by email is the only copy
+of the token.
 """
 import hashlib
 import secrets
 
-VALIDITY = "+1 day"  # durée de vie du lien, lue telle quelle par SQLite
+VALIDITY = "+1 day"  # lifetime of the link, read as is by SQLite
 
 
 def ensure_table(conn):
-    """Crée la table si elle manque : une base déjà en place n'a pas besoin d'être refaite."""
+    """Creates the table if it is missing: an existing database does not need to be rebuilt."""
     conn.execute(
         """
         CREATE TABLE IF NOT EXISTS pending_email_changes (
@@ -34,15 +34,15 @@ def ensure_table(conn):
 
 
 def _fingerprint(token):
-    """Empreinte du jeton : c'est elle qui va en base, jamais le jeton lui-même."""
+    """Fingerprint of the token: it is what goes into the database, never the token itself."""
     return hashlib.sha256(token.encode("utf-8")).hexdigest()
 
 
 def create(conn, person_id, new_email):
-    """Enregistre la demande et renvoie le jeton en clair, pour le lien.
+    """Saves the request and returns the plain token, for the link.
 
-    Une seule demande par personne : une nouvelle demande remplace la précédente, donc
-    le lien précédent ne fonctionne plus.
+    One request per person: a new request replaces the previous one, so the previous
+    link no longer works.
     """
     ensure_table(conn)
 
@@ -66,10 +66,10 @@ def create(conn, person_id, new_email):
 
 
 def take(conn, token):
-    """Lit la demande correspondant au jeton, puis la supprime.
+    """Reads the request matching the token, then deletes it.
 
-    Renvoie la ligne (person_id, new_email), ou None si le jeton est inconnu, déjà
-    utilisé ou expiré. La suppression fait qu'un lien ne sert qu'une seule fois.
+    Returns the row (person_id, new_email), or None if the token is unknown, already
+    used or expired. The deletion makes a link usable only once.
     """
     ensure_table(conn)
 

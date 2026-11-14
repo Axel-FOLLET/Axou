@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Colour of the browser bar on mobile: the page background colour -->
+    <meta name="theme-color" content="#0B0B0F">
+
+    <title>Axel FOLLET</title>
+    <meta name="author" content="Axel FOLLET">
+    <!-- Search engines: description, canonical page and version in the other language (addresses of the published site) -->
+    <meta name="description" content="Axel FOLLET, chargé de projets IT&nbsp;: mon parcours, du pilotage de projets RH à l'informatique, et mes projets web, Python et IA.">
+    <link rel="canonical" href="https://axel-follet.github.io/parcours_portfolio/">
+    <link rel="alternate" hreflang="fr" href="https://axel-follet.github.io/parcours_portfolio/">
+    <link rel="alternate" hreflang="en" href="https://axel-follet.github.io/parcours_portfolio/pages/en/index.html">
+    <link rel="alternate" hreflang="x-default" href="https://axel-follet.github.io/parcours_portfolio/">
+
+    <!-- Preview when the link is shared (Open Graph, also read by Twitter); one image for French and English -->
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="fr_FR">
+    <meta property="og:locale:alternate" content="en_GB">
+    <meta property="og:title" content="Axel FOLLET | Parcours &amp; Portfolio">
+    <meta property="og:description" content="Axel FOLLET, chargé de projets IT&nbsp;: mon parcours, du pilotage de projets RH à l'informatique, et mes projets web, Python et IA.">
+    <meta property="og:url" content="https://axel-follet.github.io/parcours_portfolio/">
+    <meta property="og:image" content="https://axel-follet.github.io/parcours_portfolio/assets/images/share.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Axel FOLLET, Portfolio">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://axel-follet.github.io/parcours_portfolio/assets/images/share.jpg">
+
+    <!-- Structured data (schema.org): the person behind the site -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Axel FOLLET",
+        "jobTitle": "Chargé de projets IT",
+        "url": "https://axel-follet.github.io/parcours_portfolio/",
+        "sameAs": ["https://www.linkedin.com/in/axel-follet/", "https://github.com/Axel-FOLLET"]
+    }
+    </script>
+    <link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml">
+
+    <!-- Fonts loaded from the start: the text is displayed without a font swap -->
+    <link rel="preload" href="assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <!-- Serif of the large headings, roman and italic -->
+    <link rel="preload" href="assets/fonts/instrument-serif-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="assets/fonts/instrument-serif-italic-latin.woff2" as="font" type="font/woff2" crossorigin>
+
+    <!-- Shared style sheets in cascade order, then the page's own sheet (always the last one) -->
+    <link rel="stylesheet" href="css/base/tokens.css">
+    <link rel="stylesheet" href="css/base/base.css">
+    <link rel="stylesheet" href="css/layout/navigation.css">
+    <link rel="stylesheet" href="css/layout/sections.css">
+    <link rel="stylesheet" href="css/components/buttons.css">
+    <link rel="stylesheet" href="css/components/cubes.css">
+    <link rel="stylesheet" href="css/components/cards.css">
+    <link rel="stylesheet" href="css/components/tags.css">
+    <link rel="stylesheet" href="css/components/form.css">
+    <link rel="stylesheet" href="css/components/timeline.css">
+    <link rel="stylesheet" href="css/components/human-check.css">
+    <link rel="stylesheet" href="css/components/motion.css">
+    <link rel="stylesheet" href="css/components/scroll.css">
+    <link rel="stylesheet" href="css/layout/footer.css">
+    <link rel="stylesheet" href="css/layout/responsive.css">
+    <link rel="stylesheet" href="css/components/hero.css">
+    <link rel="stylesheet" href="css/pages/home.css">
+
+    <!-- Modules imported upfront by main.js and their own imports, all requested together: without this list,
+         the browser discovers them level by level (main.js, then its imports, then theirs) and the first paint waits longer. -->
+    <link rel="modulepreload" href="js/modules/navigation.js">
+    <link rel="modulepreload" href="js/modules/navigation-menu.js">
+    <link rel="modulepreload" href="js/modules/reveal.js">
+    <link rel="modulepreload" href="js/modules/motion.js">
+    <link rel="modulepreload" href="js/modules/scroll-motion.js">
+    <link rel="modulepreload" href="js/modules/cubes/init-cubes.js">
+    <link rel="modulepreload" href="js/modules/cubes/create-cube.js">
+    <link rel="modulepreload" href="js/modules/cubes/update-cube.js">
+    <link rel="modulepreload" href="js/modules/cubes/drag-cube.js">
+    <!-- blocking="render": the page is only displayed once the script has run, cubes included;
+         the fade between pages therefore starts from a complete page. -->
+    <script type="module" src="js/main.js" blocking="render"></script>
+</head>
+
+<body class="page" id="top" data-theme="home">
+
+    <!-- Link that jumps straight to the content (keyboard) -->
+    <a class="skip-link" href="#main">Aller au contenu</a>
+
+
+    <!-- -------------------- HEADER -------------------- -->
+
+    <header class="header">
+
+        <nav class="header__nav" aria-label="Navigation principale">
+
+            <button
+                class="header__toggle"
+                id="menu-toggle"
+                type="button"
+                aria-label="Ouvrir le menu de navigation"
+                aria-expanded="false"
+                aria-controls="menu-links"
+            >
+                <span class="header__toggle-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+            </button>
+
+            <!-- Identity: photo + link to the home page + language choice -->
+            <div class="header__identity">
+
+                <span class="header__avatar">
+                    <img
+                        class="header__photo"
+                        src="assets/images/profile-small.png"
+                        alt="Photo de profil d'Axel FOLLET" width="80" height="80"
+                    >
+                </span>
+
+                <a class="header__logo" href="index.html">Accueil</a>
+
+                <!-- The EN link leads to the same page in English -->
+                <div class="language-switch" role="group" aria-label="Choisir la langue">
+                    <span class="language-switch__option language-switch__option--active" lang="fr" aria-current="true">FR</span>
+                    <a class="language-switch__option" href="pages/en/index.html" hreflang="en" lang="en" aria-label="English">EN</a>
+                </div>
+
+            </div>
+
+
+            <!-- Tabs: each one is a page; aria-current="page" marks the current one. Name of the page in the mobile header: empty on the home page, which the Home link already names -->
+            <span class="header__current"></span>
+            <ul class="header__links" id="menu-links">
+                <li>
+                    <a class="header__link" href="pages/fr/parcours.html">Mon parcours</a>
+                </li>
+                <li>
+                    <a class="header__link" href="pages/fr/portfolio.html">Mon portfolio</a>
+                </li>
+                <li>
+                    <a class="header__link" href="pages/fr/contact.html">Me contacter</a>
+                </li>
+            </ul>
+
+        </nav>
+
+    </header>
+
+
+    <!-- -------------------- MAIN CONTENT -------------------- -->
+
+    <main id="main">
+
+        <!-- -------------------- HOME (black, blue cube and red cube) -------------------- -->
+
+        <!--
+            Only section of the page: name, role and catchphrase on the left, the two entry doors of the site on the right.
+            The motion comes from the shared sheets: title entrance (motion.js), depth on scroll (scroll.css),
+            cubes that follow the mouse (scroll-motion.js).
+        -->
+        <section class="hero" aria-labelledby="hero-title">
+
+            <div class="hero__text">
+
+                <h1 class="hero__title" id="hero-title">
+                    Axel<br>
+                    <em>FOLLET</em>
+                </h1>
+
+                <p class="hero__role">Chargé de projets IT</p>
+
+                <!-- Catchphrase -->
+                <p class="hero__catchphrase">
+                    J'ai piloté des projets. Aujourd'hui, je les construis.
+                </p>
+
+
+            </div>
+
+
+            <!--
+                The two entry doors of the site, instead of buttons: a blue cube to My background,
+                a red cube to My portfolio, of the same size; the colour tells where the door leads.
+                The cube is clicked like the rest of the link; it can also be turned with the mouse or a finger,
+                and a drag does not open the page (init-cubes.js). draggable="false": the browser does not drag the link.
+                data-speed sets the speed and data-phase the initial orientation; JavaScript creates the six faces.
+                Blue and red are allowed only here and on the 404 page (same doors); the two cubes move in opposite directions (home.css, --depth).
+            -->
+            <nav class="hero__visual doors" aria-label="Entrer dans le site">
+                <a class="door door--parcours" href="pages/fr/parcours.html" draggable="false">
+                    <span class="cube cube--large cube--blue" data-speed="14" data-phase="60" aria-hidden="true"></span>
+                    <span class="door__label">Mon parcours</span>
+                </a>
+                <a class="door door--portfolio" href="pages/fr/portfolio.html" draggable="false">
+                    <span class="cube cube--large cube--red" data-speed="18" data-phase="140" aria-hidden="true"></span>
+                    <span class="door__label">Mon portfolio</span>
+                </a>
+            </nav>
+
+        </section>
+
+    </main>
+
+
+    <!-- -------------------- FOOTER -------------------- -->
+
+    <footer class="footer">
+
+        <div class="footer__row">
+
+            <div>
+                <p class="footer__title">Navigation</p>
+                <ul class="footer__list">
+                    <li><a href="index.html">Accueil</a></li>
+                    <li><a href="pages/fr/parcours.html">Mon parcours</a></li>
+                    <li><a href="pages/fr/portfolio.html">Mon portfolio</a></li>
+                    <li><a href="pages/fr/contact.html">Me contacter</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <p class="footer__title">Liens</p>
+                <ul class="footer__list">
+                    <li><a href="https://www.linkedin.com/in/axel-follet/" target="_blank" rel="noopener noreferrer">LinkedIn<span class="visually-hidden"> (nouvel onglet)</span></a></li>
+                    <li><a href="https://github.com/Axel-FOLLET" target="_blank" rel="noopener noreferrer">GitHub<span class="visually-hidden"> (nouvel onglet)</span></a></li>
+                </ul>
+            </div>
+
+            <div>
+                <p class="footer__title">Crédits</p>
+                <p class="footer__credits">
+                    Photo, dessins et textes&nbsp;: créations personnelles d'Axel FOLLET. Cubes 3D, chat en facettes, pictogrammes et scènes animées des projets réalisés en HTML, CSS, SVG et JavaScript, sauf le logo LinkedIn. Chat 3D de Lost&nbsp;: modèle «&nbsp;<span lang="en">Rigged and animated Cat</span>&nbsp;» de JonasDichelle (BlendSwap), sous licence <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noopener noreferrer" hreflang="en">CC BY 3.0<span class="visually-hidden"> (nouvel onglet)</span></a>, retouché et posé assis&nbsp;; affiché avec <a href="https://threejs.org" target="_blank" rel="noopener noreferrer" hreflang="en">three.js<span class="visually-hidden"> (nouvel onglet)</span></a>, sous licence MIT. Polices Manrope (The Manrope Project Authors) et Instrument Serif (The Instrument Serif Project Authors), sous licence SIL Open Font License 1.1 (<a href="assets/fonts/OFL-Manrope.txt">licence de Manrope</a>, <a href="assets/fonts/OFL-InstrumentSerif.txt">licence d'Instrument Serif</a>), hébergées avec le site. LinkedIn® et le logo [in]® sont des marques de LinkedIn Corporation et de ses sociétés affiliées&nbsp;; ce site personnel n'est ni affilié à LinkedIn ni approuvé par LinkedIn.
+                </p>
+                <details class="footer__legal">
+                    <summary class="footer__legal-toggle">Mentions légales et données</summary>
+                    <p><strong>Éditeur et directeur de la publication&nbsp;:</strong> Axel FOLLET, particulier, site personnel non professionnel. Contact&nbsp;: formulaire du site ou LinkedIn.</p>
+                    <p><strong>Hébergeur&nbsp;:</strong> GitHub, Inc. (GitHub Pages), 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, États-Unis, <a href="https://support.github.com/" target="_blank" rel="noopener noreferrer" hreflang="en">support.github.com<span class="visually-hidden"> (nouvel onglet)</span></a>. Pour la sécurité, GitHub enregistre l'adresse IP des visiteurs.</p>
+                    <p id="donnees-formulaire"><strong>Formulaire de contact&nbsp;:</strong> responsable du traitement, Axel FOLLET. Nom, prénom, e-mail et message sont obligatoires&nbsp;; le sujet est facultatif. Ces données servent uniquement à vous répondre, sur la base de l'intérêt légitime à traiter votre demande. Elles transitent par Formspree, Inc., aux États-Unis, qui les conserve selon sa <a href="https://formspree.io/legal/privacy-policy" target="_blank" rel="noopener noreferrer" hreflang="en">politique de confidentialité<span class="visually-hidden"> (nouvel onglet)</span></a>, et sont supprimées 12 mois après notre dernier échange. Vous pouvez demander l'accès à vos données, leur rectification, leur effacement ou la limitation de leur traitement, ou vous y opposer, par le formulaire ou LinkedIn, et adresser une réclamation à la <a href="https://www.cnil.fr/fr/plaintes" target="_blank" rel="noopener noreferrer">CNIL<span class="visually-hidden"> (nouvel onglet)</span></a>.</p>
+                    <p><strong>Navigateur&nbsp;:</strong> aucun cookie ni mesure d'audience. Le site garde seulement sur votre appareil la réponse à la protection anti-robot du formulaire («&nbsp;<span lang="en">Are you human?</span>&nbsp;», posée à l'envoi), jusqu'à la fermeture de l'onglet, et vos records de Snake et du Pendu, jusqu'à ce que vous effaciez les données du site dans votre navigateur.</p>
+                    <p><strong>Propriété intellectuelle&nbsp;:</strong> textes, photo, dessins, mise en page et code source © 2026 Axel FOLLET, tous droits réservés. Le code est public sur GitHub pour être lu&nbsp;; toute réutilisation demande mon accord. Les polices Manrope et Instrument Serif, le modèle du chat de Lost, three.js et le logo LinkedIn restent sous leurs propres licences et marques.</p>
+                </details>
+            </div>
+
+        </div>
+
+        <!-- Last line: rights on the left, back to top on the right -->
+        <div class="footer__bottom">
+            <p class="footer__copyright">&copy; 2026 Axel FOLLET, tous droits réservés</p>
+            <a class="footer__top" href="#top">Retour en haut ↑</a>
+        </div>
+
+    </footer>
+
+</body>
+
+</html>

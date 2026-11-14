@@ -1,0 +1,110 @@
+/* -------------------- BUTTONS -------------------- */
+
+/* Shared buttons (taken from the portfolio, icon from the CV). No button is underlined. */
+
+/* Secondary button: thin outline, lit on hover, without movement */
+.button {
+    display: inline-block;
+
+    padding: 13px 24px;
+
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-l);
+
+    background-color: var(--clear);
+    color: var(--white);
+
+    font-family: inherit;
+    font-size: var(--text-body);
+    font-weight: 600;
+    line-height: 1.4;
+    text-align: center;
+    text-decoration: none;
+
+    cursor: pointer;
+
+    transition:
+        background-color var(--dur-fast) var(--ease-out),
+        border-color var(--dur-fast) var(--ease-out),
+        color var(--dur-fast) var(--ease-out),
+        scale calc(var(--dur-fast) / 2) var(--ease-out);
+}
+
+
+/* Immediate feedback on press, useful on touch screens where hover does not exist */
+.button:active {
+    scale: 0.97;
+}
+
+
+/* Button disabled while the form is being sent (aria-disabled: it keeps the keyboard focus, contact.js) */
+.button:disabled,
+.button[aria-disabled="true"] {
+    cursor: wait;
+    opacity: 0.6;
+}
+
+
+.button:hover,
+.button:focus-visible {
+    border-color: var(--white);
+
+    background-color: var(--veil-strong);
+}
+
+
+/*
+ * Primary button on every page: solid white, text in the background colour of the page (--accent):
+ * blue on My background (contrast 12.3), red on My portfolio (6.4), near-black on the home and contact pages (17.7).
+ * A single primary action per section.
+ */
+.button--primary,
+.button--primary:hover,
+.button--primary:focus-visible {
+    border-color: var(--white);
+
+    background-color: var(--white);
+    color: var(--accent);
+}
+
+
+.button--primary:hover {
+    background-color: var(--white-soft);
+}
+
+
+/* Buttons as wide as their text, side by side; wrap onto the next line if there is not enough room */
+.button-group {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+
+    gap: 12px 28px;
+
+    margin-top: 40px;
+}
+
+
+.button-group > .button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 48px;
+}
+
+
+/* Icon inside a button (CV download), drawn in the text colour (taken from the CV) */
+.button__icon {
+    flex-shrink: 0;
+
+    width: 20px;
+    height: 20px;
+
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+

@@ -1,6 +1,6 @@
-// Pied de page commun, en deux colonnes : navigation, puis mentions légales (LCEN, art. 1-1)
-// et information sur les données (RGPD, art. 13), repliées. Contenu validé par l'équipe ;
-// la démonstration est hébergée sur Render (voir README, « Déploiement sur Render »).
+// Common footer, in two columns: navigation, then legal notice (LCEN, art. 1-1)
+// and data information (GDPR, art. 13), collapsed. Content validated by the team;
+// the demo is hosted on Render (see the README, section on deploying to Render).
 import { useContext } from 'react'
 import { Link } from 'react-router'
 import { AuthContext } from '../AuthContext'
@@ -13,7 +13,7 @@ export default function Footer() {
   return (
     <footer className="site-footer">
       <div className="footer-columns">
-        {/* Mêmes liens que l'en-tête, selon l'état : visiteur, personne connectée, administration. */}
+        {/* Same links as the header, depending on the state: visitor, logged-in person, administration. */}
         <nav aria-label={t('Navigation du pied de page', 'Footer navigation')}>
           <h2 className="footer-title">Navigation</h2>
           <ul className="footer-links">
@@ -31,7 +31,7 @@ export default function Footer() {
           </ul>
         </nav>
 
-        {/* Le titre de la colonne ouvre et ferme le détail. */}
+        {/* The column title opens and closes the details. */}
         <details className="legal">
           <summary className="footer-title">{t('Mentions légales et données personnelles', 'Legal notice and personal data')}</summary>
 

@@ -1,0 +1,486 @@
+#!/usr/bin/env python3
+
+import os
+import sys
+
+sys.dont_write_bytecode = True
+os.environ.setdefault("SDL_AUDIODRIVER", "dummy")
+
+import datetime
+import unicodedata
+import pygame
+
+from word_bank import choose_word
+
+
+# -------------------- INITIALIZATION --------------------
+
+pygame.init()
+
+window = pygame.display.set_mode((1200, 800))
+pygame.display.set_caption("Jeu du pendu")
+
+font = pygame.font.SysFont(None, 30)
+large_font = pygame.font.SysFont(None, 50)
+small_font = pygame.font.SysFont(None, 24)
+
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+GRAY = (200, 200, 200)
+BROWN = (101, 67, 33)
+RED = (180, 0, 0)
+GREEN = (0, 130, 0)
+ORANGE = (240, 150, 0)
+LIGHT_GREEN = (170, 225, 170)
+LIGHT_RED = (240, 150, 150)
+MESSAGE_BACKGROUND = (255, 235, 235)
+VICTORY_BACKGROUND = (215, 245, 215)
+DEFEAT_BACKGROUND = (250, 215, 215)
+
+max_penalties = 12
+
+KEYBOARD_ROWS = ["AZERTYUIOP", "QSDFGHJKLM", "WXCVBN"]
+KEY_WIDTH = 46
+KEY_HEIGHT = 50
+KEY_GAP = 8
+KEYBOARD_X = 620
+KEYBOARD_WIDTH = 532
+KEYBOARD_Y = 250
+
+
+# -------------------- WORD --------------------
+
+word_to_guess = choose_word()
+word = ""
+
+
+def normalize_text(text):
+    # Removes the accents and lowercases the text.
+    cleaned_text = ""
+    for letter in text:
+        decomposed_letter = unicodedata.normalize("NFD", letter)
+        for char in decomposed_letter:
+            if char.isalpha():
+                cleaned_text += char.lower()
+    return cleaned_text
+
+word = normalize_text(word_to_guess)
+
+
+# -------------------- GAME --------------------
+
+penalty = 0
+attempt_count = 0
+tried_letters = set()
+guessed_letters = set()
+
+
+def is_valid_input(attempt):
+    # Checks that the input contains only letters.
+    return len(attempt) > 0 and attempt.isalpha()
+
+
+def format_word(word, guessed_letters):
+    # Returns the word with the found letters and the hidden letters.
+    display = ""
+    for letter in word:
+        if letter in guessed_letters:
+            display += letter.upper() + " "
+        else:
+            display += "_ "
+    return display
+
+
+# Penalty rules:
+def handle_letter(attempt):
+    # Handles an attempt made of a single letter.
+    global penalty
+    tried_letters.add(attempt)
+    if attempt in word:
+        guessed_letters.add(attempt)
+        return True
+    penalty += 1
+    return False
+
+
+def handle_full_word(attempt):
+    # Handles an attempt made of a complete word.
+    global penalty
+    if attempt == word:
+        return True
+    penalty += 5
+    return False
+
+
+# The rest:
+def handle_attempt(attempt):
+    # Handles an attempt and returns the result.
+    global attempt_count
+
+    if not is_valid_input(attempt):
+        return "invalid"
+    attempt_count += 1
+
+    if len(attempt) == 1:
+        if attempt in tried_letters:
+            return "already_tried"
+        handle_letter(attempt)
+        return "ok"
+
+    if handle_full_word(attempt):
+        return "victory"
+    return "ok"
+
+
+def word_found():
+    # Checks whether all the letters of the word have been found.
+    return set(word) == guessed_letters
+
+
+# -------------------- HANGMAN --------------------
+
+def draw_segments(surface, color, segments):
+    # Draws the segments whose penalty threshold is reached, a list avoids repeated ifs.
+    for threshold, start, end in segments:
+        if penalty >= threshold:
+            pygame.draw.line(surface, color, start, end, 5)
+
+
+def draw_gallows(surface):
+    # Draws the gallows progressively.
+    segments = [
+        (1, (150, 500), (250, 500)),
+        (2, (250, 500), (350, 500)),
+        (3, (200, 500), (200, 100)),
+        (4, (200, 100), (300, 100)),
+        (5, (200, 130), (240, 100)),
+        (6, (300, 100), (300, 150)),
+    ]
+    draw_segments(surface, BROWN, segments)
+
+
+def draw_man(surface):
+    # Draws the character progressively.
+    if penalty >= 7:
+        pygame.draw.circle(surface, RED, (300, 200), 50, 5)
+    segments = [
+        (8, (300, 250), (300, 400)),
+        (9, (300, 260), (250, 310)),
+        (10, (300, 260), (350, 310)),
+        (11, (300, 400), (250, 450)),
+        (12, (300, 400), (350, 450)),
+    ]
+    draw_segments(surface, RED, segments)
+
+
+# -------------------- DISPLAY --------------------
+
+def draw_text(text, position, font_used=font, color=BLACK):
+    # Draws a text in the window.
+    surface = font_used.render(text, True, color)
+    window.blit(surface, position)
+
+
+def draw_centered(text, y, font_used=font, color=BLACK):
+    # Draws a text centered horizontally.
+    surface = font_used.render(text, True, color)
+    x = (window.get_width() - surface.get_width()) // 2
+    window.blit(surface, (x, y))
+
+
+def key_color(letter):
+    # White if not tried, green if in the word, red otherwise.
+    if letter not in tried_letters:
+        return WHITE
+    if letter in word:
+        return LIGHT_GREEN
+    return LIGHT_RED
+
+
+def draw_keyboard():
+    # Draws the 26 letters as an AZERTY keyboard, colored according to the attempts.
+    for row_index, row in enumerate(KEYBOARD_ROWS):
+        row_width = len(row) * (KEY_WIDTH + KEY_GAP) - KEY_GAP
+        start_x = KEYBOARD_X + (KEYBOARD_WIDTH - row_width) // 2
+        y = KEYBOARD_Y + row_index * (KEY_HEIGHT + KEY_GAP)
+        for index, letter in enumerate(row):
+            key_rect = pygame.Rect(start_x + index * (KEY_WIDTH + KEY_GAP), y, KEY_WIDTH, KEY_HEIGHT)
+            pygame.draw.rect(window, key_color(letter.lower()), key_rect, border_radius=8)
+            pygame.draw.rect(window, GRAY, key_rect, 2, border_radius=8)
+            surface = font.render(letter, True, BLACK)
+            window.blit(surface, surface.get_rect(center=key_rect.center))
+
+
+def draw_found_letters():
+    # Draws the letters already found.
+    draw_text("Mot : " + format_word(word, guessed_letters), (50, 650), large_font)
+
+
+def bar_color(ratio):
+    # Green at the start, orange in the middle, red when the hanging gets close.
+    if ratio < 1 / 3:
+        return GREEN
+    if ratio < 2 / 3:
+        return ORANGE
+    return RED
+
+
+def draw_penalty_bar(x, y, width, height):
+    # Draws a bar that fills up with every penalty.
+    ratio = min(penalty / max_penalties, 1)
+    background = pygame.Rect(x, y, width, height)
+    pygame.draw.rect(window, GRAY, background, border_radius=10)
+    if ratio > 0:
+        filled = pygame.Rect(x, y, int(width * ratio), height)
+        pygame.draw.rect(window, bar_color(ratio), filled, border_radius=10)
+    pygame.draw.rect(window, BLACK, background, 2, border_radius=10)
+
+
+def draw_penalties():
+    # Draws the number of penalties taken with its bar, then the remaining chances.
+    draw_text(f"Pénalités : {penalty}/{max_penalties}", (620, 50))
+    draw_penalty_bar(620, 85, KEYBOARD_WIDTH, 26)
+    draw_text(f"Chances restantes : {max(max_penalties - penalty, 0)}", (620, 130), font, RED)
+    draw_text(f"Tentatives : {attempt_count}", (620, 165), font, GRAY)
+
+
+def draw_input_field(typed_text):
+    # Draws an input field with a blinking cursor.
+    draw_text("Votre proposition :", (50, 708), font)
+    field = pygame.Rect(260, 695, 400, 42)
+    pygame.draw.rect(window, WHITE, field, border_radius=8)
+    pygame.draw.rect(window, BROWN, field, 3, border_radius=8)
+    surface = font.render(typed_text.upper(), True, BLACK)
+    window.blit(surface, (field.x + 12, field.y + 12))
+    if (pygame.time.get_ticks() // 500) % 2 == 0:
+        cursor_x = field.x + 14 + surface.get_width()
+        pygame.draw.line(window, BLACK, (cursor_x, field.y + 8), (cursor_x, field.bottom - 8), 2)
+
+
+def draw_message(message, color=BLACK):
+    # Draws a message centered in a colored frame.
+    surface = font.render(message, True, color)
+    frame = surface.get_rect(center=(window.get_width() // 2, 605)).inflate(40, 20)
+    pygame.draw.rect(window, MESSAGE_BACKGROUND, frame, border_radius=10)
+    pygame.draw.rect(window, color, frame, 2, border_radius=10)
+    window.blit(surface, surface.get_rect(center=frame.center))
+
+
+def refresh_screen(typed_text="", message=""):
+    # Clears the screen.
+    window.fill(WHITE)
+    # Then redraws everything that must be displayed on the screen.
+    draw_gallows(window)
+    draw_man(window)
+    draw_keyboard()
+    draw_found_letters()
+    draw_penalties()
+    draw_input_field(typed_text)
+
+    if message:
+        draw_message(message, RED)
+
+    pygame.display.flip()
+
+
+# -------------------- SCORE --------------------
+
+SCORE_PATH = os.path.join(os.path.dirname(__file__), "best_score.txt")
+
+def read_best_score():
+    # Reads the best score saved in the file, avoids errors if the file does not exist.
+    try:
+        with open(SCORE_PATH) as score_file:
+            return score_file.readline().strip()
+    except FileNotFoundError:
+        return None
+
+
+def is_best_score_beaten(content):
+    # Checks whether the current score is better than the previous one.
+    if content is None:
+        return True
+    # Here too, we handle the cases where the file content is empty or badly formatted.
+    try:
+        previous_score = int(content.split()[0])
+    except (ValueError, IndexError):
+        return True
+    return attempt_count < previous_score
+
+
+def save_score():
+    # Saves the new best score ("w" lets us overwrite the existing file).
+    today = datetime.date.today()
+    with open(SCORE_PATH, "w") as score_file:
+        score_file.write(str(attempt_count) + " " + str(today))
+
+
+def best_score_text(victory):
+    # Returns the best score text, and saves it only in case of victory.
+    content = read_best_score()
+
+    if victory and is_best_score_beaten(content):
+        save_score()
+        return "FÉLICITATIONS ! NOUVEAU MEILLEUR SCORE !"
+
+    if content is None:
+        return "Aucun meilleur score enregistré."
+
+    previous_score = content.split()[0]
+    previous_date = content.split()[1]
+    return (
+        f"Meilleur score : {previous_score} tentative(s) "
+        f"le {previous_date}."
+    )
+
+
+# -------------------- WELCOME SCREEN --------------------
+
+def draw_hangman_logo(center_x, top):
+    # Draws a small gallows with its rope and its noose.
+    left = center_x - 30
+    bottom = top + 70
+    pygame.draw.line(window, BROWN, (left - 15, bottom), (left + 45, bottom), 5)
+    pygame.draw.line(window, BROWN, (left, bottom), (left, top), 5)
+    pygame.draw.line(window, BROWN, (left, top), (left + 50, top), 5)
+    pygame.draw.line(window, BROWN, (left, top + 20), (left + 20, top), 4)
+    pygame.draw.line(window, BLACK, (left + 50, top), (left + 50, top + 22), 3)
+    pygame.draw.circle(window, RED, (left + 50, top + 32), 10, 3)
+
+
+def draw_welcome_screen():
+    # Draws the welcome screen with the game instructions in a frame.
+    window.fill(WHITE)
+    draw_hangman_logo(window.get_width() // 2, 25)
+    draw_centered("BIENVENUE AU JEU DU PENDU", 120, large_font)
+    draw_centered("Trouvez le mot secret pour survivre !", 190)
+    pygame.draw.rect(window, BROWN, (300, 245, 600, 205), 4, border_radius=14)
+    draw_centered(f"Vous avez droit à {max_penalties} pénalités.", 270)
+    draw_centered("Une mauvaise lettre coûte 1 pénalité.", 320)
+    draw_centered("Un mot complet incorrect coûte 5 pénalités.", 360)
+    draw_centered(f"Le mot contient {len(word)} lettre(s).", 410)
+    draw_centered("Appuyez sur ENTRÉE pour commencer.", 520, font, GREEN)
+    draw_centered("ÉCHAP pour quitter.", 570, small_font)
+
+    pygame.display.flip()
+
+
+# -------------------- END SCREEN --------------------
+
+def draw_end_screen(victory, score_text):
+    # Draws the victory or defeat screen, with the gallows in its final state.
+    window.fill(VICTORY_BACKGROUND if victory else DEFEAT_BACKGROUND)
+
+    # The gallows is drawn on a transparent surface, then shifted to the left of the text.
+    drawing = pygame.Surface((400, 520), pygame.SRCALPHA)
+    draw_gallows(drawing)
+    draw_man(drawing)
+    window.blit(drawing, (-100, 130))
+
+    if victory:
+        draw_centered("VOUS REMPORTEZ LA PARTIE !", 150, large_font, GREEN)
+        draw_centered("Vous obtenez le droit de survivre.", 230)
+        draw_centered(score_text, 310)
+
+    else:
+        draw_centered("DÉFAITE", 150, large_font, RED)
+        draw_centered("Le sort vous a été défavorable.", 230)
+        draw_centered("Vous allez être pendu.", 280)
+        draw_centered(score_text, 350)
+
+    draw_centered("Le mot était : " + word_to_guess.upper(), 450)
+    draw_centered("Appuyez sur ÉCHAP pour quitter.", 550, small_font)
+    pygame.display.flip()
+
+
+# -------------------- EVENTS --------------------
+
+def handle_typing(event, typed_text):
+    # Changes the typed text according to the pressed key.
+    if event.key == pygame.K_BACKSPACE:
+        return typed_text[:-1]
+
+    if event.unicode.isalpha():
+        return typed_text + event.unicode
+    return typed_text
+
+
+# -------------------- MAIN PROGRAM --------------------
+
+state = "welcome"
+typed_text = ""
+message = ""
+message_end_time = 0
+score_text = None
+victory = False
+running = True
+
+while running:
+# Go through all the events in the queue.
+    for event in pygame.event.get():
+
+        # Handle the closing of the window.
+        if event.type == pygame.QUIT:
+            running = False
+
+        # Handle the pressed keys.
+        elif event.type == pygame.KEYDOWN:
+
+            if event.key == pygame.K_ESCAPE:
+                running = False
+
+            elif state == "welcome":
+                if event.key == pygame.K_RETURN:
+                    state = "playing"
+
+            elif state == "playing":
+                # Handle the user's typing.
+
+                if event.key == pygame.K_RETURN:
+                    cleaned_attempt = normalize_text(typed_text)
+                    result = handle_attempt(cleaned_attempt)
+
+                    typed_text = ""
+                    message = ""
+
+                    if result == "invalid":
+                        message = "ENTRÉE INVALIDE. ENTREZ UNE LETTRE OU UN MOT."
+                        message_end_time = pygame.time.get_ticks() + 3000
+
+                    elif result == "already_tried":
+                        message = "CETTE LETTRE A DÉJÀ ÉTÉ TENTÉE."
+                        message_end_time = pygame.time.get_ticks() + 3000
+
+                    elif result == "victory":
+                        victory = True
+                        state = "end"
+
+                    elif word_found():
+                        victory = True
+                        state = "end"
+
+                    elif penalty >= max_penalties:
+                        victory = False
+                        state = "end"
+
+                else:
+                    typed_text = handle_typing(event, typed_text)
+
+    if state == "welcome":
+        draw_welcome_screen()
+
+    elif state == "playing":
+        # The message disappears after 3 seconds.
+        if message and pygame.time.get_ticks() > message_end_time:
+            message = ""
+        refresh_screen(typed_text, message)
+
+    elif state == "end":
+        # The score is computed (and saved) only once.
+        if score_text is None:
+            score_text = best_score_text(victory)
+        draw_end_screen(victory, score_text)
+
+
+pygame.quit()
+sys.exit()

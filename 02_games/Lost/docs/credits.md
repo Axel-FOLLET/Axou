@@ -45,6 +45,18 @@ The boss music is rendered with sampled instruments from the **Fluid (R3)** bank
 - Contributors named by the bank: Suren M. Seron, Scott Hanan, Steve Aupperle, Chris Gillman, Alex Taubr, Chris Prola, Andrew Klenk, Winfried Hubbe, Dylan, Tim, Gort, Uros Katic, Ethan Winer.
 - Declared origin: built in part from public domain samples, largely from the author's own recordings.
 
+## AI trial (cutscene 1, tumbling fragment)
+
+One trial, agreed by the owner on 2026-11-08, run on 2026-11-12. One capture of the game (the kitten falling, `source_chute.png`, rendered by the project) and a short English prompt were sent once, with no account and no token, to a public Hugging Face Space; nothing else was sent. The result is kept outside the game, in the mission folder (`videos/essai_ia/`), next to the captured version, which is the one in the game. Licences were read on 2026-11-12 on the Hugging Face pages and API.
+
+| Item | Name | Licence as read |
+|---|---|---|
+| Space | "Wan2.2 14B Fast", `zerogpu-aoti/wan2-2-fp8da-aoti-faster`, https://huggingface.co/spaces/zerogpu-aoti/wan2-2-fp8da-aoti-faster (ZeroGPU, Gradio) | None declared in the Space card |
+| Model | `Wan-AI/Wan2.2-I2V-A14B-Diffusers` (Wan 2.2 image-to-video, 14B) | Apache-2.0 |
+| Weights and LoRA used by the Space | `cbensimon/Wan2.2-I2V-A14B-bf16-Diffusers`, `cbensimon/WanTransformer3DModel-sm120-cu130-raa`, `Kijai/WanVideo_comfy` (Lightning LoRA) | No licence declared in the repositories' metadata: to confirm |
+
+Obtained: a 4.06 s clip (832 x 480, 16 images/s), conformed to 1280 x 720 at 30 images/s without sound. Not credited in the game unless the owner picks it.
+
 ## Software
 
 | Software | Use | Author | Licence |

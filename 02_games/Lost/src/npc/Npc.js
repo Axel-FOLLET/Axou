@@ -13,6 +13,7 @@ import { accessoryFit } from './npcAccessoryFit.js';
 import { bossForm } from './npcBossForm.js';
 import { carryAndHug } from './npcCarryAndHug.js';
 import { sitPose } from './npcSitPose.js';
+import { paintMark } from './npcPaintMark.js';
 import { mixin } from '../mixin.js';
 
 /**
@@ -29,8 +30,9 @@ import { mixin } from '../mixin.js';
  * - Boss (`startBoss` / `setBoss` / `endBoss`, NPC_BOSS settings): the only case where `body` is scaled, hair
  *   included. Red coat on the instance uniforms, giant brush in a front paw, capped shells.
  *
- * The class is split by theme: npcAccessoryFit.js, npcBossForm.js, npcCarryAndHug.js and npcSitPose.js add their methods
- * through the `mixin` call at the end of this file. Tuning tables are in npcTuning.js.
+ * The class is split by theme: npcAccessoryFit.js, npcBossForm.js, npcCarryAndHug.js, npcSitPose.js and
+ * npcPaintMark.js (dried paint mark on Maman's flank, `setPaintMark`) add their methods through the `mixin` call at
+ * the end of this file. Tuning tables are in npcTuning.js.
  */
 
 const _v = new THREE.Vector3();
@@ -137,6 +139,8 @@ export class Npc {
     this.fur.shells.forEach((s) => this._ownMaterials.push(s.material));
     this.eyes.eyes.forEach((e) => this._ownMaterials.push(e.material));
     if (opts.coat ?? def.coat) this.setCoat(opts.coat ?? def.coat);
+    this._paint = null;    // dried paint mark on a flank (npcPaintMark.js), else null
+    if (def.paintMark) this._buildPaintMark();
     this._beanie = opts.beanie ?? {};
     this._skeletons = [...new Set([body, ...eyes, ...this.fur.shells].map((m) => m.skeleton))];
     this._skinned = [body, ...eyes, ...this.fur.shells];
@@ -176,9 +180,7 @@ export class Npc {
     this._lod = -1;
     this._qualityStep = opts.furStep ?? def.furStep ?? 1;
     this._fadeLeft = 0;
-    this._headDip = 0;     // head lowering (0 to 1), see setHeadDip
-    this._dipBase = null;  // frozen pose: quaternions of Neck, Neck.001 and Head before the lowering
-    this._dipLive = null;  // played clip: same, before this frame's lowering (some clips do not drive the neck)
+    this._neckBase = null; // frozen pose: quaternions of Neck, Neck.001 and Head (restored after the hug turns them)
     this._hug = null;      // hug in progress (startHug), else null
     this._boss = null;     // boss (startBoss / setBoss): previous state and settings, else null
     this._bossAnim = null; // growth in progress: { t, duration, from, to }
@@ -348,7 +350,6 @@ export class Npc {
     if (!clip) { console.warn(`NPC ${this.kind}: clip missing from the GLB: ${name}`); return false; }
     const { loop = false, fade = 0.3, instant = false, timeScale = 1 } = o;
     this._unfreeze();
-    this._undip();
     this._loop = loop;
     this._freezeAt = THREE.MathUtils.clamp(o.freezeAt ?? clip.duration, 0, clip.duration);
     this.pose = name;
@@ -440,10 +441,8 @@ export class Npc {
       else if (this._settling) this._settleStep(dt);
       return;
     }
-    this._undip();
     this.mixer.update(dt);
     if (this._hatPose) this._holdHatPose();
-    if (this._headDip) this._dip();
     this._fadeLeft = Math.max(0, this._fadeLeft - dt);
     const a = this.action;
     // Boss (bossPlay): a finished clip stays on its last frame (clampWhenFinished), with no frozen pose.
@@ -505,8 +504,8 @@ export class Npc {
 
   // ------------------------------------------------------------------------------- internal
 
-  /** Bones lowered by setHeadDip: Neck, Neck.001, Head. */
-  _dipBones() { return [this.rig.neck[0], this.rig.neck[1], this.rig.head].filter(Boolean); }
+  /** Neck bones turned by the hug (chin toward the kitten): Neck, Neck.001, Head. */
+  _neckBones() { return [this.rig.neck[0], this.rig.neck[1], this.rig.head].filter(Boolean); }
 
   _updateLod(camera) {
     _w.setFromMatrixPosition(camera.matrixWorld);
@@ -560,7 +559,6 @@ export class Npc {
   }
 
   _freeze() {
-    this._undip();
     const a = this.action;
     for (const other of this.actions.values()) if (other !== a) other.stop();
     a.time = this._freezeAt;
@@ -569,8 +567,7 @@ export class Npc {
     this.mixer.update(0);
     const sitPose = !!this.def.sit && this.pose === this.def.pose;
     if (sitPose) this._sitCat(this.pose === 'SitNpc' ? SIT_NPC : SIT);
-    this._dipBase = this._dipBones().map((b) => b.quaternion.clone());
-    this._dip();
+    this._neckBase = this._neckBones().map((b) => b.quaternion.clone());
     this._contact(0, true);
     this.refresh();
     if (this._spots) this._paintSpots(sitPose);
@@ -586,7 +583,7 @@ export class Npc {
     if (!this._frozen) return;
     this._settling = null;
     if (this._hug) { this._hug = null; this.eyes.setLid(0); }
-    if (this._dipBase) { this._dipBones().forEach((b, i) => b.quaternion.copy(this._dipBase[i])); this._dipBase = null; }
+    if (this._neckBase) { this._neckBones().forEach((b, i) => b.quaternion.copy(this._neckBase[i])); this._neckBase = null; }
     // Bones changed by _sitCat (including `Root`, which clips do not necessarily drive): back to the clip pose before
     // playing a clip again.
     if (this._boneBackup) {
@@ -645,4 +642,4 @@ function sameSkeleton(a, b) {
   return true;
 }
 
-mixin(Npc, accessoryFit, bossForm, carryAndHug, sitPose);
+mixin(Npc, accessoryFit, bossForm, carryAndHug, sitPose, paintMark);

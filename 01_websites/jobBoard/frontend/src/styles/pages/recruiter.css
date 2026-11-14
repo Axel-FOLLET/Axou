@@ -1,6 +1,6 @@
-/* Espace recruteur, vue d'ensemble (RecruiterPage.jsx) : deux colonnes de cartes de postes. */
+/* Recruiter area, overview (RecruiterPage.jsx): two columns of position cards. */
 
-/* Deux colonnes de même largeur, alignées en haut. Deux lignes : les titres, puis les cartes. */
+/* Two columns of equal width, aligned at the top. Two rows: the titles, then the cards. */
 .recruiter-overview {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -9,8 +9,8 @@
   column-gap: 32px;
 }
 
-/* Chaque colonne reprend les deux lignes de la grille (subgrid) : un titre sur deux lignes
-   agrandit la ligne des titres des deux côtés, et les cartes restent alignées. */
+/* Each column takes both grid rows (subgrid): a title on two lines
+   enlarges the titles row on both sides, and the cards stay aligned. */
 .recruiter-overview > section {
   display: grid;
   grid-row: span 2;
@@ -18,14 +18,14 @@
   grid-template-columns: minmax(0, 1fr);
 }
 
-/* Titres des colonnes sans grande marge haute, pour démarrer à la même hauteur. */
+/* Column titles without a large top margin, to start at the same height. */
 .recruiter-overview h2 {
   margin-top: 0;
   font-size: 20px;
   align-self: end;
 }
 
-/* Cartes empilées, sans puces. */
+/* Stacked cards, without bullets. */
 .overview-list {
   display: flex;
   flex-direction: column;
@@ -35,15 +35,15 @@
   padding: 0;
 }
 
-/* Carte d'un poste, comme la carte d'offre (offers.css). */
+/* Card of a position, like the job offer card (offers.css). */
 .overview-card {
   background: var(--color-surface);
   border-radius: var(--radius-card);
   border: 1px solid var(--color-line);
 }
 
-/* Toute la carte est un lien vers les candidatures du poste : même forme à gauche et à droite,
-   le titre du poste puis une ligne grise. */
+/* The whole card is a link to the position's applications: same shape on the left and on the right,
+   the position title then a grey line. */
 .overview-card a {
   display: flex;
   flex-direction: column;
@@ -54,7 +54,7 @@
   text-decoration: none;
 }
 
-/* Titre du poste sur une seule ligne, coupé par des points de suspension ; le titre entier au survol. */
+/* Position title on a single line, cut with an ellipsis; the whole title on hover. */
 .overview-card strong {
   white-space: nowrap;
   overflow: hidden;
@@ -66,12 +66,12 @@
   color: var(--color-text-secondary);
 }
 
-/* Survol : bordure bleue, la carte se clique. */
+/* Hover: blue border, the card is clickable. */
 .overview-card:hover {
   border-color: var(--color-blue);
 }
 
-/* Une seule colonne sur téléphone et petite tablette ; le second titre se détache des cartes du dessus. */
+/* A single column on phones and small tablets; the second title is set apart from the cards above. */
 @media (max-width: 700px) {
   .recruiter-overview {
     grid-template-columns: minmax(0, 1fr);
@@ -82,76 +82,76 @@
   }
 }
 
-/* Flèche de retour au-dessus du titre d'une sous-page (RecruiterApplicationsPage.jsx). */
+/* Back arrow above the title of a sub-page (RecruiterApplicationsPage.jsx). */
 .back-link {
   margin: 0 0 8px;
   font-size: 14px;
 }
 
-/* Tableaux « Mes postes » et « Mes postes clôturés » (RecruiterOffersPage.jsx), dans le cadre .table-scroll
-   partagé avec l'administration (admin.css) ; mêmes cellules que le tableau d'administration. */
-.postes-table {
+/* "My positions" and "My closed positions" tables (RecruiterOffersPage.jsx), in the .table-scroll frame
+   shared with the administration (admin.css); same cells as the administration table. */
+.positions-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 14px;
 }
 
-.postes-table th, .postes-table td {
+.positions-table th, .positions-table td {
   padding: 16px;
   text-align: left;
   vertical-align: top;
   border-bottom: 1px solid var(--color-line);
 }
 
-.postes-table th {
+.positions-table th {
   white-space: nowrap;
   background: var(--color-surface-blue);
   font-weight: 600;
 }
 
-/* Les colonnes du nombre et du statut restent étroites : le titre du poste prend la place. */
-.postes-table th:nth-child(n + 2), .postes-table td:nth-child(n + 2) {
+/* The number and status columns stay narrow: the position title takes the room. */
+.positions-table th:nth-child(n + 2), .positions-table td:nth-child(n + 2) {
   width: 1%;
   white-space: nowrap;
 }
 
-/* Postes clôturés : lignes grisées, le lien vers les candidatures reste cliquable. */
-.postes-table-closed td {
+/* Closed positions: greyed rows, the link to the applications stays clickable. */
+.positions-table-closed td {
   color: var(--color-text-secondary);
   background: var(--color-neutral);
 }
 
-.postes-table-closed td a {
+.positions-table-closed td a {
   color: var(--color-text-secondary);
 }
 
-/* « Modifier » et « Supprimer » côte à côte, de la taille des actions du tableau des candidatures. */
-.postes-table .row-actions {
+/* "Edit" and "Delete" side by side, the size of the actions of the applications table. */
+.positions-table .row-actions {
   display: flex;
   gap: 8px;
 }
 
-.postes-table .row-actions button, .postes-table .row-actions a.button-link {
+.positions-table .row-actions button, .positions-table .row-actions a.button-link {
   padding: 6px 14px;
   font-size: 14px;
 }
 
-/* Le titre du poste garde une largeur lisible et passe à la ligne entre les mots, pas au milieu
-   (base.css coupe partout les textes longs avec overflow-wrap: anywhere). */
-.postes-table td:first-child {
+/* The position title keeps a readable width and wraps between words,
+   not in the middle (base.css breaks long texts everywhere with overflow-wrap: anywhere). */
+.positions-table td:first-child {
   min-width: 9rem;
   overflow-wrap: break-word;
 }
 
-/* Sur téléphone : Modifier et Supprimer l'un sous l'autre, dans une colonne collée au bord droit du cadre ;
-   le titre et les actions restent visibles, le nombre et le statut défilent dessous. */
+/* On phones: Edit and Delete one under the other, in a column stuck to the right edge of the frame;
+   the title and the actions stay visible, the number and the status scroll underneath. */
 @media (max-width: 600px) {
-  .postes-table .row-actions {
+  .positions-table .row-actions {
     flex-direction: column;
     align-items: stretch;
   }
 
-  .postes-table .col-actions {
+  .positions-table .col-actions {
     position: sticky;
     right: 0;
     z-index: 1;
@@ -159,20 +159,20 @@
     box-shadow: inset 1px 0 0 var(--color-line);
   }
 
-  .postes-table th.col-actions {
+  .positions-table th.col-actions {
     background: var(--color-surface-blue);
   }
 }
 
-/* Tableau « Candidatures reçues » (RecruiterApplicationsPage.jsx), dans le cadre .table-scroll (admin.css) :
-   mêmes cellules que le tableau d'administration. */
-.candidatures-table {
+/* "Applications received" table (RecruiterApplicationsPage.jsx), in the .table-scroll frame (admin.css):
+   same cells as the administration table. */
+.applications-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 14px;
 }
 
-.candidatures-table th, .candidatures-table td {
+.applications-table th, .applications-table td {
   padding: 16px;
   text-align: left;
   vertical-align: top;
@@ -180,37 +180,37 @@
   white-space: nowrap;
 }
 
-.candidatures-table th {
+.applications-table th {
   background: var(--color-surface-blue);
   font-weight: 600;
 }
 
-/* Repère discret lors du survol d'une ligne. */
-.candidatures-table tbody tr:hover {
+/* Discreet marker when hovering a row. */
+.applications-table tbody tr:hover {
   background: var(--color-bg);
 }
 
-/* Message coupé sur une ligne, avec des points de suspension. */
-.candidatures-table td.cell-clip {
+/* Message cut to one line, with an ellipsis. */
+.applications-table td.cell-clip {
   max-width: 240px;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* « Retenir ce candidat » et « Refuser » côte à côte (le flex est sur un bloc intérieur : une cellule reste une cellule). */
-.candidatures-table .row-actions {
+/* "Accept this candidate" and "Reject" side by side (flex is on an inner block: a cell stays a cell). */
+.applications-table .row-actions {
   display: flex;
   gap: 8px;
 }
 
-.candidatures-table .col-actions button {
+.applications-table .col-actions button {
   padding: 6px 14px;
   font-size: 14px;
 }
 
-/* Colonne « Retenir ce candidat » collée au bord droit du cadre, comme Modifier et Supprimer en administration :
-   elle reste visible quand le tableau défile. Fond opaque, trait fin à gauche pour la détacher. */
-.candidatures-table .col-actions {
+/* "Accept this candidate" column stuck to the right edge of the frame, like Edit and Delete in administration:
+   it stays visible when the table scrolls. Opaque background, thin line on the left to set it apart. */
+.applications-table .col-actions {
   position: sticky;
   right: 0;
   z-index: 1;
@@ -218,29 +218,29 @@
   box-shadow: inset 1px 0 0 var(--color-line);
 }
 
-.candidatures-table th.col-actions {
+.applications-table th.col-actions {
   background: var(--color-surface-blue);
 }
 
-.candidatures-table tbody tr:hover .col-actions {
+.applications-table tbody tr:hover .col-actions {
   background: var(--color-bg);
 }
 
-/* Sur téléphone, la colonne collée cacherait presque tout le tableau : elle défile avec les autres,
-   et « Retenir ce candidat » et « Refuser » passent l'un sous l'autre. */
+/* On phones, the stuck column would hide almost the whole table: it scrolls with the others,
+   and "Accept this candidate" and "Reject" go one under the other. */
 @media (max-width: 600px) {
-  .candidatures-table .col-actions {
+  .applications-table .col-actions {
     position: static;
     box-shadow: none;
   }
 
-  .candidatures-table .row-actions {
+  .applications-table .row-actions {
     flex-direction: column;
     align-items: stretch;
   }
 }
 
-/* Bouton rouge « Clôturer l'annonce », détaché du tableau. */
+/* Red "Close the job offer" button, set apart from the table. */
 .table-scroll + .button-danger {
   margin-top: 24px;
 }

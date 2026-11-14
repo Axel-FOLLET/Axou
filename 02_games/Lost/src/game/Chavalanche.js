@@ -64,8 +64,8 @@ export const CHAVALANCHE = {
   proxyEvery: 0.5,
 };
 
-/** Steps where he is off screen: title screen, opening, hug and end screen. */
-const HIDDEN = new Set(['title', 'opening', 'hug', 'end']);
+/** Steps where he is off screen: title screen, arrival cutscene, opening, hug and end screen. */
+const HIDDEN = new Set(['title', 'arrival', 'opening', 'hug', 'end']);
 
 // Stride of each clip at rate 1 (Cat.js: WALK_STRIDE, TROT_STRIDE, RUN_STRIDE), so steps stay glued to the ground.
 const STRIDE = { Walk: 3.2 / 0.67, Trot: 3.6 / 0.45, run: 4.0 / 0.25 };

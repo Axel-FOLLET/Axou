@@ -1,11 +1,11 @@
-// Formulaire de candidature à une annonce, ouvert depuis sa carte.
+// Application form for a job offer, opened from its card.
 import { useContext, useEffect, useState } from 'react'
 import { Link } from 'react-router'
 import { AuthContext } from '../AuthContext'
 import { apiFetch } from '../api.js'
 import { useLang } from '../lang.js'
 
-// Nom de chaque champ de l'API, par langue, pour le message « Il manque un champ » : FIELD_NAMES[lang][champ].
+// Name of each API field, per language, for the "A field is missing" message: FIELD_NAMES[lang][field].
 const FIELD_NAMES = {
     fr: {
         first_name: 'prénom',
@@ -21,7 +21,7 @@ const FIELD_NAMES = {
     },
 }
 
-// CV facultatif : un PDF de 2 Mo maximum (même limite que l'API).
+// Optional CV: a PDF of 2 MB maximum (same limit as the API).
 const MAX_CV_SIZE = 2 * 1024 * 1024
 const CV_ERROR = {
     fr: 'Votre CV doit être un fichier PDF de 2 Mo maximum.',
@@ -30,25 +30,25 @@ const CV_ERROR = {
 
 export default function Form({ id, onClose }) {
     const { t, lang } = useLang()
-    // Un visiteur saisit son identité ; une personne connectée ne remplit que le message.
+    // A visitor enters their identity; a logged-in person only fills in the message.
     const { user } = useContext(AuthContext)
     const [firstName, setFirstName] = useState('')
     const [surname, setSurname] = useState('')
     const [telephone, setTelephone] = useState('')
     const [email, setEmail] = useState('')
     const [message, setMessage] = useState('')
-    // errors = un message par champ fautif ; status pilote le bouton : idle, sending, sent, error.
+    // errors = one message per faulty field; status drives the button: idle, sending, sent, error.
     const [errors, setErrors] = useState({})
     const [status, setStatus] = useState('idle')
     const [sendError, setSendError] = useState('')
     const [needLogin, setNeedLogin] = useState(false)
-    // CV : fichier choisi ici, ou CV enregistré dans l'espace candidat (personne connectée).
-    // cvChoice : 'profile' (CV enregistré), 'file' (un autre fichier) ou 'none'.
+    // CV: file chosen here, or CV saved in the candidate area (logged-in person).
+    // cvChoice: 'profile' (saved CV), 'file' (another file) or 'none'.
     const [cvFile, setCvFile] = useState(null)
     const [profileCv, setProfileCv] = useState(null)
     const [cvChoice, setCvChoice] = useState('file')
 
-    // Personne connectée : le CV de son profil est proposé par défaut (404 : elle n'en a pas).
+    // Logged-in person: the CV from their profile is offered by default (404: they have none).
     useEffect(() => {
         if (!user) return
         async function fetchProfileCv() {
@@ -61,7 +61,7 @@ export default function Form({ id, onClose }) {
         fetchProfileCv()
     }, [user])
 
-    // Laisse le V se dessiner avant de fermer le formulaire.
+    // Let the check mark finish drawing before closing the form.
     useEffect(() => {
         if (status !== 'sent') return
         const timer = setTimeout(onClose, 1150)
@@ -70,14 +70,14 @@ export default function Form({ id, onClose }) {
 
     const handleSubmit = async (event) => {
         event.preventDefault()
-        // Double clic ou renvoi pendant l'attente : on ignore.
+        // Double click or resubmission while waiting: ignore.
         if (status === 'sending' || status === 'sent') return
 
         setSendError('')
         setNeedLogin(false)
         const newErrors = {}
 
-        // Les informations personnelles sont nécessaires aux visiteurs seulement.
+        // Personal information is needed from visitors only.
         if (!user) {
             if (firstName.trim() === '') {
                 newErrors.firstName = t('Veuillez indiquer votre prénom.', 'Please enter your first name.')
@@ -102,22 +102,22 @@ export default function Form({ id, onClose }) {
             }
         }
 
-        // Message obligatoire pour tout le monde.
+        // Message required for everyone.
         if (message.trim() === '') {
             newErrors.message = t('Veuillez indiquer votre message.', 'Please enter your message.')
         }
 
-        // Le fichier choisi est vérifié avant l'envoi ; l'API refait la vérification.
+        // The chosen file is checked before sending; the API checks again.
         const sendFile = cvChoice === 'file' && cvFile !== null
         if (sendFile && (!/\.pdf$/i.test(cvFile.name) || cvFile.size > MAX_CV_SIZE)) {
             newErrors.cv = CV_ERROR[lang]
         }
 
-        // Au moins une erreur de saisie : rien n'est envoyé au serveur.
+        // At least one input error: nothing is sent to the server.
         setErrors(newErrors)
         if (Object.keys(newErrors).length > 0) return
 
-        // Si connecté, le serveur prend l'identité dans la session.
+        // If logged in, the server takes the identity from the session.
         const body = { message: message.trim() }
 
         if (!user) {
@@ -129,12 +129,12 @@ export default function Form({ id, onClose }) {
             }
         }
 
-        // CV du profil : le serveur en joint une copie à la candidature.
+        // Profile CV: the server attaches a copy to the application.
         if (user && profileCv && cvChoice === 'profile') {
             body.use_profile_cv = true
         }
 
-        // Un fichier part dans un formulaire multipart, avec les autres champs ; sinon, en JSON.
+        // A file goes in a multipart form together with the other fields; otherwise, as JSON.
         let payload = body
         if (sendFile) {
             payload = new FormData()
@@ -150,17 +150,17 @@ export default function Form({ id, onClose }) {
                 body: payload,
             })
 
-            // 201 : candidature enregistrée, l'effet plus haut referme le formulaire.
+            // 201: application saved, the effect above closes the form.
             if (httpStatus === 201) {
                 setStatus('sent')
                 return
             }
 
-            // Refus de l'API : le détail technique va dans la console, le candidat lit un message en français.
+            // Refusal by the API: the technical detail goes to the console, the candidate reads a message in their language.
             console.error(httpStatus, apiError)
             setStatus('error')
 
-            // Un message français par cas : champ manquant, candidature en double, annonce clôturée, compte existant.
+            // One message per case: missing field, duplicate application, closed job offer, existing account.
             if (httpStatus === 400 && apiError.startsWith('Missing field: ')) {
                 const field = apiError.replace('Missing field: ', '')
                 setSendError(t(`Il manque un champ : ${FIELD_NAMES.fr[field] || field}.`, `A field is missing: ${FIELD_NAMES.en[field] || field}.`))
@@ -177,17 +177,17 @@ export default function Form({ id, onClose }) {
                 throw new Error(`Unexpected response ${httpStatus}`)
             }
         } catch (err) {
-            // Serveur arrêté, réponse illisible ou code inattendu.
+            // Server stopped, unreadable response or unexpected code.
             console.error(err)
             setStatus('error')
             setSendError(t("Nous n'arrivons pas à envoyer votre candidature pour le moment. Merci de réessayer dans quelques instants.", 'We cannot send your application at the moment. Please try again in a few moments.'))
         }
     }
 
-    // noValidate : les messages du navigateur sont remplacés par les nôtres, en français.
+    // noValidate: the browser's messages are replaced by our own, in the chosen language.
     return (
         <form onSubmit={handleSubmit} noValidate>
-            {/* Connecté : l'identité vient de la session, seuls les visiteurs voient ces champs. */}
+            {/* Logged in: the identity comes from the session, only visitors see these fields. */}
             {user ? (
                 <p>{t('Vous candidatez en tant que ', 'You are applying as ')}{user.first_name} {user.last_name}.</p>
             ) : (
@@ -229,7 +229,7 @@ export default function Form({ id, onClose }) {
             </label>
             {errors.message && <p>{errors.message}</p>}
 
-            {/* Personne connectée qui a un CV dans son espace : il est joint par défaut, ou remplacé par un autre fichier. */}
+            {/* Logged-in person with a CV in their area: it is attached by default, or replaced by another file. */}
             {profileCv && (
                 <label>
                     {t('CV joint', 'Attached CV')}
@@ -250,7 +250,7 @@ export default function Form({ id, onClose }) {
             )}
             {errors.cv && <p>{errors.cv}</p>}
 
-            {/* Bouton verrouillé pendant l'envoi : spinner, puis coche avant la fermeture. */}
+            {/* Button locked while sending: spinner, then check mark before closing. */}
             <button type="submit" disabled={status === 'sending' || status === 'sent'}>
                 {status === 'sending' && <span className="spinner" aria-hidden="true"></span>}
                 {status === 'sent' ? (
@@ -264,7 +264,7 @@ export default function Form({ id, onClose }) {
                 ) : status === 'sending' ? t('Envoi en cours…', 'Sending…') : t('Envoyer ma candidature', 'Send my application')}
             </button>
 
-            {/* aria-live : un lecteur d'écran annonce le résultat sans action de l'utilisateur. */}
+            {/* aria-live: a screen reader announces the result without any user action. */}
             <div aria-live="polite">
                 {status === 'sent' && (
                     <p className="visually-hidden">{t('Votre candidature est envoyée.', 'Your application has been sent.')}</p>

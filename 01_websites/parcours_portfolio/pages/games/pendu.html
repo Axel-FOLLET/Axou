@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <!-- Page loaded in the iframe of a card on the portfolio page: the module creates the canvas in the game container. The ?lang=en parameter selects the English texts. -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Colour of the browser bar on mobile: the page background colour -->
+    <meta name="theme-color" content="#C8001E">
+    <!-- Page shown inside a portfolio card: it must not appear alone in search engines -->
+    <meta name="robots" content="noindex">
+    <title>Pendu</title>
+    <!-- Opened alone, the page would otherwise request /favicon.ico, which the site does not have -->
+    <link rel="icon" href="../../assets/images/favicon.svg" type="image/svg+xml">
+    <!-- Site font, preloaded: the game waits for it (document.fonts) before drawing -->
+    <link rel="preload" href="../../assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <!-- Site colours (the only file that holds them), then the game layout that uses them -->
+    <link rel="stylesheet" href="../../css/base/tokens.css">
+    <link rel="stylesheet" href="../../css/components/game-player.css">
+</head>
+<body class="game-player">
+    <!-- Link to jump straight to the content (keyboard); translations.js translates it with ?lang=en -->
+    <a class="skip-link" href="#main">Aller au contenu</a>
+    <main id="main">
+        <h1 class="visually-hidden">Jeu du Pendu</h1>
+        <div id="hangman-root" class="game-player__root"></div>
+        <!-- Spoken version of the canvas: screens.js writes the word, the result of each guess and the end of the game here -->
+        <p class="visually-hidden" id="hangman-status" role="status" aria-live="polite"></p>
+    </main>
+    <script type="module" src="../../js/games/pendu/main.js"></script>
+</body>
+</html>

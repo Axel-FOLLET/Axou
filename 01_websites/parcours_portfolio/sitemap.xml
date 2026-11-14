@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- List of the pages for search engines; xhtml:link links each page to its translation. -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+    <url>
+        <loc>https://axel-follet.github.io/parcours_portfolio/</loc>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://axel-follet.github.io/parcours_portfolio/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://axel-follet.github.io/parcours_portfolio/pages/en/index.html"/>
+        <xhtml:link rel="alternate" hreflang="x-default" href="https://axel-follet.github.io/parcours_portfolio/"/>
+    </url>
+    <url>
+        <loc>https://axel-follet.github.io/parcours_portfolio/pages/en/index.html</loc>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://axel-follet.github.io/parcours_portfolio/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://axel-follet.github.io/parcours_portfolio/pages/en/index.html"/>
+        <xhtml:link rel="alternate" hreflang="x-default" href="https://axel-follet.github.io/parcours_portfolio/"/>
+    </url>
+    <url>
+        <loc>https://axel-follet.github.io/parcours_portfolio/pages/fr/parcours.html</loc>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://axel-follet.github.io/parcours_portfolio/pages/fr/parcours.html"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://axel-follet.github.io/parcours_portfolio/pages/en/parcours.html"/>
+        <xhtml:link rel="alternate" hreflang="x-default" href="https://axel-follet.github.io/parcours_portfolio/pages/fr/parcours.html"/>
+    </url>
+    <url>
+        <loc>https://axel-follet.github.io/parcours_portfolio/pages/en/parcours.html</loc>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://axel-follet.github.io/parcours_portfolio/pages/fr/parcours.html"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://axel-follet.github.io/parcours_portfolio/pages/en/parcours.html"/>
+        <xhtml:link rel="alternate" hreflang="x-default" href="https://axel-follet.github.io/parcours_portfolio/pages/fr/parcours.html"/>
+    </url>
+    <url>
+        <loc>https://axel-follet.github.io/parcours_portfolio/pages/fr/portfolio.html</loc>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://axel-follet.github.io/parcours_portfolio/pages/fr/portfolio.html"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://axel-follet.github.io/parcours_portfolio/pages/en/portfolio.html"/>
+        <xhtml:link rel="alternate" hreflang="x-default" href="https://axel-follet.github.io/parcours_portfolio/pages/fr/portfolio.html"/>
+    </url>
+    <url>
+        <loc>https://axel-follet.github.io/parcours_portfolio/pages/en/portfolio.html</loc>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://axel-follet.github.io/parcours_portfolio/pages/fr/portfolio.html"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://axel-follet.github.io/parcours_portfolio/pages/en/portfolio.html"/>
+        <xhtml:link rel="alternate" hreflang="x-default" href="https://axel-follet.github.io/parcours_portfolio/pages/fr/portfolio.html"/>
+    </url>
+    <url>
+        <loc>https://axel-follet.github.io/parcours_portfolio/pages/fr/contact.html</loc>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://axel-follet.github.io/parcours_portfolio/pages/fr/contact.html"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://axel-follet.github.io/parcours_portfolio/pages/en/contact.html"/>
+        <xhtml:link rel="alternate" hreflang="x-default" href="https://axel-follet.github.io/parcours_portfolio/pages/fr/contact.html"/>
+    </url>
+    <url>
+        <loc>https://axel-follet.github.io/parcours_portfolio/pages/en/contact.html</loc>
+        <xhtml:link rel="alternate" hreflang="fr" href="https://axel-follet.github.io/parcours_portfolio/pages/fr/contact.html"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://axel-follet.github.io/parcours_portfolio/pages/en/contact.html"/>
+        <xhtml:link rel="alternate" hreflang="x-default" href="https://axel-follet.github.io/parcours_portfolio/pages/fr/contact.html"/>
+    </url>
+</urlset>

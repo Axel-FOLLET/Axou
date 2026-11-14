@@ -1,13 +1,13 @@
-# Environnement virtuel Python (propre à chaque machine)
+# Python virtual environment (specific to each machine)
 venv/
 .venv/
 
-# Cache de Python
+# Python cache
 __pycache__/
 *.pyc
 
-# Base SQLite : recréée avec init_db.py, jamais versionnée
+# SQLite database: recreated with init_db.py, never versioned
 *.db
 
-# Réglages locaux (mots de passe, clés)
+# Local settings (passwords, keys)
 .env

@@ -1,0 +1,209 @@
+/* -------------------- FOOTER -------------------- */
+
+/* Near-black: the page closes on the breathing-room colour */
+.footer {
+    padding: 72px var(--gutter) 32px;
+
+    border-top: 1px solid var(--line);
+
+    background-color: var(--ink);
+}
+
+
+.footer__row {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+
+    gap: 40px;
+}
+
+
+/* Label style in base.css */
+.footer__title {
+    margin: 0 0 14px;
+
+    color: var(--muted);
+}
+
+
+.footer__list {
+    margin: 0;
+    padding: 0;
+
+    list-style: none;
+}
+
+
+/*
+    32 px high: comfortable finger target. No underline at rest:
+    a thin line (1 px gradient under the text) stretches from left to right on hover and focus.
+*/
+.footer__list a,
+.footer__top {
+    display: inline-flex;
+    align-items: center;
+
+    min-height: 32px;
+
+    background: linear-gradient(currentColor, currentColor) no-repeat 0 calc(50% + 0.75em) / 0 1px;
+
+    text-decoration: none;
+
+    transition: background-size var(--dur-base) var(--ease-out);
+}
+
+
+.footer__list a:hover,
+.footer__list a:focus-visible,
+.footer__top:hover,
+.footer__top:focus-visible {
+    background-size: 100% 1px;
+}
+
+
+.footer__credits {
+    max-width: 520px;
+
+    margin: 0;
+
+    color: var(--muted);
+
+    font-size: 0.875rem;
+}
+
+
+/*
+    Links inside text: underlined at rest (white alone is not enough to tell them from the grey).
+    On hover and focus, the line withdraws then redraws from left to right.
+*/
+.footer__credits a,
+.footer__legal a {
+    color: var(--white);
+
+    background: linear-gradient(currentColor, currentColor) no-repeat 0 100% / 100% 1px;
+
+    text-decoration: none;
+}
+
+
+.footer__credits a:hover,
+.footer__credits a:focus-visible,
+.footer__legal a:hover,
+.footer__legal a:focus-visible {
+    animation: footer-underline var(--dur-base) var(--ease-out);
+}
+
+
+@keyframes footer-underline {
+    from {
+        background-size: 0 1px;
+    }
+}
+
+
+/* Last line: rights on the left, back to top on the right */
+.footer__bottom {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+
+    gap: 12px;
+
+    margin-top: 56px;
+    padding-top: 20px;
+
+    border-top: 1px solid var(--line);
+
+    font-size: 0.875rem;
+}
+
+
+.footer__copyright {
+    margin: 0;
+
+    color: var(--muted);
+}
+
+
+/* Collapsed legal notice: one line until clicked, the detail opens under the credits */
+.footer__legal {
+    max-width: 520px;
+
+    margin-top: 10px;
+
+    font-size: 0.875rem;
+}
+
+
+/* list-style and ::-webkit-details-marker remove the browser triangle, replaced by + / - */
+.footer__legal-toggle {
+    display: inline-flex;
+    align-items: center;
+
+    min-height: 32px;
+
+    font-weight: 600;
+
+    list-style: none;
+    cursor: pointer;
+}
+
+
+.footer__legal-toggle::-webkit-details-marker {
+    display: none;
+}
+
+
+.footer__legal-toggle::after {
+    content: "+";
+
+    margin-left: 8px;
+}
+
+
+.footer__legal[open] .footer__legal-toggle::after {
+    content: "−";
+}
+
+
+.footer__legal-toggle:hover {
+    color: var(--muted);
+}
+
+
+.footer__legal p {
+    margin: 8px 0 0;
+
+    color: var(--muted);
+}
+
+
+/* Forced colours (high contrast): the backgrounds disappear, the real underline comes back */
+@media (forced-colors: active) {
+
+    .footer__credits a,
+    .footer__legal a {
+        text-decoration: underline;
+    }
+
+}
+
+
+/* Reduced motion: the line appears at once, without stretching */
+@media (prefers-reduced-motion: reduce) {
+
+    .footer__list a,
+    .footer__top {
+        transition: none;
+    }
+
+
+    .footer__credits a:hover,
+    .footer__credits a:focus-visible,
+    .footer__legal a:hover,
+    .footer__legal a:focus-visible {
+        animation: none;
+    }
+
+}

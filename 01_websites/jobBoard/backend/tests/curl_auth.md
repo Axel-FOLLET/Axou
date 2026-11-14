@@ -1,36 +1,36 @@
-# Tests de l'authentification (J3, Task04)
+# Authentication tests (J3, Task04)
 
-Tests rejoués le 07/10/2026 sur la branche `feature/auth` (inscription et connexion), après `python init_db.py` pour partir d'une base propre. Les réponses viennent du client de test de Flask, qui exécute le même code que le serveur ; la commande `curl` de chaque cas est celle à taper pour le refaire à la main.
+Tests replayed on 07/10/2026 on the `feature/auth` branch (registration and login), after `python init_db.py` to start from a clean database. The responses come from the Flask test client, which runs the same code as the server; the `curl` command of each case is the one to type to redo it by hand.
 
-| N° | Cas | Code attendu | Code obtenu |
+| No. | Case | Expected code | Obtained code |
 |----|-----|--------------|-------------|
-| 1 | register complet | 201 | 201 |
-| 2 | même email une 2ᵉ fois | 409 | 409 |
-| 3 | register sans password | 400 | 400 |
-| 4 | login bon couple | 200 | 200 |
-| 5 | login mauvais mot de passe | 401 | 401 |
-| 6 | login email inconnu | 401 | 401 |
-| 7 | login sans email | 400 | 400 |
-| 8 | register avec un mot de passe de 5 caractères | 400 | 400 |
-| 9 | register avec `Test@Example.com`, puis login avec `test@example.com` | 200 | 200 |
+| 1 | complete register | 201 | 201 |
+| 2 | same email a 2nd time | 409 | 409 |
+| 3 | register without password | 400 | 400 |
+| 4 | login with the right pair | 200 | 200 |
+| 5 | login with a wrong password | 401 | 401 |
+| 6 | login with an unknown email | 401 | 401 |
+| 7 | login without email | 400 | 400 |
+| 8 | register with a 5-character password | 400 | 400 |
+| 9 | register with `Test@Example.com`, then login with `test@example.com` | 200 | 200 |
 
-Aucune réponse de succès (cas 1, 4 et 9) ne contient `password` ni `password_hash`. Les cas 5 et 6 renvoient le même message (`Invalid credentials`), pour ne pas révéler si l'email existe.
+No success response (cases 1, 4 and 9) contains `password` or `password_hash`. Cases 5 and 6 return the same message (`Invalid credentials`), so as not to reveal whether the email exists.
 
-Vérifications complémentaires : un `role` envoyé par le client à l'inscription est ignoré (le compte est créé avec le rôle `user`), et le mot de passe est stocké haché (jamais en clair).
+Additional checks: a `role` sent by the client at registration is ignored (the account is created with the role `user`), and the password is stored hashed (never in plain text).
 
-À traiter au J4 (validation des types) : un mot de passe ou un email qui n'est pas du texte (un nombre par exemple) provoque encore une erreur 500 au lieu d'un 400.
+To handle on J4 (type validation): a password or an email that is not text (a number for example) still causes a 500 error instead of a 400.
 
-## Cas 1 : register complet (attendu 201)
+## Case 1: complete register (expected 201)
 
-Commande :
+Command:
 
 ```bash
 curl -i -X POST http://localhost:5000/api/auth/register -H "Content-Type: application/json" -d '{"first_name": "Alice", "last_name": "Test", "email": "alice.test@example.com", "password": "motdepasse1"}'
 ```
 
-Code obtenu : 201
+Status code: 201
 
-Réponse :
+Response:
 
 ```json
 {
@@ -44,51 +44,51 @@ Réponse :
 ```
 
 
-## Cas 2 : même email une 2ᵉ fois (attendu 409)
+## Case 2: same email a 2nd time (expected 409)
 
-Commande :
+Command:
 
 ```bash
 curl -i -X POST http://localhost:5000/api/auth/register -H "Content-Type: application/json" -d '{"first_name": "Alice", "last_name": "Test", "email": "alice.test@example.com", "password": "motdepasse1"}'
 ```
 
-Code obtenu : 409
+Status code: 409
 
-Réponse :
+Response:
 
 ```json
 { "error": "Email already used" }
 ```
 
 
-## Cas 3 : register sans password (attendu 400)
+## Case 3: register without password (expected 400)
 
-Commande :
+Command:
 
 ```bash
 curl -i -X POST http://localhost:5000/api/auth/register -H "Content-Type: application/json" -d '{"first_name": "Alice", "last_name": "Test", "email": "alice.test@example.com"}'
 ```
 
-Code obtenu : 400
+Status code: 400
 
-Réponse :
+Response:
 
 ```json
 { "error": "Missing field: password" }
 ```
 
 
-## Cas 4 : login bon couple (attendu 200)
+## Case 4: login with the right pair (expected 200)
 
-Commande :
+Command:
 
 ```bash
 curl -i -X POST http://localhost:5000/api/auth/login -H "Content-Type: application/json" -d '{"email": "alice.test@example.com", "password": "motdepasse1"}'
 ```
 
-Code obtenu : 200
+Status code: 200
 
-Réponse :
+Response:
 
 ```json
 {
@@ -102,87 +102,87 @@ Réponse :
 ```
 
 
-## Cas 5 : login mauvais mot de passe (attendu 401)
+## Case 5: login with a wrong password (expected 401)
 
-Commande :
+Command:
 
 ```bash
 curl -i -X POST http://localhost:5000/api/auth/login -H "Content-Type: application/json" -d '{"email": "alice.test@example.com", "password": "mauvais-mot-de-passe"}'
 ```
 
-Code obtenu : 401
+Status code: 401
 
-Réponse :
+Response:
 
 ```json
 { "error": "Invalid credentials" }
 ```
 
 
-## Cas 6 : login email inconnu (attendu 401)
+## Case 6: login with an unknown email (expected 401)
 
-Commande :
+Command:
 
 ```bash
 curl -i -X POST http://localhost:5000/api/auth/login -H "Content-Type: application/json" -d '{"email": "inconnu@example.com", "password": "motdepasse1"}'
 ```
 
-Code obtenu : 401
+Status code: 401
 
-Réponse :
+Response:
 
 ```json
 { "error": "Invalid credentials" }
 ```
 
 
-## Cas 7 : login sans email (attendu 400)
+## Case 7: login without email (expected 400)
 
-Commande :
+Command:
 
 ```bash
 curl -i -X POST http://localhost:5000/api/auth/login -H "Content-Type: application/json" -d '{"password": "motdepasse1"}'
 ```
 
-Code obtenu : 400
+Status code: 400
 
-Réponse :
+Response:
 
 ```json
 { "error": "Missing field: email" }
 ```
 
 
-## Cas 8 : register avec un mot de passe de 5 caractères (attendu 400)
+## Case 8: register with a 5-character password (expected 400)
 
-Commande :
+Command:
 
 ```bash
 curl -i -X POST http://localhost:5000/api/auth/register -H "Content-Type: application/json" -d '{"first_name": "Bob", "last_name": "Test", "email": "bob.test@example.com", "password": "12345"}'
 ```
 
-Code obtenu : 400
+Status code: 400
 
-Réponse :
+Response:
 
 ```json
 { "error": "Password must be at least 8 characters" }
 ```
 
 
-## Cas 9 : register avec Test@Example.com, puis login avec test@example.com (attendu 200)
+## Case 9: register with Test@Example.com, then login with test@example.com (expected 200)
 
-Étape 1 : inscription avec une majuscule dans l'email (attendu 201, email enregistré en minuscules).
+Step 1: registration with a capital letter in the email (expected 201, email saved in lowercase).
 
-Commande :
+Command:
 
 ```bash
 curl -i -X POST http://localhost:5000/api/auth/register -H "Content-Type: application/json" -d '{"first_name": "Chloé", "last_name": "Test", "email": "Test@Example.com", "password": "motdepasse1"}'
 ```
 
-Code obtenu : 201
+Status code: 201
 
-Réponse :
+Response:
 
 ```json
 {
@@ -196,249 +196,249 @@ Réponse :
 ```
 
 
-# Changement d'adresse e-mail (J8-J9)
+# Email address change (J8-J9)
 
-Tests rejou\u00e9s le 14/10/2026 avec le client de test de Flask, sur une copie de la base. Le compte de test (`Testeur Changement`, id 37, mot de passe `MotDePasse1`) a \u00e9t\u00e9 cr\u00e9\u00e9 dans cette copie ; avec une autre base, l'`id` et l'adresse \u00ab d\u00e9j\u00e0 utilis\u00e9e \u00bb du cas 16 changent. Contrat : `docs/contrat_api.md`, section \u00ab Changement d'adresse e-mail \u00bb.
+Tests replayed on 14/10/2026 with the Flask test client, on a copy of the database. The test account (`Testeur Changement`, id 37, password `MotDePasse1`) was created in this copy; with another database, the `id` and the "already used" address of case 16 change. Contract: `docs/contrat_api.md`, section "Changement d'adresse e-mail" (the section title is in French in that file).
 
-La demande (`POST /api/auth/email-change`) exige la session **et** le mot de passe actuel ; elle ne modifie pas la fiche, elle envoie un lien \u00e0 la **nouvelle** adresse. La confirmation (`POST /api/auth/email-change/confirm`) se fait sans session, avec le jeton du lien. Avec `MAIL_ENABLED=0`, le lien s'affiche dans le terminal du serveur : `[changement d'adresse] lien pour <adresse> : http://localhost:5173/confirmation-email?token=<jeton>`.
+The request (`POST /api/auth/email-change`) requires the session **and** the current password; it does not modify the record, it sends a link to the **new** address. The confirmation (`POST /api/auth/email-change/confirm`) is done without a session, with the token of the link. With `MAIL_ENABLED=0`, the link is printed in the server terminal: `[email change] link for <address>: http://localhost:5173/confirmation-email?token=<token>`.
 
-| N\u00b0 | Cas | Code attendu | Code obtenu |
+| No. | Case | Expected code | Obtained code |
 |----|-----|--------------|-------------|
-| 10 | demande sans session | 401 | 401 |
-| 11 | demande, corps qui n'est pas un objet JSON | 400 | 400 |
-| 12 | demande sans `email` | 400 | 400 |
-| 13 | demande avec un `email` sans `@` | 400 | 400 |
-| 14 | demande avec un mauvais mot de passe | 401 | 401 |
-| 15 | demande avec l'adresse actuelle (m\u00eame en majuscules) | 400 | 400 |
-| 16 | demande avec une adresse d\u00e9j\u00e0 pr\u00e9sente dans `people` | 409 | 409 |
-| 17 | demande valide | 202 | 202 |
-| 18 | confirmation sans `token` | 400 | 400 |
-| 19 | confirmation avec un jeton inconnu | 400 | 400 |
-| 20 | confirmation avec le bon jeton | 200 | 200 |
-| 21 | le m\u00eame jeton une deuxi\u00e8me fois | 400 | 400 |
-| 22 | deux demandes de suite : premier lien, puis second | 400 puis 200 | 400 puis 200 |
-| 23 | jeton expir\u00e9 | 400 | 400 |
-| 24 | adresse prise par une autre fiche entre la demande et le clic | 409 | 409 |
-| 25 | apr\u00e8s confirmation : login nouvelle adresse, puis ancienne | 200 puis 401 | 200 puis 401 |
-| 26 | `PATCH /api/auth/me` avec `email` | 400 | 400 |
+| 10 | request without session | 401 | 401 |
+| 11 | request, body that is not a JSON object | 400 | 400 |
+| 12 | request without `email` | 400 | 400 |
+| 13 | request with an `email` without `@` | 400 | 400 |
+| 14 | request with a wrong password | 401 | 401 |
+| 15 | request with the current address (even in capitals) | 400 | 400 |
+| 16 | request with an address already present in `people` | 409 | 409 |
+| 17 | valid request | 202 | 202 |
+| 18 | confirmation without `token` | 400 | 400 |
+| 19 | confirmation with an unknown token | 400 | 400 |
+| 20 | confirmation with the right token | 200 | 200 |
+| 21 | the same token a second time | 400 | 400 |
+| 22 | two requests in a row: first link, then second | 400 then 200 | 400 then 200 |
+| 23 | expired token | 400 | 400 |
+| 24 | address taken by another record between the request and the click | 409 | 409 |
+| 25 | after confirmation: login with the new address, then the old one | 200 then 401 | 200 then 401 |
+| 26 | `PATCH /api/auth/me` with `email` | 400 | 400 |
 
-V\u00e9rifications compl\u00e9mentaires, dans la base (`sqlite3 jobboard.db`) : apr\u00e8s le cas 17, `SELECT person_id, new_email, token_hash FROM pending_email_changes;` montre une ligne dont `token_hash` (64 caract\u00e8res hexad\u00e9cimaux) **n'est pas** le jeton du lien, et `SELECT email FROM people WHERE id = 37;` affiche **toujours l'ancienne** adresse. Apr\u00e8s le cas 20, la table `pending_email_changes` est vide et la fiche porte la nouvelle adresse. La r\u00e9ponse 202 du cas 17 ne contient jamais le jeton. Le `GET /api/auth/me` fait avec la session d'origine apr\u00e8s le cas 20 r\u00e9pond 200 avec la nouvelle adresse : la session reste ouverte.
+Additional checks, in the database (`sqlite3 jobboard.db`): after case 17, `SELECT person_id, new_email, token_hash FROM pending_email_changes;` shows a row whose `token_hash` (64 hexadecimal characters) is **not** the token of the link, and `SELECT email FROM people WHERE id = 37;` **still** shows the old address. After case 20, the table `pending_email_changes` is empty and the record carries the new address. The 202 response of case 17 never contains the token. The `GET /api/auth/me` made with the original session after case 20 answers 200 with the new address: the session stays open.
 
-Le compte de test a \u00e9t\u00e9 cr\u00e9\u00e9 avec le cas 1 (`register`), adapt\u00e9 : `{"first_name": "Testeur", "last_name": "Changement", "email": "test.change@example.com", "password": "MotDePasse1"}`.
+The test account was created with case 1 (`register`), adapted: `{"first_name": "Testeur", "last_name": "Changement", "email": "test.change@example.com", "password": "MotDePasse1"}`.
 
-## Cas 10 : demande sans session (attendu 401)
+## Case 10: request without session (expected 401)
 
-Commande :
+Command:
 
 ```bash
 curl -i -X POST http://localhost:5000/api/auth/email-change -H "Content-Type: application/json" -d '{"email": "nouvelle@example.com", "password": "MotDePasse1"}'
 ```
 
-Code obtenu : 401
+Status code: 401
 
-R\u00e9ponse :
+Response:
 
 ```json
 { "error": "Login required" }
 ```
 
 
-## Connexion du compte de test (attendu 200)
+## Login of the test account (expected 200)
 
-Les cas 11 \u00e0 17 utilisent le cookie de session enregistr\u00e9 ici.
+Cases 11 to 17 use the session cookie saved here.
 
-Commande :
+Command:
 
 ```bash
 curl -i -c cookies.txt -X POST http://localhost:5000/api/auth/login -H "Content-Type: application/json" -d '{"email": "test.change@example.com", "password": "MotDePasse1"}'
 ```
 
-Code obtenu : 200
+Status code: 200
 
 
-## Cas 11 : demande, corps qui n'est pas un objet JSON (attendu 400)
+## Case 11: request, body that is not a JSON object (expected 400)
 
-Commande :
+Command:
 
 ```bash
 curl -i -b cookies.txt -X POST http://localhost:5000/api/auth/email-change -H "Content-Type: application/json" -d '[]'
 ```
 
-Code obtenu : 400
+Status code: 400
 
-R\u00e9ponse :
+Response:
 
 ```json
 { "error": "JSON object expected" }
 ```
 
 
-## Cas 12 : demande sans email (attendu 400)
+## Case 12: request without email (expected 400)
 
-Commande :
+Command:
 
 ```bash
 curl -i -b cookies.txt -X POST http://localhost:5000/api/auth/email-change -H "Content-Type: application/json" -d '{"password": "MotDePasse1"}'
 ```
 
-Code obtenu : 400
+Status code: 400
 
-R\u00e9ponse :
+Response:
 
 ```json
 { "error": "Invalid field: email" }
 ```
 
 
-## Cas 13 : demande avec un email sans @ (attendu 400)
+## Case 13: request with an email without @ (expected 400)
 
-Commande :
+Command:
 
 ```bash
 curl -i -b cookies.txt -X POST http://localhost:5000/api/auth/email-change -H "Content-Type: application/json" -d '{"email": "nouvelle", "password": "MotDePasse1"}'
 ```
 
-Code obtenu : 400
+Status code: 400
 
-R\u00e9ponse :
+Response:
 
 ```json
 { "error": "Invalid field: email" }
 ```
 
 
-## Cas 14 : demande avec un mauvais mot de passe (attendu 401)
+## Case 14: request with a wrong password (expected 401)
 
-Le mot de passe est v\u00e9rifi\u00e9 **avant** l'adresse : avec une session vol\u00e9e mais sans le mot de passe, on ne peut m\u00eame pas savoir si une adresse est d\u00e9j\u00e0 dans la base (le 409 n'est jamais atteint).
+The password is checked **before** the address: with a stolen session but without the password, one cannot even know whether an address is already in the database (the 409 is never reached).
 
-Commande :
+Command:
 
 ```bash
 curl -i -b cookies.txt -X POST http://localhost:5000/api/auth/email-change -H "Content-Type: application/json" -d '{"email": "nouvelle@example.com", "password": "faux"}'
 ```
 
-Code obtenu : 401
+Status code: 401
 
-R\u00e9ponse :
+Response:
 
 ```json
 { "error": "Invalid credentials" }
 ```
 
 
-## Cas 15 : demande avec l'adresse actuelle (attendu 400)
+## Case 15: request with the current address (expected 400)
 
-L'adresse est compar\u00e9e apr\u00e8s `.strip().lower()` : `Test.Change@example.com` est bien l'adresse actuelle.
+The address is compared after `.strip().lower()`: `Test.Change@example.com` is indeed the current address.
 
-Commande :
+Command:
 
 ```bash
 curl -i -b cookies.txt -X POST http://localhost:5000/api/auth/email-change -H "Content-Type: application/json" -d '{"email": "Test.Change@example.com", "password": "MotDePasse1"}'
 ```
 
-Code obtenu : 400
+Status code: 400
 
-R\u00e9ponse :
+Response:
 
 ```json
 { "error": "Invalid value" }
 ```
 
 
-## Cas 16 : demande avec une adresse d\u00e9j\u00e0 pr\u00e9sente dans people (attendu 409)
+## Case 16: request with an address already present in people (expected 409)
 
-`claude.test@example.com` est une adresse d'une autre fiche de la base utilis\u00e9e pour le test ; prendre n'importe quelle adresse de `SELECT email FROM people;` qui n'est pas celle du compte de test.
+`claude.test@example.com` is an address of another record in the database used for the test; take any address from `SELECT email FROM people;` that is not the one of the test account.
 
-Commande :
+Command:
 
 ```bash
 curl -i -b cookies.txt -X POST http://localhost:5000/api/auth/email-change -H "Content-Type: application/json" -d '{"email": "claude.test@example.com", "password": "MotDePasse1"}'
 ```
 
-Code obtenu : 409
+Status code: 409
 
-R\u00e9ponse :
+Response:
 
 ```json
 { "error": "Email already used" }
 ```
 
 
-## Cas 17 : demande valide (attendu 202)
+## Case 17: valid request (expected 202)
 
-Commande :
+Command:
 
 ```bash
 curl -i -b cookies.txt -X POST http://localhost:5000/api/auth/email-change -H "Content-Type: application/json" -d '{"email": "nouvelle@example.com", "password": "MotDePasse1"}'
 ```
 
-Code obtenu : 202
+Status code: 202
 
-R\u00e9ponse :
+Response:
 
 ```json
 { "message": "Verification required" }
 ```
 
-Terminal du serveur (le jeton change \u00e0 chaque demande) :
+Server terminal (the token changes at every request):
 
 ```
-[mail d\u00e9sactiv\u00e9] \u00c0 : nouvelle@example.com | Sujet : Confirmez votre nouvelle adresse \u2014 Y.I.A Jobs
-[changement d'adresse] lien pour nouvelle@example.com : http://localhost:5173/confirmation-email?token=gjMpvMTs5rzYIxfuCEFC92c00MC91dqv-1vUobRb6Ro
+[mail disabled] To: nouvelle@example.com | Subject: Confirmez votre nouvelle adresse — Y.I.A Jobs
+[email change] link for nouvelle@example.com: http://localhost:5173/confirmation-email?token=gjMpvMTs5rzYIxfuCEFC92c00MC91dqv-1vUobRb6Ro
 ```
 
-Dans la base, juste apr\u00e8s : `pending_email_changes` contient `person_id = 37`, `new_email = nouvelle@example.com`, `token_hash = 6efab373\u2026e0be` (l'empreinte, pas le jeton) ; `people.email` de l'id 37 vaut toujours `test.change@example.com`.
+In the database, just after: `pending_email_changes` contains `person_id = 37`, `new_email = nouvelle@example.com`, `token_hash = 6efab373…e0be` (the fingerprint, not the token); `people.email` of id 37 is still `test.change@example.com`.
 
 
-## Cas 18 : confirmation sans token (attendu 400)
+## Case 18: confirmation without token (expected 400)
 
-Les cas 18 \u00e0 24 sont jou\u00e9s **sans cookie** : la confirmation ne demande pas de session.
+Cases 18 to 24 are played **without a cookie**: the confirmation does not require a session.
 
-Commande :
+Command:
 
 ```bash
 curl -i -X POST http://localhost:5000/api/auth/email-change/confirm -H "Content-Type: application/json" -d '{}'
 ```
 
-Code obtenu : 400
+Status code: 400
 
-R\u00e9ponse :
+Response:
 
 ```json
 { "error": "Invalid field: token" }
 ```
 
 
-## Cas 19 : confirmation avec un jeton inconnu (attendu 400)
+## Case 19: confirmation with an unknown token (expected 400)
 
-Commande :
+Command:
 
 ```bash
 curl -i -X POST http://localhost:5000/api/auth/email-change/confirm -H "Content-Type: application/json" -d '{"token": "pasunjeton"}'
 ```
 
-Code obtenu : 400
+Status code: 400
 
-R\u00e9ponse :
+Response:
 
 ```json
 { "error": "Invalid value" }
 ```
 
 
-## Cas 20 : confirmation avec le bon jeton (attendu 200)
+## Case 20: confirmation with the right token (expected 200)
 
-Le jeton est celui du lien affich\u00e9 au cas 17.
+The token is the one of the link shown in case 17.
 
-Commande :
+Command:
 
 ```bash
 curl -i -X POST http://localhost:5000/api/auth/email-change/confirm -H "Content-Type: application/json" -d '{"token": "gjMpvMTs5rzYIxfuCEFC92c00MC91dqv-1vUobRb6Ro"}'
 ```
 
-Code obtenu : 200
+Status code: 200
 
-R\u00e9ponse :
+Response:
 
 ```json
 {
@@ -451,57 +451,57 @@ R\u00e9ponse :
 }
 ```
 
-Dans la base, juste apr\u00e8s : `pending_email_changes` est vide ; `people.email` de l'id 37 vaut `nouvelle@example.com`. `GET /api/auth/me` avec `-b cookies.txt` r\u00e9pond 200 avec la nouvelle adresse : la session d'origine est toujours ouverte.
+In the database, just after: `pending_email_changes` is empty; `people.email` of id 37 is `nouvelle@example.com`. `GET /api/auth/me` with `-b cookies.txt` answers 200 with the new address: the original session is still open.
 
 
-## Cas 21 : le m\u00eame jeton une deuxi\u00e8me fois (attendu 400)
+## Case 21: the same token a second time (expected 400)
 
-Commande :
+Command:
 
 ```bash
 curl -i -X POST http://localhost:5000/api/auth/email-change/confirm -H "Content-Type: application/json" -d '{"token": "gjMpvMTs5rzYIxfuCEFC92c00MC91dqv-1vUobRb6Ro"}'
 ```
 
-Code obtenu : 400
+Status code: 400
 
-R\u00e9ponse :
-
-```json
-{ "error": "Invalid value" }
-```
-
-
-## Cas 22 : deux demandes de suite, premier lien puis second (attendu 400 puis 200)
-
-\u00c9tape 1 : deux demandes avec le cookie, pour `encore1@example.com` puis `encore2@example.com` (202 chacune, un lien par demande dans le terminal). `create` supprime la demande pr\u00e9c\u00e9dente de la m\u00eame personne : seul le second jeton existe encore en base.
-
-\u00c9tape 2 : confirmation avec le **premier** jeton (attendu 400).
-
-Commande :
-
-```bash
-curl -i -X POST http://localhost:5000/api/auth/email-change/confirm -H "Content-Type: application/json" -d '{"token": "<jeton du premier lien>"}'
-```
-
-Code obtenu : 400
-
-R\u00e9ponse :
+Response:
 
 ```json
 { "error": "Invalid value" }
 ```
 
-\u00c9tape 3 : confirmation avec le **second** jeton (attendu 200).
 
-Commande :
+## Case 22: two requests in a row, first link then second (expected 400 then 200)
+
+Step 1: two requests with the cookie, for `encore1@example.com` then `encore2@example.com` (202 each, one link per request in the terminal). `create` deletes the previous request of the same person: only the second token still exists in the database.
+
+Step 2: confirmation with the **first** token (expected 400).
+
+Command:
 
 ```bash
-curl -i -X POST http://localhost:5000/api/auth/email-change/confirm -H "Content-Type: application/json" -d '{"token": "<jeton du second lien>"}'
+curl -i -X POST http://localhost:5000/api/auth/email-change/confirm -H "Content-Type: application/json" -d '{"token": "<token of the first link>"}'
 ```
 
-Code obtenu : 200
+Status code: 400
 
-R\u00e9ponse :
+Response:
+
+```json
+{ "error": "Invalid value" }
+```
+
+Step 3: confirmation with the **second** token (expected 200).
+
+Command:
+
+```bash
+curl -i -X POST http://localhost:5000/api/auth/email-change/confirm -H "Content-Type: application/json" -d '{"token": "<token of the second link>"}'
+```
+
+Status code: 200
+
+Response:
 
 ```json
 {
@@ -515,67 +515,67 @@ R\u00e9ponse :
 ```
 
 
-## Cas 23 : jeton expir\u00e9 (attendu 400)
+## Case 23: expired token (expected 400)
 
-Une demande pour `encore3@example.com` (202), puis la ligne est vieillie \u00e0 la main dans la base pour ne pas attendre 24 heures :
+A request for `encore3@example.com` (202), then the row is aged by hand in the database so as not to wait 24 hours:
 
 ```sql
 UPDATE pending_email_changes SET expires_at = datetime('now', '-1 minute');
 ```
 
-Commande :
+Command:
 
 ```bash
-curl -i -X POST http://localhost:5000/api/auth/email-change/confirm -H "Content-Type: application/json" -d '{"token": "<jeton du lien>"}'
+curl -i -X POST http://localhost:5000/api/auth/email-change/confirm -H "Content-Type: application/json" -d '{"token": "<token of the link>"}'
 ```
 
-Code obtenu : 400
+Status code: 400
 
-R\u00e9ponse :
+Response:
 
 ```json
 { "error": "Invalid value" }
 ```
 
 
-## Cas 24 : adresse prise par une autre fiche entre la demande et le clic (attendu 409)
+## Case 24: address taken by another record between the request and the click (expected 409)
 
-Une demande pour `prise.entre.temps@example.com` (202), puis une autre fiche prend cette adresse avant le clic (ici directement dans la base ; un `register` avec cette adresse ferait pareil) :
+A request for `prise.entre.temps@example.com` (202), then another record takes this address before the click (here directly in the database; a `register` with this address would do the same):
 
 ```sql
 INSERT INTO people (first_name, last_name, email) VALUES ('Autre', 'Personne', 'prise.entre.temps@example.com');
 ```
 
-Commande :
+Command:
 
 ```bash
-curl -i -X POST http://localhost:5000/api/auth/email-change/confirm -H "Content-Type: application/json" -d '{"token": "<jeton du lien>"}'
+curl -i -X POST http://localhost:5000/api/auth/email-change/confirm -H "Content-Type: application/json" -d '{"token": "<token of the link>"}'
 ```
 
-Code obtenu : 409
+Status code: 409
 
-R\u00e9ponse :
+Response:
 
 ```json
 { "error": "Email already used" }
 ```
 
 
-## Cas 25 : apr\u00e8s confirmation, login nouvelle adresse puis ancienne (attendu 200 puis 401)
+## Case 25: after confirmation, login with the new address then the old one (expected 200 then 401)
 
-Apr\u00e8s le cas 22, l'adresse du compte est `encore2@example.com`.
+After case 22, the address of the account is `encore2@example.com`.
 
-\u00c9tape 1 : connexion avec la nouvelle adresse et le m\u00eame mot de passe (attendu 200).
+Step 1: login with the new address and the same password (expected 200).
 
-Commande :
+Command:
 
 ```bash
 curl -i -X POST http://localhost:5000/api/auth/login -H "Content-Type: application/json" -d '{"email": "encore2@example.com", "password": "MotDePasse1"}'
 ```
 
-Code obtenu : 200
+Status code: 200
 
-R\u00e9ponse :
+Response:
 
 ```json
 {
@@ -588,52 +588,52 @@ R\u00e9ponse :
 }
 ```
 
-\u00c9tape 2 : connexion avec l'ancienne adresse (attendu 401).
+Step 2: login with the old address (expected 401).
 
-Commande :
+Command:
 
 ```bash
 curl -i -X POST http://localhost:5000/api/auth/login -H "Content-Type: application/json" -d '{"email": "test.change@example.com", "password": "MotDePasse1"}'
 ```
 
-Code obtenu : 401
+Status code: 401
 
-R\u00e9ponse :
+Response:
 
 ```json
 { "error": "Invalid credentials" }
 ```
 
 
-## Cas 26 : PATCH /api/auth/me avec email (attendu 400)
+## Case 26: PATCH /api/auth/me with email (expected 400)
 
-Le changement d'adresse ne passe jamais par `PATCH /api/auth/me` : la seule voie reste la demande puis la confirmation.
+The address change never goes through `PATCH /api/auth/me`: the only way remains the request then the confirmation.
 
-Commande :
+Command:
 
 ```bash
 curl -i -b cookies.txt -X PATCH http://localhost:5000/api/auth/me -H "Content-Type: application/json" -d '{"email": "x@y.z"}'
 ```
 
-Code obtenu : 400
+Status code: 400
 
-R\u00e9ponse :
+Response:
 
 ```json
 { "error": "Unknown field: email" }
 ```
 
-Étape 2 : connexion avec l'email en minuscules (attendu 200).
+Step 2: login with the email in lowercase (expected 200).
 
-Commande :
+Command:
 
 ```bash
 curl -i -X POST http://localhost:5000/api/auth/login -H "Content-Type: application/json" -d '{"email": "test@example.com", "password": "motdepasse1"}'
 ```
 
-Code obtenu : 200
+Status code: 200
 
-Réponse :
+Response:
 
 ```json
 {

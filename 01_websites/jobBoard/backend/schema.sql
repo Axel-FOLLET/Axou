@@ -1,4 +1,4 @@
---suppression des tables si elles existent déjà dans la base de données. Sinon on passe à la suite.
+-- drop the tables if they already exist in the database. Otherwise move on.
 DROP TABLE IF EXISTS application_cvs;
 DROP TABLE IF EXISTS person_cvs;
 DROP TABLE IF EXISTS pending_email_changes;
@@ -9,19 +9,19 @@ DROP TABLE IF EXISTS people;
 DROP TABLE IF EXISTS categories;
 DROP TABLE IF EXISTS companies;
 
--- créations des tables (=tableaux) selon les différentes catégories du jobBoard. On indique les headers qu'on veut.
+-- create the tables according to the different categories of the jobBoard. The columns we want are listed.
 CREATE TABLE companies (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT NOT NULL,
   description TEXT,
   location TEXT,
   website TEXT,
-  -- SIREN : texte de 9 chiffres (garde les zéros du début) ; NULL pour une ancienne fiche à compléter
+  -- SIREN: 9-digit text (keeps the leading zeros); NULL for an old record still to be completed
   siren TEXT CHECK (siren IS NULL OR (length(siren) = 9 AND siren NOT GLOB '*[^0-9]*'))
 );
 
--- Un SIREN renseigné n'apparaît qu'une fois (plusieurs NULL restent possibles).
--- Même index que celui créé par migrate_siren.py sur une base existante.
+-- A SIREN that is filled in appears only once (several NULLs remain possible).
+-- Same index as the one created by migrate_siren.py on an existing database.
 CREATE UNIQUE INDEX companies_siren_unique ON companies(siren);
 
 CREATE TABLE categories (
@@ -37,7 +37,7 @@ CREATE TABLE people (
   phone TEXT,
   password_hash TEXT,
   role TEXT NOT NULL DEFAULT 'user' CHECK (role IN ('user', 'admin')),
-  -- entreprise du recruteur ; NULL par défaut : la personne n'est pas recruteur
+  -- the recruiter's company; NULL by default: the person is not a recruiter
   company_id INTEGER REFERENCES companies(id) ON DELETE RESTRICT
 );
 
@@ -74,10 +74,10 @@ CREATE TABLE applications (
   FOREIGN KEY (person_id) REFERENCES people(id) ON DELETE RESTRICT);
   
 
--- Inscription en attente : une personne déjà dans people sans mot de passe crée son compte.
--- Rien n’est appliqué à sa fiche avant le clic sur le lien envoyé à son adresse.
--- Seule l’empreinte SHA-256 du jeton est gardée ; le lien vaut 24 heures et ne sert qu’une fois.
--- Même définition que pending_registrations.py, qui crée la table sur une base déjà en place.
+-- Pending registration: a person already in people without a password creates their account.
+-- Nothing is applied to their record before the click on the link sent to their address.
+-- Only the SHA-256 fingerprint of the token is kept; the link is valid for 24 hours and works once.
+-- Same definition as pending_registrations.py, which creates the table on an existing database.
 CREATE TABLE pending_registrations (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   person_id INTEGER NOT NULL UNIQUE,
@@ -91,10 +91,10 @@ CREATE TABLE pending_registrations (
   FOREIGN KEY (person_id) REFERENCES people(id) ON DELETE CASCADE
 );
 
--- CV en PDF (2 Mo maximum), gardés dans la base. person_cvs : le CV du profil (espace candidat),
--- un seul par personne. application_cvs : la copie jointe à une candidature ; elle ne change pas
--- si le candidat remplace ensuite le CV de son profil.
--- Même définition que application_cvs.py, qui crée les tables sur une base déjà en place.
+-- PDF CVs (2 MB maximum), kept in the database. person_cvs: the profile CV (candidate area),
+-- one per person. application_cvs: the copy attached to an application; it does not change
+-- if the candidate later replaces the CV on their profile.
+-- Same definition as application_cvs.py, which creates the tables on an existing database.
 CREATE TABLE person_cvs (
   person_id INTEGER PRIMARY KEY,
   filename TEXT NOT NULL,
@@ -111,11 +111,11 @@ CREATE TABLE application_cvs (
   FOREIGN KEY (application_id) REFERENCES applications(id) ON DELETE CASCADE
 );
 
--- Changement d’adresse e-mail en attente : la personne a demandé une nouvelle adresse
--- (avec son mot de passe), mais n’a pas encore ouvert le lien envoyé à cette nouvelle adresse.
--- La fiche people n’est modifiée qu’à la confirmation. Mêmes règles que pending_registrations :
--- empreinte SHA-256 du jeton seulement, lien valable 24 heures, une seule demande par personne.
--- Même définition que pending_email_changes.py, qui crée la table sur une base déjà en place.
+-- Pending email address change: the person asked for a new address (with their password),
+-- but has not yet opened the link sent to this new address.
+-- The people record is modified only at confirmation. Same rules as pending_registrations:
+-- SHA-256 fingerprint of the token only, link valid for 24 hours, one request per person.
+-- Same definition as pending_email_changes.py, which creates the table on an existing database.
 CREATE TABLE pending_email_changes (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   person_id INTEGER NOT NULL UNIQUE,

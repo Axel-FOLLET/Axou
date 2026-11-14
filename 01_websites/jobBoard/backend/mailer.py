@@ -1,15 +1,15 @@
-"""Envoi des vrais emails du Job Board (accusé de réception, retenue, refus).
+"""Sending of the real Job Board emails (acknowledgement, acceptance, rejection).
 
-Les réglages viennent de .env (jamais du code) :
-    MAIL_ENABLED=1                 # 0 ou absent : rien n'est envoyé, le message s'affiche dans le terminal
+The settings come from .env (never from the code):
+    MAIL_ENABLED=1                 # 0 or absent: nothing is sent, the message is printed in the terminal
     SMTP_HOST=smtp.gmail.com
     SMTP_PORT=587
-    SMTP_USER=adresse@example.com  # le compte d'envoi de l'équipe, seulement dans .env
-    SMTP_PASSWORD=...              # seulement dans .env
-    MAIL_FROM=adresse@example.com
+    SMTP_USER=address@example.com  # the team's sending account, only in .env
+    SMTP_PASSWORD=...              # only in .env
+    MAIL_FROM=address@example.com
 
-Règle importante : un email qui échoue ne doit jamais faire échouer la candidature ni la clôture.
-Les fonctions renvoient donc True ou False, et ne lèvent jamais d'exception.
+Important rule: an email that fails must never make the application or the closure fail.
+The functions therefore return True or False, and never raise an exception.
 """
 import os
 import smtplib
@@ -17,9 +17,9 @@ from email.message import EmailMessage
 
 
 def send_email(to, subject, body):
-    """Envoie un email texte. Renvoie True si l'envoi a réussi, False sinon."""
+    """Sends a plain-text email. Returns True if it was sent, False otherwise."""
     if os.environ.get("MAIL_ENABLED") != "1":
-        print(f"[mail désactivé] À : {to} | Sujet : {subject}")
+        print(f"[mail disabled] To: {to} | Subject: {subject}")
         return False
 
     msg = EmailMessage()
@@ -35,13 +35,13 @@ def send_email(to, subject, body):
             smtp.login(os.environ["SMTP_USER"], os.environ["SMTP_PASSWORD"])
             smtp.send_message(msg)
         return True
-    except Exception as err:  # réseau, identifiants, réglage manquant : on note et on continue
-        print(f"[mail non envoyé] À : {to} | {type(err).__name__} : {err}")
+    except Exception as err:  # network, credentials, missing setting: log it and carry on
+        print(f"[mail not sent] To: {to} | {type(err).__name__}: {err}")
         return False
 
 
 def notify_application_received(conn, application_id):
-    """Accusé de réception, juste après la création d'une candidature."""
+    """Acknowledgement of receipt, right after an application is created."""
     row = conn.execute(
         """SELECT people.email, people.first_name, ads.title, companies.name AS company
            FROM applications
@@ -63,7 +63,7 @@ def notify_application_received(conn, application_id):
     )
     sent = send_email(row["email"], f"Candidature reçue : {row['title']}", body)
 
-    # Envoi réussi : on note quand l'accusé de réception est parti
+    # Sent successfully: record when the acknowledgement went out
     if sent:
         conn.execute(
             "UPDATE applications SET receipt_email_sent_at = datetime('now') WHERE id = ?",
@@ -74,7 +74,7 @@ def notify_application_received(conn, application_id):
     return sent
 
 def rejection_text(title, company):
-    """Texte du « non retenu », le même à la clôture et au refus d'une seule candidature."""
+    """Text of the "not selected" message, the same at closure and when a single application is rejected."""
     return (
         f"Nous vous remercions pour votre candidature à l'annonce « {title} ».\n"
         f"L'équipe de {company} n'a pas donné suite à votre candidature. N'hésitez pas à consulter nos autres offres d'emploi sur le site carrière Y.I.A Jobs."
@@ -82,9 +82,9 @@ def rejection_text(title, company):
 
 
 def notify_closure(conn, ad_id):
-    """Après la clôture d'une annonce : un email au candidat retenu, un email à chaque candidat refusé.
-    Les candidats déjà prévenus (refus d'une seule candidature, decision_email_sent_at rempli) ne reçoivent rien.
-    Renvoie le nombre d'emails envoyés."""
+    """After an ad is closed: one email to the accepted candidate, one email to each rejected candidate.
+    Candidates already notified (single-application rejection, decision_email_sent_at filled in) receive nothing.
+    Returns the number of emails sent."""
     rows = conn.execute(
         """SELECT people.email, people.first_name, applications.status, ads.title, companies.name AS company, applications.id
            FROM applications
@@ -109,7 +109,7 @@ def notify_closure(conn, ad_id):
             continue
         body = f"Bonjour {row['first_name']},\n\n{text}\n\nCordialement,\nL'équipe Y.I.A Jobs"
 
-        # Envoi réussi : on compte l'email et on note quand la réponse est partie
+        # Sent successfully: count the email and record when the answer went out
         if send_email(row["email"], subject, body):
             sent += 1
             conn.execute(
@@ -117,13 +117,13 @@ def notify_closure(conn, ad_id):
                 (row["id"],),
             )
 
-    # Un seul commit pour toutes les dates de la boucle
+    # A single commit for all the dates set in the loop
     conn.commit()
     return sent
 
 
 def notify_rejection(conn, application_id):
-    """Refus d'une seule candidature, annonce encore ouverte : un email « non retenu » à ce candidat."""
+    """Rejection of a single application, ad still open: a "not selected" email to this candidate."""
     row = conn.execute(
         """SELECT people.email, people.first_name, ads.title, companies.name AS company
            FROM applications
@@ -139,7 +139,7 @@ def notify_rejection(conn, application_id):
     body = f"Bonjour {row['first_name']},\n\n{rejection_text(row['title'], row['company'])}\n\nCordialement,\nL'équipe Y.I.A Jobs"
     sent = send_email(row["email"], f"Information concernant votre candidature : {row['title']}", body)
 
-    # Envoi réussi : on note quand la réponse est partie (la clôture ne lui écrira plus)
+    # Sent successfully: record when the answer went out (the closure will not write to them again)
     if sent:
         conn.execute(
             "UPDATE applications SET decision_email_sent_at = datetime('now') WHERE id = ?",
@@ -151,12 +151,12 @@ def notify_rejection(conn, application_id):
 
 
 def send_verification_link(to, first_name, token):
-    """Lien de vérification d'une inscription mise en attente.
+    """Verification link for a pending registration.
 
-    Le lien n'est écrit dans le journal du serveur que si l'envoi est désactivé
-    (MAIL_ENABLED différent de "1", en développement) : la procédure reste testable
-    sans SMTP. Si l'envoi est activé mais échoue, le lien n'est écrit nulle part.
-    Il ne sort jamais dans la réponse HTTP.
+    The link is written to the server log only if sending is disabled
+    (MAIL_ENABLED different from "1", in development): the procedure stays testable
+    without SMTP. If sending is enabled but fails, the link is written nowhere.
+    It never appears in the HTTP response.
     """
     base_url = os.environ.get("APP_BASE_URL", "http://localhost:5173")
     link = f"{base_url}/verification?token={token}"
@@ -176,16 +176,16 @@ def send_verification_link(to, first_name, token):
     sent = send_email(to, "Confirmez votre adresse — Y.I.A Jobs", body)
 
     if not sent and os.environ.get("MAIL_ENABLED") != "1":
-        print(f"[vérification] lien pour {to} : {link}")
+        print(f"[verification] link for {to}: {link}")
 
     return sent
 
 
 def send_email_change_link(to, first_name, token):
-    """Lien de confirmation d'un changement d'adresse, envoyé à la NOUVELLE adresse.
+    """Confirmation link for an address change, sent to the NEW address.
 
-    Mêmes règles que send_verification_link : le lien n'est écrit dans le journal du
-    serveur que si l'envoi est désactivé, et il ne sort jamais dans la réponse HTTP.
+    Same rules as send_verification_link: the link is written to the server log
+    only if sending is disabled, and it never appears in the HTTP response.
     """
     base_url = os.environ.get("APP_BASE_URL", "http://localhost:5173")
     link = f"{base_url}/confirmation-email?token={token}"
@@ -204,6 +204,6 @@ def send_email_change_link(to, first_name, token):
     sent = send_email(to, "Confirmez votre nouvelle adresse — Y.I.A Jobs", body)
 
     if not sent and os.environ.get("MAIL_ENABLED") != "1":
-        print(f"[changement d'adresse] lien pour {to} : {link}")
+        print(f"[email change] link for {to}: {link}")
 
     return sent

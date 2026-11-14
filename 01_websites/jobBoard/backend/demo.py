@@ -1,11 +1,11 @@
-"""Mode démo (DEMO_MODE=1) : trois comptes de démonstration et une route qui ouvre
-leur session.
+"""Demo mode (DEMO_MODE=1): three demonstration accounts and a route that opens
+their session.
 
-Le portfolio pointe sur GET /api/demo/login?role=candidat|recruteur|admin : la
-session s'ouvre, puis le navigateur est redirigé vers l'espace correspondant.
-Avec &lang=fr ou &lang=en (liens du portfolio), l'interface s'ouvre dans cette langue.
-Les mots de passe sont tirés au hasard à chaque démarrage : ces comptes ne se
-connectent que par cette route. Hors mode démo, rien n'est enregistré.
+The portfolio points to GET /api/demo/login?role=candidat|recruteur|admin: the
+session is opened, then the browser is redirected to the matching area.
+With &lang=fr or &lang=en (portfolio links), the interface opens in that language.
+The passwords are drawn at random at every start: these accounts can only be
+logged into through this route. Outside demo mode, nothing is created.
 """
 import secrets
 import sqlite3
@@ -17,7 +17,7 @@ from db import get_db
 
 demo = Blueprint("demo", __name__)
 
-# rôle demandé -> adresse, prénom, nom, page d'arrivée
+# requested role -> email, first name, last name, landing page
 ACCOUNTS = {
     "candidat": ("demo.candidat@example.com", "Camille", "Démo", "/"),
     "recruteur": ("demo.recruteur@example.com", "Robin", "Démo", "/recruteur"),
@@ -26,7 +26,7 @@ ACCOUNTS = {
 
 
 def ensure_demo_accounts():
-    """Crée les trois comptes s'ils manquent (appelé au démarrage de l'API)."""
+    """Creates the three accounts if they are missing (called when the API starts)."""
     conn = get_db()
     try:
         for role, (email, first_name, last_name, _) in ACCOUNTS.items():
@@ -38,7 +38,7 @@ def ensure_demo_accounts():
                 role="admin" if role == "admin" else "user",
             )
             if role == "recruteur":
-                # rattaché à l'entreprise qui a le plus d'annonces
+                # attached to the company that has the most ads
                 company = conn.execute(
                     """SELECT company_id FROM ads
                        GROUP BY company_id ORDER BY COUNT(*) DESC, company_id LIMIT 1"""
@@ -47,7 +47,7 @@ def ensure_demo_accounts():
                     conn.execute("UPDATE people SET company_id = ? WHERE id = ?",
                                  (company["company_id"], person_id))
             elif role == "candidat":
-                # deux candidatures, pour que « Mes candidatures » ait un contenu
+                # two applications, so that "My applications" has some content
                 for ad in conn.execute(
                     "SELECT id FROM ads WHERE status = 'open' ORDER BY created_at DESC, id DESC LIMIT 2"
                 ).fetchall():
@@ -56,9 +56,9 @@ def ensure_demo_accounts():
                         (ad["id"], person_id, "Bonjour, candidature de démonstration."),
                     )
             conn.commit()
-        print("[démo] comptes prêts : " + ", ".join(ACCOUNTS))
+        print("[demo] accounts ready: " + ", ".join(ACCOUNTS))
     except sqlite3.OperationalError as error:
-        print(f"[démo] comptes non créés ({error}) : lancer init_db.py d'abord")
+        print(f"[demo] accounts not created ({error}): run init_db.py first")
     finally:
         conn.close()
 
@@ -76,7 +76,7 @@ def demo_login():
         return jsonify({"error": "Demo account missing"}), 503
     session.clear()
     session["user_id"] = row["id"]
-    # ?lang=fr|en transmis à la page d'arrivée : le front (LangProvider) le lit et affiche cette langue.
+    # ?lang=fr|en is passed on to the landing page: the front end (LangProvider) reads it and shows that language.
     lang = request.args.get("lang")
     if lang in ("fr", "en"):
         landing += f"?lang={lang}"

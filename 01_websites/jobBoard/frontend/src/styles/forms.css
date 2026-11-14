@@ -1,6 +1,6 @@
-/* Formulaires : cadre, libellés, champs et messages de validation. */
+/* Forms: frame, labels, fields and validation messages. */
 
-/* Présentation commune des formulaires : carte blanche détachée par un trait fin, sans ombre. */
+/* Common form presentation: white card set apart by a thin line, no shadow. */
 form {
   display: flex;
   flex-direction: column;
@@ -11,7 +11,7 @@ form {
   padding: 32px;
 }
 
-/* Libellés au-dessus des champs. */
+/* Labels above the fields. */
 form label {
   display: flex;
   flex-direction: column;
@@ -20,7 +20,7 @@ form label {
   font-weight: 500;
 }
 
-/* Champs de saisie et listes déroulantes. */
+/* Input fields and drop-down lists. */
 input, textarea, select {
   width: 100%;
   min-width: 0;
@@ -33,43 +33,43 @@ input, textarea, select {
   transition: border-color .2s;
 }
 
-/* Survol d'un champ disponible. */
+/* Hover of an available field. */
 input:hover:not(:disabled), textarea:hover:not(:disabled), select:hover:not(:disabled) {
   border-color: var(--color-blue-deep);
 }
 
-/* Zone de message redimensionnable verticalement. */
+/* Message area resizable vertically. */
 textarea {
   min-height: 140px;
   resize: vertical;
 }
 
-/* Champ temporairement verrouillé. */
+/* Temporarily locked field. */
 input:disabled, textarea:disabled, select:disabled {
   background: var(--color-neutral);
   color: var(--color-text-secondary);
 }
 
-/* Champ affiché sans être modifiable (adresse e-mail, SIREN). */
+/* Field displayed without being editable (email address, SIREN). */
 input[readonly] {
   background: var(--color-neutral);
   color: var(--color-text-secondary);
 }
 
-/* Messages de validation dans les formulaires. */
+/* Validation messages in forms. */
 form label + p, form div > input + p, form [role="alert"] {
   color: var(--color-danger);
   font-size: 14px;
   margin: 0;
 }
 
-/* Résultat de l'envoi annoncé dans le formulaire. */
+/* Result of the sending announced in the form. */
 form [aria-live] p:not(.visually-hidden) {
   margin: 0;
 }
 
-/* Formulaires des espaces candidat et recruteur : sans carte, deux colonnes, largeur de lecture.
-   Les champs courts vont par paires ; .field-wide (descriptions) et les groupes prennent toute la ligne. */
+/* Forms of the candidate and recruiter areas: no card, two columns, reading width.
+   Short fields go in pairs; .field-wide (descriptions) and the groups take the whole line. */
 .form-columns {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -86,7 +86,7 @@ form [aria-live] p:not(.visually-hidden) {
   grid-column: 1 / -1;
 }
 
-/* Groupe nommé (« Le poste », « Conditions ») : sa propre grille, sous un petit intertitre et un trait fin. */
+/* Named group ("The position", "Terms"): its own grid, under a small subheading and a thin line. */
 .form-columns fieldset {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -110,12 +110,12 @@ form [aria-live] p:not(.visually-hidden) {
   text-transform: uppercase;
 }
 
-/* Descriptions moins hautes dans ces formulaires : elles s'agrandissent à la main si besoin. */
+/* Shorter descriptions in these forms: they can be enlarged by hand if needed. */
 .form-columns textarea {
   min-height: 110px;
 }
 
-/* Boutons d'envoi collés au bas de l'écran tant que le formulaire est visible : plus besoin de les chercher. */
+/* Submit buttons stuck to the bottom of the screen while the form is visible: no need to look for them. */
 .form-actions {
   grid-column: 1 / -1;
   position: sticky;
@@ -129,7 +129,7 @@ form [aria-live] p:not(.visually-hidden) {
   border-top: 1px solid var(--color-line);
 }
 
-/* Phrase en bas d'un formulaire dont l'envoi n'est pas encore ouvert : sous un trait fin, à la place des boutons. */
+/* Sentence at the bottom of a form whose sending is not open yet: under a thin line, in place of the buttons. */
 .form-note {
   margin: 0;
   padding-top: 16px;
@@ -138,7 +138,7 @@ form [aria-live] p:not(.visually-hidden) {
   font-size: 14px;
 }
 
-/* Formulaires moins espacés sur téléphone ; les paires repassent sur une seule colonne. */
+/* Less spaced forms on phones; the pairs go back to a single column. */
 @media (max-width: 600px) {
   form {
     padding: 20px;

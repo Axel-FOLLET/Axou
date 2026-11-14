@@ -1,0 +1,139 @@
+/* -------------------- SECTIONS -------------------- */
+
+/*
+    Page sections shared by all pages (taken from the portfolio): margins, eyebrow, big heading, introduction,
+    dark section and reveal on scroll (reveal.js). The colours come from the page theme.
+*/
+.section {
+    position: relative;
+
+    padding: var(--space-section) var(--gutter);
+}
+
+
+/* Breathing-room section: near-black, the page colour stays only on the accents and the cards */
+.section--dark {
+    background-color: var(--ink);
+}
+
+
+/* Contact me: the section lets through the blue and red glows of the black pages, set on <body> (base.css) */
+[data-theme="contact"] .section--dark {
+    background-color: var(--clear);
+}
+
+
+/*
+    Two dark sections in a row (Progress then Projects): without a background change,
+    their two margins added up (320 px on desktop). The second one starts closer.
+*/
+.section--dark + .section--dark {
+    padding-top: calc(var(--space-section) / 2);
+}
+
+
+/* Eyebrow (label style in base.css) */
+.section__eyebrow {
+    margin: 0 0 20px;
+}
+
+
+/* Eyebrow in the accent readable on the near-black: light blue, light red, white on the black pages */
+.section--dark .section__eyebrow {
+    color: var(--accent-text);
+}
+
+
+/* Big heading in the display serif, slightly enlarged: this serif is narrower than Manrope */
+.section__title {
+    max-width: 18ch;
+
+    margin: 0 0 28px;
+
+    font-family: var(--font-display);
+    font-size: calc(var(--text-title) * 1.15);
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: -0.01em;
+
+    /* Lines of similar length: no lone word on the last one */
+    text-wrap: balance;
+}
+
+
+/* One key word per big heading, in the italic of the serif (surname on the home page) */
+.hero__title em,
+.section__title em {
+    font-style: italic;
+}
+
+
+/* About 60 characters per line: a comfortable reading length */
+.section__intro {
+    max-width: 60ch;
+
+    margin: 0 0 56px;
+
+    font-size: var(--text-lead);
+    line-height: 1.55;
+}
+
+
+.section--dark .section__intro {
+    color: var(--muted);
+}
+
+
+/* Key words of the introduction: in white, they stand out from the grey */
+.section--dark .section__intro strong {
+    color: var(--white);
+
+    font-weight: 700;
+}
+
+
+/* -------------------- REVEAL ON SCROLL -------------------- */
+
+/*
+    Classes added by reveal.js. translate: none on arrival rather than 0:
+    the section becomes an ordinary element again, with no new reference for its children.
+    Fade and 24 px rise in 0.65 s (--dur-reveal, tokens.css).
+*/
+.reveal {
+    opacity: 0;
+    translate: 0 24px;
+
+    transition:
+        opacity var(--dur-reveal) var(--ease-out),
+        translate var(--dur-reveal) var(--ease-out);
+}
+
+
+.reveal--visible {
+    opacity: 1;
+    translate: none;
+}
+
+
+/*
+    A single entrance per block: the big headings already rise word by word under their mask (motion.js, motion.css),
+    the ruled rows (method, fields) draw themselves then descend. reveal.js does not also fade them in,
+    otherwise the heading would stay pale during its rise.
+*/
+.reveal:is(.section__title, :has(.method__item, .domains__item)) {
+    opacity: 1;
+    translate: none;
+}
+
+
+/* reveal.js sets no class with reduced motion; this rule guarantees that no fade remains */
+@media (prefers-reduced-motion: reduce) {
+
+    .reveal {
+        opacity: 1;
+        translate: none;
+
+        transition: none;
+    }
+
+}

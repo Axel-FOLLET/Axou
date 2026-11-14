@@ -1,8 +1,8 @@
-/* Accueil (HomePage.jsx) et haut de la page des offres (JobBoardPage.jsx) : grand titre,
-   barre de recherche avec ses filtres (components/SearchBar.jsx), et les offres récentes à sa droite.
-   Aucun encadré : l'espace sépare les blocs, un trait fin seulement là où il guide l'œil. */
+/* Home (HomePage.jsx) and top of the offers page (JobBoardPage.jsx): main title,
+   search bar with its filters (components/SearchBar.jsx), and the recent offers on its right.
+   No frame: space separates the blocks, a thin line only where it guides the eye. */
 
-/* Grand titre, uni et sans effet, précédé d'un grand vide qui grandit avec la hauteur de l'écran. */
+/* Main title, plain and without effect, preceded by a large empty space that grows with the screen height. */
 .home-title {
   max-width: 880px;
   margin: clamp(48px, 14vh, 144px) 0 56px;
@@ -12,7 +12,7 @@
   letter-spacing: -0.03em;
 }
 
-/* Recherche à gauche (deux tiers), offres récentes à droite (un tiers), sur la même ligne. */
+/* Search on the left (two thirds), recent offers on the right (one third), on the same line. */
 .home-row {
   display: grid;
   grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
@@ -21,7 +21,7 @@
   margin-bottom: 64px;
 }
 
-/* Formulaire de recherche sans carte : il ne reprend pas l'habillage des autres formulaires (forms.css). */
+/* Search form without a card: it does not take the styling of the other forms (forms.css). */
 .home-search {
   margin: 0;
   padding: 0;
@@ -31,13 +31,13 @@
   gap: 12px;
 }
 
-/* Page des offres : recherche de largeur lisible, puis les résultats. */
+/* Offers page: search of readable width, then the results. */
 .offers-page .home-search {
   max-width: 720px;
   margin-bottom: 40px;
 }
 
-/* Nombre de résultats, discret, au-dessus de la grille. */
+/* Number of results, discreet, above the grid. */
 .results-count {
   color: var(--color-text-secondary);
   font-size: 14px;
@@ -48,8 +48,8 @@
   display: block;
 }
 
-/* Cadre de saisie, habillé comme les autres champs : il contient le champ et la flèche, et sa hauteur suit celle du texte.
-   La flèche reste en bas quand le texte passe sur plusieurs lignes. */
+/* Input frame, styled like the other fields: it contains the field and the arrow, and its height follows that of the text.
+   The arrow stays at the bottom when the text wraps onto several lines. */
 .home-search-box {
   display: flex;
   align-items: flex-end;
@@ -61,8 +61,8 @@
   transition: border-color .2s, background-color .2s;
 }
 
-/* Le champ n'a plus de cadre à lui : il démarre à une ligne, grandit ligne par ligne, puis défile au-delà de six.
-   min-height remet à zéro les 140 px imposés à tous les textarea dans forms.css, sinon il démarrerait à cette hauteur. */
+/* The field no longer has its own frame: it starts at one line, grows line by line, then scrolls beyond six.
+   min-height resets the 140 px imposed on every textarea in forms.css, otherwise it would start at that height. */
 .home-search-box textarea {
   flex: 1 1 auto;
   min-width: 0;
@@ -78,7 +78,7 @@
   max-height: 180px;
 }
 
-/* Le contour de focus est porté par le cadre entier, pas par le champ seul. */
+/* The focus outline is carried by the whole frame, not by the field alone. */
 .home-search-box textarea:focus-visible {
   outline: none;
   box-shadow: none;
@@ -93,7 +93,7 @@
   box-shadow: 0 0 0 4px var(--color-blue-halo);
 }
 
-/* Flèche posée au bas du cadre, pour pousser la recherche. */
+/* Arrow placed at the bottom of the frame, to trigger the search. */
 .home-search-submit {
   flex: 0 0 auto;
   display: inline-flex;
@@ -105,7 +105,7 @@
   border-radius: var(--radius-control);
 }
 
-/* Bouton hamburger des filtres : dans le cadre, à gauche de la flèche, sans contour pour ne pas faire deux boutons. */
+/* Hamburger button of the filters: inside the frame, left of the arrow, without outline so as not to make two buttons. */
 .filters-toggle {
   position: relative;
   flex: 0 0 auto;
@@ -121,19 +121,19 @@
   border-radius: var(--radius-control);
 }
 
-/* Les icônes dessinées (SearchBar.jsx) ne captent pas le clic, qui revient au bouton. */
+/* The drawn icons (SearchBar.jsx) do not capture the click, which goes back to the button. */
 .home-search-submit svg, .filters-toggle svg {
   display: block;
   pointer-events: none;
 }
 
-/* Survol et ouverture : texte foncé sur fond bleu très pâle. */
+/* Hover and open: dark text on a very pale blue background. */
 .filters-toggle:hover:not(:disabled), .filters-toggle[aria-expanded="true"] {
   color: var(--color-text);
   background-color: var(--color-surface-blue);
 }
 
-/* Nombre de filtres actifs, en pastille sur le coin du bouton. */
+/* Number of active filters, as a pill on the corner of the button. */
 .filters-count {
   position: absolute;
   top: -4px;
@@ -149,7 +149,7 @@
   line-height: 18px;
 }
 
-/* Filtres ouverts : listes côte à côte, puis l'effacement. */
+/* Filters open: lists side by side, then the clear button. */
 .search-filters {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
@@ -160,12 +160,12 @@
   border-radius: var(--radius-control);
 }
 
-/* Libellés des filtres : même style que ceux des formulaires, malgré le display: block de la recherche. */
+/* Filter labels: same style as those of the forms, despite the display: block of the search. */
 .home-search .search-filters label {
   display: flex;
 }
 
-/* Offres récentes : petite liste éditoriale, sans carte ni bouton, séparée par des traits fins. */
+/* Recent offers: small editorial list, without card or button, separated by thin lines. */
 .recent-offers h2 {
   margin: 0 0 12px;
   color: var(--color-text-secondary);
@@ -191,7 +191,7 @@
   border-bottom: 1px solid var(--color-line);
 }
 
-/* Une ligne par offre : le poste, puis l'entreprise et le lieu en gris. */
+/* One line per offer: the position, then the company and the location in grey. */
 .recent-offers li a {
   display: flex;
   flex-direction: column;
@@ -211,20 +211,20 @@
   font-size: 13px;
 }
 
-/* Survol : seul le poste se souligne. */
+/* Hover: only the position is underlined. */
 .recent-offers li a:hover .recent-offer-title {
   text-decoration: underline;
   text-underline-offset: 3px;
 }
 
-/* Lien vers toute la liste, en texte, sous les deux offres. */
+/* Link to the whole list, as text, under the two offers. */
 .recent-offers .recent-offers-all {
   display: inline-block;
   margin-top: 16px;
   font-size: 14px;
 }
 
-/* Tablette et téléphone : les offres récentes passent sous la recherche. */
+/* Tablet and phone: the recent offers move under the search. */
 @media (max-width: 900px) {
   .home-row {
     grid-template-columns: 1fr;
@@ -232,7 +232,7 @@
   }
 }
 
-/* Titre avec un vide réduit sur téléphone. */
+/* Title with a reduced empty space on phones. */
 @media (max-width: 600px) {
   .home-title {
     margin: 40px 0 32px;

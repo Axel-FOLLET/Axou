@@ -1,0 +1,620 @@
+/* -------------------- MOTION FINISHING TOUCHES -------------------- */
+
+/*
+ * Finishing touches shared by every page: background grain, cascade reveal, entrance of the title
+ * and glow of the openings (.hero), reveal of the large titles, details of the timeline (.timeline), card hovers (data-hover),
+ * bars of the method and of the fields (.method__item, .domains__item).
+ * The magnetic buttons have no style here: motion.js moves them on its own.
+ * Each block only applies if the page contains its classes (motion.js does the same).
+ * Durations, curves and offsets: variables --dur-*, --ease-* and --stagger-* of tokens.css.
+ * No brand colour here: the grain is grey, the strokes take the text colour (currentColor),
+ * the glow reads --accent-glow, set by the theme of the page (tokens.css); the drawings come from tokens.css (--sprite-*).
+ */
+
+
+/* -------------------- BACKGROUND GRAIN -------------------- */
+
+/*
+ * Very light noise laid over the whole page: the flat areas (red, blue, near black) look less digital.
+ * The noise is drawn by the browser (SVG feTurbulence, no image to download), in grey: it stays neutral on every colour.
+ * position: fixed: the texture is not redrawn on scroll; pointer-events: none: clicks and selection go through it.
+ * Placed above the content, otherwise the section backgrounds would hide it; an opacity of 3.5 % does not change readability.
+ */
+body::after {
+    content: "";
+
+    position: fixed;
+    inset: 0;
+
+    z-index: 3000;
+
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 160px 160px;
+
+    opacity: 0.035;
+
+    pointer-events: none;
+}
+
+
+/* No grain in print nor in forced colours mode: it would only add noise there */
+@media print, (forced-colors: active) {
+
+    body::after {
+        display: none;
+    }
+
+}
+
+
+/* -------------------- CASCADE REVEAL -------------------- */
+
+/*
+ * Elements of a repeated set (steps, items, cards, tags): motion.js gives them the class
+ * motion-stagger and their rank --i among their siblings. They rise one after the other when their block appears (reveal.js).
+ * An animation rather than a transition: it does not replace the element's own transitions,
+ * and motion.js removes the class at the end, the element becomes ordinary again.
+ * Offset of 70 ms per rank (--stagger-step), capped at 400 ms (--stagger-max): a long set does not make anyone wait.
+ * backwards: the element stays hidden during its delay, then keeps its own styles.
+ */
+.reveal--visible .motion-stagger {
+    animation: motion-rise var(--dur-reveal) var(--ease-out) backwards;
+    animation-delay: min(calc(var(--i, 0) * var(--stagger-step)), var(--stagger-max));
+}
+
+
+@keyframes motion-rise {
+    from {
+        opacity: 0;
+        translate: 0 16px;
+    }
+}
+
+
+/* -------------------- ENTRANCE OF THE OPENING -------------------- */
+
+/*
+ * motion.js wraps each word of the opening title in a mask (motion-intro__mask),
+ * then gives each mask the rank of its line on screen (--line, measured) and the number of lines to .hero (--lines).
+ * The text stays the same node by node: screen readers and textContent see no difference.
+ * The styles only exist under .motion-intro, removed at the end: the masks become plain inline spans again.
+ * Without JavaScript or with reduced motion, the class is never set: everything is shown at once.
+ */
+.motion-intro .motion-intro__mask {
+    display: inline-block;
+
+    /*
+     * Mask: only the bottom is cut, where the word rises from. The other sides overflow widely,
+     * so as not to trim the accents or the letters that stick out of a tightly spaced title.
+     * clip-path rather than overflow: clip: the baseline of the inline block does not move, nor does the layout.
+     */
+    clip-path: inset(-0.5em -0.5em 0 -0.5em);
+}
+
+
+/*
+ * Each word starts from under its mask; all the words of a line start together.
+ * 70 ms between two lines, capped at 400 ms: a name on four lines (phone) does not make anyone wait.
+ * backwards: the word stays hidden during its delay.
+ */
+.motion-intro .motion-intro__word {
+    display: inline-block;
+
+    animation: motion-intro-line var(--dur-reveal) var(--ease-out) backwards;
+    animation-delay: min(calc(var(--line, 0) * var(--stagger-step)), var(--stagger-max));
+}
+
+
+@keyframes motion-intro-line {
+    from {
+        translate: 0 120%;
+    }
+}
+
+
+/*
+ * Role, sentence and button (the elements that follow the title) then fade in, 70 ms apart.
+ * Their start follows the last line of the title (--lines, capped at 3): at most 0.21 s + 0.2 s + 0.14 s, then a 0.45 s fade, i.e. 1 s.
+ */
+.motion-intro .motion-intro__follow {
+    animation: motion-intro-fade var(--dur-base) var(--ease-out) backwards;
+    animation-delay: calc(min(var(--lines, 1), 3) * var(--stagger-step) + var(--dur-fast) + var(--i, 0) * var(--stagger-step));
+}
+
+
+@keyframes motion-intro-fade {
+    from {
+        opacity: 0;
+        translate: 0 8px;
+    }
+}
+
+
+/* -------------------- REVEAL OF THE TITLES -------------------- */
+
+/*
+ * Same mask as the name of the opening for the large titles (section titles, career change or method titles, footer).
+ * motion.js sets motion-title before the first frame: the words wait under their mask.
+ * When the title enters the screen, motion-title--play makes them rise line by line, then both classes are removed.
+ * The bottom of the mask goes a little lower (0.2em): the descenders of the italic (g, p) are not trimmed while rising,
+ * and 130 % of the height of the word is enough to hide it below.
+ */
+.motion-title .motion-intro__mask {
+    display: inline-block;
+
+    clip-path: inset(-0.5em -0.5em -0.2em -0.5em);
+}
+
+
+.motion-title .motion-intro__word {
+    display: inline-block;
+
+    translate: 0 130%;
+
+    transition: translate var(--dur-reveal) var(--ease-out);
+}
+
+
+.motion-title--play .motion-intro__word {
+    translate: none;
+
+    transition-delay: min(calc(var(--line, 0) * var(--stagger-step)), var(--stagger-max));
+}
+
+
+/* In print, the titles never reached on screen are printed anyway */
+@media print {
+
+    .motion-title .motion-intro__word {
+        translate: none;
+    }
+
+}
+
+
+/* -------------------- GLOW OF THE OPENING -------------------- */
+
+/*
+ * Soft halo behind the large cube, centred like it in the figure of the opening.
+ * Its colour comes from --accent-glow (theme of the page, tokens.css): white on the home page, blue on My background, red on My portfolio.
+ * A circle as tall as the figure, at most 520 px: it does not spill over the text placed above it on phones.
+ * closest-side: the gradient fades out at the edge of the circle, without a visible edge.
+ * First in the figure, it goes under the cubes; pointer-events: none lets the cubes be grabbed.
+ */
+.hero__visual::before {
+    content: "";
+
+    position: absolute;
+    top: 50%;
+    left: 50%;
+
+    height: min(100%, 520px);
+    aspect-ratio: 1;
+
+    background: radial-gradient(closest-side, var(--accent-glow), var(--clear));
+
+    translate: -50% -50%;
+
+    pointer-events: none;
+}
+
+
+/* -------------------- DETAILS OF THE TIMELINE -------------------- */
+
+/*
+ * Animated timeline (timeline--animated, set by timeline.js): when a step lights up
+ * (timeline__step--visible), its elements (title, text, challenge, or role and place on the resume) settle one after the other.
+ * motion.js gives them the class timeline__detail and their rank --i in the step.
+ */
+.timeline--animated .timeline__detail {
+    opacity: 0;
+    translate: 0 10px;
+
+    transition:
+        opacity var(--dur-reveal) var(--ease-out),
+        translate var(--dur-reveal) var(--ease-out);
+}
+
+
+/* First detail after 70 ms, then 70 ms more per rank, at most 400 ms */
+.timeline--animated .timeline__step--visible .timeline__detail {
+    opacity: 1;
+    translate: none;
+
+    transition-delay: min(calc((var(--i, 0) + 1) * var(--stagger-step)), var(--stagger-max));
+}
+
+
+/*
+ * Number (portfolio) or date (resume) of the step: grey while the step waits, white when it lights up.
+ * The list repeats the background and border transitions of the portfolio pill: without them,
+ * this more specific rule would replace them and the pill would change colour at once.
+ */
+.timeline--animated :is(.timeline__number, .timeline__date) {
+    color: var(--muted);
+
+    transition:
+        color var(--dur-base) var(--ease-out),
+        background-color var(--dur-base) var(--ease-out),
+        border-color var(--dur-base) var(--ease-out);
+}
+
+
+.timeline--animated .timeline__step--visible :is(.timeline__number, .timeline__date) {
+    color: var(--white);
+}
+
+
+/* -------------------- CARD HOVERS -------------------- */
+
+/*
+ * Hovers chosen card by card with data-hover (snake, stick figure, cat, arrow, cipher, language), only with a mouse or a touchpad:
+ * with a finger, a hover never really ends.
+ * They touch neither the transform nor the filter of the card, kept for the project wheel (project-showcase.js).
+ * The figure crosses the top of the media area (about 40 px) above the animated scene of the card (z-index):
+ * the scenes (card-scenes.js) are built in the same area and stay under it.
+ */
+@media (hover: hover) and (pointer: fine) {
+
+    /*
+     * data-hover="snake": a small five-square snake crosses the top of the decorative area of the card
+     * (project-card__media, or any element marked data-hover-zone).
+     * The area becomes the reference of the snake and cuts it at its edges; its top corners follow the rounding of the card.
+     */
+    [data-hover="snake"] :is(.project-card__media, [data-hover-zone]) {
+        position: relative;
+
+        border-radius: var(--radius-m, 16px) var(--radius-m, 16px) 0 0;
+
+        overflow: clip;
+    }
+
+
+    /*
+     * Snake drawn with five 8 px gradients (no image) in the text colour, head on the right.
+     * Sizes of the four figures raised by 1.5 to 2 times (motion audit M-01): they were too small to be seen
+     * in a media area of 330 × 230 px; they still stay in its free top band of 40 px.
+     * The box spans the whole width of the area: translate from -56px to 100 % makes it enter from the left
+     * and leave entirely on the right. At rest, it waits outside the area, on the left.
+     */
+    [data-hover="snake"] :is(.project-card__media, [data-hover-zone])::before {
+        content: "";
+
+        position: absolute;
+        top: 8px;
+        left: 0;
+        z-index: 2;
+
+        width: 100%;
+        height: 8px;
+
+        background:
+            linear-gradient(currentColor, currentColor) 0 0 / 8px 8px no-repeat,
+            linear-gradient(currentColor, currentColor) 11px 0 / 8px 8px no-repeat,
+            linear-gradient(currentColor, currentColor) 22px 0 / 8px 8px no-repeat,
+            linear-gradient(currentColor, currentColor) 33px 0 / 8px 8px no-repeat,
+            linear-gradient(currentColor, currentColor) 44px 0 / 8px 8px no-repeat;
+
+        opacity: 0.8;
+
+        translate: -56px 0;
+
+        pointer-events: none;
+    }
+
+
+    /*
+     * One crossing per hover, in regular steps as in the game (steps); forwards:
+     * the snake stays out on the right instead of coming back on the left.
+     */
+    [data-hover="snake"]:hover :is(.project-card__media, [data-hover-zone])::before {
+        animation: motion-snake 1.6s steps(28) forwards;
+    }
+
+
+    /*
+     * data-hover="hangman", "cat" and "cursor": a figure crosses the top of the same area, once per hover, like the snake.
+     * These areas hold a cube or a cat that can be turned: cutting the area at its edges (overflow: clip) would trim their corners.
+     * The figure therefore stays inside the area: the arrow slides in a strip of the whole width (background-position),
+     * the stick figure and the cat go from one edge to the other, fading in and out. The area is only their reference.
+     */
+    :is([data-hover="hangman"], [data-hover="cat"], [data-hover="cursor"]) :is(.project-card__media, [data-hover-zone]) {
+        position: relative;
+    }
+
+
+    /*
+     * Shared reference: at the top of the area, its whole width (the stick figure and the cat reduce it to that of one frame).
+     * pointer-events: none: the cube and the cat can still be grabbed through it.
+     */
+    :is([data-hover="hangman"], [data-hover="cat"], [data-hover="cursor"]) :is(.project-card__media, [data-hover-zone])::before {
+        content: "";
+
+        position: absolute;
+        left: 0;
+        z-index: 2;
+
+        width: 100%;
+
+        pointer-events: none;
+    }
+
+
+    /*
+     * Hangman and cat: the drawing is a white background image (SVG in data:, no image to download), like the arrow.
+     * A mask filled with the text colour was not repainted during the hover in Chrome: the drawing stayed invisible.
+     * Each file stacks its frames one under the other: the element, one frame wide, shows only one at a time.
+     * motion-sprite-frames scrolls through them (background-position) while motion-sprite-cross moves the element forward (left).
+     * --sprite-width: width of one frame; --sprite-sheet: height of all the stacked frames.
+     * At rest, the drawing waits on the left, invisible.
+     */
+    :is([data-hover="hangman"], [data-hover="cat"]) :is(.project-card__media, [data-hover-zone])::before {
+        width: var(--sprite-width);
+
+        background-repeat: no-repeat;
+        background-position: 0 0;
+        background-size: var(--sprite-width) var(--sprite-sheet);
+
+        opacity: 0;
+    }
+
+
+    /* Stick figure: round head, body, arms and legs in four running positions, frames of 28 × 32 px (drawing of 14 × 16, scaled) */
+    [data-hover="hangman"] :is(.project-card__media, [data-hover-zone])::before {
+        --sprite-width: 28px;
+        --sprite-sheet: 128px;
+
+        top: 4px;
+
+        height: 32px;
+
+        background-image: var(--sprite-hangman);
+    }
+
+
+    /*
+     * Pixel-art cat, facing right, tail up: 13 × 8 squares, shown at 3 px each, two leg positions.
+     * shape-rendering: crispEdges keeps sharp squares, without blurred edges.
+     */
+    [data-hover="cat"] :is(.project-card__media, [data-hover-zone])::before {
+        --sprite-width: 39px;
+        --sprite-sheet: 48px;
+
+        top: 6px;
+
+        height: 24px;
+
+        background-image: var(--sprite-cat);
+    }
+
+
+    /*
+     * One crossing per hover, in regular steps like the snake; forwards: the drawing stays faded on the right.
+     * The legs change position during the whole crossing (same total duration), then stop.
+     */
+    [data-hover="hangman"]:hover :is(.project-card__media, [data-hover-zone])::before {
+        animation:
+            motion-sprite-cross 1.6s steps(32) forwards,
+            motion-sprite-frames 0.2s steps(4) 8;
+    }
+
+
+    [data-hover="cat"]:hover :is(.project-card__media, [data-hover-zone])::before {
+        animation:
+            motion-sprite-cross 2.1s steps(30) forwards,
+            motion-sprite-frames 0.3s steps(2) 7;
+    }
+
+
+    /*
+     * White mouse arrow with a dark outline, tip at the top left (1 px from the edge of the image):
+     * two colours, hence a background image. No brand colour: white and black suit every page (drawing in tokens.css).
+     */
+    [data-hover="cursor"] :is(.project-card__media, [data-hover-zone])::before {
+        top: 6px;
+
+        height: 30px;
+
+        background: var(--sprite-cursor) -21px 0 / 21px 30px no-repeat;
+    }
+
+
+    /* The arrow crosses the strip in one go, once per hover, like the snake; forwards: it stays out on the right. */
+    [data-hover="cursor"]:hover :is(.project-card__media, [data-hover-zone])::before {
+        animation: motion-cursor 1.2s var(--ease-in-out) forwards;
+    }
+
+
+    /*
+     * data-hover="cipher": motion.js encrypts the word marked data-cipher letter by letter, then restores it when leaving the card.
+     * data-hover="language": motion.js switches the word marked data-language from one language to another, then restores it when leaving the card.
+     * The displayed word is an ::after (data-cipher-shown or data-language-shown) laid over the original word, made transparent;
+     * its empty alternative text (/ "") hides it from screen readers, which keep the original word.
+     * The text stays in the page: textContent and selection do not change.
+     * inline-block: the box of the word takes the height of its line, the displayed word sits exactly on the original
+     * (in an inline box, it rose by a few pixels). A single word does not wrap: the layout does not move.
+     */
+    [data-cipher-shown],
+    [data-language-shown] {
+        display: inline-block;
+
+        position: relative;
+
+        -webkit-text-fill-color: var(--clear);
+    }
+
+
+    [data-cipher-shown]::after,
+    [data-language-shown]::after {
+        position: absolute;
+        inset: 0 auto auto 0;
+
+        -webkit-text-fill-color: currentColor;
+
+        white-space: nowrap;
+    }
+
+
+    [data-cipher-shown]::after {
+        content: attr(data-cipher-shown) / "";
+    }
+
+
+    [data-language-shown]::after {
+        content: attr(data-language-shown) / "";
+    }
+
+}
+
+
+@keyframes motion-snake {
+    to {
+        translate: 100% 0;
+    }
+}
+
+
+/* The drawing appears at the left edge of the area, crosses it and fades at the right edge (100 % minus its width) */
+@keyframes motion-sprite-cross {
+    from {
+        left: 0;
+
+        opacity: 0;
+    }
+
+    10%,
+    90% {
+        opacity: 0.8;
+    }
+
+    to {
+        left: calc(100% - var(--sprite-width));
+
+        opacity: 0;
+    }
+}
+
+
+/* Next frame of the stack: a shift up by one frame, steps() jumps from one to the next */
+@keyframes motion-sprite-frames {
+    from {
+        background-position: 0 0;
+    }
+
+    to {
+        background-position: 0 calc(-1 * var(--sprite-sheet));
+    }
+}
+
+
+/* The arrow enters from the left and leaves the strip entirely on the right (100 % plus its width) */
+@keyframes motion-cursor {
+    from {
+        background-position-x: -21px;
+    }
+
+    to {
+        background-position-x: calc(100% + 21px);
+    }
+}
+
+
+/* -------------------- BARS OF THE METHOD -------------------- */
+
+/*
+ * motion.js sets motion-bar on each practice of the method (My portfolio) and each row of the fields (My background) before the first frame: their rule turns transparent
+ * and ::before draws it again, folded on the left; cube, name and text wait above the rule, hidden by clip-path.
+ * motion-bar--play draws the rule in 0.65 s (--dur-reveal); 0.2 s after it starts, it brings its elements down in a single block of --bar-h, the height of the practice:
+ * a shared distance, otherwise the name, shorter, would come down less far than the text and overlap it.
+ * clip-path only cuts the top, flush with the rule: on the other sides, the halo of the cube spills freely.
+ * :is(.method__item, .domains__item).motion-bar > *: two classes, to win over the cube's own transition (cubes.css).
+ * Each bar starts 140 ms after the previous one (two steps of --stagger-step), at most 400 ms after the first one:
+ * the third practice is fully in place 1.13 s after the block enters (0.28 s + 0.2 s + 0.65 s).
+ */
+.motion-bar {
+    position: relative;
+
+    border-top-color: var(--clear);
+
+    clip-path: inset(-1px -40px -40px -40px);
+}
+
+
+.motion-bar::before {
+    content: "";
+
+    position: absolute;
+    top: -1px;
+    right: 0;
+    left: 0;
+
+    height: 1px;
+
+    background-color: var(--line);
+
+    transform-origin: 0 50%;
+
+    scale: 0 1;
+
+    transition: scale var(--dur-reveal) var(--ease-in-out);
+    transition-delay: min(calc(var(--bar-i, 0) * 2 * var(--stagger-step)), var(--stagger-max));
+}
+
+
+:is(.method__item, .domains__item).motion-bar > * {
+    translate: 0 calc(-1 * var(--bar-h, 100%) - 24px);
+
+    transition: translate var(--dur-reveal) var(--ease-out);
+}
+
+
+.motion-bar--play::before {
+    scale: 1 1;
+}
+
+
+:is(.method__item, .domains__item).motion-bar--play > * {
+    translate: none;
+
+    transition-delay: calc(min(calc(var(--bar-i, 0) * 2 * var(--stagger-step)), var(--stagger-max)) + var(--dur-fast));
+}
+
+
+
+/* In print, the practices never reached on screen are printed anyway */
+@media print {
+
+    .motion-bar::before {
+        scale: 1 1;
+    }
+
+
+    :is(.method__item, .domains__item).motion-bar > * {
+        translate: none;
+    }
+
+}
+
+
+/* -------------------- REDUCED MOTION -------------------- */
+
+/*
+ * No cascade (reveal.js already adds no class). motion.js stops before setting its classes: no magnetic buttons,
+ * no entrance, no reveal of the titles, no bars, no cipher, no language switch.
+ * No snake, stick figure, cat or arrow (they stay hidden).
+ * The details of the timeline are shown at once: timeline.js does not set timeline--animated.
+ * The grain and the glow, motionless, stay.
+ */
+@media (prefers-reduced-motion: reduce) {
+
+    .reveal--visible .motion-stagger {
+        animation: none;
+    }
+
+
+    [data-hover="snake"]:hover :is(.project-card__media, [data-hover-zone])::before,
+    :is([data-hover="hangman"], [data-hover="cat"], [data-hover="cursor"]):hover :is(.project-card__media, [data-hover-zone])::before {
+        animation: none;
+    }
+
+}

@@ -10,8 +10,8 @@ from werkzeug.security import generate_password_hash
 
 from db import get_db
 
-# scrypt N=2^15, r=8, p=3 : l'un des réglages minimaux de l'OWASP. Le réglage par
-# défaut de Werkzeug (p=1) reste en dessous.
+# scrypt N=2^15, r=8, p=3: one of the minimum settings recommended by OWASP. The
+# Werkzeug default (p=1) stays below it.
 PASSWORD_METHOD = "scrypt:32768:8:3"
 
 
@@ -20,7 +20,7 @@ def hash_password(password):
 
 
 def needs_rehash(password_hash):
-    """Vrai pour une empreinte calculée avec un ancien réglage : à recalculer."""
+    """True for a hash computed with an older setting: it must be recomputed."""
     return not password_hash.startswith(PASSWORD_METHOD + "$")
 
 
@@ -32,7 +32,7 @@ def init_security(app):
 
     if not secret_key:
         raise RuntimeError(
-            "SECRET_KEY manquante : copie .env.example en .env"
+            "SECRET_KEY missing: copy .env.example to .env"
         )
 
     app.secret_key = secret_key
@@ -41,8 +41,8 @@ def init_security(app):
         SESSION_COOKIE_HTTPONLY=True,
         SESSION_COOKIE_SAMESITE="Lax",
         SESSION_COOKIE_SECURE=os.environ.get("COOKIE_SECURE") == "1",
-        # Un cookie signé depuis plus d'un jour est refusé (31 jours par défaut) :
-        # une copie dérobée ne sert pas longtemps, même après la déconnexion.
+        # A cookie signed more than one day ago is refused (31 days by default):
+        # a stolen copy does not stay useful for long, even after logout.
         PERMANENT_SESSION_LIFETIME=timedelta(days=1),
     )
 

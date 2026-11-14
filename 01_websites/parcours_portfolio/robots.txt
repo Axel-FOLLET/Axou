@@ -1,0 +1,5 @@
+# Allows search engines to crawl the whole site and gives them the sitemap
+User-agent: *
+Allow: /
+
+Sitemap: https://axel-follet.github.io/parcours_portfolio/sitemap.xml

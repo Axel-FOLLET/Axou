@@ -42,10 +42,10 @@ def register():
     email = data["email"].strip().lower()
     conn = get_db()
 
-    # Adresse déjà dans people, mais sans mot de passe : la personne existe (elle a candidaté
-    # sans compte, ou une entreprise l'a saisie) et n'a jamais eu de compte. Sa fiche n'est pas
-    # modifiée ici : l'inscription attend le lien envoyé à cette adresse, sinon connaître un
-    # email suffirait à prendre la main sur ses candidatures.
+    # Address already in people, but without a password: the person exists (they applied
+    # without an account, or a company entered them) and never had an account. Their record
+    # is not modified here: the registration waits for the link sent to this address,
+    # otherwise knowing an email would be enough to take over their applications.
     existing = conn.execute(
         """
         SELECT id, password_hash
@@ -69,8 +69,8 @@ def register():
 
         conn.close()
 
-        # Le jeton part par email, et dans le journal du serveur si l'envoi est désactivé.
-        # Il ne figure jamais dans la réponse, qui est la même pour tout le monde.
+        # The token goes out by email, and into the server log if sending is disabled.
+        # It never appears in the response, which is the same for everyone.
         send_verification_link(email, first_name, token)
 
         return jsonify({"message": "Verification required"}), 202
@@ -100,8 +100,8 @@ def register():
 
     conn.close()
 
-    # Compte neuf, mot de passe choisi à l'instant : la session s'ouvre comme à la connexion.
-    # Le cas 202 n'y passe jamais, tant que le lien n'a pas été ouvert.
+    # New account, password just chosen: the session opens as at login.
+    # The 202 case never gets here, as long as the link has not been opened.
     session.clear()
     session["user_id"] = person_id
 
@@ -152,7 +152,7 @@ def login():
         conn.close()
         return jsonify({"error": "Invalid credentials"}), 401
 
-    # Empreinte d'un ancien réglage : le mot de passe vient d'être vérifié, on la recalcule.
+    # Hash from an older setting: the password was just verified, so recompute it.
     if needs_rehash(row["password_hash"]):
         conn.execute(
             "UPDATE people SET password_hash = ? WHERE id = ?",
@@ -202,8 +202,8 @@ def me():
     if not data:
         return jsonify({"error": "No fields to update"}), 400
 
-    # L'adresse e-mail n'est pas modifiable ici : sans vérification de la nouvelle
-    # adresse, on pourrait s'approprier celle d'une autre personne.
+    # The email address cannot be edited here: without verifying the new address,
+    # someone could claim another person's address.
     allowed_fields = {"first_name", "last_name", "phone"}
 
     for field in data:
@@ -230,7 +230,7 @@ def me():
         if isinstance(value, str):
             value = value.strip()
 
-        # Téléphone effacé : NULL en base, comme une personne qui n'en a jamais donné.
+        # Phone cleared: NULL in the database, like a person who never gave one.
         if field == "phone" and value == "":
             value = None
 
@@ -259,10 +259,10 @@ def me():
     return jsonify(dict(row)), 200
 
 
-# ------------------- Changement d'adresse e-mail (contrat, section du même nom) -------------------
-# Deux temps, comme la vérification d'inscription : la demande met la nouvelle adresse de côté
-# et envoie un lien à cette adresse ; la confirmation, quand le lien est ouvert, applique le
-# changement. PATCH /api/auth/me refuse toujours le champ email.
+# ------------------- Email address change (contract, section of the same name) -------------------
+# Two steps, like the registration verification: the request sets the new address aside
+# and sends a link to that address; the confirmation, when the link is opened, applies the
+# change. PATCH /api/auth/me still refuses the email field.
 
 
 @auth.route("/email-change", methods=["POST"])
@@ -283,7 +283,7 @@ def request_email_change():
     user = current_user()
     conn = get_db()
 
-    # current_user() ne renvoie pas password_hash : on relit la fiche.
+    # current_user() does not return password_hash: read the record again.
     row = conn.execute(
         """
         SELECT id, first_name, email, password_hash
@@ -293,8 +293,8 @@ def request_email_change():
         (user["id"],),
     ).fetchone()
 
-    # Le mot de passe actuel prouve que la personne devant l'écran est bien la titulaire
-    # du compte : une session laissée ouverte ne suffit pas.
+    # The current password proves that the person at the screen is the account holder:
+    # a session left open is not enough.
     if (
         row is None
         or not row["password_hash"]
@@ -307,7 +307,7 @@ def request_email_change():
         conn.close()
         return jsonify({"error": "Invalid value"}), 400
 
-    # Adresse déjà dans people, avec ou sans compte : même refus qu'à l'inscription.
+    # Address already in people, with or without an account: same refusal as at registration.
     existing = conn.execute(
         "SELECT id FROM people WHERE email = ?",
         (new_email,),
@@ -320,8 +320,8 @@ def request_email_change():
     token = pending_email_changes.create(conn, row["id"], new_email)
     conn.close()
 
-    # Le lien part à la NOUVELLE adresse : c'est elle qu'il faut prouver. Le jeton ne
-    # figure jamais dans la réponse.
+    # The link goes to the NEW address: that is the one to prove. The token never
+    # appears in the response.
     send_email_change_link(new_email, row["first_name"], token)
 
     return jsonify({"message": "Verification required"}), 202
@@ -329,8 +329,8 @@ def request_email_change():
 
 @auth.route("/email-change/confirm", methods=["POST"])
 def confirm_email_change():
-    # Pas de session exigée : le lien peut être ouvert sur un autre appareil, le jeton
-    # suffit à prouver que la nouvelle adresse est contrôlée.
+    # No session required: the link may be opened on another device, the token is
+    # enough to prove that the new address is controlled.
     data, error = get_json_object()
 
     if error:
@@ -344,14 +344,14 @@ def confirm_email_change():
     conn = get_db()
     pending = pending_email_changes.take(conn, data["token"].strip())
 
-    # Jeton inconnu, déjà utilisé ou expiré : même refus dans les trois cas, pour ne rien
-    # apprendre à quelqu'un qui essaierait des jetons au hasard.
+    # Unknown, already used or expired token: same refusal in all three cases, so as to
+    # teach nothing to someone trying random tokens.
     if pending is None:
         conn.close()
         return jsonify({"error": "Invalid value"}), 400
 
-    # Entre la demande et le clic, une autre fiche a pu prendre cette adresse : la
-    # contrainte UNIQUE de people.email refuse alors la mise à jour.
+    # Between the request and the click, another record may have taken this address: the
+    # UNIQUE constraint on people.email then refuses the update.
     try:
         conn.execute(
             "UPDATE people SET email = ? WHERE id = ?",
@@ -375,5 +375,5 @@ def confirm_email_change():
 
     conn.close()
 
-    # La session en cours, s'il y en a une, reste ouverte ; le mot de passe ne change pas.
+    # The current session, if there is one, stays open; the password does not change.
     return jsonify(dict(row)), 200

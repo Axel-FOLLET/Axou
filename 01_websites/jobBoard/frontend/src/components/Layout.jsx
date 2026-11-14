@@ -1,4 +1,4 @@
-// Habillage commun à toutes les pages : en-tête, navigation, la page courante, puis le pied de page.
+// Common frame of all pages: header, navigation, the current page, then the footer.
 import { useContext, useState } from 'react'
 import { AuthContext } from '../AuthContext'
 import { Outlet, NavLink, Link, useNavigate } from 'react-router'
@@ -12,7 +12,7 @@ export default function Layout() {
   const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
 
-  // Déconnexion : on prévient l'API, puis on vide le contexte dans tous les cas.
+  // Logout: tell the API, then clear the context in all cases.
   async function handleLogout() {
     try {
       const { ok, error: apiError } = await apiFetch('/api/auth/logout', { method: 'POST' })
@@ -22,7 +22,7 @@ export default function Layout() {
     } catch (error) {
       console.error('Error logging out:', error)
     }
-    // Même si l'appel a échoué, on déconnecte côté navigateur et on revient à l'accueil.
+    // Even if the call failed, log out on the browser side and return to the home page.
     setUser(null)
     navigate('/')
   }
@@ -31,7 +31,7 @@ export default function Layout() {
     <div>
       <header>
         <nav aria-label={t('Navigation principale', 'Main navigation')}>
-          {/* Le logo est le lien vers la page d'accueil : pas de lien « Accueil » dans le menu. */}
+          {/* The logo is the link to the home page: no "Home" link in the menu. */}
           <Link className="logo" to="/" aria-label={t("Y.I.A Jobs, retour à l'accueil", 'Y.I.A Jobs, back to the home page')}>
             Y.I.A J<span className="logo-o">o</span>bs
           </Link>
@@ -44,7 +44,7 @@ export default function Layout() {
             if (event.key === 'Escape') setMenuOpen(false)
           }}>
           <NavLink to="/offres">{t("Offres d'emploi", 'Job offers')}</NavLink>
-          {/* Navigation selon l'état : visiteur, personne connectée, administration. */}
+          {/* Navigation depending on the state: visitor, logged-in person, administration. */}
           {user ? ( 
             <>
               <NavLink to="/recruteur">{t('Espace recruteur', 'Recruiter area')}</NavLink>
@@ -55,14 +55,14 @@ export default function Layout() {
           ) : (
             <NavLink to="/login">{t('Connexion', 'Log in')}</NavLink>
           )}
-          {/* Bouton de langue : il affiche la langue proposée, écrite dans cette langue. */}
+          {/* Language button: it shows the language offered, written in that language. */}
           <button type="button" lang={lang === 'en' ? 'fr' : 'en'} onClick={() => setLang(lang === 'en' ? 'fr' : 'en')}>
             {lang === 'en' ? 'Français' : 'English'}
           </button>
           </div>
         </nav>
       </header>
-      {/* Outlet : la page correspondant à l'URL s'affiche ici. */}
+      {/* Outlet: the page matching the URL is displayed here. */}
       <Outlet />
       <Footer />
     </div>

@@ -1,6 +1,6 @@
-/* Offres (JobBoardPage.jsx) : grille et carte d'une offre (components/AddJobOffer.jsx). */
+/* Offers (JobBoardPage.jsx): grid and job offer card (components/AddJobOffer.jsx). */
 
-/* Grille des offres : deux cartes par ligne, de même hauteur sur une rangée (une seule sur téléphone, plus bas). */
+/* Grid of offers: two cards per line, of equal height in a row (only one on phones, further down). */
 .offers-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -9,8 +9,8 @@
   padding-bottom: 48px;
 }
 
-/* Carte d'offre blanche, détachée du fond par un trait fin qui passe au gris foncé au survol.
-   En colonne, pour pousser les boutons au bas de la carte. */
+/* White job offer card, set apart from the background by a thin line that turns dark grey on hover.
+   In a column, to push the buttons to the bottom of the card. */
 .job-offer {
   display: flex;
   flex-direction: column;
@@ -20,7 +20,7 @@
   margin-bottom: 0;
   border: 1px solid var(--color-line);
   transition: border-color .2s;
-  /* Repère du badge « Nouveau », placé en absolu dans le coin. */
+  /* Anchor of the "New" badge, absolutely positioned in the corner. */
   position: relative;
 }
 
@@ -28,14 +28,14 @@
   border-color: var(--color-line-strong);
 }
 
-/* Texte secondaire des offres. */
+/* Secondary text of the offers. */
 .job-offer p {
   margin: 4px 0;
   color: var(--color-text-secondary);
 }
 
-/* Entreprise en petites capitales espacées, au-dessus du poste.
-   La marge droite, réservée sur toutes les cartes, empêche un nom long de passer sous le badge. */
+/* Company in small spaced capitals, above the position.
+   The right margin, reserved on every card, stops a long name from going under the badge. */
 .job-offer .offer-company {
   margin: 0 0 8px;
   padding-right: 88px;
@@ -45,7 +45,7 @@
   text-transform: uppercase;
 }
 
-/* Titre du poste, premier niveau de la carte. */
+/* Position title, first level of the card. */
 .job-offer h2 {
   margin: 0 0 10px;
   font-size: 20px;
@@ -54,8 +54,8 @@
   letter-spacing: -0.02em;
 }
 
-/* Badge « Nouveau » en haut à droite, au-dessus de l'entreprise : hors du flux, il ne décale aucun texte.
-   Annonce publiée depuis moins de NEW_DAYS jours (JobBoardPage.jsx). */
+/* "New" badge at the top right, above the company: out of the flow, it shifts no text.
+   Job offer published less than NEW_DAYS days ago (JobBoardPage.jsx). */
 .job-offer .badge-new {
   position: absolute;
   top: 6px;
@@ -69,8 +69,8 @@
   border-radius: var(--radius-pill);
 }
 
-/* Le titre est un bouton qui ouvre le détail : il garde l'aspect du titre, et se souligne au survol comme un lien.
-   Ce fichier vient après buttons.css, il l'emporte donc sur le bouton bleu commun. */
+/* The title is a button that opens the details: it keeps the look of a title, and is underlined on hover like a link.
+   This file comes after buttons.css, so it wins over the common blue button. */
 .job-offer .offer-title {
   padding: 0;
   font: inherit;
@@ -88,24 +88,24 @@
   text-underline-offset: 4px;
 }
 
-/* Un titre ne s'enfonce pas au clic comme un bouton. */
+/* A title does not sink on click like a button. */
 .job-offer .offer-title:active:not(:disabled) {
   transform: none;
 }
 
-/* Lieu et contrat en une ligne de texte discrète, sans cadre. */
+/* Location and contract on one line of discreet text, without a frame. */
 .job-offer .offer-meta {
   margin-top: 12px;
   font-size: 14px;
   font-weight: 500;
 }
 
-/* Conserver les retours à la ligne des descriptions. */
+/* Keep the line breaks of the descriptions. */
 .description {
   white-space: pre-line;
 }
 
-/* Bouton de candidature poussé au bas de la carte (margin-top: auto). */
+/* Apply button pushed to the bottom of the card (margin-top: auto). */
 .offer-actions {
   display: flex;
   flex-wrap: wrap;
@@ -114,19 +114,19 @@
   padding-top: 24px;
 }
 
-/* Détail ouvert sous les boutons, séparé par un trait fin. */
+/* Details open under the buttons, separated by a thin line. */
 .offer-details {
   margin-top: 24px;
   padding-top: 16px;
   border-top: 1px solid var(--color-line);
 }
 
-/* Boutons des offres : le bouton commun (buttons.css), un peu plus compact. Le titre-bouton garde son padding nul. */
+/* Offer buttons: the common button (buttons.css), a little more compact. The title button keeps its zero padding. */
 .job-offer button:not(.offer-title) {
   padding: 8px 18px;
 }
 
-/* Formulaire ouvert dans une carte d'offre : fond de page, sans trait, pour ne pas faire carte dans la carte. */
+/* Form open inside a job offer card: page background, no line, so as not to make a card inside a card. */
 .job-offer form {
   margin-top: 24px;
   padding: 20px;
@@ -135,13 +135,13 @@
   border: 0;
 }
 
-/* Messages de validation des cartes. */
+/* Validation messages of the cards. */
 .job-offer form label + p, .job-offer form [role="alert"] {
   color: var(--color-danger);
   font-size: 14px;
 }
 
-/* Case « Nouvelles annonces uniquement », sous la barre de recherche. */
+/* "New job offers only" checkbox, under the search bar. */
 .new-filter {
   display: inline-flex;
   align-items: center;
@@ -152,21 +152,21 @@
   cursor: pointer;
 }
 
-/* La case garde sa taille : forms.css met tous les champs en pleine largeur. */
+/* The checkbox keeps its size: forms.css makes all fields full width. */
 .new-filter input {
   width: auto;
   margin: 0;
 }
 
-/* Grille et cartes compactes sur téléphone. */
+/* Compact grid and cards on phones. */
 @media (max-width: 600px) {
-  /* Une carte par ligne, espacements réduits. */
+  /* One card per line, reduced spacing. */
   .offers-grid {
     grid-template-columns: 1fr;
     gap: 20px;
   }
 
-  /* Cartes compactes. */
+  /* Compact cards. */
   .job-offer {
     padding: 20px;
   }

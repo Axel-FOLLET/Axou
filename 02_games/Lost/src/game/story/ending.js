@@ -3,7 +3,7 @@ import { MINIMAP_GOALS } from '../../ui/MiniMap.js';
 import { HUG, FOLLOW } from './tuning.js';
 import { sightOn } from './framing.js';
 
-/** Story methods for the ending: the helmet falls, the kitten hugs Maman, end screen and stay-or-quit choice. */
+/** Story methods for the ending: the helmet falls, hug cutscene over the hug scene, end screen and stay-or-quit choice. */
 
 export const endingScene = {
   /**
@@ -46,8 +46,17 @@ export const endingScene = {
     this.lastHelmetDrop = { t: this._shake?.t ?? 0, clipTime: cat.actions?.HeadShake?.time ?? null, side: [sx, sz] };
   },
 
-  /** Starts the hug (Npc.startHug): kitten against Maman's belly, or against her flank without a clip. Called after the shake. */
+  /**
+   * Starts the hug cutscene (video 3), after the shake. The hug scene is set up behind it (`_setUpHug`, step 'hug': the
+   * music goes on and the purrs start, main.js); the end screen comes when the video ends (`_finish`).
+   */
   _startHug() {
+    this._setUpHug();
+    this._playCutscene('hug', () => this._finish());
+  },
+
+  /** Hug scene (Npc.startHug): kitten against Maman's belly, or against her flank without a clip. It stays behind the end screen. */
+  _setUpHug() {
     const m = this.npcs.maman, cat = this.cat;
     this.bubble.close();
     this._talking = null;
@@ -69,7 +78,6 @@ export const endingScene = {
       this._frame('maman');
     }
     this.minimap.setVisible(false);
-    this._hugT = 0;
     this._setStep('hug');
   },
 

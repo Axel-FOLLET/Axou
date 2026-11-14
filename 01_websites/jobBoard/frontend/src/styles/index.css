@@ -1,6 +1,6 @@
-/* Point d'entrée du CSS, importé une seule fois par main.jsx.
-   L'ordre compte : à priorité égale, la règle du fichier importé le plus bas l'emporte.
-   Les styles communs d'abord, les pages ensuite, pour qu'une page puisse ajuster un style commun. */
+/* Entry point of the CSS, imported once by main.jsx.
+   Order matters: at equal priority, the rule of the file imported last wins.
+   Common styles first, pages after, so that a page can adjust a common style. */
 
 @import './base.css';
 @import './buttons.css';

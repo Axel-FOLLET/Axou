@@ -1,8 +1,7 @@
 import * as THREE from 'three';
-import { WALK_RATE, HUG, HEAD_DIP, HEAD_DIP_SHARE } from './npcTuning.js';
-import { rotateWorld } from './npcBones.js';
+import { WALK_RATE, HUG } from './npcTuning.js';
 
-/** Npc methods for what Maman does with the kitten: carrying it in her mouth, dipping her head, the final hug. */
+/** Npc methods for what Maman does with the kitten: carrying it in her mouth, the final hug. */
 
 const _v = new THREE.Vector3();
 
@@ -10,7 +9,7 @@ const _w = new THREE.Vector3();
 
 const _q = new THREE.Quaternion();
 
-const _dipAxis = new THREE.Vector3();
+const _axis = new THREE.Vector3();
 
 const _aimTo = new THREE.Vector3();
 
@@ -37,21 +36,6 @@ export const carryAndHug = {
   },
 
   /**
-   * Head and neck lowered (putting the kitten down): rotation added on `Neck`, `Neck.001` and `Head`, muzzle
-   * downward, up to HEAD_DIP rad in total at k = 1. Kept until the next call; applied each frame after the mixer, or
-   * at once on a frozen pose. `mouthAnchor` follows the head. No timer: the caller gives k each frame. The carried
-   * kitten reaches the ground at k = 1 in `Idle`, and at k ≈ 0.5 in `Walk` frozen at 0 s (head already lower).
-   * @param {number} k 0 (normal head) to 1
-   */
-  setHeadDip(k) {
-    this._headDip = THREE.MathUtils.clamp(Number(k) || 0, 0, 1);
-    if (this._frozen && !this._hug) {
-      this._dip();
-      this.refresh();
-    }
-  },
-
-  /**
    * Hug: Maman lying on her left side in an open C (`Sleep` clip frozen at HUG.at), chin turned toward the kitten's
    * head, upper front paw over it, eyes half-closed, slow breathing. The kitten is read only (head, root); the caller
    * places it at `hugSpot()` and puts it to sleep. End: `endHug()`, or any other `setPose`.
@@ -62,8 +46,8 @@ export const carryAndHug = {
   startHug(cat = null, opts = {}) {
     const o = { ...HUG, ...opts };
     if (!this.setPose('Sleep', { instant: true, freezeAt: o.at })) return false;
-    // Clip pose with no lowering: the hug restarts from it each frame.
-    if (this._dipBase) { this._dipBones().forEach((b, i) => b.quaternion.copy(this._dipBase[i])); this._dipBase = null; }
+    // Neck of the frozen clip pose: the hug restarts from it each frame.
+    if (this._neckBase) { this._neckBones().forEach((b, i) => b.quaternion.copy(this._neckBase[i])); this._neckBase = null; }
     this.root.updateMatrixWorld(true);
     // Upper front paw (the right one, left side on the ground) over the kitten's back.
     const spot = this.hugSpot(o);
@@ -73,7 +57,7 @@ export const carryAndHug = {
       .addScaledVector(new THREE.Vector3(0, 0, 1).applyQuaternion(rq), o.paw[2] * s);
     const leg = this.rig.legs.FR;
     if (leg && o.paw) this._reach(leg, paw);
-    const bones = [this.rig.spine[2], ...this._dipBones()].filter(Boolean);
+    const bones = [this.rig.spine[2], ...this._neckBones()].filter(Boolean);
     this._hug = { cat, o, bones, base: bones.map((b) => b.quaternion.clone()), t0: this._time, paw, pawError: this._lastReach?.error ?? null };
     this.eyes.setLid(o.lid);
     this._hugPose();
@@ -102,38 +86,14 @@ export const carryAndHug = {
     this.setPose(this.def.pose ?? 'Lie', { instant: true });
   },
 
-  /**
-   * Lowers head and neck by headDip × HEAD_DIP around the left-right axis of the root (positive angle = muzzle down).
-   * Frozen pose: starts from the saved quaternions (no accumulation); played clip: the mixer has just rewritten the
-   * bones.
-   */
-  _dip() {
-    const bones = this._dipBones();
-    if (this._frozen && this._dipBase) bones.forEach((b, i) => b.quaternion.copy(this._dipBase[i]));
-    if (!this._headDip) return;
-    if (!this._frozen) this._dipLive = bones.map((b) => b.quaternion.clone());
-    const axis = _dipAxis.set(1, 0, 0).applyQuaternion(this.root.getWorldQuaternion(_q));
-    bones.forEach((b, i) => {
-      rotateWorld(b, axis, this._headDip * HEAD_DIP * HEAD_DIP_SHARE[i], b.quaternion.clone());
-      b.updateMatrixWorld(true);
-    });
-  },
-
-  /** Played clip: neck bones restored to their state before last frame's lowering (no accumulation). */
-  _undip() {
-    if (!this._dipLive) return;
-    this._dipBones().forEach((b, i) => b.quaternion.copy(this._dipLive[i]));
-    this._dipLive = null;
-  },
-
-  /** Hug, each frame: starting pose, breathing, chin toward the kitten's head, lowering. */
+  /** Hug, each frame: starting pose, breathing, chin toward the kitten's head. */
   _hugPose() {
     const h = this._hug, o = h.o;
     h.bones.forEach((b, i) => b.quaternion.copy(h.base[i]));
     // Slow breathing (as on the sleeping hero: Spine.002 bone, sine).
     const chest = this.rig.spine[2];
     if (chest && o.breath) {
-      chest.quaternion.multiply(_q.setFromAxisAngle(_dipAxis.set(1, 0, 0), Math.sin((this._time - h.t0) * o.breath[0]) * o.breath[1]));
+      chest.quaternion.multiply(_q.setFromAxisAngle(_axis.set(1, 0, 0), Math.sin((this._time - h.t0) * o.breath[0]) * o.breath[1]));
     }
     this.root.updateMatrixWorld(true);
     // Chin on top of the kitten's helmet (CCD on Neck, Neck.001, Head, bounded angles), when the kitten is against
@@ -141,7 +101,7 @@ export const carryAndHug = {
     const target = o.aim ? this._hugTarget(h) : null;
     h.chinGap = null;
     if (target) {
-      const bones = this._dipBones(), used = bones.map(() => 0);
+      const bones = this._neckBones(), used = bones.map(() => 0);
       for (let it = 0; it < o.aim[2]; it++) {
         for (let i = bones.length - 1; i >= 0; i--) {
           const b = bones[i], room = o.aim[0] * o.aim[1][i] - used[i];
@@ -159,7 +119,6 @@ export const carryAndHug = {
       }
       h.chinGap = this.mouthAnchor.getWorldPosition(_w).distanceTo(target);
     }
-    if (this._headDip) this._dip();
     this.refresh();
   },
 

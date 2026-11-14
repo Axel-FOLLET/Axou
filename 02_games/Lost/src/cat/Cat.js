@@ -57,16 +57,17 @@ const TILT = { gain: 0.6, ahead: 0.25, side: 0.1, rate: 5, max: 0.25 };
 /**
  * Carrying by the scruff (`Carried` clip). nape: point of the nape in the `Neck001` bone frame, stuck each frame to
  * Maman's `mouthAnchor`; the clip keeps the legs above the ground for a mouth at 0.41-0.42 m.
- * yaw: kitten heading relative to Maman's, rad (carried crosswise, set down facing the opening camera).
+ * yaw: kitten heading relative to Maman's, rad (carried crosswise). Used by the capture of cutscene 1
+ * (`tools/cutscenes/stages/arrival_chase/`); the game itself no longer carries the kitten.
  */
 const CARRY = { nape: new THREE.Vector3(0, 0.3907, -0.6178), yaw: -Math.PI / 2 };
 /**
  * Setting the kitten down asleep: start time (s) of the `Sleep` clip (lying from 1.5 to 2.0, on its side at 2.6,
- * curled at 3.8) and fade from `Carried` (s).
+ * curled at 3.8) and fade from the current clip (s).
  */
 const SLEEP_DROP = { from: 2.5, fade: 0.6 };
 /**
- * Sword in the mouth (`sword` true, set by Story after the pull): SwordWalk / SwordRun / SwordSwing replace
+ * Sword in the mouth (`sword` true, set by Story at the end of cutscene 2): SwordWalk / SwordRun / SwordSwing replace
  * Walk / Trot and run / Swipe, and idle holds the last frame of SwordPull (guard pose).
  * Ground speed without sliding, as for Walk (stride / stance × scale × rate / duration); strides and stances
  * come from `tools/anim_cat.py` (SWALK_*, SRUN_*).
@@ -98,15 +99,14 @@ const CLIPS = {
   // Head shake before the hug: the helmet falls (Story).
   HeadShake: { fallback: 'Idle' },
   // Chartiste and ending: brush guard (loop, also a hold layer, Npc.js brushHoldLayer), strike, flinch, defeat
-  // (seated at 1.8 s, final pose held), sword moved from mouth to paw then held (end screen), side-step backward (Maman).
+  // (seated at 1.8 s, final pose held), sword moved from mouth to paw then held (end screen).
   BrushHold: { loop: true, fallback: 'Idle' }, BrushSwing: { fallback: 'Swipe' }, Flinch: { fallback: 'Knockback' },
   Defeat: { hold: 1.8, fallback: 'Sit' }, SwordToPaw: { fallback: 'Sit' }, SwordPawHold: { loop: true, fallback: 'Sit' },
-  StepBack: { loop: true, fallback: 'Walk' },
   // Combat: left front paw claw swipe (contact at 0.33 s, 0.96 s long) and in-place knockback (1.33 s; the recoil is
   // done by src/game/combat.js). States 'swipe' and 'knock' of onStateChange.
   Swipe: { fallback: 'Idle' }, Knockback: { fallback: 'Idle' },
-  // Sword (see SWORD_GAIT): pull played once (sword and stone placed by src/world/Sword.js), walk and gallop in a
-  // cycle, strike (contact at 0.38 s, 1.25 s long).
+  // Sword (see SWORD_GAIT): SwordPull only gives the guard pose (its last frame), walk and gallop in a cycle, strike
+  // (contact at 0.38 s, 1.25 s long).
   SwordPull: { fallback: 'Idle' }, SwordWalk: { loop: true, fallback: 'Walk' }, SwordRun: { loop: true, fallback: 'run' },
   SwordSwing: { fallback: 'Swipe' },
 };
@@ -248,7 +248,7 @@ export class Cat {
 
   /**
    * Sets the kitten down asleep: brain `sleep` state (scene), but the `Sleep` clip starts at `from` s (on its side,
-   * SLEEP_DROP) rather than 0 (standing), with a `fade` s from the current clip (`Carried`). Ordinary sleep keeps
+   * SLEEP_DROP) rather than 0 (standing), with a `fade` s from the current clip. Ordinary sleep keeps
    * `Sleep` from the start.
    */
   dropAsleep(from = SLEEP_DROP.from, fade = SLEEP_DROP.fade) {
@@ -388,7 +388,7 @@ export class Cat {
       case 'groom': this.play('Groom', 0.4); p.lookWeight = 0; this._tailBase = 'clip'; break;
       case 'sleep': this.play('Sleep', this._sleepFrom?.fade ?? 0.8, 1, this._sleepFrom?.from ?? null); p.lookWeight = 0; this._tailBase = 'clip'; p.breathRate = 1.1; p.breathAmp = 0.035; break;
       case 'wake': this.play('Wake', 0.4); p.lookWeight = 0.5; this._tailBase = 'clip'; break;
-      // Opening scene (Story.js): hanging by the scruff, nothing moves apart from the clip.
+      // Carried by Maman (capture of cutscene 1, Cat.carry): hanging by the scruff, nothing moves apart from the clip.
       case 'carried': this.play(this.actions.Carried ? 'Carried' : 'Idle', 0.3); p.lookWeight = 0; this._tailBase = 'clip'; break;
       // Opening: standing, the head searches (Story sets `lookOverride`); then a seated yawn (`Yawn` clip, after
       // 'sit'), rising as from 'sit'.
@@ -403,9 +403,6 @@ export class Cat {
       // (balance of the strike); knockback: in-place clip, root pushed back by the game, gaze and tail left to the clip.
       case 'swipe': this.play(this.actions.Swipe ? 'Swipe' : 'Idle', 0.1); p.lookWeight = 0.3; p.focus = true; this._tailBase = 'clip'; break;
       case 'knock': this.play(this.actions.Knockback ? 'Knockback' : 'Idle', 0.06); p.lookWeight = 0; this._tailBase = 'clip'; break;
-      // Sword pull (Story cutscene; src/world/Sword.js places the sword on the head): clip only, procedural gaze
-      // off (the mouth must stay on the hilt).
-      case 'pull': this.play(this.actions.SwordPull ? 'SwordPull' : 'Idle', 0.2); p.lookWeight = 0; this._tailBase = 'clip'; break;
       default:
         p.lookWeight = 1; this._tailBase = 'up';
         if (prev === 'sit' || prev === 'yawn') this._standUp('Sit');
@@ -417,15 +414,14 @@ export class Cat {
   }
 
   /**
-   * Sword taken (`on` true, end of the pull) or dropped (victory, reset): the current state is replayed with the
-   * matching clips (SWORD_GAIT). `replay` false: state left as is (end of the pull, Story._endPull: replaying 'pull'
-   * would restart SwordPull from 0).
+   * Sword taken (`on` true, end of cutscene 2) or dropped (victory, reset): the current state is replayed with the
+   * matching clips (SWORD_GAIT).
    */
-  setSword(on, { replay = true } = {}) {
+  setSword(on) {
     on = !!on;
     if (on === this.sword) return;
     this.sword = on;
-    if (replay) this.onStateChange(this._state);
+    this.onStateChange(this._state);
   }
 
   /** Clips with the sword held (SWORD_GAIT); false: state has no sword clip, handled as without a sword. */

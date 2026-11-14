@@ -1,6 +1,6 @@
---Insertion des données dans les tableaux correspondants avec INSERT INTO
+-- Insert the data into the matching tables with INSERT INTO
 
--- SIREN fictifs : données de test uniquement, ce ne sont pas les SIREN d'entreprises réelles
+-- Fictitious SIRENs: test data only, they are not the SIRENs of real companies
 INSERT INTO companies (name, description, location, website, siren) VALUES
   ('TechNova', 'Studio de développement web', 'Paris', 'https://technova.example.com', '000000991'),
   ('GreenWorks', 'Agence de design durable', 'Lyon', 'https://greenworks.example.com', '000000993');

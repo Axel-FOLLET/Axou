@@ -1,5 +1,5 @@
-// useLang() : la langue courante, de quoi la changer, et t(fr, en) qui renvoie le texte de la langue choisie.
-// locale sert au formatage des dates et des nombres (toLocaleDateString, Intl...).
+// useLang(): the current language, a way to change it, and t(fr, en), which returns the text of the chosen language.
+// locale is used to format dates and numbers (toLocaleDateString, Intl...).
 import { useContext } from 'react'
 import { LangContext } from './LangContext'
 
@@ -10,9 +10,9 @@ export function useLang() {
   return { lang, setLang, t, locale }
 }
 
-// Types de contrat et temps de travail des annonces : des données saisies en français.
-// En anglais, on traduit à l'affichage les valeurs connues ; une autre valeur s'affiche telle quelle.
-// La valeur envoyée à l'API (filtres, formulaires) ne change pas.
+// Contract types and working time of job offers: data entered in French.
+// In English, the known values are translated at display time; any other value is shown as is.
+// The value sent to the API (filters, forms) does not change.
 const DATA_LABELS_EN = {
   CDI: 'Permanent',
   CDD: 'Fixed-term',

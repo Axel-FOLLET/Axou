@@ -1,10 +1,10 @@
-/* Onglets des espaces recruteur et candidat (CandidateLayout.jsx, RecruiterLayout.jsx) :
-   contrôle segmenté, une piste gris bleuté avec l'onglet courant en case blanche. */
+/* Tabs of the recruiter and candidate areas (CandidateLayout.jsx, RecruiterLayout.jsx):
+   segmented control, a bluish grey track with the current tab as a white box. */
 
-/* Bande des onglets (espaces et administration) collée sous l'en-tête (65 px : 64 de barre + 1 de trait).
-   Fond couleur de la page et même flou que l'en-tête (layout.css) : invisible au repos, le flou n'apparaît que sur le contenu qui passe dessous.
-   Pas de trait : le bas s'efface en fondu sur 12 px (la marge sous les onglets, qui ne pâlissent donc pas).
-   Marges négatives = marges de .page : la bande couvre toute la largeur où le contenu défile, sans 100vw. */
+/* Tab strip (areas and administration) stuck under the header (65 px: 64 of bar + 1 of line).
+   Page-colored background and same blur as the header (layout.css): invisible at rest, the blur only shows on the content passing underneath.
+   No line: the bottom fades out over 12 px (the margin under the tabs, which therefore do not fade).
+   Negative margins = margins of .page: the strip covers the whole width where the content scrolls, without 100vw. */
 .tab-bar {
   position: sticky;
   top: 65px;
@@ -16,12 +16,12 @@
   mask-image: linear-gradient(to bottom, #000 calc(100% - 12px), transparent);
 }
 
-/* L'espace sous la piste vient désormais de la bande. */
+/* The space under the track now comes from the strip. */
 .tab-bar .tab-switch, .tab-bar .admin-tabs {
   margin: 0;
 }
 
-/* Sur mobile, .page n'a plus que 16 px de marge (base.css). */
+/* On mobile, .page only has 16 px of margin (base.css). */
 @media (max-width: 600px) {
   .tab-bar {
     margin-inline: -16px;
@@ -29,7 +29,7 @@
   }
 }
 
-/* Piste des onglets : annule aussi les marges de la barre de navigation du site. */
+/* Tab track: also cancels the margins of the site navigation bar. */
 .tab-switch {
   display: inline-flex;
   flex-wrap: wrap;
@@ -42,7 +42,7 @@
   border-radius: var(--radius-card);
 }
 
-/* Un onglet, en gris tant qu'il n'est pas choisi. */
+/* A tab, grey while it is not chosen. */
 .tab-switch a {
   font-size: 15px;
   font-weight: 500;
@@ -54,7 +54,7 @@
   transition: background-color .2s, color .2s, transform .2s;
 }
 
-/* Survol : le texte fonce seulement, pour ne pas imiter la case blanche de l'onglet courant. */
+/* Hover: the text only darkens, so as not to imitate the white box of the current tab. */
 .tab-switch a:hover {
   color: var(--color-text);
 }
@@ -63,7 +63,7 @@
   transform: translateY(1px);
 }
 
-/* Onglet courant : case blanche cernée d'un trait fin, texte bleu profond et semi-gras (deux repères au moins, selon NN/g). */
+/* Current tab: white box surrounded by a thin line, deep blue semi-bold text (at least two markers, per NN/g). */
 .tab-switch a.active {
   color: var(--color-blue-deep);
   font-weight: 600;

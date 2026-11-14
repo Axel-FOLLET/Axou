@@ -1,0 +1,215 @@
+/*
+    Naming convention: BEM
+    block           .project-card
+    element         .project-card__title
+    modifier        .project-card--active
+
+    tokens.css: the ONLY site file that contains colours.
+    The other sheets use the variables below only.
+    Each page picks its theme on <body data-theme="home|parcours|portfolio|contact">;
+    every theme defines the same variables (--accent, --accent-card, --accent-text...).
+*/
+
+
+/* -------------------- COMMON PALETTE -------------------- */
+
+/*
+    Colours taken from the two former sites: the CV blue, the portfolio red, the shared near-black.
+    WCAG contrasts measured against the off-white (--white):
+    12.3 on --blue, 9.4 on --blue-card; 6.4 on --red, 5.5 on --red-card; 17.7 on --ink.
+*/
+:root {
+    --blue: #0D0A9B;
+    --blue-card: #1F1BC4;
+    /* Blue readable on the near-black (contrast 5.6): eyebrows and accents of the dark sections */
+    --blue-accent: #6E7BFF;
+    /* --blue-accent is readable on the near-black only: 3.87 on --blue, 2.95 on --blue-card */
+
+    --red: #B4001A;
+    --red-card: #C8001E;
+    /* Red readable on the near-black (contrast 5.6): eyebrows and accents of the dark sections */
+    --red-accent: #FF3B4E;
+    /* --red-accent is readable on the near-black only: 2.03 on --red, 1.72 on --red-card */
+
+    --ink: #0B0B0F;
+    --ink-raised: #16161C;
+    /* Secondary text on the near-black (contrast 7.7); not to be placed on --blue-card (4.1), --red (2.8) or --red-card (2.4) */
+    --muted: #A1A1AA;
+    /* Off-white, slightly warm: less harsh than pure white on the near-black */
+    --white: #F5F3EE;
+
+    /* White veils and hairlines, valid on blue, red and black */
+    --veil: rgba(255, 255, 255, 0.07);
+    --veil-strong: rgba(255, 255, 255, 0.13);
+    /* Hover of the tabs and of discreet links: intermediate veil */
+    --veil-hover: rgba(255, 255, 255, 0.08);
+    --line: rgba(255, 255, 255, 0.1);
+    --line-strong: rgba(255, 255, 255, 0.5);
+    /* Field outline: contrast 7.0 on blue, 3.8 on red (threshold for interface elements: 3) */
+    --line-field: rgba(255, 255, 255, 0.7);
+    /* Hover of the white primary button */
+    --white-soft: rgb(255 255 255 / 88%);
+
+    /*
+        Light of the black pages (home, Contact me, 404): a blue glow on one side, a red one on the other,
+        the two colours of the site instead of a white glow. --blue-accent and --red-accent, diluted.
+    */
+    --light-blue: rgb(110 123 255 / 26%);
+    --light-red: rgb(255 59 78 / 22%);
+
+    /* Dark veils: translucent header, backdrop of the "Are you human?" window, drop shadows */
+    --header-veil: rgba(11, 11, 15, 0.72);
+    --backdrop: rgba(11, 11, 15, 0.75);
+    --shadow: rgba(0, 0, 0, 0.35);
+    --shadow-strong: rgba(0, 0, 0, 0.5);
+
+    /* White cube (all pages): white edges, almost transparent faces */
+    --cube-white-fill: rgba(255, 255, 255, 0.05);
+    --cube-white-fill-hover: rgba(255, 255, 255, 0.18);
+    --cube-white-glow: rgba(255, 255, 255, 0.35);
+
+    /* Blue cube (home and 404 page only): --blue-accent edges, tinted faces */
+    --cube-blue-fill: rgba(110, 123, 255, 0.08);
+    --cube-blue-fill-hover: rgba(110, 123, 255, 0.24);
+    --cube-blue-glow: rgba(110, 123, 255, 0.45);
+
+    /* Red cube (home and 404 page only): --red-accent edges, tinted faces, same opacities as the blue one */
+    --cube-red-fill: rgba(255, 59, 78, 0.08);
+    --cube-red-fill-hover: rgba(255, 59, 78, 0.24);
+    --cube-red-glow: rgba(255, 59, 78, 0.45);
+}
+
+
+/* -------------------- GAMES -------------------- */
+
+/*
+    Snake greens, on the --ink board of the game (js/games/snake, read through siteColor of js/games/theme.js)
+    and of its card scene (js/modules/scenes/snake.js). Used by the Snake only.
+*/
+:root {
+    /* Snake body, title text and frames (contrast 10.3 on --ink) */
+    --snake-green: #3DD65F;
+    /* Snake head: a lighter green, so the head reads apart from the body (contrast 15.6 on --ink) */
+    --snake-green-head: #A6F7B8;
+}
+
+
+/* -------------------- PAGE THEMES -------------------- */
+
+/*
+    Theme variables, same names on every page:
+    --accent              page background (and text of the white primary button)
+    --accent-card         background of the cards and of the blocks laid on the page
+    --accent-text         accent readable on the near-black (eyebrows, periods, progress hairlines)
+    --accent-glow         soft glow (behind the big cube, around active elements)
+    --accent-glow-strong  vivid glow (current timeline dot)
+    --accent-card-hover   background of a hovered card, slightly lighter than --accent-card
+                          (red: value of the former portfolio; other themes: same dosage,
+                          --accent-card at 86% and --accent-text at 14%, which almost gives back that red, #D00825)
+    --field-line          outline of the form fields
+*/
+
+/* Home: black, the blue and red cubes carry the two colours of the site */
+body[data-theme="home"] {
+    --accent: var(--ink);
+    --accent-card: var(--ink-raised);
+    --accent-text: var(--white);
+    --accent-glow: rgba(255, 255, 255, 0.12);
+    --accent-glow-strong: rgba(255, 255, 255, 0.35);
+    /* --ink-raised at 86%, --white at 14% */
+    --accent-card-hover: #353539;
+    --field-line: var(--line-field);
+}
+
+
+/* My background: the blue of the CV site */
+body[data-theme="parcours"] {
+    --accent: var(--blue);
+    --accent-card: var(--blue-card);
+    --accent-text: var(--blue-accent);
+    --accent-glow: rgba(110, 123, 255, 0.35);
+    --accent-glow-strong: rgba(110, 123, 255, 0.55);
+    /* --blue-card at 86%, --blue-accent at 14% */
+    --accent-card-hover: #2A28CC;
+    --field-line: var(--line-field);
+}
+
+
+/* My portfolio: the red of the portfolio */
+body[data-theme="portfolio"] {
+    --accent: var(--red);
+    --accent-card: var(--red-card);
+    --accent-text: var(--red-accent);
+    --accent-glow: rgba(255, 59, 78, 0.35);
+    --accent-glow-strong: rgba(255, 59, 78, 0.55);
+    /* Value of the former portfolio (projects.css, hover of a neighbouring card) */
+    --accent-card-hover: #D0001F;
+    --field-line: var(--line-field);
+}
+
+
+/* Contact me: black, like the home page; only white is used as accent */
+body[data-theme="contact"] {
+    --accent: var(--ink);
+    --accent-card: var(--ink-raised);
+    --accent-text: var(--white);
+    --accent-glow: rgba(255, 255, 255, 0.12);
+    --accent-glow-strong: rgba(255, 255, 255, 0.35);
+    /* --ink-raised at 86%, --white at 14% (like the home page) */
+    --accent-card-hover: #353539;
+    --field-line: var(--line-field);
+}
+
+
+/* -------------------- TRANSPARENCY AND DRAWINGS -------------------- */
+
+:root {
+    /* No colour: backgrounds, borders and gradients that fade out */
+    --clear: transparent;
+
+    /*
+        Small SVG drawings written in the URL (data URI): their colours (white, black outline) are inside the drawing,
+        so they live here with the other colours. The sheets use them with var().
+    */
+    /* Hangman stick figure, four running poses (hover data-hover="hangman", motion.css) */
+    --sprite-hangman: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='64' fill='white' stroke='white'%3E%3Cg transform='translate(0 0)'%3E%3Ccircle cx='9' cy='3' r='2' stroke='none'/%3E%3Cpath d='M8.5 5L7 10M8 7L11.5 8.5M8 7L4.5 9M7 10L10.5 15M7 10L3.5 14.5' fill='none' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/g%3E%3Cg transform='translate(0 16)'%3E%3Ccircle cx='9' cy='3' r='2' stroke='none'/%3E%3Cpath d='M8.5 5L7 10M8 7L10 9.5M8 7L6 9.5M7 10L8.5 12.5L8 15.5M7 10L5.5 12.5L3.5 12' fill='none' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/g%3E%3Cg transform='translate(0 32)'%3E%3Ccircle cx='9' cy='3' r='2' stroke='none'/%3E%3Cpath d='M8.5 5L7 10M8 7L5 9.5M8 7L11 7.5M7 10L10 14L11.5 14.5M7 10L4 15' fill='none' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/g%3E%3Cg transform='translate(0 48)'%3E%3Ccircle cx='9' cy='3' r='2' stroke='none'/%3E%3Cpath d='M8.5 5L7 10M8 7L9.5 9.5M8 7L6.5 9.5M7 10L6 13L7.5 15.5M7 10L9 12.5L7.5 13.5' fill='none' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/g%3E%3C/svg%3E");
+    /* Pixel-art cat, two paw positions (hover data-hover="cat", motion.css) */
+    --sprite-cat: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='32' viewBox='0 0 13 16' shape-rendering='crispEdges'%3E%3Cpath fill='white' d='M0 0h1v1h-1zM10 0h1v1h-1zM12 0h1v1h-1zM0 1h1v1h-1zM10 1h3v1h-3zM1 2h1v1h-1zM9 2h2v1h-2zM12 2h1v1h-1zM1 3h12v1h-12zM2 4h10v1h-10zM2 5h9v1h-9zM2 6h1v1h-1zM4 6h1v1h-1zM8 6h1v1h-1zM10 6h1v1h-1zM2 7h1v1h-1zM4 7h1v1h-1zM8 7h1v1h-1zM10 7h1v1h-1zM0 8h1v1h-1zM10 8h1v1h-1zM12 8h1v1h-1zM0 9h1v1h-1zM10 9h3v1h-3zM1 10h1v1h-1zM9 10h2v1h-2zM12 10h1v1h-1zM1 11h12v1h-12zM2 12h10v1h-10zM2 13h9v1h-9zM3 14h1v1h-1zM5 14h1v1h-1zM7 14h1v1h-1zM9 14h1v1h-1zM3 15h1v1h-1zM5 15h1v1h-1zM7 15h1v1h-1zM9 15h1v1h-1z'/%3E%3C/svg%3E");
+    /* White mouse arrow with a dark outline (hover data-hover="cursor", motion.css) */
+    --sprite-cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='20'%3E%3Cpath d='M1 1V15.5L4.6 12L7.2 17.8L9.6 16.8L7 11.2H11.8Z' fill='white' stroke='black' stroke-opacity='0.8' stroke-width='1.2' stroke-linejoin='round'/%3E%3C/svg%3E");
+    /* White tick of a valid field (form.css) */
+    --sprite-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M2 8.5l4 4 8-9' fill='none' stroke='white' stroke-width='2'/%3E%3C/svg%3E");
+}
+
+
+/* -------------------- MOTION -------------------- */
+
+/*
+    Durations, curves and offsets shared by all the animations (no colour here).
+    Three durations: fast (hovers, small returns), base (state changes), slow (large movements).
+    Masks and reveals last --dur-reveal (0.65 s).
+    The offset of a series grows by 70 ms per element and stops at 400 ms.
+*/
+:root {
+    --dur-fast: 0.2s;
+    --dur-base: 0.45s;
+    --dur-slow: 0.8s;
+    --dur-reveal: calc(var(--dur-base) + var(--dur-fast));
+
+    /* Soft exit: lively start, braked arrival (reveals, movements) */
+    --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+    /* Soft entry and exit (strokes that draw themselves, bars that fill up) */
+    --ease-in-out: cubic-bezier(0.6, 0, 0.2, 1);
+
+    --stagger-step: 70ms;
+    --stagger-max: 400ms;
+
+    /*
+        Page change (base.css): the page being left is wiped away (out), the colour of the destination stays alone
+        for an instant, then the new page follows (in, after wait). Curve with a slow start and a braked arrival.
+    */
+    --dur-page-out: 0.38s;
+    --dur-page-in: 0.5s;
+    --dur-page-wait: 0.3s;
+    --ease-page: cubic-bezier(0.7, 0, 0.2, 1);
+}

@@ -61,7 +61,7 @@ export const CROSS = {
 const _off = new THREE.Vector3(), _p = new THREE.Vector3();
 const _wrap = (a) => Math.atan2(Math.sin(a), Math.cos(a));
 const _ease = (x) => { const k = Math.min(Math.max(x, 0), 1); return k * k * (3 - 2 * k); };
-const NO_CROSS = new Set(['title', 'end', 'hug', 'opening', 'combat']);
+const NO_CROSS = new Set(['title', 'end', 'hug', 'arrival', 'opening', 'combat']);
 
 export class Crossing {
   constructor(story) {

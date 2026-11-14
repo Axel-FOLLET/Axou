@@ -1,24 +1,24 @@
-// Candidatures reçues pour une annonce du recruteur (GET /api/recruiter/ads/<id>/applications), avec leur CV,
-// clôture de l'annonce (POST /api/recruiter/ads/<id>/closure)
-// et refus d'un seul candidat (POST /api/recruiter/ads/<id>/applications/<application_id>/rejection).
+// Applications received for a recruiter's job offer (GET /api/recruiter/ads/<id>/applications), with their CV,
+// closing of the job offer (POST /api/recruiter/ads/<id>/closure)
+// and rejection of a single candidate (POST /api/recruiter/ads/<id>/applications/<application_id>/rejection).
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router'
 import { apiFetch } from '../api.js'
 import { useLang } from '../lang.js'
 
-// "2026-10-08 18:15:02" (UTC, comme le renvoie SQLite) -> "8 octobre 2026" (ou "8 October 2026" avec locale en-GB)
+// "2026-10-08 18:15:02" (UTC, as returned by SQLite) -> "8 octobre 2026" (or "8 October 2026" with the en-GB locale)
 function formatDate(value, locale) {
   return new Date(value.replace(' ', 'T') + 'Z').toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' })
 }
 
-// Statuts de l'API traduits pour l'écran.
+// API statuses translated for the screen.
 const STATUS_LABELS = {
   pending: { fr: 'En attente', en: 'Pending' },
   accepted: { fr: 'Retenue', en: 'Accepted' },
   rejected: { fr: 'Non retenue', en: 'Rejected' },
 }
 
-// Refus de la clôture traduits pour l'écran (messages du contrat).
+// Closure refusals translated for the screen (messages of the contract).
 const CLOSURE_ERRORS = {
   'Ad already closed': { fr: 'Cette annonce est déjà clôturée.', en: 'This job offer is already closed.' },
   'Application does not belong to this ad': { fr: 'Cette candidature ne correspond pas à l\'annonce. Rechargez la page.', en: 'This application does not match the job offer. Reload the page.' },
@@ -29,7 +29,7 @@ const CLOSURE_CONFIRM = {
   en: 'Close the job offer? Each candidate will receive an email, and the job offer can no longer be edited.',
 }
 
-// Refus d'une seule candidature (POST /api/recruiter/ads/<id>/applications/<application_id>/rejection).
+// Rejection of a single application (POST /api/recruiter/ads/<id>/applications/<application_id>/rejection).
 const REJECTION_ERRORS = {
   'Ad already closed': { fr: 'Cette annonce est déjà clôturée.', en: 'This job offer is already closed.' },
   'Application not found': { fr: 'Cette candidature n\'existe plus. Rechargez la page.', en: 'This application no longer exists. Reload the page.' },
@@ -38,16 +38,16 @@ const REJECTION_ERRORS = {
 
 export default function RecruiterApplicationsPage() {
   const { t, lang, locale } = useLang()
-  // id de l'annonce, lu dans l'URL /recruteur/postes/:id/candidatures.
+  // id of the job offer, read from the URL /recruteur/postes/:id/candidatures.
   const { id } = useParams()
   const [applications, setApplications] = useState([])
-  // null tant que rien n'a échoué, sinon 'not-found' (404 Ad not found) ou 'other'.
+  // null while nothing has failed, otherwise 'not-found' (404 Ad not found) or 'other'.
   const [loadError, setLoadError] = useState(null)
-  // Statut de l'annonce ('open' ou 'closed'), lu avec GET /api/ads/<id> ; null tant qu'il est inconnu.
+  // Status of the job offer ('open' or 'closed'), read with GET /api/ads/<id>; null while unknown.
   const [adStatus, setAdStatus] = useState(null)
   const [closing, setClosing] = useState(false)
   const [closeError, setCloseError] = useState('')
-  // Augmenté après une clôture réussie : relance le chargement de la liste et du statut.
+  // Incremented after a successful closure: restarts the loading of the list and of the status.
   const [reloadKey, setReloadKey] = useState(0)
 
   useEffect(() => {
@@ -57,26 +57,26 @@ export default function RecruiterApplicationsPage() {
         setApplications(data)
         setLoadError(null)
       } else {
-        // Seul le 404 du contrat désigne une annonce inconnue ou d'une autre entreprise.
+        // Only the 404 of the contract means an unknown job offer or one from another company.
         setLoadError(status === 404 && error === 'Ad not found' ? 'not-found' : 'other')
         console.error('Error fetching recruiter applications:', status, error)
       }
 
-      // GET /api/ads/<id> renvoie status, y compris pour une annonce fermée.
+      // GET /api/ads/<id> returns status, including for a closed job offer.
       const ad = await apiFetch('/api/ads/' + id)
       setAdStatus(ad.ok ? ad.data.status : null)
     }
     fetchApplications()
   }, [id, reloadKey])
 
-  // acceptedId : candidature retenue (bouton « Retenir ce candidat »),
-  // ou null pour clôturer sans retenir personne (bouton « Clôturer l'annonce ») : toutes les candidatures sont refusées.
+  // acceptedId: accepted application (button "Accept this candidate"),
+  // or null to close without accepting anybody (button "Close the job offer"): all the applications are rejected.
   async function handleClose(acceptedId) {
     setCloseError('')
 
     if (!window.confirm(CLOSURE_CONFIRM[lang])) return
 
-    // Sans candidat retenu, l'API attend un corps vide ; sinon, la candidature retenue.
+    // Without an accepted candidate, the API expects an empty body; otherwise, the accepted application.
     const body = acceptedId === null ? {} : { accepted_application_id: acceptedId }
 
     setClosing(true)
@@ -84,7 +84,7 @@ export default function RecruiterApplicationsPage() {
     setClosing(false)
 
     if (ok) {
-      // Recharger : les statuts passent à « Retenue » et « Non retenue », les boutons disparaissent.
+      // Reload: the statuses become "Accepted" and "Rejected", the buttons disappear.
       setReloadKey((key) => key + 1)
       return
     }
@@ -93,7 +93,7 @@ export default function RecruiterApplicationsPage() {
     console.error('Closure refused:', status, error)
   }
 
-  // Refuse un seul candidat : l'annonce reste ouverte, le candidat reçoit l'e-mail « non retenu ».
+  // Rejects a single candidate: the job offer stays open, the candidate receives the "rejected" email.
   async function handleReject(application) {
     setCloseError('')
 
@@ -110,7 +110,7 @@ export default function RecruiterApplicationsPage() {
     setClosing(false)
 
     if (ok) {
-      // L'API renvoie la candidature à jour : seule cette ligne change.
+      // The API returns the updated application: only this row changes.
       setApplications((list) => list.map((item) => (item.id === data.id ? data : item)))
       return
     }
@@ -119,13 +119,13 @@ export default function RecruiterApplicationsPage() {
     console.error('Rejection refused:', status, error)
   }
 
-  // La clôture n'est proposée que pour une annonce de l'entreprise, chargée sans erreur, encore ouverte.
+  // Closing is offered only for a job offer of the company, loaded without error, still open.
   const canClose = loadError === null && adStatus === 'open'
 
   return (
     <section>
-      {/* Bouton flèche de retour vers « Mes postes », toujours visible, même quand l'annonce est introuvable.
-          Flèche seule (button-link) : aria-label et title donnent la destination. */}
+      {/* Back arrow to "My positions", always visible, even when the job offer is not found.
+          Arrow alone (button-link): aria-label and title give the destination. */}
       <p className="back-link">
         <Link className="button-link" to="/recruteur/postes" aria-label={t('Retour à Mes postes', 'Back to My positions')} title={t('Retour à Mes postes', 'Back to My positions')}>←</Link>
       </p>
@@ -138,9 +138,9 @@ export default function RecruiterApplicationsPage() {
       ) : applications.length === 0 ? (
         <p>{t('Aucune candidature pour cette annonce pour le moment.', 'No applications for this job offer yet.')}</p>
       ) : (
-        // Tableau comme en administration, dans le cadre .table-scroll (admin.css) ; styles dans recruiter.css.
+        // Table like in administration, in the .table-scroll frame (admin.css); styles in recruiter.css.
         <div className="table-scroll" role="region" aria-label={t('Candidatures reçues', 'Applications received')} tabIndex={0}>
-          <table className="candidatures-table">
+          <table className="applications-table">
             <thead>
               <tr>
                 <th>{t('Nom', 'Name')}</th>
@@ -154,15 +154,15 @@ export default function RecruiterApplicationsPage() {
               </tr>
             </thead>
             <tbody>
-              {/* Ordre de l'API conservé : de la plus ancienne à la plus récente. */}
+              {/* API order kept: from the oldest to the most recent. */}
               {applications.map((application) => (
                 <tr key={application.id}>
                   <td>{application.first_name} {application.last_name}</td>
                   <td><a href={`mailto:${application.email}`}>{application.email}</a></td>
                   <td>{application.phone ?? '—'}</td>
-                  {/* Message coupé sur une ligne ; le texte entier s'affiche au survol. */}
+                  {/* Message cut to one line; the whole text shows on hover. */}
                   <td className="cell-clip" title={application.message}>{application.message}</td>
-                  {/* Le PDF se télécharge directement depuis l'API (même origine grâce au proxy, cookie compris). */}
+                  {/* The PDF is downloaded directly from the API (same origin thanks to the proxy, cookie included). */}
                   <td>
                     {application.has_cv ? (
                       <a href={`/api/recruiter/ads/${id}/applications/${application.id}/cv`} download>{t('Télécharger', 'Download')}</a>
@@ -170,8 +170,8 @@ export default function RecruiterApplicationsPage() {
                   </td>
                   <td>{formatDate(application.created_at, locale)}</td>
                   <td>{STATUS_LABELS[application.status]?.[lang] ?? application.status}</td>
-                  {/* Annonce ouverte, candidature en attente : « Retenir ce candidat » clôture l'annonce en le retenant
-                      (bleu, action positive), « Refuser » ne refuse que lui (rouge). Colonne collée à droite (recruiter.css). */}
+                  {/* Job offer open, application pending: "Accept this candidate" closes the job offer by accepting them
+                      (blue, positive action), "Reject" rejects only them (red). Column stuck to the right (recruiter.css). */}
                   {canClose && (
                     <td className="col-actions">
                       {application.status === 'pending' && (
@@ -193,8 +193,8 @@ export default function RecruiterApplicationsPage() {
         </div>
       )}
 
-      {/* Clôture sans candidat retenu, avec ou sans candidatures : toutes les candidatures sont refusées.
-          Rouge (button-danger, comme « Supprimer » en administration) : action définitive. */}
+      {/* Closing without an accepted candidate, with or without applications: all the applications are rejected.
+          Red (button-danger, like "Delete" in administration): definitive action. */}
       {canClose && (
         <button className="button-danger" type="button" disabled={closing} onClick={() => handleClose(null)}>
           {t("Clôturer l'annonce", 'Close the job offer')}

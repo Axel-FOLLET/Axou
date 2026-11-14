@@ -1,0 +1,454 @@
+/* -------------------- SCROLL-LINKED -------------------- */
+
+/*
+ * Animations that follow the scroll position instead of firing once:
+ * when scrolling back up, they run backwards. The browser computes them on its own (animation-timeline),
+ * with no JavaScript and no scroll listener.
+ * scroll(root): progress through the whole page; view(): the element crossing the screen.
+ * A browser that does not know animation-timeline ignores this block: the page stays as it was before.
+ * With reduced motion, nothing moves.
+ *
+ * Merge of the scroll.css files of the two former sites:
+ * - portfolio amplitudes on all pages, My background included (a single movement for the whole site);
+ * - blocks specific to a page kept here and flagged with their page: each applies only if the page
+ *   contains its classes or ids;
+ * - removed: the reading line of the sections in the menu (the site now has one page per tab)
+ *   and the entrance of the cards of the CV Projects section (section removed).
+ * The home page (data-theme="home") fits on one screen: it has no scroll relief and no cubes following the mouse.
+ * Side arrivals stay short (32 px, 35 px for the education cards): a single entrance per block, with no crossing of the screen.
+ */
+
+
+@media (prefers-reduced-motion: no-preference) {
+
+    /* -------------------- CUBES FOLLOWING THE MOUSE (page headers, except the home page) -------------------- */
+
+    /*
+     * --mx and --my (from -1 to 1) are set by scroll-motion.js according to the mouse position in the header (.hero).
+     * Each cube moves by --depth pixels at most, in one direction or the other: the big cube a little,
+     * the small ones more and in opposite directions, like planes at different distances.
+     * translate adds to the transform placement of the cubes without replacing it.
+     */
+    body:not([data-theme="home"]) .hero__visual .cube {
+        translate: calc(var(--mx, 0) * var(--depth, 0) * 1px) calc(var(--my, 0) * var(--depth, 0) * 1px);
+    }
+
+
+    .hero__visual .cube--hero {
+        --depth: 18;
+    }
+
+
+    .hero__visual .cube--pos-1 {
+        --depth: -44;
+    }
+
+
+    .hero__visual .cube--pos-2 {
+        --depth: 56;
+    }
+
+
+    /* A small cube shifted by 56 px must not widen the page, even without animation-timeline (Firefox) */
+    .hero {
+        overflow-x: clip;
+    }
+
+
+    /* -------------------- SLIDING JOBS (My background, CV timeline) -------------------- */
+
+    /*
+     * When the line reaches a job (timeline.js), its card arrives from 32 px on the right
+     * (24 px in timeline.css, without animation-timeline): a short slide, the duration does not change.
+     */
+    .timeline--animated .timeline__content {
+        translate: 32px 0;
+    }
+
+
+    .timeline--animated .timeline__step--visible .timeline__content {
+        translate: none;
+    }
+
+
+    @supports (animation-timeline: scroll()) {
+
+        /* -------------------- AMPLITUDES -------------------- */
+
+        /*
+         * Portfolio values, the same on all pages.
+         * The keyframes further down read these variables on the animated element.
+         */
+        body {
+            /* Home in depth: opacity, scale and arrival rotation of the text, the cubes and the glow */
+            --hero-text-fade: 0;
+            --hero-text-scale: 0.92;
+            --hero-visual-rotate: -10deg;
+            --hero-visual-scale: 1.12;
+            --hero-glow-scale: 1.8;
+        }
+
+
+        /* -------------------- EXEMPTION FROM reveal.js -------------------- */
+
+        /*
+         * The entrances below start as soon as their block touches the bottom of the screen; reveal.js only shows it
+         * 10% higher, then fading in: the start of the entrance would play on a block that is still invisible
+         * (up to 15% of the timeline, measured). These blocks therefore stay displayed and let the entrance play alone.
+         * The career-change banner has its own (halves of the title, then goal frame): same exemption.
+         */
+        .reveal:is(.lit-text, :has(.lit-text, .education__card, .project-card, .career__half)) {
+            opacity: 1;
+            translate: none;
+        }
+
+
+        /* -------------------- PROGRESS BAR -------------------- */
+
+        /*
+         * Line in the accent of the page under the sticky header: it fills from left to right, from 0 to 100% of the page.
+         * scale rather than width: the browser does not recompute the layout on every frame.
+         */
+        .header::after {
+            content: "";
+
+            position: absolute;
+            left: 0;
+            bottom: -1px;
+
+            width: 100%;
+            height: 2px;
+
+            background: linear-gradient(90deg, var(--accent-text), var(--white));
+
+            transform-origin: 0 50%;
+
+            animation: scroll-progress linear both;
+            animation-timeline: scroll(root);
+        }
+
+
+        @keyframes scroll-progress {
+            from {
+                scale: 0 1;
+            }
+        }
+
+
+        /* -------------------- HEADER IN DEPTH (.hero, except the home page) -------------------- */
+
+        /*
+         * The home page fits on one screen: the relief would hardly be seen there, so it is not set (body:not([data-theme="home"])).
+         * Over the first screen height scrolled, three planes move at different speeds:
+         * the text recedes (it goes down more slowly than the page, shrinks and fades out),
+         * the cubes rise faster than the page while turning, the glow widens and goes out.
+         * This difference in speed gives the depth. The title entrance animations (motion.css)
+         * touch the words, not their block: the two combine.
+         * Under 1,024 px, the cubes are under the text: when approaching, the two planes would overlap.
+         * The text then rises slightly faster than the page and the cubes follow it, only turning.
+         * overflow-x: clip: the enlarged glow would overflow on the right and widen the page (horizontal scroll).
+         */
+        .hero {
+            overflow-x: clip;
+
+            --hero-text-shift: 22svh;
+            --hero-visual-shift: -18svh;
+        }
+
+
+        @media (max-width: 1024px) {
+
+            .hero {
+                --hero-text-shift: -8svh;
+                --hero-visual-shift: 0;
+            }
+
+        }
+
+
+        body:not([data-theme="home"]) .hero__text {
+            transform-origin: 0 50%;
+
+            animation: hero-text-depth linear both;
+            animation-timeline: scroll(root);
+            animation-range: 0 90svh;
+        }
+
+
+        @keyframes hero-text-depth {
+            to {
+                opacity: var(--hero-text-fade);
+                translate: 0 var(--hero-text-shift);
+                scale: var(--hero-text-scale);
+            }
+        }
+
+
+        body:not([data-theme="home"]) .hero__visual {
+            animation: hero-visual-depth linear both;
+            animation-timeline: scroll(root);
+            animation-range: 0 100svh;
+        }
+
+
+        @keyframes hero-visual-depth {
+            to {
+                translate: 0 var(--hero-visual-shift);
+                rotate: var(--hero-visual-rotate);
+                scale: var(--hero-visual-scale);
+            }
+        }
+
+
+        body:not([data-theme="home"]) .hero__visual::before {
+            animation: hero-glow-depth linear both;
+            animation-timeline: scroll(root);
+            animation-range: 0 80svh;
+        }
+
+
+        @keyframes hero-glow-depth {
+            to {
+                opacity: 0;
+                scale: var(--hero-glow-scale);
+            }
+        }
+
+
+        /* -------------------- TEXT THAT LIGHTS UP -------------------- */
+
+        /*
+         * The highlighted words of the introductions (arranged by scroll-motion.js) go from the secondary grey (--muted)
+         * to their white one after the other, while the text rises from the bottom of the screen to its middle.
+         * Only the colour changes, starting from --muted: each word stays readable at any position
+         * (contrast 7.6 on the near-black); words that are already grey have nothing to light up.
+         * --p (from 0 to 1) is the place of the word in the text: the first lights up at 12% of the crossing, the last around 48%.
+         * The crossing is measured on the paragraph (--lit), not on each word: the words of a same line
+         * still light up one after the other.
+         */
+        .lit-text {
+            view-timeline: --lit;
+        }
+
+
+        .lit-word {
+            animation: word-lit linear both;
+            animation-timeline: --lit;
+            animation-range: cover calc(12% + var(--p, 0) * 30%) cover calc(18% + var(--p, 0) * 30%);
+        }
+
+
+        @keyframes word-lit {
+            from {
+                color: var(--muted);
+            }
+        }
+
+
+        /* -------------------- CARD DEAL (My portfolio, projects wheel) -------------------- */
+
+        /*
+         * The cards of the wheel arrive from the bottom of the screen (40% of its height at most), barely tilted (+-8 deg at most),
+         * and land one by one
+         * in their place while the wheel rises on the screen; when scrolling back up, they leave again.
+         * translate and rotate add to the transform placement computed by project-showcase.js without replacing it:
+         * the wheel stays usable during the deal, and nothing changes once the cards are laid.
+         * The crossing is measured on the wheel (--deal), which is still, and not on the moving cards.
+         * Each card has its start (--deal-x in card widths, --deal-y, --deal-r) and its rank (--deal-order);
+         * the last one lands at 40% of the crossing: the wheel placed under the header is complete.
+         */
+        .showcase--ready .showcase__track {
+            view-timeline: --deal;
+        }
+
+
+        .showcase--ready .project-card {
+            animation: card-deal var(--ease-out) both;
+            animation-timeline: --deal;
+            animation-range: cover calc(var(--deal-order, 0) * 3%) cover calc(22% + var(--deal-order, 0) * 3%);
+        }
+
+
+        @keyframes card-deal {
+            from {
+                translate: calc(var(--deal-x, 0) * var(--card-width)) var(--deal-y, 80vh);
+                rotate: var(--deal-r, 0deg);
+            }
+        }
+
+
+        .showcase--ready .project-card:nth-child(7n + 1) { --deal-x: -0.4; --deal-y: 26vh; --deal-r: -6deg; --deal-order: 3; }
+        .showcase--ready .project-card:nth-child(7n + 2) { --deal-x: 0.35; --deal-y: 32vh; --deal-r: 5deg; --deal-order: 1; }
+        .showcase--ready .project-card:nth-child(7n + 3) { --deal-x: -0.2; --deal-y: 38vh; --deal-r: 8deg; --deal-order: 5; }
+        .showcase--ready .project-card:nth-child(7n + 4) { --deal-x: 0.4; --deal-y: 28vh; --deal-r: -4deg; --deal-order: 0; }
+        .showcase--ready .project-card:nth-child(7n + 5) { --deal-x: -0.45; --deal-y: 35vh; --deal-r: 7deg; --deal-order: 4; }
+        .showcase--ready .project-card:nth-child(7n + 6) { --deal-x: 0.15; --deal-y: 40vh; --deal-r: -8deg; --deal-order: 2; }
+        .showcase--ready .project-card:nth-child(7n + 7) { --deal-x: 0.4; --deal-y: 36vh; --deal-r: 3deg; --deal-order: 6; }
+
+
+        /* -------------------- EDUCATION (My background, section #education) -------------------- */
+
+        /*
+         * The two cards each arrive from their own side (35 px, tilted by 2.2 deg), and land side by side
+         * while the list rises on the screen. On phones, stacked, they also arrive from each side.
+         * overflow-x: clip on the section: the cards still outside do not widen the page.
+         */
+        #education {
+            overflow-x: clip;
+        }
+
+
+        .education__list {
+            view-timeline: --education;
+        }
+
+
+        .education__card {
+            animation: education-in var(--ease-out) both;
+            animation-timeline: --education;
+            animation-range: entry 0% cover 40%;
+        }
+
+
+        .education__card:nth-child(odd) {
+            --from-x: -35px;
+            --from-r: -2.2deg;
+        }
+
+
+        .education__card:nth-child(even) {
+            --from-x: 35px;
+            --from-r: 2.2deg;
+        }
+
+
+        @keyframes education-in {
+            from {
+                opacity: 0;
+                translate: var(--from-x) 24px;
+                rotate: var(--from-r);
+            }
+        }
+
+
+        /* -------------------- CAREER-CHANGE TITLE (My background, section #career-change) -------------------- */
+
+        /*
+         * The title splits in two: the first half (.career__half) arrives from 32 px on the left,
+         * the second from 32 px on the right, and the two meet while the title rises on the screen.
+         * The words are inside the masks of motion.js; translate does not act on an inline span,
+         * hence inline-block, which changes neither the line breaks nor the layout.
+         * overflow-x: clip on the section: the halves still outside do not widen the page.
+         */
+        #career-change {
+            overflow-x: clip;
+        }
+
+
+        #career-change-title {
+            view-timeline: --career-title;
+        }
+
+
+        .career__half .motion-intro__mask {
+            display: inline-block;
+
+            animation: half-join var(--ease-out) both;
+            animation-timeline: --career-title;
+            animation-range: entry 0% cover 45%;
+        }
+
+
+        .career__half:first-child { --from-x: -32px; }
+        .career__half:last-child { --from-x: 32px; }
+
+
+        @keyframes half-join {
+            from {
+                opacity: 0;
+                translate: var(--from-x) 0;
+            }
+        }
+
+
+        /* -------------------- DRAWN GOAL (My background, .career__goal) -------------------- */
+
+        /*
+         * The goal frame draws itself stroke by stroke while the background is read: the hairline goes down,
+         * then its two branches go off to the right; the label and the text light up afterwards.
+         * The hairline of the goal (page sheet of the background page) becomes transparent: ::before redraws it in its place,
+         * ::after carries the branches, shorter than the margin of the text so as never to touch it.
+         */
+        .career__goal {
+            position: relative;
+
+            border-left-color: var(--clear);
+
+            view-timeline: --goal;
+        }
+
+
+        .career__goal::before,
+        .career__goal::after {
+            content: "";
+
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: -1px;
+
+            pointer-events: none;
+        }
+
+
+        .career__goal::before {
+            width: 1px;
+
+            background-color: var(--white);
+
+            transform-origin: 50% 0;
+
+            animation: goal-line linear both;
+            animation-timeline: --goal;
+            animation-range: entry 60% cover 40%;
+        }
+
+
+        .career__goal::after {
+            width: 24px;
+
+            border-block: 1px solid var(--white);
+
+            transform-origin: 0 50%;
+
+            animation: goal-arms linear both;
+            animation-timeline: --goal;
+            animation-range: cover 40% cover 48%;
+        }
+
+
+        @media (max-width: 767px) {
+
+            .career__goal::after {
+                width: 12px;
+            }
+
+        }
+
+
+        @keyframes goal-line {
+            from {
+                scale: 1 0;
+            }
+        }
+
+
+        @keyframes goal-arms {
+            from {
+                scale: 0 1;
+            }
+        }
+
+    }
+
+}

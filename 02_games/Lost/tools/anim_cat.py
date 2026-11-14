@@ -23,6 +23,9 @@ Pitfalls:
   - the neck IK (Neck.002 -> Head_controller, chain of 3) overrides the Copy Rotation of Neck.002: head orientation depends
     on the neck base -> controller direction and on the chain folding, not on the controller rotation. head_at() places
     the controller at distance 2.4 (neck nearly straight, length 2.46) with a calibrated 21.3° offset (`calib` mode).
+  - the export is not deterministic (two runs of this script differ on several clips) and does not reproduce the 32
+    clips shipped before session 11 B: public/models/cat.glb keeps those 32 clips from the previous file and takes only
+    the 7 clips of session 11 B (Tumble, LeapCatch, HopJoy, RageCry, Stumble, LimpRise, Rub) from an export of this script.
 """
 import bpy, sys, os, math
 from mathutils import Vector, Matrix, Quaternion, Euler
@@ -1743,6 +1746,397 @@ ACTIONS.update({
     "SwordPawHold": [(i / FPS, sword_paw_pose(i / SWPAW_FRAMES)) for i in range(SWPAW_FRAMES + 1)],
     "StepBack": [(i / FPS, step_back_pose(i / SB_FRAMES)) for i in range(SB_FRAMES + 1)],
 })
+
+# --- Cutscene clips (kitten), session 11 B. Three clips for the videos only (no use in the game).
+# Rotation helper: twisted() gives the head, front and rear the same twist logic but through rolled() only; the tumble
+# needs a different roll angle for head, front and rear at every frame (the corkscrew), so poses are turned part by
+# part by 3x3 matrices around the same pivot (PIVOT, the spine axis at ZC).
+def _turn_parts(p, front, rear, head, pivot=PIVOT):
+    """Pose turned by one matrix per body part (front, rear, head), like twisted(); the middle of the spine and Root
+    take the mean rotation. Keys starting with "_" (ears, mouth, air) are copied unchanged."""
+    pv = Vector(pivot)
+    mid = front.to_quaternion().slerp(rear.to_quaternion(), 0.5).to_matrix()
+    out = {}
+    for name, spec in p.items():
+        if name == "Root":
+            continue
+        if name.startswith("_"):
+            out[name] = spec
+            continue
+        M = head if name == "Head_controller" else front if name in FRONT_CTRL else rear if name in REAR_CTRL else mid
+        s = dict(spec)
+        base = Vector(s["pos"]) if s.get("pos") is not None else REST[name][0]
+        s["pos"] = pv + M @ (base - pv)
+        if s.get("aim") is not None:
+            s["aim"] = M @ Vector(s["aim"])
+        s["pre"] = M @ s["pre"] if s.get("pre") is not None else M
+        out[name] = s
+    out["Root"] = dict(pos=pv - mid @ pv, quat=mid.to_quaternion())
+    return out
+
+def _Rm(roll):
+    """Rotation matrix around Y (body axis), degrees; > 0 = left side down."""
+    return Matrix.Rotation(math.radians(roll), 3, "Y")
+
+def _lerp_legs(a, b, k):
+    """Feet of two leg sets (fl, fr, bl, br) blended by k; elbows and hocks recomputed by pole() in _legs_pet."""
+    return {key: V(a[key]).lerp(V(b[key]), k) for key in ("fl", "fr", "bl", "br")}
+
+# --- Tumble: the kitten falls spinning, hits the ground, rolls twice and lies on its side. In-place clip: the scene
+# moves the root (height of the fall, travel of the roll, see TB_ROLL_RADIUS). Poses are written in the TUCK frame
+# (body on its axis at ZC, legs folded or flung out), then turned around the spine axis by the roll angle
+# TB_THETA(t); each part of the body has its own angle (head first in the air, rear last), which gives the corkscrew.
+# One key per frame, grounded by apply_pose (every key touches the ground), then raised by "_air".
+# Roll difference between head, front and rear in the air (degrees): corkscrew. With a pitch or yaw swing added to it, the
+# stretchable spine IK tore on single frames (tested: lead 25-40 with pitch 8-15 or yaw 8-18); roll alone is stable.
+TB_LEAD = 50
+TB_FRAMES = 60              # 2.5 s at 24 fps
+TB_T_TOUCH = 0.80           # first ground contact (s)
+TB_T_ROLL_END = 2.0         # end of the second turn (s): the kitten lies on its side from here
+TB_ROLL_AIR = 450           # roll angle at the first contact (degrees): 1.25 turns, ends on the side (450 = 90 mod 360)
+TB_ROLL_GROUND = 720        # two full turns on the ground (degrees)
+TB_FALL_H = 3.0             # height above the ground at t = 0 (units): the last stretch of a longer fall
+TB_BOUNCES = ((TB_T_TOUCH, 0.35, 0.9), (1.18, 0.25, 0.3))  # (start s, duration s, height units) of the two bounces
+TB_ROLL_RADIUS = 1.9        # radius of the rolling body (units): the scene moves the root by 2 pi r per turn
+# Legs in the TUCK frame (x = side, y = along the body, z = up before the roll). Ball: folded under the body
+# (TUCK_LEGS); flung: arms and legs out and up around the spine axis (ZC), as a falling kitten flails.
+TB_BALL = {k: V(TUCK_LEGS[k]) for k in ("fl", "fr", "bl", "br")}
+TB_FLUNG = dict(fl=P(2.4, -3.6, ZC + 0.7), fr=P(-2.4, -3.6, ZC + 0.7), bl=P(2.1, 4.8, ZC - 0.5), br=P(-2.1, 4.8, ZC - 0.5))
+TB_LOOSE = dict(fl=P(0.9, -3.4, g + 1.5), fr=P(-0.9, -3.0, g + 1.3), bl=P(1.3, 4.6 + TUCK_DY, g + 1.4),
+                br=P(-0.9, 4.2 + TUCK_DY, g + 1.1))   # relaxed lying legs, a little apart
+
+def _tb_theta(t):
+    """Roll angle of the middle of the body (degrees): constant spin in the air, then two turns slowing down to a stop
+    (quadratic ease-out: the angular speed falls linearly to zero at TB_T_ROLL_END)."""
+    if t <= TB_T_TOUCH:
+        return TB_ROLL_AIR * t / TB_T_TOUCH
+    x = min(1.0, (t - TB_T_TOUCH) / (TB_T_ROLL_END - TB_T_TOUCH))
+    return TB_ROLL_AIR + TB_ROLL_GROUND * (1 - (1 - x) ** 2)
+
+def _tb_air(t):
+    """Height of the mesh above the ground (units): accelerated fall, then two decreasing bounces."""
+    if t < TB_T_TOUCH:
+        return TB_FALL_H * (1 - (t / TB_T_TOUCH) ** 2)
+    for t0, d, h in TB_BOUNCES:
+        if t0 <= t <= t0 + d:
+            return h * math.sin(math.pi * (t - t0) / d)
+    return 0.0
+
+def tumble_pose(t):
+    air = max(0.0, 1 - (t / TB_T_TOUCH) ** 2) if t < TB_T_TOUCH else 0.0     # 1 in the air, 0 on the ground
+    settle = _smooth(TB_T_ROLL_END - 0.1, TB_T_ROLL_END + 0.4, t)            # 0 -> 1: legs relax, head and tail rest
+    # Legs: flung while falling, folded into a ball while rolling, loose when lying.
+    flail = 0.5 + 0.5 * math.sin(2 * math.pi * 2.5 * t)     # limbs open and close 2.5 times per second
+    sprawl = (0.85 * air + 0.25 * (1 - air) * flail) * (1 - settle)
+    legs_ = _lerp_legs(_lerp_legs(TB_BALL, TB_FLUNG, sprawl), TB_LOOSE, 0.35 + 0.65 * settle)
+    head_yaw = 30 * math.sin(2 * math.pi * 1.5 * t) * (1 - settle)
+    head_pitch = 12 - 14 * air * math.sin(2 * math.pi * t)
+    tail = P(0.9 * math.sin(2 * math.pi * 2 * t) * (1 - settle) + 0.9 * settle, 5.9 + TUCK_DY, g + 1.6 - 0.8 * settle)
+    faim = V((0.2, -1, 0.3)).lerp(V((0, -0.6, -0.8)), 1 - air)
+    baim = V((0.2, 0.8, 0.2)).lerp(V((0.1, 0.8, -0.55)), 1 - air)
+    p = pose(body(**TUCK_BODY, HD_=head_at(TUCK_N, pitch=head_pitch, yaw=head_yaw), T_=tail),
+             legs(**_legs_pet(legs_["fl"], legs_["fr"], legs_["bl"], legs_["br"], faim=faim, baim=baim)))
+    th = _tb_theta(t)
+    lead = TB_LEAD * air * math.sin(math.pi * min(1.0, t / TB_T_TOUCH))      # head leads, rear lags in the air (corkscrew)
+    out = _turn_parts(p, _Rm(th + lead * 0.5), _Rm(th - lead * 0.5), _Rm(th + lead * 1.4))
+    out["_ears"] = (0, 28 * air + 8, 0)
+    out["_mouth"] = 26 * air * (0.6 + 0.4 * math.sin(2 * math.pi * 3 * t))   # cry while falling
+    out["_air"] = _tb_air(t)
+    return out
+
+# --- LeapCatch: the kitten crouches, leaps and closes its jaws on the sword grip in mid-air (LEAP_T_CATCH), lands
+# with the sword held and ends on SWORD_STANCE. The sword is not part of the clip (the scene places it: at the instant
+# LEAP_T_CATCH the grip is between the jaws, see setup_leap_props for the preview). Heights are baked ("_air"), the
+# horizontal travel is left to the scene (LEAP_TRAVEL).
+LEAP_T_CATCH = 0.75         # s: the jaw has closed on the grip (apex of the leap)
+LEAP_AIR_PEAK = 4.5         # height of the mesh above the ground at the catch (units, about 39 cm)
+LEAP_TRAVEL = 8.0           # forward travel the scene should give the root between the push (0.33 s) and the touch (1.08 s), units
+LEAP_MOUTH_OPEN = 30        # jaw opening while reaching (degrees); SW_MOUTH once the grip is held
+def _leap(body_args, leg_args, deg=0, pivot=(0, 0, 0), mouth=SW_MOUTH, ears=(0, 10, 0), air=0.0):
+    p = _jpose(_jbody(*body_args[0], **body_args[1]), lambda hj: _jlegs(*leg_args[0], hj, **leg_args[1]), deg, pivot)
+    p.update(_mouth=mouth, _ears=ears)
+    if air:
+        p["_air"] = air
+    return p
+
+# Crouch: low, loaded rear, head up toward the sword (muzzle raised by 10 degrees around the hind feet), mouth ajar.
+LEAP_CROUCH = _leap(((2.7, 3.3, 1.9), dict(pitch=-6, tail=P(0, 6.4, g + 1.0))),
+                    ((-3.2, PAW, 2.0, PAW), dict(hock_up=0.8)), 10, (0, 2.0, g), mouth=14, ears=(0, 5, 0))
+# Coil: one step deeper, rump up, tail low (0.17 s); nothing leaves the ground.
+LEAP_COIL = _leap(((2.3, 3.5, 1.6), dict(pitch=-8, tail=P(0, 6.4, g + 0.8))),
+                  ((-3.0, PAW, 1.8, PAW), dict(hock_up=0.8)), 14, (0, 2.0, g), mouth=16, ears=(0, 12, 0))
+# Push: rear unfolding, front legs folded against the chest, body reared by 24 degrees around the hind feet, jaw
+# opening wide (0.33 s). Hind feet still on the ground.
+LEAP_PUSH = _leap(((4.4, 4.4, 3.6), dict(stretch=0.8, pitch=-6, tail=P(0, 7.4, g + 3.4))),
+                  ((-3.4, 2.2, 5.4, PAW), dict(faim=(0, -0.3, -0.95), baim=(0, 0.6, -0.8))), 24, (0, 5.4, g),
+                  mouth=LEAP_MOUTH_OPEN - 6, ears=(0, 20, 0))
+# Rise: all four feet in the air, body stretched and pitched up 20 degrees, front legs reaching up and forward, jaw
+# wide open (0.5 s).
+LEAP_RISE = _leap(((4.2, 4.3, 3.6), dict(stretch=0.8, pitch=-6, tail=P(0, 7.6, g + 3.6))),
+                  ((-5.0, 2.8, 7.4, 3.2), dict(faim=(0, -1, 0.3), baim=(0, 1, 0))), 20, (0, 0.5, g + 4),
+                  mouth=LEAP_MOUTH_OPEN, ears=(0, 25, 0), air=2.6)
+# Just before the catch (0.67 s): near the apex, jaw still wide, head stretched toward the grip.
+LEAP_REACH = _leap(((4.2, 4.3, 3.7), dict(stretch=0.8, pitch=-6, tail=P(0, 7.6, g + 3.8))),
+                   ((-4.8, 3.0, 7.0, 3.4), dict(faim=(0, -1, 0.3), baim=(0, 1, 0))), 18, (0, 0.5, g + 4),
+                   mouth=LEAP_MOUTH_OPEN, ears=(0, 20, 0), air=LEAP_AIR_PEAK - 0.4)
+# Catch (LEAP_T_CATCH): apex, jaw closed on the grip (SW_MOUTH), head high and pitch like SWORD_STANCE; legs start
+# folding.
+LEAP_CATCH = _leap(((4.3, 4.3, 3.7), dict(stretch=0.8, pitch=SW_PITCH, tail=P(0, 7.2, g + 3.8))),
+                   ((-4.4, 3.0, 6.6, 3.2), dict(faim=(0, -1, 0.1), baim=(0, 1, 0))), 14, (0, 0.5, g + 4),
+                   mouth=SW_MOUTH, ears=(0, 14, 0), air=LEAP_AIR_PEAK)
+# Descent (0.92 s): body levelling off, front legs reaching down for the ground, sword held.
+LEAP_FALL = _leap(((4.0, 4.3, 3.4), dict(stretch=0.7, pitch=SW_PITCH, tail=P(0, 7.2, g + 4.2))),
+                  ((-4.2, 1.2, 5.6, 2.2), dict(faim=(0, -0.9, -0.5), baim=(0, 0.6, -0.8))), 10, (0, -4.0, g),
+                  ears=(0, 12, 0), air=LEAP_AIR_PEAK * 0.5)
+# Front paws touch (1.08 s): hind legs still trailing, rump high.
+LEAP_TOUCH = _leap(((3.5, 4.5, 2.7), dict(stretch=0.4, pitch=SW_PITCH, tail=P(0, 6.9, g + 4.0))),
+                   ((-4.0, PAW, 4.4, 1.4), dict()), 4, (0, -4.0, g), ears=(0, 18, 0), air=0.12)
+# Landing cushion (1.25 s): four feet down, crouched, head high with the sword.
+LEAP_LAND = _leap(((3.0, 3.9, 2.3), dict(pitch=SW_PITCH, tail=P(0.4, 6.6, g + 2.0))),
+                  ((-3.4, PAW, 2.8, PAW), dict(hock_up=0.8)), 0, (0, 0, g), ears=(0, 18, 0))
+
+# --- HopJoy: the kitten hops for joy on the spot, three small hops in 2.0 s, tail up and hooked, ears out, mouth ajar
+# in the air, head tilting from side to side. Seamless loop (LOOP_FRAMES, SEAMLESS): the pose of frame 48 is that of
+# frame 0 (crouch at the start of a hop).
+HOP_FRAMES = 48             # one cycle = 2.0 s at 24 fps
+HOP_COUNT = 3               # hops per cycle (0.667 s each)
+HOP_HEIGHT = 2.6            # apex of a hop above the ground (units, about 17 cm): small bounces, easy to read from afar
+HOP_TAIL = P(0, 3.8, g + 10.0)       # tail tip, up and slightly forward (hook); rest tip is at g + 9.1
+HOP_HEAD_YAW = 14           # head tilt amplitude (degrees)
+HOP_TAIL_WAG = 0.6          # sideways sway of the tail tip (units)
+HOP_HEAD_PITCH = -5         # head_at input (degrees, < 0 = muzzle up): cheerful, chin raised
+def _hop_key(body_args, leg_args, mouth=0, ears=(25, 0, 0)):
+    return _leap(body_args, leg_args, mouth=mouth, ears=ears)
+
+# Crouch: landing absorbed, body low, hind legs folded, tail already up.
+HOP_CROUCH = _hop_key(((3.0, 3.6, 2.4), dict(pitch=-4, tail=HOP_TAIL - V((0, 0, 0.4)))),
+                      ((-2.6, PAW, 2.2, PAW), dict(hock_up=0.9)), ears=(25, 0, 0))
+# Push: body stretched upward, legs extended down, feet still on the ground.
+HOP_PUSH = _hop_key(((5.2, 5.6, 4.6), dict(stretch=0.4, pitch=-8, tail=HOP_TAIL + V((0, 0.4, 0.5)))),
+                    ((-1.7, PAW, 2.7, PAW), dict()), ears=(25, -8, 0))
+# Air: feet tucked, front legs folded against the chest, mouth ajar (happy).
+HOP_AIR = _hop_key(((4.8, 5.2, 4.0), dict(pitch=-6, tail=HOP_TAIL + V((0, 0.6, 0.2)))),
+                   ((-2.2, 1.4, 3.0, 1.2), dict(faim=(0, -0.4, -0.9), hock_up=0.5)), mouth=12, ears=(30, -6, 0))
+# Landing reach: legs reaching for the ground, body already dropping.
+HOP_LAND = _hop_key(((4.2, 4.7, 3.5), dict(pitch=-4, tail=HOP_TAIL + V((0, 0.2, -0.2)))),
+                    ((-2.0, 0.7, 2.7, 0.6), dict()), mouth=6, ears=(25, 4, 0))
+HOP_SEQ = (HOP_CROUCH, HOP_PUSH, HOP_AIR, HOP_LAND, HOP_CROUCH)   # at u = 0, 0.25, 0.5, 0.75, 1 of each hop
+HOP_AIR_PHASE = (0.25, 0.75)                                        # feet off the ground between these phases
+
+def hop_pose(ph):
+    """ph in [0, 1): phase in the 2.0 s cycle. Pose blended between the four key poses by the phase within the hop;
+    air height from a sine arch between HOP_AIR_PHASE; head tilt and tail sway are continuous at the loop point."""
+    u = (ph * HOP_COUNT) % 1.0
+    seg = min(3, int(u * 4))
+    k = u * 4 - seg
+    k = k * k * (3 - 2 * k)
+    p = _mix_pose(HOP_SEQ[seg], HOP_SEQ[seg + 1], k)
+    a0, a1 = HOP_AIR_PHASE
+    p["_air"] = HOP_HEIGHT * math.sin(math.pi * (u - a0) / (a1 - a0)) if a0 < u < a1 else 0.0
+    sway = math.sin(2 * math.pi * ph * 1.5)          # head side to side: 1.5 periods per cycle, zero at the loop point
+    p["Head_controller"] = dict(pos=head_at(p["Neck"]["pos"], pitch=HOP_HEAD_PITCH, yaw=HOP_HEAD_YAW * sway), rot=(0, 0, 0))
+    wag = HOP_TAIL_WAG * math.sin(2 * math.pi * ph * HOP_COUNT)   # one wag per hop, zero at the loop point
+    p["Tail_controller"] = dict(pos=V(p["Tail_controller"]["pos"]) + V((wag, 0, 0)))
+    return p
+
+# --- Actions of the block
+# Bake order: the export bakes the NLA tracks in alphabetical order, so HopJoy is baked between HeadShake and Idle,
+# LeapCatch between Knockback and Lie, Tumble between Trot and Wake. Tested alternative (all three baked last): the first
+# frame of Sit then jumps (joints move up to 2.9 units from frame 0 to frame 1) and so do the first frames of the new
+# clips; the alphabetical order leaves the existing clips as the script of origin gives them, except Idle (2 keys -> 49
+# keys of the same pose, joint jump <= 0.01).
+RESET_KEYS.add("Tumble")   # every key starts from the rest pose (stable with this much rotation, see build_action)
+LOOP_FRAMES["HopJoy"] = HOP_FRAMES
+SEAMLESS.add("HopJoy")
+ACTIONS.update({
+    "Tumble": [(i / FPS, tumble_pose(i / FPS)) for i in range(TB_FRAMES + 1)],
+    "LeapCatch": [(0, LEAP_CROUCH), (0.17, LEAP_COIL), (0.33, LEAP_PUSH), (0.5, LEAP_RISE), (0.67, LEAP_REACH),
+                  (LEAP_T_CATCH, LEAP_CATCH), (0.92, LEAP_FALL), (1.08, LEAP_TOUCH), (1.25, LEAP_LAND),
+                  (1.625, SWORD_STANCE)],
+    "HopJoy": [(i / FPS, hop_pose(i / HOP_FRAMES)) for i in range(HOP_FRAMES + 1)],
+})
+
+def setup_leap_props(name):
+    """Preview of LeapCatch only: the sword hangs in the air where the grip will be between the jaws at LEAP_T_CATCH,
+    then follows the head (grip across the mouth, as in SwordSwing). Returns place(f)."""
+    VIEWS["leap"] = make_camera("CamLeap", (40, -1.0, 5.0), V((0, -1.0, 5.0)), ortho=24)   # tall profile: the leap climbs
+    sword = make_sword()
+    kc = round(LEAP_T_CATCH * FPS) + 1
+    for k in range(1, kc + 1):
+        scene.frame_set(k)
+    hover = _head_world() @ SWORD_HOLD_L
+    sword.parent, sword.parent_type, sword.parent_bone = None, "OBJECT", ""
+
+    def place(f):
+        scene.frame_set(f)
+        sword.matrix_world = hover if f < kc else _head_world() @ SWORD_HOLD_L
+        bpy.context.view_layer.update()
+        gap = (hover.to_translation() - (_head_world() @ SWORD_HOLD_L).to_translation()).length
+        print(f"PROP LeapCatch f{f} sword {'hovering' if f < kc else 'held'} catch_frame={kc} grip-to-mouth={gap:.2f}")
+    return place
+
+# --- Cutscene clips (Maman, Chartiste), session 11 B. Same skeleton as every cat: any NPC can play them.
+# Poses use the vocabulary above (body, legs, _spine, _hind, pitched, _tilt, LIE, SIT, BH0...). Durations, angles and
+# positions by eye, tuned on previews.
+
+def _with(p, **kw):
+    """Pose p with extra keys (_ears, _mouth, _air...)."""
+    p.update(kw)
+    return p
+
+def _shift(p, dy):
+    """Copy of pose p moved by dy units along Y (negative: toward the muzzle): the translation is baked in the
+    controller tracks, so the clip really travels (Stumble, LimpRise)."""
+    out = {}
+    for name, spec in p.items():
+        if name.startswith("_") or name == "Root":
+            out[name] = spec
+            continue
+        s = dict(spec)
+        s["pos"] = (V(s["pos"]) if s.get("pos") is not None else REST[name][0]) + V((0, dy, 0))
+        out[name] = s
+    return out
+
+def _cp(b, pitch, tail, fl, fr, bl, br, faim=(0, -1, -0.1), baim=None, hock_up=0.0, wl=None, wr=None, ears=(0, 10, 0),
+        mouth=0, deg=0, pivot=(0, 0, 0)):
+    """Standing-family pose from a _spine dict b: feet fl, fr, bl, br (full positions), head pitch (head_at), tail tip;
+    optionally pitched by deg° around pivot (deg < 0: nose down)."""
+    p = pose(body(**b, HD_=head_at(b["N_"], pitch=pitch), T_=tail),
+             legs(fl=fl, fr=fr, wl=wl, wr=wr, faim=faim, **_hind(bl, br, b["HJ_"], baim=baim, hock_up=hock_up)))
+    if deg:
+        p = pitched(p, deg, P(*pivot))
+    return _with(p, _ears=ears, _mouth=mouth)
+
+#   - RageCry (2.5 s, played once, last pose held): the giant Chartiste of cutscene 1. From the BrushHold guard (BH0)
+#     the cat rears on its hind legs, brush in the front right paw (BrushHold grip), head thrown back, mouth wide open,
+#     ears flat; the head and the brush keep rising slightly while the cry is held.
+RC_TILT = 62                       # spine elevation when upright (degrees from horizontal; the hip joint is the pivot)
+RC_HJ = P(0, 3.7, g + 4.0)         # hip joint when upright: above the hind feet, legs bent (units)
+
+def _up(p, tilt=RC_TILT, hj=RC_HJ):
+    """Rest point of the trunk, rotated by tilt° (front up) around the hip joint, then carried to hj."""
+    return hj + (_tilt(p, tilt, pivot=HJ) - HJ)
+
+def _rc_pose(tilt=RC_TILT, hj=RC_HJ, pitch=-23, mouth=0, ears=(0, 25, 0), brush=(-0.3, -0.45, 0.84),
+             fr_rel=V((-1.2, -2.0, -1.0)), fl_rel=V((1.0, -1.6, -1.3)), tail=None):
+    """Upright pose: trunk leaning back, hind feet planted, front right paw holding the brush (direction brush) at
+    fr_rel from the shoulder, front left paw at fl_rel; head_at pitch < 0 = muzzle up."""
+    U = lambda q: _up(q, tilt, hj)
+    b = dict(S_=U(S), N_=U(N), M1_=U(M1), M0_=U(M0), H_=U(H), HJ_=hj)
+    foot = hj.y - 0.9
+    hind = _hind(P(0.85, foot, g + PAW), P(-0.85, foot, g + PAW), hj, baim=(0, -1, 0.05), hock_up=0.3)
+    fr, fl = b["S_"] + fr_rel, b["S_"] + fl_rel
+    p = pose(body(**b, HD_=head_at(b["N_"], pitch=pitch), T_=tail if tail is not None else P(0.5, hj.y + 2.4, g + 0.4)),
+             legs(fl=fl, wl=fl + V((0.3, 0.8, -0.9)), fl_aim=(0.2, -1, 0.3), **hind))
+    _fr_spec(p, fr, fr + V((-0.3, 0.8, -0.9)), brush=brush)
+    return _with(p, _ears=ears, _mouth=mouth)
+
+RC_UP = _rc_pose(pitch=-30, mouth=6, fr_rel=V((-1.5, -1.8, -0.6)), brush=(-0.45, -0.5, 0.74))
+RC_CRY_A = _rc_pose(pitch=-65, mouth=40, ears=(0, 38, 0), brush=(-0.55, -0.35, 0.76), fr_rel=V((-2.0, -1.0, 0.5)),
+                    fl_rel=V((2.0, -0.8, -1.6)))
+RC_CRY_B = _rc_pose(pitch=-82, mouth=50, ears=(0, 40, 0), brush=(-0.6, -0.3, 0.74), fr_rel=V((-2.2, -0.8, 1.0)),
+                    fl_rel=V((2.2, -0.6, -1.2)))
+
+#   - Stumble (1.8 s, played once, last pose held): Maman running (run_pose); the front right paw catches 0.2 s, the
+#     body pitches over its planted paw 0.4 s, nose dive with the hind legs in the air 0.65 s, belly landing 0.9 s,
+#     slide on the belly (front legs stretched, 2.6 units travelled, baked) to 1.25 s, front half pushed up 1.5 s,
+#     half risen (sitting, head up, panting) 1.8 s.
+_ST_FY = -4.5   # y of the front right paw that catches (units)
+ST_CATCH = _cp(_spine(4.5, 5.2, 3.9), 14, P(0, 7.0, g + 5.0), P(0.65, -3.4, g + 1.4), P(-0.65, _ST_FY, g + PAW),
+               P(0.75, 5.4, g + 0.5), P(-0.75, 4.6, g + 0.3), faim=(0, -1, -0.5), baim=(0, 0.8, -0.6), hock_up=0.5,
+               ears=(0, 20, 0), mouth=10)
+ST_PITCH = _cp(_spine(4.4, 5.4, 3.6), 24, P(0, 7.4, g + 6.2), P(0.9, -3.6, g + 1.8), P(-0.65, _ST_FY, g + PAW),
+               P(0.75, 5.8, g + 1.6), P(-0.75, 5.4, g + 1.2), faim=(0, -1, -0.5), baim=(0, 0.8, -0.6), hock_up=0.5,
+               ears=(0, 28, 0), mouth=14, deg=-18, pivot=(0, _ST_FY, g))
+ST_DIVE = _cp(_spine(3.8, 5.2, 3.0), 34, P(0.4, 7.6, g + 6.6), P(0.9, -3.4, g + 1.0), P(-0.9, -3.8, g + 0.7),
+              P(0.8, 5.6, g + 2.4), P(-0.8, 5.2, g + 2.0), faim=(0, -1, -0.6), baim=(0, 0.8, -0.6), hock_up=0.6,
+              ears=(0, 35, 0), mouth=18, deg=-32, pivot=(0, _ST_FY, g))
+_ST_LIE_B = dict(HJ_=P(0, 3.0 + LIE_DY, g + 1.5), H_=P(0, 2.2 + LIE_DY, g + 2.2), M0_=P(0, 1.1 + LIE_DY, g + 2.45),
+                 M1_=P(0, -0.2, g + 2.5), S_=P(0, -2.3, g + 1.8))
+_ST_HIND = dict(bl=P(1.9, 2.6 + LIE_DY, g + PAW), br=P(-1.0, 3.2 + LIE_DY, g + PAW), baim=(0, -1, 0.05),
+                kl=P(1.8, 4.2 + LIE_DY, g + 0.6), kr=P(-1.0, 4.6 + LIE_DY, g + 0.6))
+
+def _sprawl(n, pitch, mouth, ears):
+    """Lying on the belly, front legs stretched forward, hind legs sprawled (units: LIE frame)."""
+    p = pose(body(**_ST_LIE_B, N_=n, HD_=head_at(n, pitch=pitch), T_=P(1.6, 5.4 + LIE_DY, g + 0.3)),
+             legs(fl=P(0.9, -5.4, g + PAW), fr=P(-0.9, -5.4, g + PAW), faim=(0, -1, -0.1),
+                  wl=P(1.0, -4.4, g + 0.5), wr=P(-1.0, -4.4, g + 0.5), **_ST_HIND))
+    return _with(p, _mouth=mouth, _ears=ears)
+
+ST_LAND = _shift(_sprawl(P(0, -1.5, g + 2.3), 26, 16, (0, 35, 0)), -2.6)
+ST_SLIDE = _shift(_sprawl(P(0, -1.4, g + 2.6), 14, 12, (0, 30, 0)), -5.0)
+_PUSH_N = P(0, -1.5, g + 3.6)
+ST_PUSH = _shift(_with(pose(body(**dict(_ST_LIE_B, S_=P(0, -2.4, g + 2.9), M1_=P(0, -0.2, g + 2.8)), N_=_PUSH_N,
+                                 HD_=head_at(_PUSH_N, pitch=0), T_=P(1.2, 5.6 + LIE_DY, g + 0.4)),
+                            legs(fl=P(0.65, -3.5, g + PAW), fr=P(-0.65, -3.5, g + PAW), faim=(0, -1, -0.1),
+                                 wl=P(0.75, -3.0, g + 1.2), wr=P(-0.75, -3.0, g + 1.2), **_ST_HIND)),
+                       _ears=(0, 25, 0), _mouth=14), -5.0)
+ST_HALF = _shift(_with(pose(SIT, body(**SIT_BODY, HD_=head_at(SIT_N, pitch=-6), T_=P(1.6, 1.6, g + 0.3))),
+                       _ears=(0, 20, 0), _mouth=10), -5.0)
+
+#   - LimpRise (4 s, played once, last pose held): Maman hurt, lying (end of Lie). Head lifts 0.9 s, chest rises on the
+#     stretched front legs 1.7 s, sitting 2.4 s, standing low with the front right paw held up (spared) 3.0 s, then two
+#     limping steps (head dips each time the left side takes the weight) and a pause, the right paw still held up,
+#     4.0 s. The body moves 1.9 units forward (baked).
+_LR_N = P(0, -1.5, g + 3.3)
+LR_HEAD = _with(dict(LIE_SETTLE, **body(**_ST_LIE_B, N_=_LR_N, HD_=head_at(_LR_N, pitch=-6),
+                                        T_=P(1.2, 5.8 + LIE_DY, g + 0.3))), _ears=(0, 30, 0), _mouth=0)
+LR_CHEST = _with(_shift(ST_PUSH, 5.0), _ears=(0, 28, 0), _mouth=0)
+LR_SIT = _with(pose(SIT, body(**SIT_BODY, HD_=head_at(SIT_N, pitch=18), T_=P(1.6, 1.6, g + 0.3))), _ears=(0, 30, 0),
+               _mouth=0)
+_LR_HELD = V((-0.75, -1.1, -1.45))   # front right paw held against the chest, from the shoulder (units, as CARRY_PAW_F)
+_LR_ELBOW = V((-0.8, -0.9, -0.9))    # elbow target of that leg, from the shoulder (units, as CARRY_WRIST)
+
+def _limp(dy=0.0, nz=4.0, hz=4.8, pitch=22, fl=(-3.0, 0.0), bl=(2.4, 0.0), br=(2.4, 0.0), tail_up=0.0):
+    """Standing, hurt: the front right paw is held up against the chest; the other feet at absolute (y, lift)."""
+    b = {k: V(v) + V((0, dy, 0)) for k, v in _spine(nz, hz, nz - 0.9).items()}
+    held = b["S_"] + _LR_HELD
+    p = _cp(b, pitch, P(0, 6.2 + dy, g + 1.8 + tail_up), P(0.65, fl[0], g + PAW + fl[1]), held,
+            P(0.75, bl[0], g + PAW + bl[1]), P(-0.75, br[0], g + PAW + br[1]), baim=(0, -1, 0.05),
+            hock_up=0.3, wr=b["S_"] + _LR_ELBOW, ears=(0, 28, 0))
+    p["Foot_front_IK_R"]["aim"] = (0, 0.2, -0.95)
+    return p
+
+LR_STAND = _limp()
+LR_STEP1_UP = _limp(-0.4, pitch=26, fl=(-3.0, 0.0), bl=(1.9, 0.7), br=(2.4, 0.0))
+LR_STEP1 = _limp(-0.9, pitch=18, fl=(-3.9, 0.9), bl=(1.4, 0.0), br=(2.4, 0.0))
+LR_STEP2_UP = _limp(-1.3, pitch=26, fl=(-3.9, 0.0), bl=(1.4, 0.0), br=(1.6, 0.7))
+LR_STEP2 = _limp(-1.8, pitch=18, fl=(-4.8, 0.9), bl=(1.4, 0.0), br=(1.0, 0.0))
+LR_END = _limp(-1.9, pitch=24, fl=(-4.8, 0.0), bl=(1.4, 0.0), br=(1.0, 0.0))
+
+#   - Rub (3 s loop, 72 frames): standing, the head then the flank rub against a partner standing on the cat's left
+#     (+X): the head dips and turns toward it (yaw, roll, neck) at 0.75 s, the neck and shoulders follow, the flank
+#     leans against it at 1.1 s (spine curving, tail curling), then everything returns. Feet planted.
+RUB_FRAMES = 72                    # 3 s at 24 fps
+RUB_HEAD, RUB_FLANK = 1.3, 1.0     # sideways travel toward the partner: head and neck base, middle of the back (units)
+
+def rub_pose(t):
+    """t in [0, 1): time within the rubbing cycle. head, mid and rear go 0 -> 1 -> 0 (away from the partner, against it,
+    away), each a little later than the previous one."""
+    w = 2 * math.pi
+    ease = lambda ph: 0.5 - 0.5 * math.cos(w * (t - ph))
+    head, mid, rear = ease(0.0), ease(0.12), ease(0.25)
+    dx = lambda k, v: V((k * v, 0, 0))
+    sweep = V((0, 0.3 * math.sin(2 * w * t), 0.1 * math.cos(2 * w * t)))   # the head rubs back and forth along the partner
+    n = N + dx(RUB_HEAD * 0.6, mid) + sweep + V((0, 0, -0.35 * head))
+    p = pose(body(S_=S + dx(RUB_FLANK * 0.7, mid), N_=n, M1_=M1 + dx(RUB_FLANK, mid),
+                  M0_=M0 + dx(RUB_FLANK * 0.6, rear), H_=H + dx(RUB_FLANK * 0.3, rear),
+                  HJ_=HJ + dx(RUB_FLANK * 0.2, rear), HD_=head_at(n, pitch=12 + 14 * head, yaw=24 * head),
+                  head_rot=(0, 22 * head, 0), T_=T + dx(1.1, ease(0.4)) + V((0, 0.4, -0.3 + 0.3 * mid))),
+             legs())
+    return _with(p, _ears=(0, 10 + 8 * head, 0), _mouth=0)
+
+ACTIONS.update({
+    "RageCry": [(0, BH0), *_mix_keys(0, BH0, 0.9, RC_UP, n=3), (0.9, RC_UP), (1.3, RC_CRY_A), (2.5, RC_CRY_B)],
+    "Stumble": [(0, run_pose(0.55)), (0.2, ST_CATCH), (0.4, ST_PITCH), (0.65, ST_DIVE), (0.9, ST_LAND),
+                (1.25, ST_SLIDE), (1.5, ST_PUSH), (1.8, ST_HALF)],
+    "LimpRise": [(0, LIE_SETTLE), (0.9, LR_HEAD), (1.7, LR_CHEST), (2.4, LR_SIT), (3.0, LR_STAND), (3.3, LR_STEP1_UP),
+                 (3.5, LR_STEP1), (3.75, LR_STEP2_UP), (3.95, LR_STEP2), (4.0, LR_END)],
+    "Rub": [(i / FPS, rub_pose(i / RUB_FRAMES)) for i in range(RUB_FRAMES + 1)],
+})
+LOOP_FRAMES["Rub"] = RUB_FRAMES
+SEAMLESS.add("Rub")
+
 # Preview-mode-only actions (never built at export): BrushHold layer check.
 PREVIEW_ONLY = {"BrushLayerSit": [(0, BRUSH_LAYER_SIT), (1, BRUSH_LAYER_SIT)]}
 
@@ -1818,6 +2212,8 @@ def _lerp_m(A, B, e):
 def setup_props(name):
     """Preview mode: sword (and stone for SwordPull). Returns a place(f) function to call before rendering frame f
     (SwordPull), or None (sword parented to the Head bone, nothing to do per frame)."""
+    if name == "LeapCatch":
+        return setup_leap_props(name)
     if name in BRUSH_PROP_CLIPS or name in SWORD_PAW_CLIPS:  # prop held in the paw
         return setup_paw_props(name)
     if name not in SWORD_PROP_CLIPS:
@@ -1879,7 +2275,7 @@ def setup_props(name):
 # BrushHold guard, grip point BRUSH_GRIP and handle BRUSH_DIR (armature frame); the brush is parented to the PAW_BONE
 # bone keeping this transform, so it follows the paw in the other clips. Sword in the paw: point SWPAW_XH of the grip
 # on the paw grip point (PAW_PT_L of PAW_BONE), blade SWPAW_DIR.
-BRUSH_PROP_CLIPS = {"BrushHold", "BrushSwing", "Flinch", "Defeat", "BrushLayerSit"}
+BRUSH_PROP_CLIPS = {"BrushHold", "BrushSwing", "Flinch", "Defeat", "BrushLayerSit", "RageCry"}
 SWORD_PAW_CLIPS = {"SwordToPaw", "SwordPawHold"}
 
 def make_brush():
@@ -1936,7 +2332,7 @@ def setup_paw_props(name):
         print(f"PROP {name} f{f} grip-paw={gap:.3f} prop lowest={lo:.2f} "
               f"dir={tuple(round(c, 3) for c in prop.matrix_world.col[0].to_3d().normalized())}{extra}")
 
-    if name in ("BrushHold", "BrushSwing", "Flinch", "BrushLayerSit", "SwordPawHold"):
+    if name in ("BrushHold", "BrushSwing", "Flinch", "BrushLayerSit", "SwordPawHold", "RageCry"):
         def place(f):
             scene.frame_set(f)
             bpy.context.view_layer.update()

@@ -19,6 +19,7 @@ import { Npc } from './npc/Npc.js';
 import { loadNpcAssets, npcsEnabled } from './npc/npcAssets.js';
 import { NPC_PLACES, addNpcObstacles, npcHome } from './npc/npcPlacement.js';
 import { MiniMap } from './ui/MiniMap.js';
+import { CutscenePlayer } from './ui/CutscenePlayer.js';
 import { BossBar } from './ui/BossBar.js';
 import { Story } from './game/Story.js';
 import { EndScreen } from './game/EndScreen.js';
@@ -99,7 +100,8 @@ const minimap = new MiniMap(document.body, { world });
 const endScreen = new EndScreen();
 const bossBar = new BossBar({ name: BOSS.name, color: BOSS.red });
 const catBar = new BossBar({ variant: 'cat', color: CAT.eyeIrisOut });
-const story = new Story({ world, cat, npcs, minimap, endScreen, places: NPC_PLACES, bossBar, catBar, sword, dissolve });
+const cutscene = new CutscenePlayer();
+const story = new Story({ world, cat, npcs, minimap, endScreen, places: NPC_PLACES, bossBar, catBar, sword, dissolve, cutscene });
 
 // ---------------------------------------------------------------- pointer
 
@@ -157,7 +159,7 @@ story.chavalanche = chavalanche;
 
 story.onStep = (step) => {
   for (const hugPurr of hugPurrs) { if (step === 'hug') hugPurr.start(); else hugPurr.stop(); }
-  if (step === 'title' || step === 'opening') { footprints.reset(); snowCats.reset(); } // new game
+  if (step === 'title' || step === 'arrival' || step === 'opening') { footprints.reset(); snowCats.reset(); } // new game
   applyMusic();
 };
 
@@ -177,7 +179,7 @@ world.renderer.setAnimationLoop(() => {
   timer.update();
   const rawDt = timer.getDelta();
   quality.update(rawDt);
-  const dt = Math.min(rawDt, MAX_FRAME_SECONDS) * story.timeScale;
+  const dt = Math.min(rawDt, MAX_FRAME_SECONDS);
 
   // Story and other cats before the kitten: when it is carried, the mother's mouth is already in place.
   story.update(dt);
@@ -216,6 +218,6 @@ if (import.meta.env.DEV) {
   const { installDebugHandles } = await import('./debug/handles.js');
   installDebugHandles({
     cat, world, butterflies, yarn, story, music, hugPurrs, npcs, launchers, minimap, endScreen, bossBar, catBar,
-    sword, dissolve, occlusion, quality, snowSteps, combatSfx, snowfall, footprints, snowCats, chavalanche,
+    sword, dissolve, occlusion, quality, snowSteps, combatSfx, snowfall, footprints, snowCats, chavalanche, cutscene,
   });
 }

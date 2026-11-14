@@ -1,10 +1,10 @@
-// Onglet « Modifier l'annonce » : même formulaire que « Nouvelle offre », prérempli avec l'annonce.
+// "Edit the job offer" tab: same form as "New offer", prefilled with the job offer.
 import { useState, useEffect } from 'react'
 import { apiFetch } from '../api.js'
 import { Link, useParams } from 'react-router'
 import { useLang } from '../lang.js'
 
-// Nom français et anglais des champs obligatoires, pour traduire « Missing field: <nom> ».
+// French and English names of the required fields, to translate "Missing field: <name>".
 const fieldLabels = {
   title: { fr: 'le titre', en: 'the title' },
   short_description: { fr: 'la description courte', en: 'the short description' },
@@ -13,25 +13,25 @@ const fieldLabels = {
 
 export default function RecruiterEditOfferPage() {
   const { t, lang } = useLang()
-  // id lu dans l'adresse /recruteur/postes/:id/modifier
+  // id read from the address /recruteur/postes/:id/modifier
   const { id } = useParams()
   const [categories, setCategories] = useState([])
-  // Valeurs du formulaire au chargement : on n'enverra que les champs qui en diffèrent.
+  // Form values at load: only the fields that differ from them will be sent.
   const [initialForm, setInitialForm] = useState(null)
   const [form, setForm] = useState({ title: '', short_description: '', category_id: '', description: '', salary: '', location: '', working_time: '', contract_type: '' })
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState('')
   const [saved, setSaved] = useState(false)
-  // Annonce impossible à modifier (introuvable, clôturée, serveur indisponible) : message à la place du formulaire.
-  // Message gardé en { fr, en } : l'effet ne dépend pas de la langue, l'affichage choisit.
+  // Job offer that cannot be edited (not found, closed, server unavailable): message in place of the form.
+  // Message kept as { fr, en }: the effect does not depend on the language, the display chooses.
   const [loadError, setLoadError] = useState('')
 
-  // À l'arrivée sur la page (et si l'id de l'adresse change) : catégories puis annonce.
+  // On arrival on the page (and if the id of the address changes): categories then job offer.
   useEffect(() => {
     async function loadAd() {
       const categoriesResult = await apiFetch('/api/categories')
       const adResult = await apiFetch(`/api/ads/${id}`)
-      // GET /api/ads/<id> est public : la liste de l'entreprise dit si l'annonce lui appartient.
+      // GET /api/ads/<id> is public: the company's list says whether the job offer belongs to it.
       const ownResult = await apiFetch('/api/recruiter/ads')
       const isOwn = ownResult.ok && ownResult.data.some((item) => String(item.id) === id)
       if (adResult.status === 404 || (ownResult.ok && !isOwn)) {
@@ -44,15 +44,15 @@ export default function RecruiterEditOfferPage() {
         return
       }
       const data = adResult.data
-      // Une annonce clôturée se lit encore (GET public) mais ne se modifie plus : le serveur répondrait 409.
+      // A closed job offer can still be read (public GET) but no longer edited: the server would answer 409.
       if (data.status === 'closed') {
         setLoadError({ fr: 'Une annonce clôturée ne peut plus être modifiée.', en: 'A closed job offer can no longer be edited.' })
         return
       }
-      // L'API renvoie le nom de la catégorie : on retrouve son id dans la liste.
+      // The API returns the category name: find its id in the list.
       const category = categoriesResult.data.find((item) => item.name === data.category)
       setCategories(categoriesResult.data)
-      // null (champ vide en base) devient '' : un champ de formulaire attend du texte.
+      // null (empty field in the database) becomes '': a form field expects text.
       const values = {
         title: data.title,
         short_description: data.short_description,
@@ -77,24 +77,24 @@ export default function RecruiterEditOfferPage() {
     event.preventDefault()
     setSaveError('')
     setSaved(false)
-    // Seuls les champs différents du chargement partent à l'API.
+    // Only the fields different from the load are sent to the API.
     const changes = {}
     for (const field of Object.keys(form)) {
       if (form[field] !== initialForm[field]) changes[field] = form[field]
     }
-    // Rien de changé : pas d'appel à l'API.
+    // Nothing changed: no call to the API.
     if (Object.keys(changes).length === 0) {
       setSaveError(t('Aucune modification à enregistrer.', 'No changes to save.'))
       return
     }
-    // category_id et salary sont des nombres ; un salaire effacé devient null (non communiqué).
+    // category_id and salary are numbers; an erased salary becomes null (not disclosed).
     if (changes.category_id) changes.category_id = Number(changes.category_id)
     if ('salary' in changes) changes.salary = changes.salary === '' ? null : Number(changes.salary)
     setSaving(true)
     const { ok, status, error } = await apiFetch(`/api/recruiter/ads/${id}`, { method: 'PATCH', body: changes })
     setSaving(false)
     if (ok) {
-      // Les valeurs enregistrées deviennent la nouvelle référence de comparaison.
+      // The saved values become the new reference for comparison.
       setInitialForm(form)
       setSaved(true)
     } else {
@@ -111,8 +111,8 @@ export default function RecruiterEditOfferPage() {
 
   return (
     <>
-      {/* Flèche de retour vers « Mes postes », comme sur la page des candidatures : quitter sans enregistrer.
-          Flèche seule (button-link) : aria-label et title donnent la destination. */}
+      {/* Back arrow to "My positions", as on the applications page: leave without saving.
+          Arrow alone (button-link): aria-label and title give the destination. */}
       <p className="back-link">
         <Link className="button-link" to="/recruteur/postes" aria-label={t('Retour à Mes postes', 'Back to My positions')} title={t('Retour à Mes postes', 'Back to My positions')}>←</Link>
       </p>

@@ -10,7 +10,7 @@ from routes.verification import verification
 from auth_utils import init_security
 from routes.recruiter import recruiter
 
-# Build React (npm run build), servi par Flask quand il existe : une seule origine
+# React build (npm run build), served by Flask when it exists: a single origin
 DIST = Path(__file__).resolve().parent.parent / "frontend" / "dist"
 
 app = Flask(__name__, static_folder=None)
@@ -31,7 +31,7 @@ if os.environ.get("DEMO_MODE") == "1":
 @app.route("/", defaults={"path": ""})
 @app.route("/<path:path>")
 def frontend(path):
-    """Fichiers du build ; toute autre adresse reçoit index.html (routes React)."""
+    """Build files; any other address gets index.html (React routes)."""
     if path.startswith("api/") or not DIST.is_dir():
         abort(404)
     if path and (DIST / path).is_file():
@@ -39,6 +39,6 @@ def frontend(path):
     return send_from_directory(DIST, "index.html")
 
 
-#------ lance un serveur--------
+#------ start the server --------
 if __name__ == "__main__":
     app.run(port=5000, debug=True)

@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
-import { toonMaterial, YARN } from '../style/palette.js';
+import { toonMaterial, YARN, CAT, color } from '../style/palette.js';
+import { rng } from '../world/random.js';
 
 /**
  * Procedural NPC accessories in a cute toon style. Used by Npc.js.
@@ -434,26 +435,202 @@ function buildEasel() {
   return { mesh: merged(parts, 'NpcEasel'), canvasCenter: face, canvasNormal: normal };
 }
 
-/** Draws the canvas picture (without `document`, in Node tests: null, flat colour). */
-function paintingTexture() {
-  if (typeof document === 'undefined') return null;
-  const cv = document.createElement('canvas');
-  cv.width = 256; cv.height = 200;
-  const g = cv.getContext('2d');
+/**
+ * Portrait table: unfinished Maman on the Chartiste's canvas. The drawing is made in a 256 × 200 unit frame (the
+ * 0.27 × 0.21 m canvas plane), the same units as the coordinates below.
+ * - `px`: texture pixels per drawing unit; 2 keeps the eyes readable at the dialogue distance (about 3 m).
+ * - `seed`: seeded generator (world/random.js), so two builds draw the same picture.
+ * - `split`, `skySplit`: x of the ragged edge between painted and sketched areas at y = 80, for Maman and for the
+ *   backdrop (the sky is further along than the cat); `slope`: lean of that edge (x per y unit, negative: the lower body
+ *   is less finished than the head); `jag`: edge wobble.
+ * - `pencil`: graphite of the sketch lines. `paper`: bare canvas, the plane colour of the easel.
+ * - `earInner`: dusty pink of the inside of the ear (no pink in CAT). Coat, tips, rim and eye colours come from CAT
+ *   (palette.js), so the portrait follows Maman's real coat.
+ * - `patch`: bare canvas patches left inside the painted body, as polygons. `eye`: [x, y, radius] of the right eye,
+ *   left as an empty socket.
+ * - `drips`: paint runs under the painted body, [x, length]; `flicks`: stray dabs of paint [x, y, radius] beyond
+ *   the ragged edge.
+ */
+export const PORTRAIT = {
+  px: 2, seed: 11, split: 152, skySplit: 182, slope: -0.42, jag: 5,
+  pencil: '#5f564d', paper: ACCESSORY_COLORS.canvas, earInner: '#8c6a63',
+  patch: [[[80, 132], [90, 127], [99, 131], [108, 128], [113, 137], [107, 146], [111, 156], [100, 162], [91, 157], [83, 160], [78, 150], [82, 141]]],
+  drips: [[80, 9], [90, 15], [100, 8]],
+  flicks: [[147, 118, 2.2], [134, 148, 1.6], [124, 172, 2.6]],
+  eye: [136, 82, 8.2],
+};
+
+/** Draws a path twice with a small offset: the wobbly line of a pencil sketch. */
+function pencil(g, rand, draw) {
+  for (let pass = 0; pass < 2; pass++) {
+    g.save();
+    g.translate((rand() - 0.5) * 1.1, (rand() - 0.5) * 1.1);
+    g.beginPath();
+    draw();
+    g.stroke();
+    g.restore();
+  }
+}
+
+/** Ragged edge through (`x`, 80) leaning by `PORTRAIT.slope`, closed on the left, as a clip path. */
+function raggedRegion(g, x, rand) {
+  g.beginPath();
+  g.moveTo(-5, -5);
+  for (let y = -5; y <= 205; y += 8) g.lineTo(x + PORTRAIT.slope * (y - 80) + (rand() - 0.5) * 2 * PORTRAIT.jag + 4 * Math.sin(y / 17), y);
+  g.lineTo(-5, 205);
+  g.closePath();
+}
+
+/** Silhouette parts of Maman (round body, ruffed head, ears, front paws), drawing units. */
+const CAT_SHAPES = [
+  (g) => g.ellipse(122, 143, 50, 46, 0, 0, Math.PI * 2),
+  (g) => g.ellipse(122, 81, 28, 24, 0, 0, Math.PI * 2),
+  (g) => g.ellipse(100, 88, 10, 9, 0, 0, Math.PI * 2),
+  (g) => g.ellipse(144, 88, 10, 9, 0, 0, Math.PI * 2),
+  (g) => { g.moveTo(99, 68); g.lineTo(97, 40); g.lineTo(119, 58); },
+  (g) => { g.moveTo(145, 68); g.lineTo(147, 40); g.lineTo(125, 58); },
+  (g) => g.ellipse(106, 187, 9, 5, 0, 0, Math.PI * 2),
+  (g) => g.ellipse(138, 187, 9, 5, 0, 0, Math.PI * 2),
+];
+
+/** Pencil layer: construction lines of the whole cat, the backdrop and the tail, which only exist as a sketch. */
+function drawSketch(g) {
+  const rand = rng(PORTRAIT.seed + 1);
+  g.strokeStyle = PORTRAIT.pencil;
+  g.globalAlpha = 0.8;
+  g.lineWidth = 0.9;
+  g.lineJoin = g.lineCap = 'round';
+  for (const shape of CAT_SHAPES) pencil(g, rand, () => shape(g));
+  // Tail, right side: two lines of a long S, never painted.
+  pencil(g, rand, () => { g.moveTo(166, 168); g.bezierCurveTo(196, 172, 208, 140, 196, 112); });
+  pencil(g, rand, () => { g.moveTo(160, 182); g.bezierCurveTo(206, 188, 224, 144, 206, 104); });
+  pencil(g, rand, () => g.arc(201, 108, 5, Math.PI * 1.1, Math.PI * 2.1));
+  // Face guides: centre line, eye line, right eye (circle and slit), nose, mouth and whiskers.
+  g.globalAlpha = 0.55;
+  pencil(g, rand, () => { g.moveTo(122, 56); g.lineTo(122, 106); });
+  pencil(g, rand, () => { g.moveTo(96, 81); g.lineTo(148, 81); });
+  g.globalAlpha = 0.8;
+  pencil(g, rand, () => g.arc(136, 82, 8, 0, Math.PI * 2));
+  pencil(g, rand, () => { g.moveTo(136, 74); g.lineTo(136, 90); });
+  pencil(g, rand, () => { g.moveTo(119, 91); g.lineTo(125, 91); g.lineTo(122, 95); g.closePath(); });
+  pencil(g, rand, () => { g.moveTo(122, 95); g.quadraticCurveTo(116, 101, 110, 98); });
+  pencil(g, rand, () => { g.moveTo(122, 95); g.quadraticCurveTo(128, 101, 134, 98); });
+  pencil(g, rand, () => { g.moveTo(138, 92); g.lineTo(162, 86); });
+  pencil(g, rand, () => { g.moveTo(138, 96); g.lineTo(162, 98); });
+  // Hatching on the unpainted flank, and the rest of the backdrop: summit, sun, ground line.
+  g.globalAlpha = 0.4;
+  for (let i = 0; i < 9; i++) pencil(g, rand, () => { g.moveTo(130 + i * 4.5, 126 + (i % 2) * 3); g.lineTo(138 + i * 4.5, 160); });
+  g.globalAlpha = 0.5;
+  pencil(g, rand, () => { g.moveTo(10, 150); g.lineTo(105, 50); g.lineTo(200, 150); });
+  pencil(g, rand, () => g.arc(205, 45, 22, 0, Math.PI * 2));
+  pencil(g, rand, () => { g.moveTo(0, 168); g.quadraticCurveTo(128, 150, 256, 170); });
+  g.globalAlpha = 1;
+}
+
+/** Painted backdrop (sky, sun hint, mountain with snow, meadow): the former picture, kept behind the portrait. */
+function drawBackdrop(g) {
   const sky = g.createLinearGradient(0, 0, 0, 200);
   sky.addColorStop(0, '#bfe0f7'); sky.addColorStop(1, '#fbe3ef');
   g.fillStyle = sky; g.fillRect(0, 0, 256, 200);
-  g.fillStyle = '#ffe08a'; g.beginPath(); g.arc(205, 45, 22, 0, Math.PI * 2); g.fill();
   g.fillStyle = '#b8a6e0'; g.beginPath(); g.moveTo(10, 150); g.lineTo(105, 50); g.lineTo(200, 150); g.closePath(); g.fill();
   g.fillStyle = '#f6f2ff'; g.beginPath(); g.moveTo(84, 72); g.lineTo(105, 50); g.lineTo(126, 72); g.lineTo(115, 66); g.lineTo(105, 74); g.lineTo(95, 66); g.closePath(); g.fill();
   g.fillStyle = '#9fd17a'; g.beginPath(); g.ellipse(128, 205, 170, 70, 0, 0, Math.PI * 2); g.fill();
-  // Small grey cat sitting on the summit: hint of the mountain where Maman waits.
-  g.fillStyle = '#7d7680';
-  g.beginPath(); g.ellipse(105, 44, 6, 7, 0, 0, Math.PI * 2); g.fill();
-  g.beginPath(); g.arc(105, 34, 4.5, 0, Math.PI * 2); g.fill();
-  g.beginPath(); g.moveTo(101, 31); g.lineTo(102, 25); g.lineTo(104.5, 30); g.fill();
-  g.beginPath(); g.moveTo(109, 31); g.lineTo(108, 25); g.lineTo(105.5, 30); g.fill();
-  g.strokeStyle = '#7d7680'; g.lineWidth = 2; g.beginPath(); g.moveTo(110, 48); g.quadraticCurveTo(118, 46, 116, 38); g.stroke();
+}
+
+/** Painted half of Maman: coat, brush strokes in the tip colour, golden rim on the left, ear, left eye. */
+function drawMaman(g, rand) {
+  g.fillStyle = g.strokeStyle = color(CAT.coat).getStyle();
+  g.lineWidth = 2; g.lineJoin = 'round';
+  for (const shape of CAT_SHAPES) { g.beginPath(); shape(g); g.fill(); g.stroke(); }
+  // Brush strokes in the caramel tip colour, short and curved down and outward, clipped to the silhouette.
+  g.save();
+  g.beginPath();
+  for (const shape of CAT_SHAPES) shape(g);
+  g.clip();
+  g.strokeStyle = color(CAT.tip).getStyle(); g.lineWidth = 1.3; g.globalAlpha = 0.4;
+  for (let i = 0; i < 150; i++) {
+    const x = 70 + rand() * 80, y = 45 + rand() * 148;
+    g.beginPath(); g.moveTo(x, y); g.quadraticCurveTo(x - 2, y + 4, x - 3 - rand() * 2, y + 8); g.stroke();
+  }
+  g.restore();
+  // Golden rim light on the left contour of head and body.
+  g.strokeStyle = color(CAT.sheen).getStyle(); g.lineWidth = 1.6; g.globalAlpha = 0.65;
+  g.beginPath(); g.ellipse(122, 81, 28, 24, 0, Math.PI * 0.62, Math.PI * 1.18); g.stroke();
+  g.beginPath(); g.ellipse(122, 143, 50, 46, 0, Math.PI * 0.62, Math.PI * 1.12); g.stroke();
+  g.globalAlpha = 1;
+  // Inside of the left ear.
+  g.fillStyle = PORTRAIT.earInner;
+  g.beginPath(); g.moveTo(102, 63); g.lineTo(101, 47); g.lineTo(112, 57); g.closePath(); g.fill();
+  // Left eye: yellow-green iris, brown ring, slit pupil, catchlight.
+  const iris = g.createRadialGradient(108, 81, 1, 108, 81, 9);
+  iris.addColorStop(0, color(CAT.eyeIrisIn).getStyle()); iris.addColorStop(1, color(CAT.eyeIrisOut).getStyle());
+  g.fillStyle = iris; g.beginPath(); g.ellipse(108, 81, 8.5, 9, 0, 0, Math.PI * 2); g.fill();
+  g.strokeStyle = color(CAT.eyeRing).getStyle(); g.lineWidth = 1.2; g.stroke();
+  g.fillStyle = color(CAT.coat).getStyle(); g.beginPath(); g.ellipse(108, 81, 2.4, 7, 0, 0, Math.PI * 2); g.fill();
+  g.fillStyle = '#ffffff'; g.beginPath(); g.arc(105.5, 77, 1.8, 0, Math.PI * 2); g.fill();
+  // Nose and pale whiskers on the painted side.
+  g.fillStyle = PORTRAIT.earInner;
+  g.beginPath(); g.moveTo(118.5, 91); g.lineTo(125.5, 91); g.lineTo(122, 95.5); g.closePath(); g.fill();
+  g.strokeStyle = color(CAT.sheen).getStyle(); g.lineWidth = 0.7; g.globalAlpha = 0.7;
+  g.beginPath(); g.moveTo(112, 94); g.lineTo(88, 88); g.moveTo(112, 97); g.lineTo(88, 99); g.stroke();
+  g.globalAlpha = 1;
+}
+
+/**
+ * Canvas picture: Maman sitting in front of the mountain, half painted (left), half pencil sketch (right), with
+ * paint runs, stray dabs and a patch of bare canvas inside the painted body. Without `document` (Node tests): null,
+ * flat colour.
+ */
+function paintingTexture() {
+  if (typeof document === 'undefined') return null;
+  const P = PORTRAIT;
+  const rand = rng(P.seed);
+  const cv = document.createElement('canvas');
+  cv.width = 256 * P.px; cv.height = 200 * P.px;
+  const g = cv.getContext('2d');
+  g.scale(P.px, P.px);
+  g.fillStyle = color(P.paper).getStyle(); g.fillRect(0, 0, 256, 200);
+  // Canvas weave: faint darker specks.
+  g.fillStyle = '#c9b99a';
+  g.globalAlpha = 0.1;
+  for (let i = 0; i < 700; i++) g.fillRect(rand() * 256, rand() * 200, 1.2, 0.6);
+  g.globalAlpha = 1;
+  // Backdrop up to the sky edge, the pencil over it, then Maman up to her own edge, hiding the pencil under her.
+  g.save(); raggedRegion(g, P.skySplit, rand); g.clip(); drawBackdrop(g); g.restore();
+  drawSketch(g);
+  g.save(); raggedRegion(g, P.split, rand); g.clip(); drawMaman(g, rand); g.restore();
+  // Paint runs under the painted body, stray dabs beyond the ragged edge.
+  g.fillStyle = color(CAT.coat).getStyle();
+  for (const [x, len] of P.drips) {
+    // Start on the lower edge of the body ellipse (centre 122, 143; radii 50, 46), one unit inside it.
+    const y0 = 142 + 46 * Math.sqrt(1 - ((x - 122) / 50) ** 2);
+    g.fillRect(x - 1.1, y0, 2.2, len);
+    g.beginPath(); g.arc(x, y0 + len, 1.6, 0, Math.PI * 2); g.fill();
+  }
+  for (const [x, y, r] of P.flicks) { g.beginPath(); g.ellipse(x, y, r * 1.3, r, 0.5, 0, Math.PI * 2); g.fill(); }
+  // Bare canvas inside the painted body: the pencil layer shows again.
+  for (const poly of P.patch) {
+    g.save();
+    g.beginPath();
+    poly.forEach(([x, y], i) => (i ? g.lineTo(x, y) : g.moveTo(x, y)));
+    g.closePath(); g.clip();
+    g.fillStyle = color(P.paper).getStyle(); g.fillRect(0, 0, 256, 200);
+    drawSketch(g);
+    // A few pencil hatches: the shading is planned, not painted yet.
+    const xs = poly.map((p) => p[0]), x0 = Math.min(...xs), x1 = Math.max(...xs);
+    g.strokeStyle = P.pencil; g.globalAlpha = 0.45; g.lineWidth = 0.8;
+    for (let x = x0 - 12; x < x1; x += 5) { g.beginPath(); g.moveTo(x, 170); g.lineTo(x + 14, 122); g.stroke(); }
+    g.globalAlpha = 1;
+    g.restore();
+  }
+  // Right eye: an empty socket, only started (one stroke of iris colour in its upper left).
+  g.save();
+  g.beginPath(); g.arc(P.eye[0], P.eye[1], P.eye[2], 0, Math.PI * 2); g.clip();
+  g.fillStyle = color(P.paper).getStyle(); g.fillRect(0, 0, 256, 200);
+  drawSketch(g);
+  g.strokeStyle = color(CAT.eyeIrisOut).getStyle(); g.lineWidth = 2.4; g.lineCap = 'round';
+  g.beginPath(); g.arc(P.eye[0], P.eye[1], P.eye[2] - 2, Math.PI * 0.8, Math.PI * 1.35); g.stroke();
+  g.restore();
   const tex = new THREE.CanvasTexture(cv);
   tex.colorSpace = THREE.SRGBColorSpace;
   return tex;

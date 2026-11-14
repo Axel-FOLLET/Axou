@@ -13,7 +13,7 @@ progressions were written for this project; no existing tune is reused. The CC0 
 Tracks of --only:
 - `meadow`: `music_meadow.mp3`, exploration; soft pad, a few harp notes, no percussion; D major, 72 BPM, 16 bars of 4
   beats (53.333 s), with recorded birdsong under the music (`bird_layer`). Requires --birds.
-- `boss`: dark requiem (`boss_v4`), four stereo files read by Music.js. Sampled instruments.
+- `boss`: dark requiem with the Chartiste's theme (`boss_v5`), four stereo files read by Music.js. Sampled instruments.
 - `mountain`: `music_mountain.mp3`, snowy mountain; sleigh bells, celesta, glockenspiel, music box, soft pad, plucked
   bass, light high-altitude wind underneath (filtered noise, slow gusts); G major, 90 BPM, 24 bars of 3 beats (48 s).
 
@@ -490,19 +490,25 @@ def mountain(rng):
     return {'music_mountain': summed(music, wind), '_mountain_music': music, '_mountain_wind': wind}
 
 
-# ------------------------------------------------------------------ boss, version 4: dark requiem
-# Combat music. Intent: epic, dramatic and menacing, with no hummable tune; choir, strings, percussion and organ; slow
-# and heavy, then a relentless march from half of the boss's health, the same piece more densely scored; the piece
-# evolves, with a reprise written into it. Hence no drum kit or synthetic orchestra hits, long notes, low register,
-# large room, stereo; minor chords and open fifths; full power at 12 s. The solo-voice lull launches the second phase.
+# ------------------------------------------------------------------ boss, version 5: dark requiem with a theme
+# Combat music. Intent: epic, dramatic and menacing; choir, strings, percussion and organ; slow and heavy, then a
+# relentless march from half of the boss's health, the same piece more densely scored; the piece evolves, with a
+# reprise written into it. Hence no drum kit or synthetic orchestra hits, long notes, low register, large room,
+# stereo; minor chords and open fifths, a major third only in E flat and in the dominant A7b9; full power at 12 s.
+# The solo-voice lull launches the second phase.
+# Beside the men's chant (`RQ_CHANT_D`) and the solo voice of the lull (`RQ_SOLO`), the piece has one theme, the
+# Chartiste's (`CHARTISTE_THEME`): the slow phase only hints at its head with a distant solo cor anglais, so that the
+# march can state it whole, choir and brass in unison, the first time it is heard in full.
 #
-# Four stereo files (`boss_v4`), read by Music.js:
-#   music_boss_slow_intro   12 s rise (hit, men's chant, roll), played once;
-#   music_boss_slow         96 s loop at 60 BPM: tutti with organ, chant, climax;
-#   music_boss_march_intro  the solo-voice lull (16 s), then the march entry hit (5 s);
-#   music_boss_march        85 s loop at 96 BPM: tutti, marching chant, break, climax, descending minor chords.
-# Variant "b" (more unsettling) is kept in the code and not rendered.
-RQ_SF = None        # path of the soundfont (FluidR3_GM.sf2), set by boss_v4
+# Four stereo files (`boss_v5`), read by Music.js:
+#   music_boss_slow_intro   12 s rise (hit, men's chant, roll, first hint of the theme), played once;
+#   music_boss_slow         96 s loop at 60 BPM: tutti with organ, chant (second hint of the theme), climax;
+#   music_boss_march_intro  the solo-voice lull (16 s) that ends in a rise (strings at the march's sixteenth notes,
+#                           brass entering one by one, rolls, reverse cymbal), then the march entry hit (5 s);
+#   music_boss_march        85 s loop at 96 BPM: tutti marching on the organ, the theme sung by choir and brass
+#                           (statement), a break that builds, the theme again enlarged with octaves and higher strings
+#                           (reprise), descending chords (D minor, C minor, B flat minor, A, then the same with E flat).
+RQ_SF = None        # path of the soundfont (FluidR3_GM.sf2), set by boss_v5
 RQ_TAIL = 7.0       # s rendered after the last note of a slice (note and room decay)
 RQ_REF = 0.1        # RMS level of a group at 0 dB, before the final level adjustment
 RQ_CH = 1 << 16     # computation block size
@@ -595,40 +601,48 @@ class RqScore:
 
 
 RQ_LEVELS = {'lows': -2, 'ostinato': -5, 'tremolo': -8, 'violins': -7, 'men': 0, 'women': -1, 'organ': -3,
-          'brass': -4, 'timpani': -1, 'drum': 1, 'bell': -9, 'cymbal': -11, 'solo': -5}
+          'brass': -4, 'timpani': -1, 'drum': 1, 'bell': -9, 'cymbal': -11, 'solo': -5,
+          'herald': -12}    # herald: far under the choir (a sparse group is raised to its level)
+HERALD_SEND = 1.6   # room send of the herald (1 = as the choir): more room than dry sound, so it sounds far away
+HERALD_V_RISE = 76  # MIDI velocity (1-127) of the first hint, played over the rise
+HERALD_V_CHANT = 58  # MIDI velocity of the second hint, softer: the chant under it is thinner than the rise
+LULL_STRING_STEP = 0.15625   # beats between the string notes of the lull's rise at 60 BPM: 0.15625 s, the march's sixteenth note
 
 
-def orchestra(sc, ex, brass_ex=None, levels=None):
+def orchestra(sc, ex):
     """Instruments shared by all the scores, placed in space (pan from -1 left to +1 right)."""
-    lv = dict(RQ_LEVELS, **(levels or {}))
     o = SimpleNamespace()
-    g = sc.group('lows', lv['lows'], expr=ex)
+    g = sc.group('lows', RQ_LEVELS['lows'], expr=ex)
     o.cb, o.vc = g.part(43, pan=0.35), g.part(42, pan=0.2)
-    g = sc.group('ostinato', lv['ostinato'])
-    o.ost, o.ostb, o.alt = g.part(42, pan=0.2), g.part(43, pan=0.35), g.part(48, pan=0.05)
-    g = sc.group('tremolo', lv['tremolo'], expr=ex)
+    g = sc.group('ostinato', RQ_LEVELS['ostinato'])
+    o.ost, o.ostb = g.part(42, pan=0.2), g.part(43, pan=0.35)
+    g = sc.group('tremolo', RQ_LEVELS['tremolo'], expr=ex)
     o.trem = g.part(44, pan=-0.2)
-    g = sc.group('violins', lv['violins'], expr=ex)
+    g = sc.group('violins', RQ_LEVELS['violins'], expr=ex)
     o.vln, o.vln2 = g.part(48, pan=-0.35), g.part(48, pan=-0.2, cents=6)
-    g = sc.group('men', lv['men'], expr=ex)
+    g = sc.group('men', RQ_LEVELS['men'], expr=ex)
     o.ma, o.mb, o.mo = g.part(52, pan=0.25, cents=-7), g.part(52, pan=-0.05, cents=7), g.part(53, pan=0.1)
-    g = sc.group('women', lv['women'], expr=ex)
+    g = sc.group('women', RQ_LEVELS['women'], expr=ex)
     o.wa, o.wb, o.wo = g.part(52, pan=-0.25, cents=-7), g.part(52, pan=0.05, cents=7), g.part(53, pan=-0.1)
-    g = sc.group('organ', lv['organ'], expr=ex)
+    g = sc.group('organ', RQ_LEVELS['organ'], expr=ex)
     o.org = g.part(19)
-    g = sc.group('brass', lv['brass'], expr=brass_ex or ex)
+    g = sc.group('brass', RQ_LEVELS['brass'], expr=ex)
     o.hn, o.hn2 = g.part(60, pan=-0.15), g.part(60, pan=-0.3, cents=7)
     o.tb, o.tu = g.part(57, pan=0.25), g.part(58, pan=0.15)
-    g = sc.group('timpani', lv['timpani'])
+    g = sc.group('timpani', RQ_LEVELS['timpani'])
     o.timp = g.part(47, pan=0.1)
-    g = sc.group('drum', lv['drum'], send=0.6)
+    g = sc.group('drum', RQ_LEVELS['drum'], send=0.6)
     o.gc, o.taiko = g.part(48, bank=128), g.part(116, pan=-0.1)
-    g = sc.group('bell', lv['bell'])
+    g = sc.group('bell', RQ_LEVELS['bell'])
     o.bell = g.part(14, pan=-0.1)
-    g = sc.group('cymbal', lv['cymbal'])
+    g = sc.group('cymbal', RQ_LEVELS['cymbal'])
     o.crash, o.rev = g.part(48, bank=128), g.part(119)
-    g = sc.group('solo', lv['solo'])
+    g = sc.group('solo', RQ_LEVELS['solo'])
     o.solo = g.part(53, vib=(5.3, 28.0, 0.35))
+    # The cor anglais hints at the Chartiste's theme: a reedy, plaintive voice that the choir and the brass do not
+    # cover, placed to the right and sent deep into the room so that it sounds far away.
+    g = sc.group('herald', RQ_LEVELS['herald'], send=HERALD_SEND)
+    o.herald = g.part(69, pan=0.4)
     return o
 
 
@@ -682,15 +696,14 @@ def closing(o, sc, root, five, w):
 
 # ================================================================== first requiem score (D minor)
 RQ = {  # chord: (bass, five voices from low to high); no third below D3
-    'Dm': ('D2', 'D3 A3 D4 F4 A4'), 'Bb': ('Bb1', 'Bb2 F3 Bb3 D4 F4'), 'Gm': ('G1', 'G2 D3 G3 Bb3 D4'),
-    'A': ('A1', 'A2 E3 A3 C#4 E4'), 'A7b9': ('A1', 'A2 G3 Bb3 C#4 E4'), 'C': ('C2', 'C3 G3 C4 E4 G4'),
+    'Dm': ('D2', 'D3 A3 D4 F4 A4'), 'Gm': ('G1', 'G2 D3 G3 Bb3 D4'), 'A7b9': ('A1', 'A2 G3 Bb3 C#4 E4'),
     'Eb': ('Eb2', 'Eb3 Bb3 Eb4 G4 Bb4'), 'Bbm': ('Bb1', 'Bb2 F3 Bb3 Db4 F4'), 'Eb/D': ('D2', 'D3 Bb3 Eb4 G4 Bb4'),
     'Dm/A': ('A1', 'A2 F3 A3 D4 F4'), 'Asus': ('A1', 'A2 E3 A3 D4 E4'), 'C#o/D': ('D2', 'D3 Bb3 C#4 E4 G4'),
 }
 RQ_SOLO = ['A4:3 Bb4:1', 'A4:2 F4:2', 'G4:3 Bb4:1', 'G4:2 E4:2']     # solo voice of the lull
 # low-string ostinato, 8 eighth notes: pedal and semitone above, or root and fifth
-RQ_PED = {'Dm': 38, 'Bb': 38, 'Gm': 38, 'Eb/D': 38, 'C#o/D': 38, 'Dm/A': 45, 'A': 45, 'A7b9': 45, 'Asus': 45}
-RQ_ROOT = {'C': 48, 'Eb': 39, 'Bbm': 46}
+RQ_PED = {'Dm': 38, 'Gm': 38, 'Eb/D': 38, 'C#o/D': 38, 'Dm/A': 45, 'A7b9': 45, 'Asus': 45}
+RQ_ROOT = {'Eb': 39, 'Bbm': 46}
 RQ_CELL, RQ_CELL_ROOT = [0, 0, 1, 0, 0, 0, -2, 0], [0, 0, 7, 0, 0, 0, -2, 0]
 
 
@@ -703,13 +716,21 @@ def rq_ostinato(o, b0, name, vv, hold, double):
             o.ostb.add(b0 + 0.5 * k, base + off, hold, vv + acc)
 
 
+BRASS_HOLD = 0.9   # fraction of its length that a brass note sounds (the choir keeps 0.97): the gap sharpens the attack
+STRING_STEP = 0.25     # beats between two sixteenth notes of the strings at 96 BPM (0.15625 s)
+
+
 def score_march_phase():
-    """The march: tutti first, then the chant, a break, the climax and descending minor chords."""
-    organ_bars, chant_bars, climax_bars, ending_bars = rq_sections()
-    plan = ([('hit', 'Dm', None)] * 2 + organ_bars + chant_bars + [('break', 'Dm', None), ('break', 'A5', None)]
-            + climax_bars + ending_bars)
+    """The march: tutti hit, organ, the theme sung (statement), a break that builds, the theme again enlarged
+    (reprise), then descending chords. Bars 0-1 hit, 2-9 organ, 10-17 statement, 18-19 break, 20-27 reprise,
+    28-35 descending chords (`rq_sections`, ending)."""
+    organ_bars, _, _, ending_bars = rq_sections()
+    reprise_chords = THEME_CHORDS[:-1] + [REPRISE_LAST_BAR[0]]
+    plan = ([('hit', 'Dm', None)] * 2 + organ_bars + [('statement', c, None) for c in THEME_CHORDS]
+            + [('break', 'Dm', None), ('break', 'A5', None)] + [('reprise', c, None) for c in reprise_chords]
+            + ending_bars)
     sc = RqScore(96, 144, wet=0.42, rt60=4.6)
-    v = sc.dyn([(0, 124), (8, 120), (40, 114), (71.9, 124), (72, 72), (76, 82), (80, 122), (112, 124), (144, 127)])
+    v = sc.dyn([(0, 124), (8, 120), (40, 112), (71.9, 124), (72, 72), (76, 82), (80, 122), (112, 124), (144, 127)])
     ex = [(0, 124), (8, 120), (40, 114), (71.5, 127), (72, 84), (79.5, 118), (80, 124), (144, 127)]
     o = orchestra(sc, ex)
 
@@ -729,8 +750,16 @@ def score_march_phase():
             o.hn2.add(b0 + off, w[-1] - 12, d * 0.9, vv - 2 + dv)
         o.vc.add(b0, root + 12, 3.9, vv - 8)
         o.trem.chord(b0, w, 3.9, vv - 14)
-        for k in range(16):  # violins: measured sixteenth notes on the two upper voices
-            o.vln.add(b0 + 0.25 * k, w[-1] if k % 4 != 2 else w[-2], 0.2, vv - 12 + (8 if k % 4 == 0 else 0))
+        hammer(b0, w, vv - 12)
+
+    def hammer(b0, upper, vq):
+        """Violins: measured sixteenth notes on the two top voices of `upper`, the first of each beat accented."""
+        for k in range(16):
+            o.vln.add(b0 + STRING_STEP * k, upper[-1] if k % 4 != 2 else upper[-2], 0.2, vq + (8 if k % 4 == 0 else 0))
+
+    def sing(p, b0, text, dv=0, shift=0, hold=0.97):
+        """A part plays a theme bar `text` with the dynamics of the score offset by `dv`."""
+        p.line(b0, text, lambda t: v(t, dv), hold=hold, shift=shift)
 
     for bar, (sec, name, women) in enumerate(plan):
         b0 = 4.0 * bar
@@ -753,34 +782,47 @@ def score_march_phase():
             if sec != 'hit':
                 o.bell.add(b0, bell_note(root), 3.5, 100)
         if sec == 'hit':
-            if bar == 0:
-                tutti(o, b0, root, five, w, vv, length=7.9)
+            if bar == 0:  # the entry hit: the large tutti (three men's voices, two horns, women in the organ)
+                tutti(o, b0, root, five, w, vv, length=7.9, big=True)
                 o.gc.add(b0, 36, 1, 127)
                 o.crash.add(b0, 57, 6, 116)
                 o.bell.add(b0, 62, 6, 108)
-        elif sec == 'chant':
-            i = bar - 10
+        elif sec in ('statement', 'reprise'):
+            big = sec == 'reprise'
+            i = bar - (20 if big else 10)
+            text = REPRISE_LAST_BAR[1] if big and i == 7 else CHARTISTE_THEME[i]
             pedal = ([root - 12] if root - 12 >= 24 else []) + [root]
-            o.org.chord(b0, pedal + five[:2], 3.95, vv - 10)
-            for p in (o.ma, o.mb):
-                p.line(b0, RQ_CHANT_D[i], v)
-            o.mo.line(b0, RQ_CHANT_D[i], lambda t: v(t, -4), shift=-12)
-            for p in (o.wa, o.wb):
-                p.line(b0, RQ_CHANT_D[i], lambda t: v(t, -4), shift=12)
-            for off, dv in ((0, 0), (2, -6)):
-                o.hn.chord(b0 + off, five[1:4], 1.7, vv - 6 + dv)
-                o.tb.chord(b0 + off, five[:2], 1.7, vv - 8 + dv)
-                o.tu.add(b0 + off, root, 1.7, vv - 8 + dv)
-            o.trem.chord(b0, five[2:], 3.9, vv - 18)
-            if i % 2 == 0:
-                o.bell.add(b0, bell_note(root), 3.5, 96)
-            if i == 0:
-                o.crash.add(b0, 57, 3.5, 108)
+            hi = [m + 12 for m in five[2:]]   # upper voices an octave higher, for the strings
+            o.org.chord(b0, pedal + five[:2] + (five[2:] if big else []), 3.95, vv - (8 if big else 10))
+            for p in (o.ma, o.mb):   # the choir carries the theme: men as written, women an octave above
+                sing(p, b0, text)
+            sing(o.mo, b0, text, -4, -12)
+            for p in (o.wa, o.wb) + ((o.wo,) if big else ()):
+                sing(p, b0, text, -4 if p is not o.wo else -6, 12)
+            sing(o.hn, b0, text, -6, hold=BRASS_HOLD)   # the brass double it in unison, for the attack
+            sing(o.tb, b0, text, -8, hold=BRASS_HOLD)
+            if big:   # reprise: horns also an octave up, tuba an octave under the men, violins above the women
+                sing(o.hn2, b0, text, -8, 12, BRASS_HOLD)
+                sing(o.tu, b0, text, -8, -12, BRASS_HOLD)
+                sing(o.vln2, b0, text, -16, 24)
+                o.vc.add(b0, root + 12, 3.9, vv - 8)
+                hammer(b0, hi, vv - 12)
+            else:     # statement: horns in unison, lighter accompaniment, hammered violins only in the second phrase
+                sing(o.hn2, b0, text, -8, hold=BRASS_HOLD)
+                o.tu.add(b0, root, 1.7, vv - 8)
+                o.tu.add(b0 + 2, root, 1.7, vv - 14)
+                if i >= 4:
+                    hammer(b0, hi, vv - 22)
+            o.trem.chord(b0, five[2:], 3.9, vv - (12 if big else 18))
+            if i == 0 or (big and i == 4):
+                o.crash.add(b0, 57, 3.5, 112 if big else 108)
             if i == 7:
-                o.timp.roll(b0 + 2, 2, 45, 60, 122)
+                o.timp.roll(b0 + 2, 2, 45, 70 if big else 60, 127 if big else 122)
+                if big:
+                    o.gc.roll(b0 + 3, 1, 36, 70, 122, 0.25)
                 riser(o, sc, b0 + 4)
-        elif sec in ('organ', 'climax', 'end'):
-            first = {'organ': 2, 'climax': 20, 'end': 28}[sec]
+        elif sec in ('organ', 'end'):
+            first = {'organ': 2, 'end': 28}[sec]
             i = bar - first
             marcato(b0, root, five, w, vv)
             if i % 4 == 0:
@@ -800,18 +842,37 @@ def score_march_phase():
                 o.gc.roll(b0 + 2, 2, 36, 50, 116, 0.25)
                 for p in (o.ma, o.mb, o.hn):
                     p.chord(b0, 'A2 E3', 3.9, 104)
+                for p, note in ((o.vln, 'E5'), (o.vln2, 'A4')):   # the strings swell on the dominant into the reprise
+                    p.roll(b0, 3.9, note, 40, 118, STRING_STEP)
                 riser(o, sc, b0 + 4)
     closing(o, sc, note_number('D2'), voic(RQ['Dm'][1]), voic('D5 F5 A5'))
     return sc
 
 # Dark colour, divine and ominous choir: no bright major chords (B flat minor, A minor, C minor; dominant as an open
-# fifth; descending minor chords at the end of the march), a 12 s rise then tutti, and the lull placed just before the
-# march, which starts louder still.
+# fifth; a major third only in E flat, the flat second of D, and in the dominant A7b9, kept dark by its flat ninth;
+# descending chords at the end of the march), a 12 s rise then tutti, and the lull placed just before the march,
+# which starts louder still.
 RQ.update({'Am': ('A1', 'A2 E3 A3 C4 E4'), 'A5': ('A1', 'A2 E3 A3 E4 A4'), 'Cm': ('C2', 'C3 G3 C4 Eb4 G4')})
 RQ_PED.update({'Am': 45, 'A5': 45})
 RQ_ROOT['Cm'] = 48
 RQ_CHANT_D = ['D3:3 E3:1', 'F3:2 E3:1 D3:1', 'F3:3 Gb3:1', 'F3:2 Db3:2', 'G3:3 A3:1', 'Bb3:2 A3:1 G3:1', 'A3:4',
               'A3:2 C#4:2']
+# Theme of the Chartiste, the one theme of the boss music. D minor, 8 bars of 4 beats (20 s at the march's
+# 96 BPM), one `RqPart.line` string per bar, written for the sampled choir: men sing it as written (D3-F4, a tenth),
+# women an octave above, brass double it for the attack. Every note lasts a beat or more, because the choir samples
+# attack slowly. Two phrases of 4 bars. The first answers the head with a rising fourth (A D E flat) and stops on D4
+# over a suspended A chord, the dominant, as a question; the second repeats the head, climbs to F4 over B flat minor
+# and falls through the leading tone C#4 and the flat ninth B flat to the dominant A, then drops a fifth to D3. The
+# head (bars 0-1: D A B flat, then A) is the motif: the slow phase hints at it (`score_slow_phase`), the march states
+# the whole theme and brings it back in its loop (`score_march_phase`). Chords that carry it, one per bar: Dm, Dm,
+# Dm/A, Asus, Dm, Bbm, A7b9, Dm.
+CHARTISTE_THEME = ['D3:2 A3:1 Bb3:1', 'A3:3 R:1', 'A3:2 D4:1 Eb4:1', 'D4:3 R:1',
+                   'D3:2 A3:1 Bb3:1', 'Bb3:1 F4:2 Eb4:1', 'C#4:2 Bb3:1 A3:1', 'D3:3 R:1']
+# The march sings the theme twice. The statement (march bars 10-17) puts it over the chords below; the reprise (bars
+# 20-27) is the same bars with a last bar that stays on the dominant (A held, over A5) instead of dropping to D, so
+# that the first chord of the descending chords after it (D minor) is the resolution.
+THEME_CHORDS = ['Dm', 'Dm', 'Dm/A', 'Asus', 'Dm', 'Bbm', 'A7b9', 'Dm']
+REPRISE_LAST_BAR = ('A5', 'A3:4')   # chord and note of the last bar of the reprise
 
 
 def rq_sections():
@@ -880,6 +941,8 @@ def score_slow_phase():
                 o.gc.add(b0, 36, 1, vv)
             if bar == 1:
                 heartbeat(b0, tn, vv)
+                # first hint: the head's first three notes, left hanging on B flat (a chord note of the next bar)
+                o.herald.line(b0, CHARTISTE_THEME[0], HERALD_V_RISE, shift=12)
             if bar == 2:
                 for p in (o.wa, o.wb):
                     p.chord(b0, w, 3.9, vv - 8)
@@ -906,6 +969,8 @@ def score_slow_phase():
             o.trem.chord(b0, five[2:], 3.9, vv - 18)
             heartbeat(b0, tn, vv)
             o.wo.chord(b0, w, 3.9, vv - 12)
+            if i == 0:  # second hint: the whole head, resolved on A, over the two D minor bars of the chant
+                o.herald.line(b0, ' '.join(CHARTISTE_THEME[:2]), HERALD_V_CHANT, shift=12)
             if i % 2 == 0:
                 o.gc.add(b0, 36, 1, vv + 4)
             if i % 4 == 0:
@@ -940,11 +1005,18 @@ def score_slow_phase():
             o.bell.add(b0, 62 if i % 2 == 0 else 57, 3.5, 84)
             o.timp.add(b0, 38, 1.5, vv - 6)
             o.timp.add(b0 + 3, 38, 0.9, vv - 16)
-            if i == 3:
+            if i == 3:  # the rise: strings take up the march's sixteenth notes, the brass enter one by one
                 o.timp.roll(b0, 4, 38, 30, 122)
                 o.gc.roll(b0 + 2, 2, 36, 40, 110, 0.25)
                 for p in (o.ma, o.mb):
                     p.chord(b0, five[:2], 3.9, 92)
+                for p, note in ((o.vln, 'C#5'), (o.vln2, 'E5')):
+                    p.roll(b0, 3.9, note, 60, 127, LULL_STRING_STEP)
+                for p, chord, off, vq in ((o.hn, five[1:4], 0, 84), (o.tb, five[:2], 1, 96), (o.tu, [root], 2, 108),
+                                          (o.hn2, [m + 12 for m in five[1:4]], 3, 122)):
+                    p.chord(b0 + off, chord, 3.9 - off, vq)
+                for p in (o.wa, o.wb):   # the women join for the last two beats: the choir is whole when the hit falls
+                    p.chord(b0 + 2, five[2:], 1.9, 104)
                 riser(o, sc, b0 + 4)
     return sc
 
@@ -1069,11 +1141,11 @@ def write_wav_st(path, l, r):
         f.writeframes(pcm.tobytes())
 
 
-# ---- boss, version 4: from scores to game files
-V4_BITRATE = '96k'    # stereo mp3
-V4_BOOST_DB = 1.5     # the march sounds at least this much above the loud passages of the slow phase
-V4_DRIVE = 1.5        # soft saturation (memoryless tanh: loops stay intact)
-V4_PEAK_DB = -1.0     # peak of slow phase and march together, before encoding
+# ---- boss, version 5: from scores to game files
+V5_BITRATE = '96k'    # stereo mp3
+V5_BOOST_DB = 1.5     # the march sounds at least this much above the loud passages of the slow phase
+V5_DRIVE = 1.5        # soft saturation (memoryless tanh: loops stay intact)
+V5_PEAK_DB = -1.0     # peak of slow phase and march together, before encoding
 
 
 def rq_dry(tsf, sc, n, gains=None, keep=None):
@@ -1136,12 +1208,12 @@ def rq_fold(x, n):
 
 def encode_st(wav_path, mp3_path):
     subprocess.run(['ffmpeg', '-hide_banner', '-loglevel', 'error', '-y', '-i', wav_path,
-                    '-c:a', 'libmp3lame', '-b:a', V4_BITRATE, '-ac', '2', '-ar', str(SR),
+                    '-c:a', 'libmp3lame', '-b:a', V5_BITRATE, '-ac', '2', '-ar', str(SR),
                     '-map_metadata', '-1', '-id3v2_version', '0', mp3_path], check=True)
 
 
-def boss_v4(args, work):
-    """Writes the four version 4 files to args.out (wavs in `work`); deterministic render."""
+def boss_v5(args, work):
+    """Writes the four version 5 files to args.out (wavs in `work`); deterministic render."""
     global RQ_SF
     if not os.path.isfile(args.soundfont):
         sys.exit(f'boss track: instrument bank not found at {args.soundfont}; run tools/setup_audio.sh or pass --soundfont')
@@ -1156,7 +1228,7 @@ def boss_v4(args, work):
     print('  full slow phase rendered', flush=True)
     b, g2, kw2 = rq_full(tsf, march)
     print('  full march rendered', flush=True)
-    boost = max(1.0, active_rms(*a) * 10.0 ** (V4_BOOST_DB / 20.0) / active_rms(*b))
+    boost = max(1.0, active_rms(*a) * 10.0 ** (V5_BOOST_DB / 20.0) / active_rms(*b))
     n1 = at(slow.beats, slow.bpm)
     p = 0.0
     for c in range(2):
@@ -1181,11 +1253,11 @@ def boss_v4(args, work):
         x[nc:] = amap(add, x[nc:], hit[c])
         intro2.append(x)
     # 3. Common level adjustment, then files.
-    g = 10.0 ** (V4_PEAK_DB / 20.0) / math.tanh(V4_DRIVE)
+    g = 10.0 ** (V5_PEAK_DB / 20.0) / math.tanh(V5_DRIVE)
     files = [('music_boss_slow_intro', intro1, False), ('music_boss_slow', loop1, True),
              ('music_boss_march_intro', intro2, False), ('music_boss_march', loop2, True)]
     for name, chans, looped in files:
-        chans = [amap(lambda u: g * math.tanh(V4_DRIVE * u / p), x) for x in chans]
+        chans = [amap(lambda u: g * math.tanh(V5_DRIVE * u / p), x) for x in chans]
         n = len(chans[0])
         if looped:
             chans = [framed(x) for x in chans]
@@ -1250,7 +1322,7 @@ def meadow_parts(args):
 # track name -> function (args, work) returning the stems and files to write (the boss track writes its own files)
 TRACKS = {
     'meadow': lambda args, work: meadow_parts(args),
-    'boss': boss_v4,
+    'boss': boss_v5,
     'mountain': lambda args, work: scaled_parts(mountain, SEEDS['mountain']),
 }
 

@@ -1,4 +1,4 @@
-// Page d'accueil : le titre, puis la barre de recherche d'emploi avec les deux offres les plus récentes à sa droite.
+// Home page: the title, then the job search bar with the two most recent offers on its right.
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router'
 import { apiFetch } from '../api.js'
@@ -7,12 +7,12 @@ import { useLang } from '../lang.js'
 
 export default function HomePage() {
   const { t } = useLang()
-  // Les deux offres les plus récentes : la liste reste vide tant que l'appel n'a pas répondu.
+  // The two most recent offers: the list stays empty until the call has answered.
   const [recent, setRecent] = useState([])
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(true)
 
-  // Une seule fois, au chargement : per_page=2 suffit, l'API trie déjà de la plus récente à la plus ancienne.
+  // Once, at load: per_page=2 is enough, the API already sorts from the most recent to the oldest.
   useEffect(() => {
     async function loadRecent() {
       try {
@@ -22,9 +22,9 @@ export default function HomePage() {
         }
         setRecent(data)
       } catch (err) {
-        // Détail technique dans la console, message lisible pour le visiteur.
+        // Technical detail in the console, readable message for the visitor.
         console.error(err)
-        // Le message est traduit à l'affichage, dans la langue courante.
+        // The message is translated at display time, in the current language.
         setError(true)
       } finally {
         setLoading(false)
@@ -35,27 +35,27 @@ export default function HomePage() {
 
   return (
     <div className="page">
-      {/* Titre seul, précédé d'un grand vide : un seul message à la fois. */}
+      {/* Title alone, preceded by a large empty space: one message at a time. */}
       <h1 className="home-title">
         {t('Votre carrière,', 'Your career,')}
         <br />
         {t('traitée avec soin.', 'handled with care.')}
       </h1>
 
-      {/* Sans encadré : la recherche à gauche, les deux offres récentes à droite, en liste discrète. */}
+      {/* No frame: search on the left, the two recent offers on the right, as a discreet list. */}
       <div className="home-row">
-        {/* La recherche et ses filtres ouvrent la page des offres (components/SearchBar.jsx). */}
+        {/* The search and its filters open the offers page (components/SearchBar.jsx). */}
         <SearchBar />
 
         <section className="recent-offers" aria-labelledby="recent-offers-title">
           <h2 id="recent-offers-title">{t('Récemment publiées', 'Recently published')}</h2>
           {loading && <p>{t('Chargement…', 'Loading…')}</p>}
           {error && <p>{t('Offres récentes indisponibles pour le moment.', 'Recent job offers are unavailable at the moment.')}</p>}
-          {/* Aucune annonce ouverte : on renvoie vers la liste plutôt que d'afficher une case vide. */}
+          {/* No open job offer: point to the list rather than showing an empty box. */}
           {!loading && !error && recent.length === 0 && (
             <p>{t('Aucune offre pour le moment.', 'No job offers at the moment.')}</p>
           )}
-          {/* Chaque ligne ouvre la page des offres filtrée sur ce titre (q cherche dans le titre). */}
+          {/* Each line opens the offers page filtered on this title (q searches in the title). */}
           <ul>
             {recent.map((offer) => (
               <li key={offer.id}>

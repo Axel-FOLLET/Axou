@@ -1,0 +1,448 @@
+/* -------------------- EXPERIENCE TIMELINE -------------------- */
+
+/*
+ * Timeline taken from the CV (experience.css), now the thread of the page: a blue line in the accent of the page
+ * (--accent-text) draws itself along a hairline as the page scrolls, a small blue cube rides its head, and each job
+ * (dated node + text) lights up when the line reaches it (timeline.js).
+ * No card around the jobs: the text sits on the page. The .tag labels are in tags.css.
+ * A single .timeline per page: timeline.js animates only the first one.
+ */
+
+/*
+ * --node: diameter of the dated nodes; the line goes through their centre.
+ * --axis-top: start of the line, at the centre of the first node.
+ * --thread: thickness of the blue line.
+ * --axis-length: length of the plain line, down to the bottom of the timeline.
+ */
+.timeline {
+    --node: 56px;
+    --axis-top: calc(var(--node) / 2);
+    --thread: 3px;
+    --axis-length: calc(100% - var(--axis-top));
+
+    position: relative;
+
+    display: grid;
+
+    gap: 56px;
+
+    /* The introduction of the section (.section__intro) already provides the space above */
+    margin: 0;
+    padding: 0;
+
+    list-style: none;
+}
+
+
+/*
+ * Plain line, without JavaScript: a hairline, then the blue line on top, fully drawn.
+ * With JavaScript, the thread below replaces both (timeline--threaded).
+ */
+.timeline::before,
+.timeline::after {
+    content: "";
+
+    position: absolute;
+    top: var(--axis-top);
+    left: calc(var(--node) / 2);
+
+    width: 1px;
+    height: var(--axis-length);
+
+    background-color: var(--line);
+
+    translate: -50% 0;
+}
+
+
+.timeline::after {
+    width: var(--thread);
+
+    background-color: var(--accent-text);
+
+    box-shadow: 0 0 14px var(--accent-glow-strong);
+}
+
+
+.timeline--threaded::before,
+.timeline--threaded::after {
+    content: none;
+}
+
+
+/* -------------------- THREAD -------------------- */
+
+/*
+ * Extra list item added by timeline.js (hidden from screen readers): it starts at the centre of the first node
+ * and goes beyond the timeline, down to the top edge of the career-change banner (height set by timeline.js).
+ * Without width, it only carries the hairline, the blue line and the cube, all centred on it.
+ * z-index 1: above the background of the next section, under the dated nodes (z-index 2), which hide the line and the cube.
+ * pointer-events: none: only the cube can be grabbed.
+ */
+.timeline__thread {
+    position: absolute;
+    top: var(--axis-top);
+    left: calc(var(--node) / 2);
+    z-index: 1;
+
+    width: 0;
+
+    pointer-events: none;
+}
+
+
+/* Hairline of the whole way, already there before the blue line */
+.timeline__thread::before {
+    content: "";
+
+    position: absolute;
+    top: 0;
+    left: -0.5px;
+
+    width: 1px;
+    height: 100%;
+
+    background-color: var(--line);
+}
+
+
+/*
+ * Blue line, as long as the thread: timeline.js scales it from its top (scaleY from 0 to 1) to draw it.
+ * The glow makes it a line of light on the near-black; will-change keeps the redraw on the graphics card.
+ */
+.timeline__thread-line {
+    position: absolute;
+    top: 0;
+    left: calc(var(--thread) / -2);
+
+    width: var(--thread);
+    height: 100%;
+
+    border-radius: 0 0 var(--thread) var(--thread);
+
+    background-color: var(--accent-text);
+
+    box-shadow:
+        0 0 4px var(--accent-text),
+        0 0 16px var(--accent-glow-strong);
+
+    transform-origin: 50% 0;
+
+    will-change: transform;
+}
+
+
+/*
+ * Cube of the thread: the blue cube of the home page door (cubes.css, .cube--blue), smaller,
+ * centred on the head of the line; timeline.js slides it down (transform) and turns it.
+ * Finer edges for its size, like the small cubes.
+ */
+.timeline__cube {
+    --cube-size: 44px;
+
+    position: absolute;
+    top: calc(var(--cube-size) / -2);
+    left: calc(var(--cube-size) / -2);
+
+    pointer-events: auto;
+
+    will-change: transform;
+}
+
+
+.timeline__cube .cube__face {
+    border-width: 1.5px;
+}
+
+
+/*
+ * The cube of the thread ends its way where the white transition cube of the section stands:
+ * it takes over its role, the white one steps aside.
+ */
+.timeline--threaded ~ .cube--transition {
+    display: none;
+}
+
+
+/* Two columns: the dated node, then the text of the job */
+.timeline__step {
+    position: relative;
+
+    display: grid;
+    grid-template-columns: var(--node) minmax(0, 1fr);
+    align-items: start;
+
+    gap: 28px;
+}
+
+
+/*
+ * Dated node: start year, and end year below it if it differs.
+ * Near-black, it lights up when the line reaches it (timeline.js): filled with the colour of the page cards (--accent-card),
+ * circled and haloed in the accent of the line, while a ring leaves it once (::after).
+ * z-index places it above the thread: the line and the cube pass behind it; tabular-nums aligns the digits.
+ * The text colour (grey, then white) comes from motion.css.
+ */
+.timeline__date {
+    position: relative;
+    z-index: 2;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    width: var(--node);
+    height: var(--node);
+
+    border: 1px solid var(--line-strong);
+    border-radius: 50%;
+
+    background-color: var(--ink);
+
+    font-size: var(--text-label);
+    font-weight: 700;
+    line-height: 1.2;
+    font-variant-numeric: tabular-nums;
+}
+
+
+/* Three classes: this list of transitions wins over the one of motion.css, which only knows the colours */
+.timeline--animated .timeline__step .timeline__date {
+    transition:
+        color var(--dur-base) var(--ease-out),
+        background-color var(--dur-base) var(--ease-out),
+        border-color var(--dur-base) var(--ease-out),
+        box-shadow var(--dur-base) var(--ease-out);
+}
+
+
+.timeline__step--visible .timeline__date,
+.timeline:not(.timeline--animated) .timeline__date {
+    border-color: var(--accent-text);
+
+    background-color: var(--accent-card);
+
+    box-shadow:
+        0 0 0 2px var(--accent-text),
+        0 0 22px var(--accent-glow-strong);
+}
+
+
+/* Ring that leaves the node when it lights up: it widens and fades, once */
+.timeline__date::after {
+    content: "";
+
+    position: absolute;
+    inset: -1px;
+
+    border: 2px solid var(--accent-text);
+    border-radius: 50%;
+
+    opacity: 0;
+
+    pointer-events: none;
+}
+
+
+.timeline--animated .timeline__step--visible .timeline__date {
+    animation: timeline-node-pop var(--dur-base) var(--ease-out);
+}
+
+
+.timeline--animated .timeline__step--visible .timeline__date::after {
+    animation: timeline-node-ring var(--dur-slow) var(--ease-out);
+}
+
+
+@keyframes timeline-node-pop {
+    40% {
+        scale: 1.16;
+    }
+}
+
+
+@keyframes timeline-node-ring {
+    from {
+        opacity: 0.9;
+    }
+
+    to {
+        opacity: 0;
+        scale: 2.2;
+    }
+}
+
+
+/*
+ * Text of the job, laid on the page, over the full width of the column.
+ * From 768 px, two columns (see below): period, company and position on the left, text and tags on the right.
+ * The text keeps its own reading width (70ch).
+ */
+.timeline__content {
+    min-width: 0;
+}
+
+
+/* Period of the job, written out above the company name; 18 px centres it on the node */
+.timeline__period {
+    margin: 18px 0 0;
+
+    color: var(--accent-text);
+
+    font-size: var(--text-label);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+
+.timeline__title {
+    margin: 10px 0 0;
+
+    font-size: 1.625rem;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+}
+
+
+.timeline__role {
+    margin: 6px 0 0;
+
+    font-size: 1.0625rem;
+    font-weight: 500;
+}
+
+
+.timeline__text {
+    max-width: 70ch;
+
+    margin: 12px 0 0;
+
+    color: var(--muted);
+}
+
+
+.timeline__role + .timeline__text {
+    margin-top: 20px;
+}
+
+
+/* -------------------- SKILLS AND TOOLS -------------------- */
+
+/* Skills and tools of each job, always visible: .tag labels (tags.css) */
+.timeline__tags {
+    display: flex;
+    flex-wrap: wrap;
+
+    gap: 6px;
+
+    margin: 20px 0 0;
+    padding: 0;
+
+    list-style: none;
+}
+
+
+/* -------------------- TWO COLUMNS (768 px and above) -------------------- */
+
+/*
+ * On the left the period, company and position; on the right the paragraph(s), then the tags.
+ * The left column is made of stacked floats (clear: left): it keeps the height of its content,
+ * whatever the number of paragraphs on the right. The elements on the right keep a left margin equal
+ * to the left column plus the gap: they start at the top of the job, next to the period.
+ * display: flow-root makes the job contain its floats. Proportions 2/5 and 3/5; gap --timeline-gap.
+ * The first paragraph starts at 18 px, like the period: the two columns start at the same height.
+ */
+@media (min-width: 768px) {
+
+    .timeline__content {
+        --timeline-gap: clamp(32px, 4vw, 64px);
+
+        display: flow-root;
+    }
+
+
+    .timeline__period,
+    .timeline__title,
+    .timeline__role {
+        float: left;
+        clear: left;
+
+        width: calc((100% - var(--timeline-gap)) * 0.4);
+    }
+
+
+    .timeline__text,
+    .timeline__tags {
+        margin-left: calc((100% - var(--timeline-gap)) * 0.4 + var(--timeline-gap));
+    }
+
+
+    :is(.timeline__period, .timeline__title, .timeline__role) + .timeline__text {
+        margin-top: 18px;
+    }
+
+}
+
+
+/* -------------------- APPEARANCE OF THE JOBS -------------------- */
+
+/*
+ * Classes added by timeline.js: each card slides in from the right, toward the line, fading in.
+ * The starting offset must not widen the page: the section that holds the timeline cuts it (overflow-x: clip, page sheet).
+ * The list itself cuts nothing: the cube of the thread and the rings of the nodes overflow it on the left.
+ */
+.timeline--animated .timeline__content {
+    opacity: 0;
+    translate: 24px 0;
+
+    transition:
+        opacity var(--dur-reveal) var(--ease-out),
+        translate var(--dur-reveal) var(--ease-out);
+}
+
+
+.timeline--animated .timeline__step--visible .timeline__content {
+    opacity: 1;
+    translate: none;
+}
+
+
+/* -------------------- PHONE -------------------- */
+
+@media (max-width: 767px) {
+
+    .timeline {
+        --node: 48px;
+
+        gap: 40px;
+    }
+
+
+    .timeline__step {
+        gap: 16px;
+    }
+
+
+    .timeline__date {
+        font-size: 0.75rem;
+    }
+
+
+    /* Smaller cube on the thread, like the nodes */
+    .timeline__cube {
+        --cube-size: 36px;
+    }
+
+
+    .timeline__period {
+        margin-top: 14px;
+    }
+
+
+    .timeline__title {
+        font-size: 1.375rem;
+    }
+
+}

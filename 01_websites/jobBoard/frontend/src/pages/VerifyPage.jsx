@@ -1,4 +1,4 @@
-// Page ouverte depuis le lien reçu par email : elle confirme l'adresse, puis renvoie vers la connexion.
+// Page opened from the link received by email: it confirms the address, then points to the login.
 import { useEffect, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router'
 import { apiFetch } from '../api.js'
@@ -8,14 +8,14 @@ export default function VerifyPage() {
   const { t } = useLang()
   const [searchParams] = useSearchParams()
   const token = searchParams.get('token') ?? ''
-  // Lien tronqué ou recopié sans le jeton : l'état part directement sur le refus, sans appel.
+  // Truncated link or copied without the token: the state goes straight to the refusal, without a call.
   const [status, setStatus] = useState(token === '' ? 'invalid' : 'checking')
-  // Le lien ne sert qu'une fois : ce verrou empêche le second appel du double montage
-  // de StrictMode, qui arriverait après la consommation du jeton et afficherait un refus.
+  // The link works only once: this lock prevents the second call of the StrictMode
+  // double mount, which would come after the token was consumed and would display a refusal.
   const started = useRef(false)
 
   useEffect(() => {
-    // Sans jeton, il n'y a rien à envoyer au serveur ; le verrou coupe le second appel.
+    // Without a token there is nothing to send to the server; the lock cuts the second call.
     if (token === '' || started.current) {
       return
     }
@@ -30,10 +30,10 @@ export default function VerifyPage() {
       if (httpStatus === 200) {
         setStatus('done')
       } else if (httpStatus === 409) {
-        // La fiche a déjà un compte : le lien n'a plus d'objet.
+        // The record already has an account: the link no longer has a purpose.
         setStatus('already')
       } else {
-        // Jeton inconnu, déjà utilisé ou périmé : un seul message, comme côté serveur.
+        // Unknown, already used or expired token: a single message, as on the server side.
         setStatus('invalid')
       }
     }

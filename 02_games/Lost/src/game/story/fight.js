@@ -42,7 +42,7 @@ export const fightDirection = {
    *   around him (World.enterArena, minimap rebaked without the hidden trees). The kitten walks to BOSS.catDist m from the
    *   Chartiste, on its side, then stays there (`_combatLock`). Camera in slow orbit around the centre (COMBAT_CAM.build).
    * - 'grow' (BOSS.grow s): `_growBoss`.
-   * - 'fight': `_fight` (Duel; sword can be taken, `pickSword`).
+   * - 'fight': `_fight` (Duel; sword can be taken, `pickSword`: cutscene 2).
    * - 'victory': `_victory` (VICTORY), then back out of combat and step 'maman'.
    */
   _startCombat() {
@@ -94,7 +94,7 @@ export const fightDirection = {
   /** True during the sequence, kitten at its place (Story.update → Brain.setHold). */
   get _combatLock() {
     const c = this._combat;
-    return !!c && (c.phase === 'grow' || c.phase === 'victory' || (c.phase === 'build' && !this.cat.brain.target));
+    return !!c && (c.phase === 'grow' || c.phase === 'victory' || (c.phase === 'build' && !this.cat.brain.target) || !!this._swordScene);
   },
 
   /** Narrow screen (COMBAT_CAM.narrowAspect): higher or farther shots. */
@@ -117,8 +117,6 @@ export const fightDirection = {
       if (c.t >= BOSS.grow && !this.npcs.chartiste.bossGrowing) this._fight();
     } else if (c.phase === 'victory') {
       this._updateVictory(dt);
-    } else if (this._pull) {
-      this._updatePull(dt); // sword-pull cinematic: duel paused, close-up
     } else {
       // Point followed between the kitten and the boss: both stay in the backed-off shot.
       const p = this.cat.root.position, r = this.npcs.chartiste.root.position, k = C.fight.follow;
@@ -156,12 +154,12 @@ export const fightDirection = {
   /**
    * Camera kept above the arena disc (COMBAT_CAM.inside), in every phase: outside the disc, pillars, wall and edge flowers
    * would come to the foreground. The camera is pulled towards the aimed point along its azimuth, and raised to keep its
-   * distance (pitch capped at `maxPitch`, `fightPitch` in phases `fight` and `victory`; in `fight`, only the sword-pull
-   * close-up keeps `maxPitch`). Nothing if the aimed point is itself outside the disc.
+   * distance (pitch capped at `maxPitch`, `fightPitch` in phases `fight` and `victory`). Nothing if the aimed point is
+   * itself outside the disc.
    */
   _keepInArena() {
     const a = this.world.arena, I = COMBAT_CAM.inside, R = a.radius - I.margin, ph = this._combat?.phase;
-    const pitch = ph === 'victory' || (ph === 'fight' && this._pull?.phase !== 'pull') ? I.fightPitch : I.maxPitch;
+    const pitch = ph === 'victory' || ph === 'fight' ? I.fightPitch : I.maxPitch;
     if (!(R > 0) || !a.center) return;
     const cam = this.world.camera.position, t = this.world.controls.target;
     const cx = a.center.x, cz = a.center.z;
