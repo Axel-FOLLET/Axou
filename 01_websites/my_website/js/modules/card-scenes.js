@@ -28,6 +28,7 @@ const SCENES = {
     "pendu": { path: "./scenes/hangman.js", ready: true },
     "cat-game": { path: "./cat-3d.js", ready: true },
     "parcours-portfolio": { path: "./scenes/portfolio-site.js", ready: true },
+    "guide-contexte": { path: "./scenes/context-guide.js", ready: true },
     "detecteur-langue": { path: "./scenes/language.js", ready: true }
 };
 

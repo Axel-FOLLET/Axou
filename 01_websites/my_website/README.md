@@ -19,12 +19,13 @@ The site is in French (default) and in English.
 
 ## What is in the portfolio
 
-Seven project cards on a wheel, each with a small animated scene. Some can be tried without leaving the page:
+Eight project cards on a wheel, each with a small animated scene. Some can be tried without leaving the page:
 
 - **Snake** and **Hangman**: both games, playable in the browser (`js/games/`); the original projects are in Python, with Pygame.
 - **Caesar and Vigenère ciphers** and **Language detector**: live demos of the algorithms (`js/tools/`).
 - **Lost**: the cat of the game, in 3D, which can be turned with the mouse or a finger.
 - **Job Board**: links to the candidate, recruiter and admin demos of the deployed project.
+- **Context engineering guide**: the guide in PDF to read, and its Markdown version to give to an AI, in French and in English (`assets/documents/`). The Markdown file is stored as `.md.txt`, because GitHub Pages would turn a `.md` file into an HTML page; the download link gives it back its `.md` name.
 
 ## Built with
 
@@ -57,7 +58,7 @@ js/
 ├── tools/              ciphers and language detector
 └── vendor/             three.js (reduced bundle)
 assets/
-├── documents/          resume in PDF, French and English
+├── documents/          resume in PDF, French and English; context engineering guide (PDF and Markdown)
 ├── fonts/              typefaces and their licences
 ├── images/             favicon, photo, LinkedIn logo, share image
 └── models/             3D model of the cat

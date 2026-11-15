@@ -19,8 +19,8 @@ const LABELS = {
  * Order and displayed name of the fields. Projects in progress keep their "Coming soon" badge without a button of their own.
  */
 const DOMAINS = {
-    fr: { web: "Web", games: "Jeux", algorithms: "Algorithmique" },
-    en: { web: "Web", games: "Games", algorithms: "Algorithms" }
+    fr: { web: "Web", games: "Jeux", algorithms: "Algorithmique", ai: "IA" },
+    en: { web: "Web", games: "Games", algorithms: "Algorithms", ai: "AI" }
 };
 
 

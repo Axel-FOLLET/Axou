@@ -248,7 +248,7 @@ body::after {
 /* -------------------- CARD HOVERS -------------------- */
 
 /*
- * Hovers chosen card by card with data-hover (snake, stick figure, cat, arrow, cipher, language), only with a mouse or a touchpad:
+ * Hovers chosen card by card with data-hover (snake, stick figure, cat, arrow, typed word, cipher, language), only with a mouse or a touchpad:
  * with a finger, a hover never really ends.
  * They touch neither the transform nor the filter of the card, kept for the project wheel (project-showcase.js).
  * The figure crosses the top of the media area (about 40 px) above the animated scene of the card (z-index):
@@ -426,6 +426,51 @@ body::after {
 
 
     /*
+     * data-hover="type": a text cursor types "guide.md", the file given to an AI, at the top left of the area,
+     * once per hover, blinks, then the word fades. Monospace font: the box widens by one character (1ch) per step.
+     * Its empty alternative text (/ "") hides the word from screen readers. At rest, it waits invisible and empty.
+     */
+    [data-hover="type"] :is(.project-card__media, [data-hover-zone]) {
+        position: relative;
+    }
+
+
+    [data-hover="type"] :is(.project-card__media, [data-hover-zone])::before {
+        content: "guide.md" / "";
+
+        position: absolute;
+        top: 8px;
+        left: 20px;
+        z-index: 2;
+
+        box-sizing: content-box;
+        width: 0;
+        padding-right: 3px;
+
+        overflow: hidden;
+
+        border-right: 2px solid transparent;
+
+        color: var(--white);
+        font: 700 15px/22px ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+        white-space: nowrap;
+
+        opacity: 0;
+
+        pointer-events: none;
+    }
+
+
+    /* Eight letters in eight steps, the caret blinks four times, then the word fades; it starts again at the next hover */
+    [data-hover="type"]:hover :is(.project-card__media, [data-hover-zone])::before {
+        animation:
+            motion-type-text 0.9s steps(8, end) 0.15s forwards,
+            motion-type-caret 0.45s steps(1) 0.15s 4,
+            motion-type-out 0.4s var(--ease-out) 2s forwards;
+    }
+
+
+    /*
      * data-hover="cipher": motion.js encrypts the word marked data-cipher letter by letter, then restores it when leaving the card.
      * data-hover="language": motion.js switches the word marked data-language from one language to another, then restores it when leaving the card.
      * The displayed word is an ::after (data-cipher-shown or data-language-shown) laid over the original word, made transparent;
@@ -519,6 +564,41 @@ body::after {
 }
 
 
+/* Typed word: the box widens from nothing to its eight characters */
+@keyframes motion-type-text {
+    from {
+        width: 0;
+
+        opacity: 1;
+    }
+
+    to {
+        width: 8ch;
+
+        opacity: 1;
+    }
+}
+
+
+/* Blinking caret: visible for the first half of each blink, hidden for the second */
+@keyframes motion-type-caret {
+    0% {
+        border-right-color: var(--white);
+    }
+
+    50% {
+        border-right-color: transparent;
+    }
+}
+
+
+@keyframes motion-type-out {
+    to {
+        opacity: 0;
+    }
+}
+
+
 /* -------------------- BARS OF THE METHOD -------------------- */
 
 /*
@@ -601,7 +681,7 @@ body::after {
 /*
  * No cascade (reveal.js already adds no class). motion.js stops before setting its classes: no magnetic buttons,
  * no entrance, no reveal of the titles, no bars, no cipher, no language switch.
- * No snake, stick figure, cat or arrow (they stay hidden).
+ * No snake, stick figure, cat, arrow or typed word (they stay hidden).
  * The details of the timeline are shown at once: timeline.js does not set timeline--animated.
  * The grain and the glow, motionless, stay.
  */
@@ -613,7 +693,7 @@ body::after {
 
 
     [data-hover="snake"]:hover :is(.project-card__media, [data-hover-zone])::before,
-    :is([data-hover="hangman"], [data-hover="cat"], [data-hover="cursor"]):hover :is(.project-card__media, [data-hover-zone])::before {
+    :is([data-hover="hangman"], [data-hover="cat"], [data-hover="cursor"], [data-hover="type"]):hover :is(.project-card__media, [data-hover-zone])::before {
         animation: none;
     }
 

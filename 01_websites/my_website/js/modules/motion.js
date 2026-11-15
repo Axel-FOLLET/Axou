@@ -505,7 +505,7 @@ function initLanguages() {
 
 /*
  * Starts the finishing touches. To be called after initReveal: the cascade relies on its classes.
- * The snake, the stick figure, the cat and the arrow (data-hover="snake", "hangman", "cat", "cursor") only need motion.css.
+ * The snake, the stick figure, the cat, the arrow and the typed word (data-hover="snake", "hangman", "cat", "cursor", "type") only need motion.css.
  */
 export function initMotion() {
     initStagger();
