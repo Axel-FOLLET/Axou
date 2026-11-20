@@ -274,6 +274,35 @@
                 -->
                 <div class="showcase__track" role="region" aria-label="Projects">
 
+                    <article class="project-card" data-hover="ghost" data-slug="2dgame-java" aria-labelledby="project-title-2dgame" data-domain="games">
+                        <div class="project-card__main">
+                            <div class="project-card__media">
+                                <img class="farm-preview" src="../../assets/images/2dgame-java/garry-0.png" alt="" width="96" height="96">
+                            </div>
+                            <div class="project-card__body">
+                                <h3 class="project-card__title" id="project-title-2dgame" tabindex="0">2D game in Java</h3>
+                                <ul class="project-card__tags" aria-label="Skills and technologies">
+                                    <li class="tag">Java</li>
+                                    <li class="tag">libGDX</li>
+                                    <li class="tag">Epitech</li>
+                                </ul>
+                                <div class="project-card__story">
+                                    <p class="project-card__text">A farm game built by three: by day, Garry grows crops; at night, he defends his farm.</p>
+                                    <p class="project-card__label">What I learned</p>
+                                    <p class="project-card__text">Polymorphism: each defence reacts in its own way. And the Factory pattern, which I discovered and used.</p>
+                                </div>
+                                <div class="project-card__actions">
+                                    <a class="button" href="https://github.com/Axel-FOLLET/Axou/tree/main/02_games/2D_game" target="_blank" rel="noopener noreferrer">Source code<span class="visually-hidden"> – 2D game in Java (new tab)</span></a>
+                                    <button class="button project-card__toggle project-card__toggle--game" type="button" aria-expanded="false" aria-controls="stage-2dgame" data-label-open="Play" data-label-close="Close the game"><span class="project-card__toggle-label">Play</span><span class="visually-hidden"> – 2D game in Java</span></button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Game: project-showcase.js loads pages/games/2d-game/ into this area when opened, with a full screen button, and unloads it when closed or when "Quitter" (Quit) is clicked in the game. -->
+                        <div class="project-card__stage project-card__stage--game" id="stage-2dgame" data-game="2d-game" data-game-title="Playable 2D game in Java" data-fullscreen-label="Full screen" hidden></div>
+
+                    </article>
+
                     <article class="project-card" data-slug="yia-jobs" aria-labelledby="project-title-yia-jobs" data-domain="web" data-hover="cursor">
 
                         <div class="project-card__main">
@@ -315,6 +344,273 @@
 
                     </article>
 
+                    <!-- Lost: in development, source code published, no playable version yet. -->
+                    <article class="project-card" data-slug="cat-game" aria-labelledby="project-title-cat-game" data-domain="games" data-hover="cat">
+
+                        <div class="project-card__main">
+
+                            <div class="project-card__media">
+                                <span class="cat-figure" role="img" aria-label="Seated cat drawn in facets"></span>
+                            </div>
+
+                            <div class="project-card__body">
+
+                                <h3 class="project-card__title" id="project-title-cat-game">Lost</h3>
+
+                                <p class="project-card__badge">In development</p>
+
+                                <ul class="project-card__tags" aria-label="Skills and technologies">
+                                    <li class="tag">Three.js</li>
+                                    <li class="tag">Blender</li>
+                                    <li class="tag">AI agent</li>
+                                </ul>
+
+                                <div class="project-card__story">
+                                    <p class="project-card__text"><strong>A 3D browser game</strong>: a kitten looks for its mother.</p>
+                                    <p class="project-card__text">With an AI agent (Claude) that I direct: <strong>I decide what the game is and validate the result by playing it</strong>.</p>
+                                </div>
+
+                                <div class="project-card__actions">
+                                    <a class="button" href="https://github.com/Axel-FOLLET/Axou/tree/main/02_games/Lost" target="_blank" rel="noopener noreferrer">Source code<span class="visually-hidden"> – Lost (new tab)</span></a>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </article>
+
+                    <!-- Context engineering guide: guide.md is given to an AI, the PDF is the edition for readers (English version of both).
+                         The .md is stored as .md.txt: GitHub Pages (Jekyll) would turn a .md file into an HTML page;
+                         the download attribute gives it back its .md name. -->
+                    <article class="project-card" data-slug="guide-contexte" aria-labelledby="project-title-guide-contexte" data-domain="ai" data-hover="type">
+
+                        <div class="project-card__main">
+
+                            <div class="project-card__media">
+                                <!-- Symbol: open book -->
+                                <svg class="project-card__icon" viewBox="0 0 48 48" aria-hidden="true">
+                                    <path d="M24 12c-4-3-10-4-17-3v26c7-1 13 0 17 3 4-3 10-4 17-3V9c-7-1-13 0-17 3z"/>
+                                    <path d="M24 12v26M11 16h8M11 21h8M29 16h8M29 21h8"/>
+                                </svg>
+                            </div>
+
+                            <div class="project-card__body">
+
+                                <h3 class="project-card__title" id="project-title-guide-contexte">Context engineering guide</h3>
+
+                                <ul class="project-card__tags" aria-label="Skills and technologies">
+                                    <li class="tag">AI project lead</li>
+                                    <li class="tag">Claude</li>
+                                    <li class="tag">Codex</li>
+                                </ul>
+
+                                <div class="project-card__story">
+                                    <p class="project-card__text"><strong>A guide to give to your AI</strong> to frame its use and build your own system.</p>
+                                    <p class="project-card__label">How it was built</p>
+                                    <p class="project-card__text"><strong>Designed and directed by me</strong>, written by AI agents I steered.</p>
+                                    <p class="project-card__text">Give the .md to your AI agent.</p>
+                                </div>
+
+                                <div class="project-card__actions">
+                                    <a class="button" href="../../assets/documents/context_engineering_guide.pdf" target="_blank" rel="noopener noreferrer">Read the PDF<span class="visually-hidden"> – Context engineering guide (new tab)</span></a>
+                                    <a class="button" href="../../assets/documents/context_engineering_guide.md.txt" download="context_engineering_guide.md">Download the .md<span class="visually-hidden"> – Context engineering guide, version to give to your AI</span></a>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </article>
+
+                    <article class="project-card" data-slug="snake" aria-labelledby="project-title-snake" data-domain="games" data-hover="snake">
+
+                        <div class="project-card__main">
+
+                            <div class="project-card__media">
+                                <!-- Symbol: snake made of squares and its apple -->
+                                <svg class="project-card__icon" viewBox="0 0 48 48" aria-hidden="true">
+                                    <path d="M5 29h24v-16h8v8"/>
+                                    <path d="M5 37h32v-8"/>
+                                    <path d="M5 29v8M13 29v8M21 29v8M29 21h8M29 13v16"/>
+                                    <path d="M33 16.5h.01"/>
+                                    <circle cx="14" cy="15" r="4"/>
+                                    <path d="M14 11c0-2 1-3 3-3.5"/>
+                                </svg>
+                            </div>
+
+                            <div class="project-card__body">
+
+                                <h3 class="project-card__title" id="project-title-snake">Snake game</h3>
+
+                                <ul class="project-card__tags" aria-label="Skills and technologies">
+                                    <li class="tag">Python</li>
+                                    <li class="tag">Pygame</li>
+                                    <li class="tag">Keyboard events</li>
+                                    <li class="tag">Collisions</li>
+                                </ul>
+
+                                <div class="project-card__story">
+                                    <p class="project-card__text">A complete Snake, a personal project built after Hangman.</p>
+                                    <p class="project-card__label">What I learned</p>
+                                    <p class="project-card__text">Real time forces a clear split between the game loop, the display and the rules.</p>
+                                </div>
+
+                                <div class="project-card__actions">
+                                    <a class="button" href="https://github.com/Axel-FOLLET/Axou/tree/main/02_games/snake" target="_blank" rel="noopener noreferrer">Source code<span class="visually-hidden"> – Snake game (new tab)</span></a>
+                                    <button class="button project-card__toggle project-card__toggle--game" type="button" aria-expanded="false" aria-controls="stage-snake" data-label-open="Play" data-label-close="Close the game"><span class="project-card__toggle-label">Play</span><span class="visually-hidden"> – Snake game</span></button>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Game: project-showcase.js loads pages/games/snake.html into this area when opened and unloads it when closed. -->
+                        <div class="project-card__stage project-card__stage--game" id="stage-snake" data-game="snake" data-game-title="Playable Snake game" hidden></div>
+
+                    </article>
+
+                    <article class="project-card" data-slug="pendu" aria-labelledby="project-title-pendu" data-domain="games" data-hover="hangman">
+
+                        <div class="project-card__main">
+
+                            <div class="project-card__media">
+                                <!-- Symbol: gallows and hanged man -->
+                                <svg class="project-card__icon" viewBox="0 0 48 48" aria-hidden="true">
+                                    <path d="M6 43h22M13 43V5h20v6"/>
+                                    <circle cx="33" cy="15" r="4"/>
+                                    <path d="M33 19v11M33 22l-5 5M33 22l5 5M33 30l-4 8M33 30l4 8"/>
+                                </svg>
+                            </div>
+
+                            <div class="project-card__body">
+
+                                <h3 class="project-card__title" id="project-title-pendu">Hangman game</h3>
+
+                                <ul class="project-card__tags" aria-label="Skills and technologies">
+                                    <li class="tag">Python</li>
+                                    <li class="tag">Pygame</li>
+                                    <li class="tag">Functions</li>
+                                    <li class="tag">File reading</li>
+                                </ul>
+
+                                <div class="project-card__story">
+                                    <p class="project-card__text">My first personal project and my first complete program.</p>
+                                    <p class="project-card__label">What I learned</p>
+                                    <p class="project-card__text">Reading words from a file and anticipating invalid input.</p>
+                                </div>
+
+                                <div class="project-card__actions">
+                                    <a class="button" href="https://github.com/Axel-FOLLET/Axou/tree/main/02_games/hangman" target="_blank" rel="noopener noreferrer">Source code<span class="visually-hidden"> – Hangman game (new tab)</span></a>
+                                    <button class="button project-card__toggle project-card__toggle--game" type="button" aria-expanded="false" aria-controls="stage-pendu" data-label-open="Play" data-label-close="Close the game"><span class="project-card__toggle-label">Play</span><span class="visually-hidden"> – Hangman game</span></button>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="project-card__stage project-card__stage--game" id="stage-pendu" data-game="pendu" data-game-title="Playable Hangman game" hidden></div>
+
+                    </article>
+
+                    <!-- This site: it brings my resume and my portfolio together -->
+                    <article class="project-card" data-slug="parcours-portfolio" aria-labelledby="project-title-parcours-portfolio" data-domain="web" data-hover="cursor">
+
+                        <div class="project-card__main">
+
+                            <div class="project-card__media">
+                                <!-- Symbol: the two door cubes of the home page (fallback without JavaScript) -->
+                                <svg class="project-card__icon" viewBox="0 0 48 48" aria-hidden="true">
+                                    <path d="M6 19l8-5 8 5v10l-8 5-8-5zM6 19l8 5 8-5M14 24v10"/>
+                                    <path d="M26 19l8-5 8 5v10l-8 5-8-5zM26 19l8 5 8-5M34 24v10"/>
+                                </svg>
+                            </div>
+
+                            <div class="project-card__body">
+
+                                <h3 class="project-card__title" id="project-title-parcours-portfolio">Resume &amp; Portfolio</h3>
+
+                                <ul class="project-card__tags" aria-label="Skills and technologies">
+                                    <li class="tag">HTML</li>
+                                    <li class="tag">CSS</li>
+                                    <li class="tag">JavaScript</li>
+                                    <li class="tag">AI agents</li>
+                                </ul>
+
+                                <div class="project-card__story">
+                                    <p class="project-card__text">My resume website and my portfolio brought together in a single site, with no framework.</p>
+                                    <p class="project-card__label">How it was built</p>
+                                    <p class="project-card__text">Missions given to my team of AI agents: for each one, an approved mission brief, then a review by the expert agent.</p>
+                                </div>
+
+                                <div class="project-card__actions">
+                                    <a class="button" href="https://github.com/Axel-FOLLET/my_website" target="_blank" rel="noopener noreferrer">Source code<span class="visually-hidden"> – Resume &amp; Portfolio (new tab)</span></a>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </article>
+
+                    <article class="project-card" data-slug="detecteur-langue" aria-labelledby="project-title-detecteur-langue" data-domain="algorithms" data-hover="language">
+
+                        <div class="project-card__main">
+
+                            <div class="project-card__media">
+                                <!-- Symbol: speech bubble -->
+                                <svg class="project-card__icon" viewBox="0 0 48 48" aria-hidden="true">
+                                    <path d="M9 9h30a4 4 0 0 1 4 4v16a4 4 0 0 1-4 4H22l-8 7v-7H9a4 4 0 0 1-4-4V13a4 4 0 0 1 4-4z"/>
+                                    <path d="M13 19h22M13 25h14"/>
+                                </svg>
+                            </div>
+
+                            <div class="project-card__body">
+
+                                <h3 class="project-card__title" id="project-title-detecteur-langue"><span data-language="Langue Idioma Língua Lingua Sprache Taal Språk Język Dil">Language</span> detector</h3>
+
+                                <ul class="project-card__tags" aria-label="Skills and technologies">
+                                    <li class="tag">Python</li>
+                                    <li class="tag">Statistics</li>
+                                    <li class="tag">Unicode</li>
+                                </ul>
+
+                                <div class="project-card__story">
+                                    <p class="project-card__text">Recognising the language of a text among ten by comparing the frequency of its letters with that of each language.</p>
+                                    <p class="project-card__label">What I learned</p>
+                                    <p class="project-card__text">A statistical method needs volume: reliable from two sentences on, it hesitates on a few words.</p>
+                                </div>
+
+                                <div class="project-card__actions">
+                                    <a class="button" href="https://github.com/Axel-FOLLET/Axou/tree/main/03_algorithms/language_detector" target="_blank" rel="noopener noreferrer">Source code<span class="visually-hidden"> – Language detector (new tab)</span></a>
+                                    <button class="button project-card__toggle" type="button" aria-expanded="false" aria-controls="demo-language" data-label-open="Try it" data-label-close="Hide the demo"><span class="project-card__toggle-label">Try it</span><span class="visually-hidden"> – Language detector</span></button>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Demo: project-demos.js recomputes the ranking on every input -->
+                        <div class="project-card__stage demo demo--language" id="demo-language" hidden>
+
+                            <div class="form__field">
+                                <label class="form__label" for="language-text">Text to analyse</label>
+                                <textarea class="form__input form__input--area demo__input" id="language-text" rows="4" placeholder="A few sentences in French, English, Spanish, Portuguese, Italian, German, Dutch, Swedish, Polish or Turkish."></textarea>
+                                <p class="demo__hint">At least 80 letters for a reliable result: the method relies on statistics.</p>
+                            </div>
+
+                            <p class="demo__verdict" aria-live="polite"></p>
+                            <ol class="demo__ranking"></ol>
+                            <p class="demo__note"></p>
+
+                            <div class="demo__actions">
+                                <button class="button demo__example" type="button">Load an example</button>
+                            </div>
+
+                        </div>
+
+                    </article>
+
                     <article class="project-card" data-slug="cesar-vigenere" aria-labelledby="project-title-cesar-vigenere" data-domain="algorithms" data-hover="cipher">
 
                         <div class="project-card__main">
@@ -343,7 +639,7 @@
                                 </div>
 
                                 <div class="project-card__actions">
-                                    <a class="button" href="https://github.com/Axel-FOLLET/Axou/tree/main/03_algorithms/chiffrement" target="_blank" rel="noopener noreferrer">Source code<span class="visually-hidden"> – Caesar and Vigenère ciphers (new tab)</span></a>
+                                    <a class="button" href="https://github.com/Axel-FOLLET/Axou/tree/main/03_algorithms/ciphers" target="_blank" rel="noopener noreferrer">Source code<span class="visually-hidden"> – Caesar and Vigenère ciphers (new tab)</span></a>
                                     <button class="button project-card__toggle" type="button" aria-expanded="false" aria-controls="demo-cipher" data-label-open="Try it" data-label-close="Hide the demo"><span class="project-card__toggle-label">Try it</span><span class="visually-hidden"> – Caesar and Vigenère ciphers</span></button>
                                 </div>
 
@@ -398,273 +694,6 @@
 
                     </article>
 
-                    <article class="project-card" data-slug="snake" aria-labelledby="project-title-snake" data-domain="games" data-hover="snake">
-
-                        <div class="project-card__main">
-
-                            <div class="project-card__media">
-                                <!-- Symbol: snake made of squares and its apple -->
-                                <svg class="project-card__icon" viewBox="0 0 48 48" aria-hidden="true">
-                                    <path d="M5 29h24v-16h8v8"/>
-                                    <path d="M5 37h32v-8"/>
-                                    <path d="M5 29v8M13 29v8M21 29v8M29 21h8M29 13v16"/>
-                                    <path d="M33 16.5h.01"/>
-                                    <circle cx="14" cy="15" r="4"/>
-                                    <path d="M14 11c0-2 1-3 3-3.5"/>
-                                </svg>
-                            </div>
-
-                            <div class="project-card__body">
-
-                                <h3 class="project-card__title" id="project-title-snake">Snake game</h3>
-
-                                <ul class="project-card__tags" aria-label="Skills and technologies">
-                                    <li class="tag">Python</li>
-                                    <li class="tag">Pygame</li>
-                                    <li class="tag">Keyboard events</li>
-                                    <li class="tag">Collisions</li>
-                                </ul>
-
-                                <div class="project-card__story">
-                                    <p class="project-card__text">A complete Snake, a personal project built after Hangman.</p>
-                                    <p class="project-card__label">What I learned</p>
-                                    <p class="project-card__text">Real time forces a clear split between the game loop, the display and the rules.</p>
-                                </div>
-
-                                <div class="project-card__actions">
-                                    <a class="button" href="https://github.com/Axel-FOLLET/Axou/tree/main/02_games/jeu_du_snake" target="_blank" rel="noopener noreferrer">Source code<span class="visually-hidden"> – Snake game (new tab)</span></a>
-                                    <button class="button project-card__toggle project-card__toggle--game" type="button" aria-expanded="false" aria-controls="stage-snake" data-label-open="Play" data-label-close="Close the game"><span class="project-card__toggle-label">Play</span><span class="visually-hidden"> – Snake game</span></button>
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                        <!-- Game: project-showcase.js loads pages/games/snake.html into this area when opened and unloads it when closed. -->
-                        <div class="project-card__stage project-card__stage--game" id="stage-snake" data-game="snake" data-game-title="Playable Snake game" hidden></div>
-
-                    </article>
-
-                    <article class="project-card" data-slug="pendu" aria-labelledby="project-title-pendu" data-domain="games" data-hover="hangman">
-
-                        <div class="project-card__main">
-
-                            <div class="project-card__media">
-                                <!-- Symbol: gallows and hanged man -->
-                                <svg class="project-card__icon" viewBox="0 0 48 48" aria-hidden="true">
-                                    <path d="M6 43h22M13 43V5h20v6"/>
-                                    <circle cx="33" cy="15" r="4"/>
-                                    <path d="M33 19v11M33 22l-5 5M33 22l5 5M33 30l-4 8M33 30l4 8"/>
-                                </svg>
-                            </div>
-
-                            <div class="project-card__body">
-
-                                <h3 class="project-card__title" id="project-title-pendu">Hangman game</h3>
-
-                                <ul class="project-card__tags" aria-label="Skills and technologies">
-                                    <li class="tag">Python</li>
-                                    <li class="tag">Pygame</li>
-                                    <li class="tag">Functions</li>
-                                    <li class="tag">File reading</li>
-                                </ul>
-
-                                <div class="project-card__story">
-                                    <p class="project-card__text">My first personal project and my first complete program.</p>
-                                    <p class="project-card__label">What I learned</p>
-                                    <p class="project-card__text">Reading words from a file and anticipating invalid input.</p>
-                                </div>
-
-                                <div class="project-card__actions">
-                                    <a class="button" href="https://github.com/Axel-FOLLET/Axou/tree/main/02_games/jeu_du_pendu" target="_blank" rel="noopener noreferrer">Source code<span class="visually-hidden"> – Hangman game (new tab)</span></a>
-                                    <button class="button project-card__toggle project-card__toggle--game" type="button" aria-expanded="false" aria-controls="stage-pendu" data-label-open="Play" data-label-close="Close the game"><span class="project-card__toggle-label">Play</span><span class="visually-hidden"> – Hangman game</span></button>
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                        <div class="project-card__stage project-card__stage--game" id="stage-pendu" data-game="pendu" data-game-title="Playable Hangman game" hidden></div>
-
-                    </article>
-
-                    <!-- Lost: in development, source code published, no playable version yet. -->
-                    <article class="project-card" data-slug="cat-game" aria-labelledby="project-title-cat-game" data-domain="games" data-hover="cat">
-
-                        <div class="project-card__main">
-
-                            <div class="project-card__media">
-                                <span class="cat-figure" role="img" aria-label="Seated cat drawn in facets"></span>
-                            </div>
-
-                            <div class="project-card__body">
-
-                                <h3 class="project-card__title" id="project-title-cat-game">Lost</h3>
-
-                                <p class="project-card__badge">In development</p>
-
-                                <ul class="project-card__tags" aria-label="Skills and technologies">
-                                    <li class="tag">Three.js</li>
-                                    <li class="tag">Blender</li>
-                                    <li class="tag">AI agent</li>
-                                </ul>
-
-                                <div class="project-card__story">
-                                    <p class="project-card__text"><strong>A 3D browser game</strong>: a kitten looks for its mother.</p>
-                                    <p class="project-card__text">With an AI agent (Claude) that I direct: <strong>I decide what the game is and validate the result by playing it</strong>.</p>
-                                </div>
-
-                                <div class="project-card__actions">
-                                    <a class="button" href="https://github.com/Axel-FOLLET/Axou/tree/main/02_games/Lost" target="_blank" rel="noopener noreferrer">Source code<span class="visually-hidden"> – Lost (new tab)</span></a>
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </article>
-
-                    <!-- This site: it brings my resume and my portfolio together -->
-                    <article class="project-card" data-slug="parcours-portfolio" aria-labelledby="project-title-parcours-portfolio" data-domain="web" data-hover="cursor">
-
-                        <div class="project-card__main">
-
-                            <div class="project-card__media">
-                                <!-- Symbol: the two door cubes of the home page (fallback without JavaScript) -->
-                                <svg class="project-card__icon" viewBox="0 0 48 48" aria-hidden="true">
-                                    <path d="M6 19l8-5 8 5v10l-8 5-8-5zM6 19l8 5 8-5M14 24v10"/>
-                                    <path d="M26 19l8-5 8 5v10l-8 5-8-5zM26 19l8 5 8-5M34 24v10"/>
-                                </svg>
-                            </div>
-
-                            <div class="project-card__body">
-
-                                <h3 class="project-card__title" id="project-title-parcours-portfolio">Resume &amp; Portfolio</h3>
-
-                                <ul class="project-card__tags" aria-label="Skills and technologies">
-                                    <li class="tag">HTML</li>
-                                    <li class="tag">CSS</li>
-                                    <li class="tag">JavaScript</li>
-                                    <li class="tag">AI agents</li>
-                                </ul>
-
-                                <div class="project-card__story">
-                                    <p class="project-card__text">My resume website and my portfolio brought together in a single site, with no framework.</p>
-                                    <p class="project-card__label">How it was built</p>
-                                    <p class="project-card__text">Missions given to my team of AI agents: for each one, an approved mission brief, then a review by the expert agent.</p>
-                                </div>
-
-                                <div class="project-card__actions">
-                                    <a class="button" href="https://github.com/Axel-FOLLET/my_website" target="_blank" rel="noopener noreferrer">Source code<span class="visually-hidden"> – Resume &amp; Portfolio (new tab)</span></a>
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </article>
-
-                    <!-- Context engineering guide: guide.md is given to an AI, the PDF is the edition for readers (English version of both).
-                         The .md is stored as .md.txt: GitHub Pages (Jekyll) would turn a .md file into an HTML page;
-                         the download attribute gives it back its .md name. -->
-                    <article class="project-card" data-slug="guide-contexte" aria-labelledby="project-title-guide-contexte" data-domain="ai" data-hover="type">
-
-                        <div class="project-card__main">
-
-                            <div class="project-card__media">
-                                <!-- Symbol: open book -->
-                                <svg class="project-card__icon" viewBox="0 0 48 48" aria-hidden="true">
-                                    <path d="M24 12c-4-3-10-4-17-3v26c7-1 13 0 17 3 4-3 10-4 17-3V9c-7-1-13 0-17 3z"/>
-                                    <path d="M24 12v26M11 16h8M11 21h8M29 16h8M29 21h8"/>
-                                </svg>
-                            </div>
-
-                            <div class="project-card__body">
-
-                                <h3 class="project-card__title" id="project-title-guide-contexte">Context engineering guide</h3>
-
-                                <ul class="project-card__tags" aria-label="Skills and technologies">
-                                    <li class="tag">AI project lead</li>
-                                    <li class="tag">Claude</li>
-                                    <li class="tag">Codex</li>
-                                </ul>
-
-                                <div class="project-card__story">
-                                    <p class="project-card__text"><strong>A guide to give to your AI</strong> to frame its use and build your own system.</p>
-                                    <p class="project-card__label">How it was built</p>
-                                    <p class="project-card__text"><strong>Designed and directed by me</strong>, written by AI agents I steered.</p>
-                                    <p class="project-card__text">Give the .md to your AI agent.</p>
-                                </div>
-
-                                <div class="project-card__actions">
-                                    <a class="button" href="../../assets/documents/context_engineering_guide.pdf" target="_blank" rel="noopener noreferrer">Read the PDF<span class="visually-hidden"> – Context engineering guide (new tab)</span></a>
-                                    <a class="button" href="../../assets/documents/context_engineering_guide.md.txt" download="context_engineering_guide.md">Download the .md<span class="visually-hidden"> – Context engineering guide, version to give to your AI</span></a>
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </article>
-
-                    <article class="project-card" data-slug="detecteur-langue" aria-labelledby="project-title-detecteur-langue" data-domain="algorithms" data-hover="language">
-
-                        <div class="project-card__main">
-
-                            <div class="project-card__media">
-                                <!-- Symbol: speech bubble -->
-                                <svg class="project-card__icon" viewBox="0 0 48 48" aria-hidden="true">
-                                    <path d="M9 9h30a4 4 0 0 1 4 4v16a4 4 0 0 1-4 4H22l-8 7v-7H9a4 4 0 0 1-4-4V13a4 4 0 0 1 4-4z"/>
-                                    <path d="M13 19h22M13 25h14"/>
-                                </svg>
-                            </div>
-
-                            <div class="project-card__body">
-
-                                <h3 class="project-card__title" id="project-title-detecteur-langue"><span data-language="Langue Idioma Língua Lingua Sprache Taal Språk Język Dil">Language</span> detector</h3>
-
-                                <ul class="project-card__tags" aria-label="Skills and technologies">
-                                    <li class="tag">Python</li>
-                                    <li class="tag">Statistics</li>
-                                    <li class="tag">Unicode</li>
-                                </ul>
-
-                                <div class="project-card__story">
-                                    <p class="project-card__text">Recognising the language of a text among ten by comparing the frequency of its letters with that of each language.</p>
-                                    <p class="project-card__label">What I learned</p>
-                                    <p class="project-card__text">A statistical method needs volume: reliable from two sentences on, it hesitates on a few words.</p>
-                                </div>
-
-                                <div class="project-card__actions">
-                                    <a class="button" href="https://github.com/Axel-FOLLET/Axou/tree/main/03_algorithms/detecteur_de_langue" target="_blank" rel="noopener noreferrer">Source code<span class="visually-hidden"> – Language detector (new tab)</span></a>
-                                    <button class="button project-card__toggle" type="button" aria-expanded="false" aria-controls="demo-language" data-label-open="Try it" data-label-close="Hide the demo"><span class="project-card__toggle-label">Try it</span><span class="visually-hidden"> – Language detector</span></button>
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                        <!-- Demo: project-demos.js recomputes the ranking on every input -->
-                        <div class="project-card__stage demo demo--language" id="demo-language" hidden>
-
-                            <div class="form__field">
-                                <label class="form__label" for="language-text">Text to analyse</label>
-                                <textarea class="form__input form__input--area demo__input" id="language-text" rows="4" placeholder="A few sentences in French, English, Spanish, Portuguese, Italian, German, Dutch, Swedish, Polish or Turkish."></textarea>
-                                <p class="demo__hint">At least 80 letters for a reliable result: the method relies on statistics.</p>
-                            </div>
-
-                            <p class="demo__verdict" aria-live="polite"></p>
-                            <ol class="demo__ranking"></ol>
-                            <p class="demo__note"></p>
-
-                            <div class="demo__actions">
-                                <button class="button demo__example" type="button">Load an example</button>
-                            </div>
-
-                        </div>
-
-                    </article>
-
                 </div>
 
             </div>
@@ -701,14 +730,14 @@
             <div>
                 <p class="footer__title">Credits</p>
                 <p class="footer__credits">
-                    Photo, drawings and texts: original work by Axel FOLLET. 3D cubes, faceted cat, symbols and animated project scenes built with HTML, CSS, SVG and JavaScript, except the LinkedIn logo. Lost's 3D cat: “Rigged and animated Cat” model by JonasDichelle (BlendSwap), under the <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noopener noreferrer">CC BY 3.0<span class="visually-hidden"> (new tab)</span></a> licence, reshaped and posed sitting; displayed with <a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js<span class="visually-hidden"> (new tab)</span></a>, under the MIT licence. Manrope (The Manrope Project Authors) and Instrument Serif (The Instrument Serif Project Authors) typefaces, under the SIL Open Font License 1.1 (<a href="../../assets/fonts/OFL-Manrope.txt">Manrope licence</a>, <a href="../../assets/fonts/OFL-InstrumentSerif.txt">Instrument Serif licence</a>), hosted with the site. LinkedIn® and the [in]® logo are trademarks of LinkedIn Corporation and its affiliates; this site is neither affiliated with nor endorsed by LinkedIn.
+                    Photo, drawings and texts: original work by Axel FOLLET. 3D cubes, faceted cat, symbols and animated project scenes built with HTML, CSS, SVG and JavaScript, except the LinkedIn logo. The sprites of the 2D game in Java were made by the game team with Pixel Lab. Lost's 3D cat: “Rigged and animated Cat” model by JonasDichelle (BlendSwap), under the <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noopener noreferrer">CC BY 3.0<span class="visually-hidden"> (new tab)</span></a> licence, reshaped and posed sitting; displayed with <a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js<span class="visually-hidden"> (new tab)</span></a>, under the MIT licence. Manrope (The Manrope Project Authors) and Instrument Serif (The Instrument Serif Project Authors) typefaces, under the SIL Open Font License 1.1 (<a href="../../assets/fonts/OFL-Manrope.txt">Manrope licence</a>, <a href="../../assets/fonts/OFL-InstrumentSerif.txt">Instrument Serif licence</a>), hosted with the site. LinkedIn® and the [in]® logo are trademarks of LinkedIn Corporation and its affiliates; this site is neither affiliated with nor endorsed by LinkedIn.
                 </p>
                 <details class="footer__legal">
                     <summary class="footer__legal-toggle">Legal notice and data</summary>
                     <p><strong>Publisher and publication director:</strong> Axel FOLLET, private individual, personal non-professional website. Contact: the site form or LinkedIn.</p>
                     <p><strong>Host:</strong> GitHub, Inc. (GitHub Pages), 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, United States, <a href="https://support.github.com/" target="_blank" rel="noopener noreferrer">support.github.com<span class="visually-hidden"> (new tab)</span></a>. For security purposes, GitHub logs visitors' IP addresses.</p>
                     <p id="donnees-formulaire"><strong>Contact form:</strong> data controller, Axel FOLLET. Last name, first name, email and message are required; the subject is optional. This data is used only to reply to you, on the basis of the legitimate interest in handling your request. It goes through Formspree, Inc., in the United States, which keeps it under its <a href="https://formspree.io/legal/privacy-policy" target="_blank" rel="noopener noreferrer">privacy policy<span class="visually-hidden"> (new tab)</span></a>, and is deleted 12 months after our last exchange. You can ask to access, rectify or erase your data or to restrict its processing, or object to it, through the form or LinkedIn, and lodge a complaint with the <a href="https://www.cnil.fr/fr/plaintes" hreflang="fr" target="_blank" rel="noopener noreferrer">CNIL<span class="visually-hidden"> (new tab)</span></a> (French data protection authority; complaint page in French).</p>
-                    <p><strong>Browser:</strong> no cookies and no audience tracking. The site only keeps on your device your answer to “Are you human?”, asked when you send the form, until the tab is closed, and your Snake and Hangman records, until you clear the site data in your browser.</p>
+                    <p><strong>Browser:</strong> no cookies and no audience tracking. The site only keeps on your device your answer to “Are you human?”, asked when you send the form or download the CV, until the tab is closed, and your Snake and Hangman records, until you clear the site data in your browser.</p>
                     <p><strong>Intellectual property:</strong> texts, photo, drawings, layout and source code © 2026 Axel FOLLET, all rights reserved. The code is public on GitHub to be read; any reuse requires my permission. The Manrope and Instrument Serif typefaces, the Lost cat model, three.js and the LinkedIn logo remain under their own licences and trademarks.</p>
                 </details>
             </div>

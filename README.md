@@ -4,7 +4,7 @@ The projects of Axel FOLLET, gathered in one repository: websites, games and alg
 
 They are presented, with demos, on my site: **<https://axel-follet.github.io/my_website/>**
 
-Code and comments are in English. Folder names and the text shown to users are mostly in French.
+Code, comments and folder names are in English. The text shown to users is mostly in French.
 
 ## Websites — `01_websites/`
 
@@ -17,26 +17,27 @@ Code and comments are in English. Folder names and the text shown to users are m
 
 | Folder | Project |
 | --- | --- |
+| [`2D_game/`](02_games/2D_game/) | **Cropa**, a 2D farm and defense game in Java with libGDX: by day, you plant and sell; by night, you defend the farm. Epitech project by a team of three. Its [README](02_games/2D_game/README.md) explains how to build and run it. |
 | [`Lost/`](02_games/Lost/) | **Lost**, a 3D game in the browser: a kitten looks for its mother. In development, with Three.js and Blender. Its [README](02_games/Lost/README.md) describes the game and how to run it. |
-| [`jeu_du_pendu/`](02_games/jeu_du_pendu/) | **Hangman**, in Python with Pygame. My first personal project and my first complete program. |
-| [`jeu_du_snake/`](02_games/jeu_du_snake/) | **Snake**, in Python with Pygame. A complete Snake, a personal project built after Hangman. |
+| [`hangman/`](02_games/hangman/) | **Hangman**, in Python with Pygame. My first personal project and my first complete program. |
+| [`snake/`](02_games/snake/) | **Snake**, in Python with Pygame. A complete Snake, a personal project built after Hangman. |
 
 ## Algorithms — `03_algorithms/`
 
 | Folder | Project |
 | --- | --- |
-| [`chiffrement/`](03_algorithms/chiffrement/) | **Caesar and Vigenère ciphers**, in Python: encrypting and decrypting, and finding a Caesar key in a French text. Python piscine exercise. |
-| [`detecteur_de_langue/`](03_algorithms/detecteur_de_langue/) | **Language detector**, in Python: recognising the language of a text among ten by comparing the frequency of its letters with that of each language. |
+| [`ciphers/`](03_algorithms/ciphers/) | **Caesar and Vigenère ciphers**, in Python: encrypting and decrypting, and finding a Caesar key in a French text. Python piscine exercise. |
+| [`language_detector/`](03_algorithms/language_detector/) | **Language detector**, in Python: recognising the language of a text among ten by comparing the frequency of its letters with that of each language. |
 
 ## Running the Python projects
 
 Python 3 is required, and Pygame for the two games (`pip install pygame`). Each program is started from its own folder:
 
 ```bash
-cd 02_games/jeu_du_pendu && python3 hangman_pygame
-cd 02_games/jeu_du_snake && python3 snake_pygame
-cd 03_algorithms/chiffrement && python3 cipher.py
-cd 03_algorithms/detecteur_de_langue && python3 language_detector.py
+cd 02_games/hangman && python3 hangman_pygame
+cd 02_games/snake && python3 snake_pygame
+cd 03_algorithms/ciphers && python3 cipher.py
+cd 03_algorithms/language_detector && python3 language_detector.py
 ```
 
 The menus and messages of these programs are in French.

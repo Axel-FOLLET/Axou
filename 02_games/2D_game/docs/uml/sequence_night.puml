@@ -1,0 +1,385 @@
+@startuml
+    title Cropa: one night, from the click on "Lancer la nuit" (Start the night) to dawn or the fall of the farm (v4.11, project day 13)
+    autonumber
+
+    actor Player
+    participant GameScreen
+    participant MeldaRenderer
+    participant Hud <<Observer>>
+    participant GameSession
+    participant Melda
+    participant DayNightCycle
+    participant NightState <<State>>
+    participant DayState <<State>>
+    participant WaveSpawner
+    participant WaveTable
+    participant EnemyFactory <<Factory>>
+    participant "enemy : LaneEnemy" as LaneEnemy
+    participant DeviateStrategy <<Strategy>>
+    participant Board
+    participant Cell
+    participant DefenseSlots
+    participant Defense
+    participant Farmer
+    participant Cat
+    participant Wallet
+    participant Farm
+    participant Shop
+
+    == Start of the night ==
+    note over GameScreen
+        render, before handleClick: "Lancer la nuit" is greyed out
+        during Melda's whole visit (Hud.lockNight).
+    end note
+    GameScreen -> GameSession : getMelda()
+    GameSession --> GameScreen : melda
+    GameScreen -> Melda : isVisiting()
+    Melda --> GameScreen : false
+    GameScreen -> Hud : lockNight(false)
+    Player -> GameScreen : click (x, y)
+    activate GameScreen
+    note right of Player
+        GameScreen.handleClick, called by render.
+        Before isOver: the title screen and the cutscenes
+        take the click if they are shown (not here).
+        Without a click, the night also starts when the day
+        timer reaches 0 (DayNightCycle.update -> startNight).
+    end note
+    GameScreen -> GameSession : isOver()
+    GameSession --> GameScreen : false
+    GameScreen -> GameSession : getMelda()
+    GameSession --> GameScreen : melda
+    GameScreen -> MeldaRenderer : handleClick(melda, x, y)
+    activate MeldaRenderer
+    MeldaRenderer -> Melda : isTalking()
+    Melda --> MeldaRenderer : false
+    MeldaRenderer --> GameScreen : false (she is not talking: the click goes on)
+    deactivate MeldaRenderer
+    note right of MeldaRenderer
+        While she talks: true, the click stops there
+        (on "Passer à la suite" (Next), nextBubble()).
+        During her visit, Hud.handleClick returns false (lockNight).
+    end note
+    GameScreen -> GameSession : getCycle()
+    GameSession --> GameScreen : cycle
+    GameScreen -> DayNightCycle : canAct()
+    DayNightCycle --> GameScreen : true (day)
+    GameScreen -> Hud : handleClick(x, y)
+    Hud --> GameScreen : true ("Lancer la nuit" button)
+    GameScreen -> DayNightCycle : launchNight(session)
+    activate DayNightCycle
+    DayNightCycle -> DayNightCycle : startNight(session)
+    DayNightCycle -> NightState : enter(session)
+    activate NightState
+    NightState -> GameSession : getMelda()
+    GameSession --> NightState : melda
+    NightState -> Melda : leave()
+    note right of Melda
+        Night falls: if she came that day, she leaves
+        at once (GONE), even in the middle of a bubble.
+        Before her day (ABSENT), nothing changes.
+    end note
+    NightState -> GameSession : getWaveSpawner()
+    GameSession --> NightState : waveSpawner
+    NightState -> GameSession : getCycle()
+    GameSession --> NightState : cycle
+    NightState -> DayNightCycle : getNumber()
+    DayNightCycle --> NightState : night
+    note right of NightState
+        Night N keeps the number of day N.
+    end note
+    NightState -> WaveSpawner : startNight(night)
+    activate WaveSpawner
+    WaveSpawner -> WaveTable : getWave(night)
+    WaveTable --> WaveSpawner : List<SpawnEntry> (sorted by delay)
+    note right of WaveSpawner
+        Timer at 0. No more POC bats:
+        the enemy list stays empty until 5 s.
+    end note
+    deactivate WaveSpawner
+    deactivate NightState
+    deactivate DayNightCycle
+    deactivate GameScreen
+
+    == One night frame: GameSession.update(delta), in order ==
+    GameScreen -> GameSession : update(delta)
+    activate GameSession
+    GameSession -> GameSession : isOver()
+    note right of GameSession
+        false: the game goes on. A finished game is frozen:
+        update only calls notifyChanges.
+    end note
+    GameSession -> DayNightCycle : getTimeLeft()
+    DayNightCycle --> GameSession : timeLeft
+    note right of GameSession
+        elapsed = min(delta, timeLeft): nobody gets
+        more time than the night has left.
+    end note
+
+    loop each enemy in the list
+        GameSession -> LaneEnemy : update(elapsed)
+        note right of GameSession
+            Move, deviate, flee, hit the farm:
+            detailed below.
+        end note
+    end
+
+    GameSession -> DefenseSlots : getDefenses()
+    DefenseSlots --> GameSession : List<Defense>
+    loop each defense
+        GameSession -> Defense : update(elapsed)
+        note right of Defense
+            The catapatate and the scarecrow aim at an enemy
+            isOnBoard() && isTargetable() within their range (takeDamage).
+        end note
+    end
+
+    GameSession -> Farmer : update(elapsed, enemies)
+    activate Farmer
+    loop each enemy
+        Farmer -> LaneEnemy : isOnBoard()
+        Farmer -> LaneEnemy : isTargetable()
+        Farmer -> LaneEnemy : getRow()
+        Farmer -> LaneEnemy : getCellsToFarm()
+    end
+    opt Garry is ready (1 hit / s) and an enemy is in his square
+        Farmer -> LaneEnemy : takeDamage(damage)
+        note right of Farmer
+            Square: rows 1 to 3, 0 to 3 cells from the farm.
+            The one closest to the farm; 4 HP (EnemyConfig).
+        end note
+    end
+    deactivate Farmer
+
+    GameSession -> Cat : update(elapsed, enemies)
+    activate Cat
+    loop each enemy, seen as EnemyView
+        Cat -> LaneEnemy : isOnBoard()
+        Cat -> LaneEnemy : getRow()
+        Cat -> LaneEnemy : getCellsToFarm()
+    end
+    note right of Cat
+        Flees if an enemy in play is on row 1
+        at 1 cell or less from the farm. Otherwise, 1 draw per
+        second (random.nextInt(30) == 0): 2 s meow.
+        It hits nobody (EnemyView, read-only).
+    end note
+    deactivate Cat
+
+    loop each enemy
+        GameSession -> LaneEnemy : collectReward()
+        LaneEnemy --> GameSession : reward
+        GameSession -> Wallet : add(reward)
+    end
+    note right of GameSession
+        The reward of a dead enemy, only once;
+        0 if it is alive, fled or already paid.
+        Taken before removal: an enemy killed during
+        this frame still pays.
+    end note
+    GameSession -> GameSession : enemies.removeIf(isDead() || hasFled())
+    note right of GameSession
+        Never !isOnBoard(): a mole underground
+        is not on the board, but stays in the night.
+    end note
+
+    GameSession -> DayNightCycle : update(session, delta)
+    activate DayNightCycle
+    DayNightCycle -> NightState : update(session, delta)
+    activate NightState
+    NightState -> GameSession : getWaveSpawner()
+    GameSession --> NightState : waveSpawner
+    NightState -> WaveSpawner : update(delta)
+    activate WaveSpawner
+    loop each SpawnEntry whose delay is reached (getStartDelay() + getDelay())
+        WaveSpawner -> WaveTable : getStartDelay()
+        WaveTable --> WaveSpawner : 5 s
+        WaveSpawner -> EnemyFactory : create(type, row)
+        activate EnemyFactory
+        EnemyFactory -> LaneEnemy : <<create>> new Bat(row, farm, board, config, defenseLine, random)\nor new Witch(row, farm, board, config, defenseLine, random)
+        note right of EnemyFactory
+            MOLE -> new Mole(board, config, random), the row is ignored:
+            the mole moves underground from one plant to the next (outside this diagram).
+        end note
+        EnemyFactory --> WaveSpawner : enemy
+        deactivate EnemyFactory
+    end
+    WaveSpawner --> NightState : List<Enemy> (empty if nobody appears)
+    deactivate WaveSpawner
+    loop each spawned enemy (forEach)
+        NightState -> GameSession : addEnemy(enemy)
+    end
+    note right of NightState
+        Added here, after the GameSession.update loops:
+        the list is never changed while it is being iterated.
+    end note
+    deactivate NightState
+    DayNightCycle -> NightState : isOver(session)
+    activate NightState
+    NightState -> GameSession : getWaveSpawner()
+    GameSession --> NightState : waveSpawner
+    NightState -> WaveSpawner : isFinished()
+    WaveSpawner --> NightState : finished
+    NightState -> GameSession : getEnemies()
+    GameSession --> NightState : List<Enemy>
+    NightState --> DayNightCycle : false (the night goes on)
+    note right of NightState
+        True if the whole wave is out and each
+        enemy is dead or gone: dawn then comes
+        without waiting for the timer (45 s).
+    end note
+    deactivate NightState
+    deactivate DayNightCycle
+
+    GameSession -> Farm : isDestroyed()
+    Farm --> GameSession : false
+    GameSession -> DayNightCycle : isNight()
+    DayNightCycle --> GameSession : true (not the last dawn yet)
+    GameSession -> GameSession : notifyChanges()
+    opt a shown value changed since the previous frame
+        GameSession -> Hud : onNightStarted(night)
+        note right of GameSession
+            Only on the first frame of the night.
+        end note
+        GameSession -> Hud : onTimerChanged(secondsLeft)
+        GameSession -> Hud : onFarmHealthChanged(health)
+        GameSession -> Hud : onMoneyChanged(balance)
+    end
+    deactivate GameSession
+
+    == An enemy moves along its row: LaneEnemy.update(elapsed) ==
+    note over LaneEnemy
+        The bat and the witch: 10 cells to cross,
+        0.35 and 0.3 cell/s (EnemyConfig).
+    end note
+    opt the enemy reaches a new column (cells left = column + 3)
+        LaneEnemy -> DeviateStrategy : nextRow(row, column, board, random)
+        activate DeviateStrategy
+        loop the cell ahead, then the rows of the column if it blocks
+            DeviateStrategy -> Board : getCell(row, column)
+            Board --> DeviateStrategy : cell
+            DeviateStrategy -> Cell : getOccupant()
+            Cell --> DeviateStrategy : Optional<Occupant>
+        end
+        note right of DeviateStrategy
+            Blocked if occupant.blocks(blocker):
+            GARLIC for the bat, TURNIP for the witch.
+            Nearest free row (random on a tie);
+            all 3 rows blocked -> 0 or 4 to flee.
+        end note
+        DeviateStrategy --> LaneEnemy : row
+        deactivate DeviateStrategy
+        alt row = 0 or 4 (the column is closed)
+            LaneEnemy -> LaneEnemy : moveTo(row, edge of the column)
+            LaneEnemy -> DefenseSlots : wearAt(row, column, percent)
+            note right of LaneEnemy
+                DefenseSlots seen as DefenseLine: LaneEnemy imports nothing from defense.
+                On the next frames, it turns back along this row:
+                wearAt once per column reached, up to column 5
+                (10% bat, 20% witch), then flee() at its starting point.
+                It never hits the farm.
+            end note
+        else a field row (1 to 3)
+            LaneEnemy -> LaneEnemy : moveTo(row, cellsToFarm)
+            LaneEnemy -> Board : getCell(row, column)
+            Board --> LaneEnemy : cell
+            LaneEnemy -> LaneEnemy : onEnterCell(cell)
+            opt Walker (the witch); Flyable (the bat) does nothing
+                LaneEnemy -> Cell : crossBy(this)
+                activate Cell
+                note right of Cell
+                    occupant.onCrossedBy(enemy): the crushed plant
+                    or the worn bramble returns true -> remove().
+                end note
+                deactivate Cell
+            end
+        end
+    end
+    opt in front of the farm: 1 hit on arrival, then 1 every 5 s
+        LaneEnemy -> Farm : isDestroyed()
+        Farm --> LaneEnemy : false
+        LaneEnemy -> Farm : takeDamage(farmDamage)
+        note right of LaneEnemy
+            10 for the bat, 20 for the witch (EnemyConfig).
+        end note
+    end
+
+    == End of the night ==
+    alt the night timer reaches 0, or NightState.isOver -> true
+        GameScreen -> GameSession : update(delta)
+        activate GameSession
+        GameSession -> DayNightCycle : update(session, delta)
+        activate DayNightCycle
+        DayNightCycle -> DayNightCycle : startDay(session)
+        note right of DayNightCycle
+            The number moves to the next day.
+        end note
+        DayNightCycle -> DayState : enter(session)
+        activate DayState
+        DayState -> GameSession : dawn()
+        activate GameSession
+        note right of DayState
+            dawn is package-private: DayState is in the
+            same package as GameSession, which runs dawn itself.
+        end note
+        GameSession -> Board : getCrops()
+        Board --> GameSession : List<Crop>
+        note right of GameSession
+            Each plant grows one stage (Crop.grow).
+        end note
+        GameSession -> DefenseSlots : getDefenses()
+        DefenseSlots --> GameSession : List<Defense>
+        GameSession -> Defense : onDawn()
+        GameSession -> LaneEnemy : flee()
+        note right of LaneEnemy
+            After that, update does nothing (hasFled); on the next
+            frame, removeIf takes it out of the list, with no reward.
+        end note
+        deactivate GameSession
+        DayState -> GameSession : getMelda()
+        GameSession --> DayState : melda
+        DayState -> GameSession : getCycle()
+        GameSession --> DayState : cycle
+        DayState -> DayNightCycle : getNumber()
+        DayNightCycle --> DayState : day
+        DayState -> Melda : startIfToday(day)
+        note right of Melda
+            On the drawn day (from 2 to 8, once per game),
+            she starts her walk in the forest.
+        end note
+        deactivate DayState
+        deactivate DayNightCycle
+        GameSession -> Farm : isDestroyed()
+        Farm --> GameSession : false
+        GameSession -> DayNightCycle : isNight()
+        DayNightCycle --> GameSession : false
+        GameSession -> DayNightCycle : getNumber()
+        DayNightCycle --> GameSession : day
+        opt day > 8: the dawn after night 8
+            GameSession -> Shop : buyUrn()
+            Shop --> GameSession : true or false
+            note right of GameSession
+                10,000 coins in hand: VICTORY (the urn is bought);
+                otherwise DEFEAT_URN_SOLD. The game is then frozen.
+            end note
+        end
+        GameSession -> GameSession : notifyChanges()
+        GameSession -> Hud : onDayStarted(day)
+        opt the game is over (last dawn)
+            GameSession -> Hud : onGameOver(result)
+        end
+        deactivate GameSession
+    else the farm drops to 0 HP during the night
+        GameScreen -> GameSession : update(delta)
+        activate GameSession
+        GameSession -> Farm : isDestroyed()
+        Farm --> GameSession : true
+        note right of GameSession
+            result = DEFEAT_FARM_DESTROYED, checked before the last
+            dawn: a farm destroyed at dawn still loses.
+        end note
+        GameSession -> GameSession : notifyChanges()
+        GameSession -> Hud : onGameOver(DEFEAT_FARM_DESTROYED)
+        deactivate GameSession
+    end
+@enduml

@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <!--
+        Page loaded in the iframe of the "2D game in Java" card of the portfolio. app.js, assets/ and scripts/ are the web
+        build of 02_games/2D_game (Axou repository, gdx-teavm): they are copied here, this page belongs to the site.
+        The game reads ?lang=fr or ?lang=en; it must stay an index.html, the game finds its images next to it.
+    -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Page shown inside a portfolio card: it must not appear alone in search engines -->
+    <meta name="robots" content="noindex">
+    <title>2D game in Java</title>
+    <!-- Opened alone, the page would otherwise request /favicon.ico, which the site does not have -->
+    <link rel="icon" href="../../../assets/images/favicon.svg" type="image/svg+xml">
+    <style>
+        /* The game draws on the whole page; the bars around it (FitViewport) are black */
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+
+            overflow: hidden;
+
+            background: #000;
+        }
+
+        #canvas {
+            display: block;
+        }
+    </style>
+</head>
+<!-- No context menu: a right click stays in the game -->
+<body oncontextmenu="return false">
+    <canvas id="canvas"></canvas>
+    <script>
+        /*
+         * When the card closes, its iframe is removed: gdx-teavm 1.6.1 disposes of the game on "pagehide", then
+         * pauses it on "visibilitychange" and fails (TypeError in the console). Once the page is leaving, this
+         * listener, registered before the one of app.js, stops that event.
+         */
+        let leaving = false;
+        window.addEventListener("pagehide", () => { leaving = true; });
+        document.addEventListener("visibilitychange", event => {
+            if (leaving) event.stopImmediatePropagation();
+        });
+    </script>
+    <!-- main() of app.js starts the game once the page is loaded -->
+    <script src="app.js"></script>
+    <script>
+        window.addEventListener("load", () => main());
+    </script>
+</body>
+</html>

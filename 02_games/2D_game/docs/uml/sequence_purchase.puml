@@ -1,0 +1,201 @@
+@startuml
+    title Cropa: the player buys a catapatate and places it on a slot (v4.11, project day 13)
+    autonumber
+
+    actor Player
+    participant GameScreen
+    participant MeldaRenderer
+    participant Hud <<Observer>>
+    participant ShopWindow
+    participant BoardLayout
+    participant GameSession
+    participant Melda
+    participant DayNightCycle
+    participant Shop
+    participant Wallet
+    participant DefenseOffer
+    participant DefenseSlot
+
+    == 1. Click on the "Défenses" (Defenses) button ==
+    Player -> GameScreen : click (x, y)
+    activate GameScreen
+    note right of Player
+        GameScreen.handleClick, called by render
+        on every frame, before session.update.
+        Before isOver: the title screen, the opening cutscene and the
+        victory cutscene take the click if they are shown (not here).
+    end note
+    GameScreen -> GameSession : isOver()
+    GameSession --> GameScreen : false
+    GameScreen -> GameSession : getMelda()
+    GameSession --> GameScreen : melda
+    GameScreen -> MeldaRenderer : handleClick(melda, x, y)
+    activate MeldaRenderer
+    MeldaRenderer -> Melda : isTalking()
+    Melda --> MeldaRenderer : false
+    MeldaRenderer --> GameScreen : false (she is not talking: the click goes on)
+    deactivate MeldaRenderer
+    note right of MeldaRenderer
+        While she talks: true, the click stops there
+        (on "Passer à la suite" (Next), nextBubble()).
+        The player buys and starts the night outside her visit.
+    end note
+    GameScreen -> GameSession : getCycle()
+    GameSession --> GameScreen : cycle
+    GameScreen -> DayNightCycle : canAct()
+    DayNightCycle --> GameScreen : true (day)
+    GameScreen -> Hud : handleClick(x, y)
+    Hud --> GameScreen : false (not on "Lancer la nuit" (Start the night))
+    GameScreen -> ShopWindow : handleClick(x, y)
+    activate ShopWindow
+    ShopWindow -> ShopWindow : toggleDefenseList()
+    note right of ShopWindow
+        defenseButton().contains(x, y): close(), then the defense
+        list unrolls (defenseListShown).
+    end note
+    ShopWindow --> GameScreen : true (the click stops there)
+    deactivate ShopWindow
+    deactivate GameScreen
+
+    == 2. Click on "Catapatate" in the list ==
+    Player -> GameScreen : click (x, y)
+    activate GameScreen
+    note right of GameScreen
+        Same first checks as in click 1
+        (isOver, MeldaRenderer.handleClick -> false,
+        canAct, Hud.handleClick -> false).
+    end note
+    GameScreen -> ShopWindow : handleClick(x, y)
+    activate ShopWindow
+    ShopWindow -> GameSession : getCycle()
+    GameSession --> ShopWindow : cycle
+    ShopWindow -> DayNightCycle : canAct()
+    DayNightCycle --> ShopWindow : true
+    note right of ShopWindow
+        canAct() && URN_BUTTON.contains(x, y): not on the urn.
+    end note
+    ShopWindow -> ShopWindow : handleDefenseListClick(x, y)
+    ShopWindow -> GameSession : getCycle()
+    GameSession --> ShopWindow : cycle
+    ShopWindow -> DayNightCycle : canAct()
+    DayNightCycle --> ShopWindow : true (at night: false, nothing is selected)
+    ShopWindow -> GameSession : getShop()
+    GameSession --> ShopWindow : shop
+    ShopWindow -> Shop : getDefenseOffers()
+    Shop --> ShopWindow : List<DefenseOffer>
+    ShopWindow -> DefenseOffer : getPrice()
+    DefenseOffer --> ShopWindow : price
+    ShopWindow -> GameSession : getWallet()
+    GameSession --> ShopWindow : wallet
+    ShopWindow -> Wallet : canAfford(price)
+    Wallet --> ShopWindow : true
+    note right of ShopWindow
+        The clicked row, if the player can pay for it:
+        pendingOffer = the catapatate offer (pending offer).
+        A row that costs too much is grey, and nothing is selected.
+    end note
+    ShopWindow --> GameScreen : true
+    deactivate ShopWindow
+    deactivate GameScreen
+
+    == 3. Click on an empty slot ==
+    Player -> GameScreen : click (x, y)
+    activate GameScreen
+    note right of GameScreen
+        Same first checks as in click 1
+        (isOver, MeldaRenderer.handleClick -> false,
+        canAct, Hud.handleClick -> false).
+    end note
+    GameScreen -> ShopWindow : handleClick(x, y)
+    activate ShopWindow
+    ShopWindow -> GameSession : getCycle()
+    GameSession --> ShopWindow : cycle
+    ShopWindow -> DayNightCycle : canAct()
+    DayNightCycle --> ShopWindow : true
+    note right of ShopWindow
+        canAct() && URN_BUTTON.contains(x, y): not on the urn.
+    end note
+    ShopWindow -> ShopWindow : handleDefenseListClick(x, y)
+    ShopWindow --> GameScreen : false
+    note right of ShopWindow
+        Outside the list, with a pending offer: nothing closes,
+        and false lets GameScreen check what is under the click.
+    end note
+    deactivate ShopWindow
+    GameScreen -> GameSession : getDefenseSlots()
+    GameSession --> GameScreen : slots
+    GameScreen -> BoardLayout : findSlot(x, y, slots)
+    BoardLayout --> GameScreen : Optional<DefenseSlot> (TOP 3)
+    GameScreen -> ShopWindow : handleSlotClick(slot)
+    activate ShopWindow
+    ShopWindow -> GameSession : getCycle()
+    GameSession --> ShopWindow : cycle
+    ShopWindow -> DayNightCycle : canAct()
+    DayNightCycle --> ShopWindow : true
+    ShopWindow -> GameSession : getShop()
+    GameSession --> ShopWindow : shop
+    ShopWindow -> Shop : buyDefense(offer, slot)
+    activate Shop
+    Shop -> DefenseOffer : getPrice()
+    DefenseOffer --> Shop : 150
+    Shop -> Wallet : canAfford(150)
+
+    alt not enough money
+        Wallet --> Shop : false
+        Shop --> ShopWindow : false
+        note right of Shop
+            Nothing is placed, nothing is paid.
+            ShopWindow keeps the pending offer.
+        end note
+    else enough money
+        Wallet --> Shop : true
+        Shop -> DefenseOffer : placeOn(slot)
+        activate DefenseOffer
+        create participant "catapatate : Catapatate" as Catapatate
+        DefenseOffer -> Catapatate : new Catapatate(slot, config, enemies)
+        DefenseOffer -> DefenseSlot : place(catapatate)
+        note right of DefenseSlot
+            place checks by itself that the slot is empty (isEmpty).
+        end note
+        alt slot taken
+            DefenseSlot --> DefenseOffer : false
+            DefenseOffer --> Shop : false
+            Shop --> ShopWindow : false
+            note right of Shop
+                Placing fails: nothing is paid,
+                the offer stays pending.
+            end note
+        else empty slot: purchase succeeds
+            DefenseSlot --> DefenseOffer : true
+            DefenseOffer --> Shop : true
+            Shop -> DefenseOffer : getPrice()
+            DefenseOffer --> Shop : 150
+            Shop -> Wallet : spend(150)
+            Wallet --> Shop : true
+            Shop --> ShopWindow : true
+            ShopWindow -> ShopWindow : close()
+            note right of ShopWindow
+                Paid only once placed. close() forgets the pending
+                offer and rolls up the list.
+            end note
+        end
+        deactivate DefenseOffer
+    end
+    deactivate Shop
+    deactivate ShopWindow
+    deactivate GameScreen
+
+    == 4. The HUD learns the new balance ==
+    GameScreen -> GameSession : update(delta)
+    activate GameSession
+    GameSession -> GameSession : notifyChanges()
+    GameSession -> Wallet : getBalance()
+    Wallet --> GameSession : balance
+    GameSession -> Hud : onMoneyChanged(balance)
+    note right of GameSession
+        GameSession keeps the balance from the previous frame;
+        if it changed, it notifies its GameListener objects.
+        Neither Wallet nor Shop knows the HUD.
+    end note
+    deactivate GameSession
+@enduml

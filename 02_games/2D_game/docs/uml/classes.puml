@@ -1,0 +1,1451 @@
+@startuml
+    !startsub WORLD
+    package com.cropa.model.world {
+        interface Occupant {
+            +onCrossedBy(crosser : Damageable):boolean
+            +onBittenByMole():boolean
+            +spriteKey():String
+            +onHarvested():OptionalInt
+            +blocks(blocker : CropType):boolean
+        }
+        note bottom of Occupant
+            What occupies a cell of the field: a crop, a scarecrow or a bramble.
+            Nobody asks what the occupant is: it is told what happens, and it reacts in its own way.
+            onCrossedBy: an enemy on foot crosses the cell; true -> the occupant leaves the cell (crushed crop).
+            onBittenByMole: true -> eaten (a crop); false for the bramble and the scarecrow.
+            spriteKey: the sprite key, never a file path (SpriteCatalog makes the link).
+        end note
+        interface Damageable {
+            +takeDamage(amount : int):void
+            +getHealth():int
+        }
+        note bottom of Damageable
+            What can take a hit: the farm and the enemies.
+            The attacker only knows this interface: a bramble hurts a witch without knowing it is a witch.
+        end note
+        interface Updatable {
+            +update(delta : float):void
+        }
+        note bottom of Updatable
+            What moves forward with time: the enemies, then the defenses.
+        end note
+        interface DefenseLine {
+            +wearAt(row : int, column : int, percent : int):void
+        }
+        note bottom of DefenseLine
+            What a fleeing enemy may do to the defenses: wear the one on its fleeing row.
+            Row 0: top slots; row 4: bottom slots; any other row -> nothing.
+            In model.world, not in model.defense: track B uses it without depending on track C
+            (dependency inversion, like Damageable). DefenseSlots implements it.
+        end note
+        interface FieldView {
+            +spriteAt(row : int, column : int):Optional<String>
+        }
+        note bottom of FieldView
+            What the view may know about the field: the sprite of each cell, nothing more.
+            WorldRenderer receives this type instead of Board: it reads the field, but cannot plant or remove.
+            Empty Optional: the cell is free.
+        end note
+        class Board {
+            +{static} ROWS : int
+            +{static} COLUMNS : int
+            +Board()
+            +getCell(row : int, column : int):Cell
+            +getCells():List<Cell>
+            +getCrops():List<Crop>
+            +spriteAt(row : int, column : int):Optional<String>
+        }
+        note bottom of Board
+            The field: 15 cells, 3 rows x 5 columns.
+            Rows 1 to 3, columns 1 to 5 (like r1c1 to r3c5 on the map).
+            ROWS (3) and COLUMNS (5): public, the only copy of the board size (L5, D10); the view,
+            the defenses and the enemies read them instead of writing 3 and 5.
+            getCells: the 15 cells, from r1c1 to r3c5, in a new list (one single loop for everyone).
+            getCell: outside the field -> IllegalArgumentException.
+            getCrops: the crops placed on the field, without the defenses, in a new list on each call.
+        end note
+        class Cell {
+            +Cell(row : int, column : int)
+            +getRow():int
+            +getColumn():int
+            +getOccupant():Optional<Occupant>
+            +isEmpty():boolean
+            +place(occupant : Occupant):boolean
+            +remove():void
+            +crossBy(crosser : Damageable):void
+        }
+        note bottom of Cell
+            A cell: its row, its column and at most one occupant.
+            place: cell already occupied -> false, nothing is placed.
+            remove frees the cell (harvest, eaten crop, destroyed defense).
+            crossBy: notifies the occupant, and frees the cell if it answers that it leaves. Empty cell -> nothing.
+        end note
+        enum CropType {
+            CARROT
+            TURNIP
+            GARLIC
+            PUMPKIN
+        }
+        note bottom of CropType
+            The 4 crops that can be sold. The bramble is a defense (track C),
+            even if the player picks it in the "Planter" (Plant) menu.
+        end note
+        class Crop {
+            +Crop(type : CropType, config : CropConfig)
+            +getType():CropType
+            +getStage():int
+            +isMature():boolean
+            +grow():void
+            +getValue():int
+            +onCrossedBy(crosser : Damageable):boolean
+            +onBittenByMole():boolean
+            +spriteKey():String
+            +onHarvested():OptionalInt
+            +blocks(blocker : CropType):boolean
+        }
+        note bottom of Crop
+            A crop placed on a cell. Stage 0 when planted, ripe at the last stage.
+            grow: one more stage at each dawn, nothing more once ripe.
+            getValue: value of the stage reached (sold at once on harvest).
+            onCrossedBy -> true (crushed), onBittenByMole -> true (eaten).
+        end note
+        class CropConfig {
+            +CropConfig()
+            +getSeedPrice(type : CropType):int
+            +getStageCount(type : CropType):int
+            +getValue(type : CropType, stage : int):int
+        }
+        note bottom of CropConfig
+            Figures from §10: carrot 10 (sprout 5, ripe 40); turnip and garlic 20 (0, 25, 90);
+            pumpkin 50 (0, 70, 210, 1,000 since the D10 rebalance, 800 on D9). Tuned in playtests without touching the logic.
+            Stages from 0 to getStageCount - 1; getValue outside these stages -> IllegalArgumentException.
+        end note
+        Occupant <|.. Crop
+        FieldView <|.. Board
+        Damageable <|.. Farm
+        Board *-- "15" Cell
+        Cell o-- "0..1" Occupant
+        Crop --> CropType
+        Crop --> CropConfig
+        class Farm {
+            +Farm(health : int)
+            +takeDamage(amount : int):void
+            +getHealth():int
+            +isDestroyed():boolean
+        }
+        note bottom of Farm
+            150 HP (100 before D10), never repaired. 0 HP -> defeat.
+        end note
+    }
+    !endsub
+    !startsub ECONOMY
+    package com.cropa.model.economy {
+        class Wallet {
+            +Wallet(startingMoney : int)
+            +add(amount : int):void
+            +spend(amount : int):boolean
+            +canAfford(amount : int):boolean
+            +getBalance():int
+        }
+        note bottom of Wallet
+            spend: balance too low -> false, nothing is spent.
+            The shop reads the answer before it places the defense.
+            canAfford: spends nothing; the HUD uses it to grey out buttons that cost too much.
+        end note
+        class Shop {
+            +Shop(wallet : Wallet, cropConfig : CropConfig, gameConfig : GameConfig, offers : List<DefenseOffer>)
+            +getSeedPrice(type : CropType):int
+            +buySeed(type : CropType, cell : Cell):boolean
+            +sell(cell : Cell):boolean
+            +getDefenseOffers():List<DefenseOffer>
+            +buyDefense(offer : DefenseOffer, cell : Cell):boolean
+            +buyDefense(offer : DefenseOffer, slot : DefenseSlot):boolean
+            +upgrade(defense : Defense):boolean
+            +buyUrn():boolean
+        }
+        note bottom of Shop
+            Called only during the day: the view checks session.getCycle().canAct() first.
+            getSeedPrice: price of the seed (CropConfig), to show it in the shop.
+            buySeed: false if the balance is too low or the cell is occupied; nothing is paid or placed.
+            sell: the harvest (sold at once); false if the cell has no crop;
+            otherwise the value of the stage reached goes to the wallet and the cell is freed.
+            buyDefense: balance checked, then offer.placeOn; paid only if the placement succeeds.
+            The bramble is bought with buyDefense, even if the view shows it in the "Planter" menu.
+            upgrade: false if canUpgrade -> false or the balance is too low.
+            buyUrn: only takes the money (false if the balance is too low); the victory comes from GameSession.buyUrn.
+            The defenses come from the track C items (DefenseOffer).
+        end note
+        Shop --> Wallet
+    }
+    !endsub
+    !startsub GAME
+    package com.cropa.model.game {
+        class GameConfig {
+            +GameConfig()
+            +GameConfig(language : Language, firstGame : boolean)
+            +GameConfig(cropConfig : CropConfig, enemyConfig : EnemyConfig, defenseConfig : DefenseConfig)
+            +getLanguage():Language
+            +getStartingMoney():int
+            +getUrnPrice():int
+            +getNightCount():int
+            +getDayDuration():float
+            +getNightDuration():float
+            +getCropConfig():CropConfig
+            +getEnemyConfig():EnemyConfig
+            +getDefenseConfig():DefenseConfig
+            +getMeldaFacts():List<String>
+            +getMeldaLettersPerSecond():float
+        }
+        note bottom of GameConfig
+            250 coins at the start (200 before D10), urn 10,000, 8 nights, day 60 s maximum, night 45 s maximum.
+            Also holds the figures for crops, enemies and defenses: GameSession reads them all here,
+            one single config per game. GameConfig() creates the three default ones; the second constructor
+            lets a test give its own (balance tried without touching the game values).
+            GameConfig(language, firstGame), called by CropaGame: the language of every text (getLanguage, read by
+            GameScreen), and Melda's texts in it (getMeldaFacts, from Texts): true at launch and after a change of
+            language (meldaFirstGame), false after "Rejouer" (Play again) (meldaReplay).
+            GameConfig() and the test constructor -> French, first game.
+        end note
+        enum GameResult {
+            VICTORY
+            DEFEAT_FARM_DESTROYED
+            DEFEAT_URN_SOLD
+        }
+        note bottom of GameResult
+            How the game ends: urn bought, farm at 0 HP,
+            or urn sold at dawn after night 8 without 10,000 coins.
+        end note
+        interface GameListener <<Observer>> {
+            +onMoneyChanged(balance : int):void
+            +onFarmHealthChanged(health : int):void
+            +onDayStarted(day : int):void
+            +onNightStarted(night : int):void
+            +onTimerChanged(secondsLeft : int):void
+            +onGameOver(result : GameResult):void
+        }
+        note bottom of GameListener
+            Observer pattern: the HUD implements GameListener and subscribes to the game.
+            The model notifies its subscribers without knowing that a HUD exists.
+            onGameOver: one single call, with the way the game ends.
+            No event for Melda (D11): the view reads session.getMelda() every frame, like the enemies.
+        end note
+        interface PhaseState <<State>> {
+            +enter(session : GameSession):void
+            +update(session : GameSession, delta : float):void
+            +canAct():boolean
+            +isOver(session : GameSession):boolean
+        }
+        note bottom of PhaseState
+            State pattern: the game delegates to the current state, with no if on the phase.
+            canAct: buying, harvesting and upgrading are allowed during the day, forbidden at night.
+            isOver: default method (false); true ends the phase before its timer.
+        end note
+        class DayState <<State>>
+        note bottom of DayState
+            enter: session.dawn() (crops grow one stage, defenses at dawn, remaining enemies flee),
+            then getMelda().startIfToday(day number). update: getMelda().update(delta), her bubble is written.
+            canAct -> true. End: timer at 0 or the "Lancer la nuit" (Start the night) button.
+        end note
+        class NightState <<State>>
+        note bottom of NightState
+            enter: Melda leaves (getMelda().leave(), even in the middle of a bubble), then the night's wave
+            starts (WaveSpawner.startNight).
+            update: adds to the game the enemies that the WaveSpawner spawns (session.addEnemy).
+            canAct -> false. End: timer at 0 -> next day, or end of the game after night 8.
+            isOver -> true when the whole wave has spawned (WaveSpawner.isFinished) and all enemies
+            are dead or gone: dawn comes without waiting for the timer.
+        end note
+        class DayNightCycle {
+            +DayNightCycle(config : GameConfig)
+            +update(session : GameSession, delta : float):void
+            +launchNight(session : GameSession):void
+            +isNight():boolean
+            +getNumber():int
+            +getSecondsLeft():int
+            +getTimeLeft():float
+            +canAct():boolean
+        }
+        note bottom of DayNightCycle
+            Keeps the current state, the day or night number (1 to 8) and the timer.
+            canAct is delegated to the current state. update moves to the next phase when the timer is at 0 or if current.isOver(session).
+        end note
+        class GameSession {
+            +GameSession(config : GameConfig, random : Random)
+            +addListener(listener : GameListener):void
+            +update(delta : float):void
+            +addEnemy(enemy : Enemy):void
+            +buyUrn():boolean
+            ~dawn():void
+            +getBoard():Board
+            +getWallet():Wallet
+            +getShop():Shop
+            +getCycle():DayNightCycle
+            ~getFarm():Farm
+            +getFarmHealth():int
+            +getCat():Cat
+            +getFarmer():Farmer
+            +getEnemies():List<Enemy>
+            ~getWaveSpawner():WaveSpawner
+            +getDefenseSlots():DefenseSlots
+            +getMelda():Melda
+            +getResult():Optional<GameResult>
+            +isOver():boolean
+        }
+        note bottom of GameSession
+            Entry point of the model: the view calls update(delta) every frame.
+            Subject of the Observer pattern: notifies its GameListeners.
+            update compares the phase, the balance and the farm HP with those of the previous frame;
+            if one of them has changed, it notifies its GameListeners (neither Wallet, Farm nor DayNightCycle knows the HUD).
+            getResult: empty Optional while the game goes on; isOver -> true as soon as there is a result.
+            buyUrn: shop.buyUrn() paid -> VICTORY result; the next frame announces it (onGameOver). Called by the view, during the day.
+            addEnemy: the only way to add an enemy (the NightState waves); the list stays private, nobody empties it from outside.
+            The game starts on day 1 as in the rules: 250 coins, empty field, no defense (D10, Antonin:
+            no more carrots or catapatate from the POC). Each night has its wave (WaveSpawner, started by NightState).
+            Reads all its configs from GameConfig; random is the only source of randomness, given to each enemy.
+            dawn (package, L7): the dawn, called by DayState.enter; DayState no longer imports Crop, Defense or Enemy.
+            Melda's day is the first draw of random; the cat receives new Random(random.nextLong()).
+        end note
+        class Melda {
+            +Melda(facts : List<String>, lettersPerSecond : float, nightCount : int, random : Random)
+            +startIfToday(day : int):void
+            +update(delta : float):void
+            +nextBubble():void
+            +leave():void
+            +getCurrentBubble():String
+            +isTalking():boolean
+            +isBubbleWritten():boolean
+            +isVisiting():boolean
+            +getPhase():Phase
+            +getWalkProgress():float
+            +getDay():int
+        }
+        note bottom of Melda
+            Her day is drawn at creation: 2 + random.nextInt(nightCount - 1), so from day 2 to day 8.
+            startIfToday: called at each dawn; she comes only once, on her day. Her texts: GameConfig.getMeldaFacts().
+            update: writes the bubble at 20 letters/s (getMeldaLettersPerSecond); the day timer keeps running.
+            Phases: ABSENT, WANDERING (8 s in the forest), ARRIVING (6 s), TALKING, LEAVING (6 s), GONE.
+            nextBubble ("Passer à la suite" (Move on) button): no effect while the bubble is being written; after the last one, she leaves.
+            leave: at nightfall, no effect if she has not come (ABSENT).
+            getCurrentBubble: the text already written, word by word; "" when she is silent.
+        end note
+        enum Phase {
+            ABSENT
+            WANDERING
+            ARRIVING
+            TALKING
+            LEAVING
+            GONE
+        }
+        note bottom of Phase
+            Public enum declared in Melda (Melda.Phase): how far she is in her visit.
+            The view reads it (getPhase) to choose the path and the direction of her walk.
+        end note
+        Melda +-- Phase
+        PhaseState <|.. DayState
+        PhaseState <|.. NightState
+        DayNightCycle --> PhaseState
+        GameSession *-- DayNightCycle
+        GameSession *-- Melda
+        GameSession o-- "*" GameListener
+    }
+    !endsub
+    !startsub TEXT
+    package com.cropa.text {
+        enum Language {
+            FRENCH
+            ENGLISH
+            +getCode():String
+            +other():Language
+            +{static} fromCode(code : String):Language
+        }
+        note bottom of Language
+            The two languages of the game (after the project, for the portfolio). fromCode: "fr", "fr_FR" or
+            "fr-FR" -> FRENCH, any other code or none -> ENGLISH; the desktop launcher gives the language of the
+            computer, the web launcher the "lang" of the address ("?lang=en"), or else the language of the browser.
+            other: the language button of the title screen.
+        end note
+        class Texts {
+            +{static} of(language : Language):Texts
+            +getLanguage():Language
+            +number(amount : int):String
+            +titleLines():List<String>
+            +introLines():List<String>
+            +status(money : int, farmHealth : int, night : boolean, number : int, secondsLeft : int):String
+            +name(type : DefenseType):String
+            +name(type : CropType):String
+            +level(level : int):String
+            +ending(result : GameResult):String
+            +tutorialBubbles():List<List<String>>
+            +meldaFirstGame():List<String>
+            +meldaReplay():List<String>
+        }
+        note bottom of Texts
+            Every word the player reads, in French and in English, side by side in each method (pick): the view
+            asks Texts instead of writing its own words. One instance per language (of). Only the main methods are
+            listed; the others follow the screens: title, cutscenes, HUD, shop, tutorial, Melda, end screen.
+            French: the words of the game as the team wrote them. English: the same, with "Catapotato" and
+            Melda's talk without its swear word. "3 450" in French, "3,450" in English (number).
+            Only characters of the game font: no typographic apostrophe (TextWidth refuses it).
+        end note
+        Texts --> Language
+    }
+    !endsub
+    !startsub ENEMY
+    package com.cropa.model.enemy {
+        enum EnemyType {
+            MOLE
+            BAT
+            WITCH
+        }
+        interface EnemyView {
+            +getRow():int
+            +getCellsToFarm():float
+            +spriteKey():String
+            +isOnBoard():boolean
+            +getHealth():int
+        }
+        note bottom of EnemyView
+            What the view may read from an enemy: no takeDamage, no flee, no update.
+            EnemyRenderer receives this type: the compiler forbids it to change the model.
+            getHealth: read by EnemyRenderer to flash the hit enemy red (HitFlash).
+        end note
+        interface CellCrosser {
+            +onEnterCell(cell : Cell):void
+        }
+        note bottom of CellCrosser
+            What enters a cell. The shared code calls onEnterCell, and the enemy does what it knows how to do:
+            no type check. Enemy implements it: the mole does nothing (it follows no row), the witch
+            crushes the crop or wears the defense on the cell (Walker).
+        end note
+        interface Flyable {
+            +onEnterCell(cell : Cell):void
+        }
+        note bottom of Flyable
+            Empty default method: what flies triggers nothing on the cell.
+        end note
+        interface Walker {
+            +onEnterCell(cell : Cell):void
+        }
+        note bottom of Walker
+            Default method: cell.crossBy(this), the cell is the one that reacts.
+        end note
+        abstract class Enemy {
+            #Enemy(type : EnemyType, row : int, config : EnemyConfig)
+            #moveTowardsFarm(cells : float):void
+            #moveTo(newRow : int, newCellsToFarm : float):void
+            +getType():EnemyType
+            +getHealth():int
+            +getRow():int
+            +getCellsToFarm():float
+            +takeDamage(amount : int):void
+            +isDead():boolean
+            +isTargetable():boolean
+            +isFlying():boolean
+            +isOnBoard():boolean
+            +getReward():int
+            +collectReward():int
+            +flee():void
+            +hasFled():boolean
+            {abstract} +spriteKey():String
+            {abstract} +update(delta : float):void
+        }
+        note bottom of Enemy
+            Row 1 to 3, otherwise IllegalArgumentException at creation. takeDamage: a negative amount is ignored.
+            Comes in from the right and moves toward the farm, on the left:
+            2 cells before the field, the 5 columns of the field, then 3 cells up to the farm.
+            cellsToFarm: cells left up to the farm (10 on entry, field from 8 to 3, 0 in front of the farm).
+            A defense attacks it without knowing its type: takeDamage, isTargetable.
+            isFlying: false; the bat answers true, and the scarecrow does not hit what flies.
+            In front of the farm: 1 hit on arrival, then 1 hit / 5 s,
+            until it dies, the farm is destroyed or dawn comes (flee).
+            hasFled: true once gone; the game then removes it from the enemy list.
+            collectReward: the reward for a killed enemy, only once; 0 if it is still alive or if the reward is already taken.
+            The board, the farm and the Random are given to it at creation (EnemyFactory).
+        end note
+        abstract class LaneEnemy {
+            #LaneEnemy(type : EnemyType, row : int, farm : Farm, board : Board, config : EnemyConfig, moveStrategy : MoveStrategy, defenseLine : DefenseLine, random : Random)
+            #LaneEnemy(type : EnemyType, row : int, farm : Farm, config : EnemyConfig, moveStrategy : MoveStrategy)
+            +update(delta : float):void
+            +spriteKey():String
+        }
+        note bottom of LaneEnemy
+            The bat and the witch move in the same way: this code is written only once.
+            update moves the enemy forward, asks its MoveStrategy for its row
+            and calls onEnterCell on each new cell.
+            spriteKey: the type in lower case ("bat", "witch"), followed by "_attack" for 0.3 s after each hit
+            on the farm (D14, like Defense.isAttacking), or by "_back" while fleeing through a defense row (seen from behind);
+            a new lane enemy only needs its three keys in SpriteCatalog.
+        end note
+        class Mole {
+            +Mole(board : Board, config : EnemyConfig, random : Random)
+            +isTargetable():boolean
+            +isOnBoard():boolean
+            +onEnterCell(cell : Cell):void
+            +update(delta : float):void
+            +spriteKey():String
+        }
+        note bottom of Mole
+            Underground: targets a random crop, eats it in 3 s (visible: isTargetable -> true),
+            waits 11 s, 2 meals at most (3 before D10). Does not eat the bramble. Ignores the farm.
+            Extends Enemy and not LaneEnemy: it follows no row, onEnterCell does nothing.
+            isOnBoard: only during a meal; underground, the view does not draw it. spriteKey -> "mole".
+        end note
+        class Bat {
+            +Bat(row : int, farm : Farm, board : Board, config : EnemyConfig, defenseLine : DefenseLine, random : Random)
+            +Bat(row : int, farm : Farm, config : EnemyConfig)
+            +isFlying():boolean
+        }
+        note bottom of Bat
+            Flies at 0.35 cell/s: triggers neither the bramble nor the scarecrow. Turns aside in front of garlic.
+            Only wears (-10%) the defenses of the defense row it flees through.
+        end note
+        class Witch {
+            +Witch(row : int, farm : Farm, board : Board, config : EnemyConfig, defenseLine : DefenseLine, random : Random)
+            +Witch(row : int, farm : Farm, config : EnemyConfig)
+        }
+        note bottom of Witch
+            Walks at 0.3 cell/s. Turns aside in front of turnip.
+            Walker: onEnterCell crushes the crop on the cell, or wears the defense on it:
+            -20% durability, not stacked (see the Defense note).
+        end note
+        interface MoveStrategy <<Strategy>> {
+            +nextRow(row : int, column : int, board : Board, random : Random):int
+        }
+        class DeviateStrategy <<Strategy>> {
+            +DeviateStrategy(blocker : CropType)
+            +nextRow(row : int, column : int, board : Board, random : Random):int
+        }
+        note bottom of DeviateStrategy
+            One single strategy for two enemies: blocker = TURNIP (witch) or GARLIC (bat).
+            Cell ahead free -> same row; blocked -> free neighboring row, at random if both are free;
+            none -> 0 (flees through the top defenses) or 4 (through the bottom ones), whichever is closest.
+        end note
+        class EnemyFactory <<Factory>> {
+            +EnemyFactory(board : Board, farm : Farm, config : EnemyConfig, defenseLine : DefenseLine, random : Random)
+            +create(type : EnemyType, row : int):Enemy
+        }
+        note bottom of EnemyFactory
+            The only place that knows Mole, Bat and Witch. To add an enemy: a subclass,
+            an EnemyType value, a case here, its numbers in WaveTable and EnemyConfig.
+            defenseLine: given to the bat and the witch, which wear the defense of their fleeing row.
+            Random always as the last parameter (team decision, D9).
+        end note
+        class SpawnEntry {
+            +SpawnEntry(type : EnemyType, row : int, delay : float)
+            +getType():EnemyType
+            +getRow():int
+            +getDelay():float
+        }
+        note bottom of SpawnEntry
+            One enemy of a wave: its type, its row, and delay = seconds after the start of the wave.
+        end note
+        class WaveTable {
+            +getWave(night : int):List<SpawnEntry>
+            +getStartDelay():float
+        }
+        note bottom of WaveTable
+            The make-up of each night (§10), from N1 (0 moles, 2 bats, 0 witches)
+            to N8 (4, 12, 5; 8 moles before D10). Also serves as the wave config. The enemies of one type are spread over 10 s (D9).
+            getStartDelay: 5 s, no enemy spawns before.
+        end note
+        class WaveSpawner {
+            +WaveSpawner(table : WaveTable, factory : EnemyFactory)
+            +startNight(night : int):void
+            +update(delta : float):List<Enemy>
+            +isFinished():boolean
+        }
+        note bottom of WaveSpawner
+            Spawns the wave of a night. The wave starts getStartDelay() (5 s)
+            after the start of the night; the delay of each SpawnEntry counts from there.
+            update: returns the enemies spawned during this frame (empty list otherwise).
+            isFinished: the whole wave has spawned.
+        end note
+        class EnemyConfig {
+            -stats : Map<EnemyType, EnemyStats>
+            +EnemyConfig()
+            +getHealth(type : EnemyType):int
+            +getSpeed(type : EnemyType):float
+            +getFarmDamage(type : EnemyType):int
+            +getReward(type : EnemyType):int
+            +getDefenseWear(type : EnemyType):int
+            +getFarmHitCooldown():float
+            +getFirstFarmHitDelay():float
+            +getSpawnCellsToFarm():float
+            +getMoleMealDuration():float
+            +getMoleWaitDuration():float
+            +getMoleMaxMeals():int
+            +getFarmHealth():int
+            +getFarmerDamage():int
+            +getFarmerCooldown():float
+        }
+        note bottom of EnemyConfig
+            As a table (D10, Yohan): one private record EnemyStats(health, speed, farmDamage, reward, defenseWear)
+            per enemy, in an EnumMap<EnemyType, EnemyStats> filled once by the constructor, one row
+            per enemy as in §10. The 5 per-type getters read their row (getHealth -> stats.get(type).health()).
+            Mole 5 HP, 0 damage, 20 coins; bat 20 HP, 0.35 cell/s, 10 damage, 30 coins, -10%;
+            witch 45 HP, 0.3 cell/s, 20 damage, 80 coins, -20%. Farm 150 HP, pitchfork 4 damage.
+            D9 rebalance (Axel's playtest): slower, more HP, stronger hits. D10 (simulated games): farm 150 (100), pitchfork 4 (5), 2 mole meals (3).
+            getFarmHitCooldown: 5 s between two hits on the farm; getFirstFarmHitDelay: 0 s, the first hit lands on arrival;
+            the same for the bat and the witch (the mole does not hit the farm).
+            getSpawnCellsToFarm: 10 cells up to the farm when entering the row.
+        end note
+        class Farmer {
+            +Farmer(config : EnemyConfig)
+            +update(delta : float, enemies : List<Enemy>):void
+            +getFacing():Facing
+            +isAttacking():boolean
+        }
+        note bottom of Farmer
+            Old Garry: does not move (row 2, in front of the farm). His pitchfork reaches the square around him
+            (team decision, D9): rows 1 to 3, from 0 to 3 cells from the farm; never the mole, which stays on the field.
+            4 damage, 1 hit/s, read from EnemyConfig.
+            D14 (Yohan): each hit turns him toward his target (getFacing, the largest gap decides: the row, or
+            in front of / behind him) and starts his attack pose, 0.3 s (isAttacking). EAST before the first hit, and
+            again when no enemy is in play any more. FarmRenderer reads both, without knowing the type of the target.
+        end note
+        enum Facing {
+            NORTH
+            EAST
+            SOUTH
+            WEST
+        }
+        note bottom of Facing
+            The four directions of Garry standing, one per image (assets/farmer): NORTH row 1, SOUTH row 3,
+            EAST the field, WEST the farm (an enemy that got behind him). No file name here.
+        end note
+        Farmer --> Facing
+        class Cat {
+            +Cat(random : Random)
+            +update(delta : float, enemies : List<? extends EnemyView>):void
+            +isFleeing():boolean
+            +isMeowing():boolean
+        }
+        note bottom of Cat
+            Decorative: does not attack. L7: only reads EnemyView (getRow, getCellsToFarm, isOnBoard).
+            Fleeing: an enemy in play on row 1, 1 cell or less from the farm (a dead enemy does not count).
+            Meow: one draw per second (nextInt(30) == 0), a 2 s meow, with no draw during it; fleeing cuts
+            the meow and pauses the draws. isFleeing and isMeowing are never true at the same time.
+        end note
+        EnemyView <|.. Enemy
+        CellCrosser <|.. Enemy
+        CellCrosser <|-- Flyable
+        CellCrosser <|-- Walker
+        Flyable <|.. Bat
+        Walker <|.. Witch
+        Enemy <|-- LaneEnemy
+        Enemy <|-- Mole
+        LaneEnemy <|-- Bat
+        LaneEnemy <|-- Witch
+        MoveStrategy <|.. DeviateStrategy
+        LaneEnemy --> MoveStrategy
+        EnemyFactory ..> Enemy : creates
+        WaveTable *-- "*" SpawnEntry
+        SpawnEntry --> EnemyType
+        WaveSpawner --> WaveTable
+        WaveSpawner --> EnemyFactory
+        Enemy --> EnemyType
+    }
+    !endsub
+    !startsub DEFENSE
+    package com.cropa.model.defense {
+        abstract class Defense {
+            #Defense(type : DefenseType, config : DefenseConfig)
+            +getType():DefenseType
+            +getLevel():int
+            +getDurability():int
+            +wear(percent : int):void
+            +upgrade():boolean
+            +canUpgrade():boolean
+            +getUpgradePrice():int
+            +isDestroyed():boolean
+            +isAttacking():boolean
+            +onDawn():void
+            #getDamage():int
+            #getWearPerUse():int
+            #startAttackPose():void
+            #countDownAttackPose(delta : float):void
+            {abstract}+update(delta : float):void
+            {abstract}+reaches(row : int, column : int):boolean
+            {abstract}#leavePlace():void
+        }
+        note bottom of Defense
+            What the 3 defenses share: catapatate, scarecrow, bramble.
+            Level 1 to 3. upgrade: next level, durability reset to 100;
+            at level 3 -> false, nothing changes. The shop reads canUpgrade and getUpgradePrice before it charges.
+            Durability in % (Durability): wear lowers it; at 0, isDestroyed -> true and the defense is removed.
+            On the field, the scarecrow and the bramble react through onCrossedBy when an enemy enters their cell.
+            Only one wear per crossing, never stacked: on the field, the defense's own wear
+            (bramble -20%, scarecrow -10%); on a slot, the enemy's wear (EnemyConfig).
+            update: each defense acts at its own rate. A flying enemy triggers neither bramble nor scarecrow.
+            onDawn: called on each defense at dawn; empty, except for the bramble, which grows.
+            reaches: the field cells it reaches (diamond, cross, its own cell). The catapatate and the scarecrow
+            choose their target with it; the view uses it to veil the range in white (OutlineRenderer.renderRange).
+            leavePlace (Template Method): wear decides when to leave, each defense empties its own place.
+            isAttacking (D14): true for 0.3 s after a shot or a hit; the catapatate and the scarecrow call
+            startAttackPose right after their hit and countDownAttackPose at the start of update. The view then shows the attack image.
+            Protected constructor: only subclasses create a defense (a plain Defense does not exist).
+        end note
+        class Durability {
+            +wear(percent : int):void
+            +reset():void
+            +getPercent():int
+            +isZero():boolean
+        }
+        note bottom of Durability
+            Starts at 100 and never goes below 0. reset: back to 100 (upgrade).
+        end note
+        enum DefenseType {
+            CATAPATATE
+            SCARECROW
+            BRAMBLE
+        }
+        note bottom of DefenseType
+            Used by DefenseConfig to find the figures of each defense.
+        end note
+        class Catapatate {
+            +Catapatate(slot : DefenseSlot, config : DefenseConfig, enemies : List<Enemy>)
+            +update(delta : float):void
+            +reaches(row : int, column : int):boolean
+        }
+        note bottom of Catapatate
+            Placed on a defense slot, not on the field: it is not an Occupant.
+            Range 2 cells in a diamond. 1 shot/s at the first enemy in range that can be hit;
+            from the top: row 1, then row 2 if row 1 is empty; from the bottom: row 3, then row 2.
+            Damage 2 / 3 / 5 by level; -2% durability per shot. "throws" image for 0.3 s after each shot (D14).
+        end note
+        class Scarecrow {
+            +Scarecrow(cell : Cell, config : DefenseConfig, enemies : List<Enemy>)
+            +update(delta : float):void
+            +reaches(row : int, column : int):boolean
+            +onCrossedBy(crosser : Damageable):boolean
+            +onBittenByMole():boolean
+            +onHarvested():OptionalInt
+            +spriteKey():String
+        }
+        note bottom of Scarecrow
+            The boxing scarecrow, placed on a field cell.
+            Hits an enemy on its cell or on the 4 neighboring cells in a cross: 4 / 6 / 9, 1 hit / 1.5 s.
+            Target: on the board, targetable, not flying (isFlying), the closest to the farm. A hit does not wear it.
+            -10% per enemy that crosses it. Not eaten by the mole (onBittenByMole -> false).
+            spriteKey: "scarecrow_attack" for 0.3 s after a hit, "scarecrow" otherwise (D14); WorldRenderer draws the key it receives.
+            onHarvested -> 0 (D14): "Retirer" (Remove) frees its cell and gives nothing back, like the bramble.
+        end note
+        class Bramble {
+            +Bramble(cell : Cell, config : DefenseConfig)
+            +update(delta : float):void
+            +grow():void
+            +isActive():boolean
+            +onDawn():void
+            +reaches(row : int, column : int):boolean
+            +onCrossedBy(crosser : Damageable):boolean
+            +onBittenByMole():boolean
+            +onHarvested():OptionalInt
+            +spriteKey():String
+        }
+        note bottom of Bramble
+            The bramble, placed on a field cell. The player picks it only in the "Défenses" (Defenses) list
+            (D10, Axel's request): it is a defense (durability, levels, sting). It only reaches its own cell.
+            Stings after 1 night of growth: onDawn calls grow at dawn;
+            isActive -> true after that. Each enemy that crosses it: 3 / 5 / 8 damage, -20% durability.
+            Not active yet: crushed like a crop. update does nothing: it only acts when an enemy passes.
+            The mole does not eat it. onHarvested -> 0: "Retirer" (shop) frees the cell and earns nothing.
+        end note
+        enum SlotSide {
+            TOP
+            BOTTOM
+        }
+        class DefenseSlot {
+            +DefenseSlot(side : SlotSide, column : int)
+            +getSide():SlotSide
+            +getColumn():int
+            +getDefense():Optional<Defense>
+            +isEmpty():boolean
+            +place(defense : Defense):boolean
+            +remove():void
+        }
+        note bottom of DefenseSlot
+            A defense slot, outside the field: top1 to top5 above row 1,
+            bottom1 to bottom5 below row 3 (Tiled slots layer). Columns 1 to 5.
+            place: slot occupied -> false, nothing is placed (like Cell).
+        end note
+        class DefenseSlots {
+            +getSlot(side : SlotSide, column : int):DefenseSlot
+            +getDefenses():List<Defense>
+            +placeOnField<D extends Defense & Occupant>(cell : Cell, defense : D):boolean
+            +getDefenseOn(cell : Cell):Optional<Defense>
+            +getFieldDefenses():Map<Cell,Defense>
+            +wearAt(row : int, column : int, percent : int):void
+        }
+        note bottom of DefenseSlots
+            The 10 slots, and the defenses placed on the field (map Cell -> Defense).
+            wearAt (DefenseLine): row 0 -> TOP slot of the column, row 4 -> BOTTOM, any other row -> nothing.
+            getDefenses: those on the slots, then those on the field, so that the game calls their update.
+            placeOnField: cell occupied -> false, nothing is kept. getDefenseOn: the defense on a cell, without instanceof.
+            A cell freed without notice (witch, harvest): the entry is removed at the next read.
+        end note
+        class DefenseOffer {
+            +DefenseOffer(type : DefenseType, config : DefenseConfig, enemies : List<Enemy>, slots : DefenseSlots)
+            +getType():DefenseType
+            +getPrice():int
+            +isPlacedOnField():boolean
+            +placeOn(cell : Cell):boolean
+            +placeOn(slot : DefenseSlot):boolean
+        }
+        note bottom of DefenseOffer
+            A defense item in the shop: its price, and it creates the defense where the player clicks.
+            The only place that knows Catapatate, Scarecrow and Bramble: the shop knows none of them.
+            placeOn(cell): false for the catapatate or an occupied cell;
+            placeOn(slot): false for the scarecrow, the bramble or an occupied slot.
+        end note
+        class DefenseConfig {
+            +getPrice(type : DefenseType):int
+            +getDamage(type : DefenseType, level : int):int
+            +getCooldown(type : DefenseType):float
+            +getWearPerUse(type : DefenseType):int
+            +getUpgradePrice(type : DefenseType, level : int):int
+            +getRange(type : DefenseType):int
+            +getBrambleGrowthNights():int
+        }
+        note bottom of DefenseConfig
+            Catapatate 150, 2/3/5, 1 shot/s, -2%, range 2, upgrades 100/200;
+            scarecrow 120, 4/6/9, 1 hit/1.5 s, -10%, range 1, 80/160;
+            bramble 40, 3/5/8 per crossing, -20%, 60/120, stings after 1 night.
+        end note
+        Defense <|-- Catapatate
+        Defense <|-- Scarecrow
+        Defense <|-- Bramble
+        Defense *-- Durability
+        Defense --> DefenseType
+        DefenseSlots *-- "10" DefenseSlot
+        DefenseSlot o-- "0..1" Defense
+        DefenseSlot --> SlotSide
+        DefenseOffer ..> Defense : creates
+        DefenseOffer --> DefenseType
+        DefenseOffer --> DefenseSlots
+        DefenseSlots o-- "*" Defense : on the field
+    }
+    !endsub
+    !startsub APP
+    package com.cropa {
+        class CropaGame {
+            +CropaGame(language : Language)
+            +create():void
+        }
+        note bottom of CropaGame
+            Entry point started by libGDX. Extends libGDX's Game, which can switch screens (setScreen).
+            The launcher gives the language to start in (desktop: the language of the computer; web: "?lang=" in
+            the address, or else the language of the browser).
+            create: creates the game (the model's GameSession, with GameConfig and Random) and opens GameScreen,
+            with the title screen (startNewGame(true)).
+            "Rejouer": startNewGame(false) (private) creates the session and the screen again, without the title screen,
+            then disposes of the previous screen.
+            Language button of the title screen: switchLanguage (private) takes the other language and starts over
+            with the title screen.
+        end note
+    }
+    !endsub
+    !startsub LIBGDX
+    package com.badlogic.gdx {
+        abstract class "Game" as GdxGame
+        interface Screen
+    }
+    !endsub
+    !startsub VIEW_GDX
+    package com.cropa.view.gdx {
+        class GameScreen {
+            +GameScreen(session : GameSession, config : GameConfig, withTitle : boolean, onReplay : Runnable, onSwitchLanguage : Runnable)
+            +show():void
+            +render(delta : float):void
+            +resize(width : int, height : int):void
+            +dispose():void
+        }
+        note bottom of GameScreen
+            The game screen. show: loads maps/map_v1.tmx (TmxMapLoader), the camera
+            and a 560 x 320 FitViewport (35 x 20 tiles of 16 px).
+            render: session.update(delta), then asks the renderers to draw, in this order: map and crops,
+            farm, defenses, enemies, front trees (trees_front layer), free places in white
+            (ShopWindow.highlightedZone), night veil, crop dots (GrowthRenderer), range of the open
+            defense (shopWindow.shownDefense, OutlineRenderer.renderRange), HUD, shop, end screen, F1 outlines.
+            Holds no drawing rule. While the title screen, then the intro cutscene, are shown:
+            no session.update, and TitleScene, then Cinematic, instead of the HUD, the shop and the end screen.
+            show: Texts.of(config.getLanguage()), given to every part that shows words.
+            intro = Cinematic.intro(world, texts) with the title screen, an empty cutscene after "Rejouer";
+            victory = Cinematic.victory(world, texts), drawn only if getResult() is VICTORY, before the end screen.
+            Click: title screen shown -> on its language button, onSwitchLanguage at the start of the next frame
+            (Gdx.app.postRunnable); anywhere else, it closes, nothing else; cutscene running -> next scene; game over (isOver) -> EndScene only: "Rejouer" -> onReplay at the start of the next frame
+            (Gdx.app.postRunnable), "Quitter" (Quit) -> Gdx.app.exit(); while Melda talks, meldaRenderer.handleClick takes all clicks;
+            during the day, "Lancer la nuit" (hud.handleClick -> launchNight);
+            then the shop (shopWindow.handleClick); then BoardLayout: slot -> handleSlotClick,
+            cell -> handleCellClick; neither -> close. The shop decides (place, plant, open).
+            resize updates the viewport; dispose frees the map, the canvas and the renderers.
+            pause, resume and hide (required by Screen) stay empty.
+            Melda (D12): drawn with the enemies, before the front trees that hide her in the forest; her dialog after the shop;
+            every frame, hud.lockNight(session.getMelda().isVisiting()).
+            Tutorial (D14, Antonin), in the first game only (withTitle): drawn after the shop; its click
+            comes after Melda's and before the HUD's; while it is shown, session.update(0): the timer
+            of day 1 stays full until "Commencer à jouer" (Start playing).
+            Garry (D14): farmRenderer receives session.getFarmer() and getCycle().isNight().
+        end note
+        class GdxCanvas {
+            +GdxCanvas(batch : SpriteBatch, camera : OrthographicCamera, map : TiledMap)
+            +drawMap():void
+            +drawSprite(spriteKey : String, area : Bounds, tint : Tint):void
+            +drawText(text : String, x : float, y : float, style : TextStyle):void
+            +drawLabel(text : String, centerX : float, y : float):void
+            +drawCenteredText(text : String, centerX : float, y : float):void
+            +drawNote(lines : List<String>, x : float, y : float, style : TextStyle):void
+            +drawDialog(lines : List<String>, area : Bounds):void
+            +drawOutline(area : Bounds, color : OutlineColor):void
+            +drawNightVeil(area : Bounds, opacity : float):void
+            +drawDot(area : Bounds, color : TextStyle):void
+            +drawRangeVeil(area : Bounds):void
+            +drawArrow(tip : Point):void
+            +drawShade(area : Bounds):void
+            +drawFront():void
+            +endFrame():void
+            +dispose():void
+        }
+        note bottom of GdxCanvas
+            The libGDX version of Canvas. Opens and closes the batch and the outline drawing by itself.
+            drawText puts each text on a 75% black bubble, fitted to the text; TextStyle.GREYED: grey text.
+            drawLabel does the same with a second font at half size, centered on x.
+            Tint.HURT: setColor(1, 0.3, 0.3) for the time of one sprite; Tint.UPGRADED: setColor(0.4, 0.6, 1).
+            drawNightVeil: the bubble pixel, stretched and tinted night blue. drawDot: the same pixel, in the color
+            of the style (red, orange, green). drawRangeVeil: the same pixel, white at 35%.
+            drawDialog: a dark bubble over the whole area, then the lines in white in the HUD font (Melda's dialog).
+            Tutorial (D14): Tint.GHOST, the image at 60% opacity; drawShade, the bubble pixel in black at 50%;
+            drawArrow, a solid yellow arrow (ShapeRenderer in Filled mode).
+            Loads each image once (key -> SpriteCatalog -> Texture) and frees them all in the same place.
+        end note
+        class TiledLayoutReader {
+            +{static} read(map : TiledMap):BoardLayout
+        }
+        note bottom of TiledLayoutReader
+            Reads the object layers of the map: cells, slots, spots, then creates BoardLayout.
+            The only class that turns Tiled objects into view types. Missing layer -> exception.
+        end note
+        GameScreen *-- GdxCanvas
+    }
+    !endsub
+    !startsub VIEW
+    package com.cropa.view {
+        interface Canvas {
+            +drawMap():void
+            +drawSprite(spriteKey : String, area : Bounds, tint : Tint):void
+            +drawSprite(spriteKey : String, area : Bounds):void
+            +drawText(text : String, x : float, y : float, style : TextStyle):void
+            +drawText(text : String, x : float, y : float):void
+            +drawLabel(text : String, centerX : float, y : float):void
+            +drawCenteredText(text : String, centerX : float, y : float):void
+            +drawNote(lines : List<String>, x : float, y : float, style : TextStyle):void
+            +drawDialog(lines : List<String>, area : Bounds):void
+            +drawOutline(area : Bounds, color : OutlineColor):void
+            +drawNightVeil(area : Bounds, opacity : float):void
+            +drawDot(area : Bounds, color : TextStyle):void
+            +drawRangeVeil(area : Bounds):void
+            +drawArrow(tip : Point):void
+            +drawShade(area : Bounds):void
+        }
+        note bottom of Canvas
+            The only door between the view and the graphics library: the renderers say what to draw, never how.
+            Changing the library = writing one single class. In tests, a fake Canvas records the calls, with no window.
+            drawSprite(spriteKey, area) is a default method: it calls the 3-parameter version with Tint.NORMAL.
+            drawText(text, x, y) too: the 4-parameter version with TextStyle.NORMAL.
+        end note
+        enum TextStyle {
+            NORMAL
+            GREYED
+            ALERT
+            SEED
+            GROWING
+            RIPE
+        }
+        note bottom of TextStyle
+            GREYED: what cannot be chosen right now (at night, or the other lines once a choice is made).
+            ALERT: in red, an alert not to miss (the last night).
+            SEED, GROWING, RIPE: red, orange, green, the growth of a crop (Growth); also the color of the dots.
+        end note
+        enum Growth {
+            SEED
+            GROWING
+            RIPE
+            +{static} of(crop : Crop):Growth
+            +label(texts : Texts):String
+            +getStyle():TextStyle
+        }
+        note bottom of Growth
+            The growth of a crop as the player sees it (D10, Axel's request): stage 0 -> seed (red),
+            last stage -> ripe (green), in between -> growing (orange). The word on the panel and the color
+            of the dot come from the same value: they cannot contradict each other.
+        end note
+        class GrowthRenderer {
+            +GrowthRenderer(layout : BoardLayout)
+            +render(canvas : Canvas, board : Board):void
+        }
+        note bottom of GrowthRenderer
+            A 3 px dot at the bottom right of each planted cell, in the color of its growth (Growth).
+            Drawn after the night veil: readable at night too. Neither the scarecrow nor the bramble has one.
+        end note
+        enum Zone {
+            FIELD
+            SLOTS
+        }
+        note bottom of Zone
+            The zone whose free places the shop shows in white: the field or the slots.
+        end note
+        enum Tint {
+            NORMAL
+            HURT
+            UPGRADED
+            GHOST
+        }
+        class HitFlash {
+            +{static} DURATION : float
+            +HitFlash()
+            +HitFlash(tint : Tint, onRise : boolean)
+            +tintOf(owner : Object, value : int, delta : float):Tint
+        }
+        note bottom of HitFlash
+            Compares the value of an object (HP, durability, level) with the one of the previous frame.
+            HitFlash(): if it goes down, red (HURT) for 0.2 s.
+            HitFlash(tint, onRise): the returned tint and the direction that triggers it (UPGRADED when the level goes up).
+            Key = the object itself (IdentityHashMap).
+        end note
+        class NightRenderer {
+            +NightRenderer(world : Bounds)
+            +render(canvas : Canvas, night : boolean, timeLeft : float):void
+        }
+        note bottom of NightRenderer
+            Night-blue veil over the whole world, before the HUD: opacity 0.5 at night,
+            fade over the last 3 seconds of the day (dusk) and of the night (dawn).
+        end note
+        class Bounds <<record>> {
+            +x : float
+            +y : float
+            +width : float
+            +height : float
+            +{static} centeredOn(center : Point, size : float):Bounds
+            +contains(pointX : float, pointY : float):boolean
+        }
+        class Point <<record>> {
+            +x : float
+            +y : float
+        }
+        enum OutlineColor {
+            GREEN
+            YELLOW
+            WHITE
+        }
+        note bottom of OutlineColor
+            GREEN and YELLOW: the debug view (F1). WHITE: what the player can use right now
+            (buttons, list lines, free places).
+        end note
+        class EndScene <<Observer>> {
+            +EndScene(world : Bounds, texts : Texts)
+            +onDayStarted(day : int):void
+            +onNightStarted(night : int):void
+            +onMoneyChanged(balance : int):void
+            +onFarmHealthChanged(health : int):void
+            +onTimerChanged(secondsLeft : int):void
+            +onGameOver(result : GameResult):void
+            +handleClick(x : float, y : float):Optional<EndChoice>
+            +getReplayButton():Bounds
+            +getQuitButton():Bounds
+            +render(canvas : Canvas):void
+        }
+        note bottom of EndScene
+            The end screen, over the frozen game: a dark veil, then one scene per ending (onGameOver).
+            Victory: Garry, the urn and the ghost of his wife, "Rachetée au jour N" (Bought back on day N).
+            Farm destroyed: the destroyed barn, "La ferme est tombée la nuit N." (The farm fell on night N.).
+            Urn sold: Mr Chmunks leaving with the urn, between Hugo and Alexis.
+            handleClick -> REPLAY or QUIT; GameScreen decides what to do with it. Nothing while the game goes on.
+        end note
+        enum EndChoice {
+            REPLAY
+            QUIT
+        }
+        class TitleScene {
+            +TitleScene(world : Bounds, visible : boolean, texts : Texts)
+            +isVisible():boolean
+            +getLanguageButton():Bounds
+            +handleClick(x : float, y : float):Optional<TitleChoice>
+            +render(canvas : Canvas):void
+        }
+        note bottom of TitleScene
+            The title screen, at launch only: the darkened farm (veil 0.6), the full title
+            on three lines, Mr Chmunks with the urn between Hugo and Alexis, "> Cliquer pour jouer <" (Click to play),
+            and at the top right the button of the other language ("English", or "Français" in English).
+            handleClick: on that button -> SWITCH_LANGUAGE, the screen stays; anywhere else -> PLAY, it closes and
+            draws nothing more; empty once closed.
+        end note
+        enum TitleChoice {
+            PLAY
+            SWITCH_LANGUAGE
+        }
+        class Cinematic {
+            +Cinematic(world : Bounds, scenes : List<Scene>, texts : Texts)
+            +{static} intro(world : Bounds, texts : Texts):Cinematic
+            +{static} victory(world : Bounds, texts : Texts):Cinematic
+            +isOver():boolean
+            +handleClick():boolean
+            +render(canvas : Canvas):void
+        }
+        note bottom of Cinematic
+            Still images, each with its line; a click moves to the next one, isOver -> true after the last one.
+            render: the image over the whole world (560 x 320), a 44 px dark band (veil 0.7), the centered line
+            and "Cliquer pour continuer" (Click to continue). intro: 5 scenes before day 1, at launch only;
+            victory: 3 scenes after a victory, before the end screen. Images: assets/cinematics/ (SpriteCatalog);
+            the line of each image comes from Texts, in the same order.
+        end note
+        class Scene <<record>> {
+            +imageKey : String
+            +line : String
+        }
+        note bottom of Scene
+            A scene: the key of its image in SpriteCatalog and the line shown below it.
+        end note
+        class Figure <<record>> {
+            ~key : String
+            ~size : float
+            ~feet : float
+            ~stand(canvas : Canvas, x : float, ground : float):void
+        }
+        note bottom of Figure
+            A character or an object standing on a line (GARRY, URN, CHMUNKS_FRONT...), shared by
+            EndScene and TitleScene. feet: the empty height under its feet, so that all of them stand on the same line.
+        end note
+        class SpriteCatalog {
+            +{static} FARM : String
+            +{static} FARMER : String
+            +{static} CAT : String
+            +{static} PICKUP : String
+            +{static} CYPRESS : String
+            +{static} CATAPATATE_TOP : String
+            +{static} CATAPATATE_BOTTOM : String
+            +{static} CATAPATATE_TOP_THROWING : String
+            +{static} CATAPATATE_BOTTOM_THROWING : String
+            +{static} FARM_HALF_DESTROYED : String
+            +{static} FARMER_STANDING : String
+            +{static} GHOST : String
+            +{static} URN : String
+            +{static} FARM_DESTROYED : String
+            +{static} CHMUNKS : String
+            +{static} HUGO : String
+            +{static} ALEXIS : String
+            +{static} CHMUNKS_FRONT : String
+            +{static} HUGO_FRONT : String
+            +{static} ALEXIS_FRONT : String
+            +{static} pathOf(spriteKey : String):String
+        }
+        note bottom of SpriteCatalog
+            Sprite key -> file (paths from assets/, see docs/sprites.md). Unknown key -> exception.
+            A new sprite = one line here, nothing in the renderers.
+            D14: Garry standing, farmer_north, farmer_east, farmer_south, farmer_west, each with its _attack version;
+            bat_back and witch_back, the enemies seen from behind.
+        end note
+        class FarmRenderer {
+            +FarmRenderer(layout : BoardLayout, fullHealth : int)
+            +render(canvas : Canvas, farmHealth : int, farmer : Farmer, night : boolean, cat : Cat, delta : float):void
+        }
+        note bottom of FarmRenderer
+            Draws the farm, old Garry, the cat and the pickup at the places given by the map. Fixed sizes,
+            computed once. The pickup has no point in the map: it is placed from the farm point,
+            parked on the dirt path, before the barrier, facing the exit (west); its image is cut
+            at both ends: a cypress on each end hides them.
+            The farm flashes red for a short moment when its HP go down (HitFlash).
+            Its image follows its HP (D14): intact above half of fullHealth (HP at the start of the game),
+            half destroyed from half down to 1 HP, destroyed at 0.
+            Garry (D14, Yohan): during the day, in his armchair; at night, standing, "farmer_" + farmer.getFacing() in lower case,
+            followed by "_attack" if isAttacking. Same farmerArea for all his images: he does not grow taller when he stands up.
+            The cat, read every frame: sitting, facing west when it flees (isFleeing), with the MEOW bubble during its meow (isMeowing).
+        end note
+        FarmRenderer *-- HitFlash
+        class OutlineRenderer {
+            +OutlineRenderer(layout : BoardLayout)
+            +render(canvas : Canvas):void
+            +renderFree(canvas : Canvas, zone : Zone, board : Board, slots : DefenseSlots):void
+            +renderRange(canvas : Canvas, defense : Defense):void
+        }
+        note bottom of OutlineRenderer
+            Debug view, F1 key: 15 cells in green, 10 slots in yellow.
+            renderFree: the empty cells (FIELD) or the empty slots (SLOTS) in white.
+            renderRange: a light white veil on each cell that the open defense reaches (defense.reaches),
+            by day and by night (D10, Axel's request, like the range of a spell in a tactics game).
+        end note
+        class BoardLayout {
+            +BoardLayout(cellAreas : Map<String,Bounds>, slotAreas : Map<String,Bounds>, spotPoints : Map<String,Point>)
+            +getCellBounds(row : int, column : int):Bounds
+            +getSlotBounds(side : SlotSide, column : int):Bounds
+            +getSpot(name : String):Point
+            +toScreen(row : int, cellsToFarm : float):Point
+            +findCell(x : float, y : float, board : Board):Optional<Cell>
+            +findSlot(x : float, y : float, slots : DefenseSlots):Optional<DefenseSlot>
+        }
+        note bottom of BoardLayout
+            Receives the places read by TiledLayoutReader: cells (r1c1 to r3c5), slots (top1 to top5, bottom1 to bottom5)
+            and spots (farm, farmer, cat), and checks the 28 names. The only place that converts pixels to model cells, and back.
+            toScreen: row (0 to 4, fleeing included) and cells left for an enemy (10 to 0) -> point on the screen.
+            findCell / findSlot: empty Optional if the click lands outside the field or the slots.
+            L5 (D10): no more ROWS / COLUMNS here; the view and the defenses read Board.ROWS and Board.COLUMNS.
+        end note
+        class Hud <<Observer>> {
+            +Hud(worldTop : float, money : int, farmHealth : int, lastNight : int, urnPrice : int, texts : Texts)
+            +onMoneyChanged(balance : int):void
+            +onFarmHealthChanged(health : int):void
+            +onDayStarted(day : int):void
+            +onNightStarted(night : int):void
+            +onTimerChanged(secondsLeft : int):void
+            +onGameOver(result : GameResult):void
+            +handleClick(x : float, y : float):boolean
+            +lockNight(locked : boolean):void
+            +getNightButton():Bounds
+            +render(canvas : Canvas):void
+        }
+        note bottom of Hud
+            Observer pattern: GameScreen subscribes it (session.addListener(hud)); it only shows what it is sent:
+            money, farm HP, day or night number, timer.
+            Second line: the "Lancer la nuit" button, during the day only; handleClick -> true if it is clicked,
+            and GameScreen calls session.getCycle().launchNight(session).
+            onGameOver: "Victoire !" (Victory!) or the defeat, in place of the button, which no longer responds.
+            Red alert (ALERT): "Dernière nuit !" (Last night!) on night lastNight (D10: no more alert on day 9, the game is settled
+            at its dawn); nothing more once the game is over. lastNight and urnPrice come from GameConfig.
+            Urn gauge (D10), second line at x 180 while the game lasts: "Urne : 3 450 / 10 000" (Urn: 3,450 / 10,000),
+            and below it a 136 px bar, green (drawDot, RIPE) in proportion to the money, full at the price.
+            The day before (day lastNight): red "Lancer la dernière nuit" (Start the last night) button, wider, and below it a block
+            of two small red lines (drawNote): "Vous ne pourrez plus rien vendre après." (You will not be able to sell anything after.),
+            "Seule la défense de votre ferme comptera." (Only the defense of your farm will count.).
+            Melda: her bubbles are drawn by MeldaRenderer, which reads session.getMelda() every frame;
+            the HUD greys out "Lancer la nuit" while she is there (lockNight).
+        end note
+        class ShopWindow {
+            +{static} REMOVE_BUTTON : Bounds
+            +{static} SELL_BUTTON : Bounds
+            +{static} URN_BUTTON : Bounds
+            +{static} plantLine(line : int):Bounds
+            +{static} defenseLine(line : int):Bounds
+            +ShopWindow(session : GameSession, urnPrice : int, crops : CropConfig, texts : Texts)
+            +plantButton():Bounds
+            +defenseButton():Bounds
+            +upgradeButton():Bounds
+            +openFor(defense : Defense):void
+            +openFor(cell : Cell):void
+            +close():void
+            +isOpen():boolean
+            +hasPendingChoice():boolean
+            +getPendingOffer():Optional<DefenseOffer>
+            +shownDefense():Optional<Defense>
+            +highlightedZone():Optional<Zone>
+            +handleClick(x : float, y : float):boolean
+            +handleSlotClick(slot : DefenseSlot):void
+            +handleCellClick(cell : Cell):void
+            +showPlantList():void
+            +showDefenseList():void
+            +render(canvas : Canvas):void
+        }
+        note bottom of ShopWindow
+            The shop on the screen, at the top right. Two fixed buttons: "Planter" and "Défenses".
+            Each one unfolds its list (the 4 seeds; catapatate, scarecrow, bramble). The chosen line stays white,
+            the others turn grey; a click on a cell (or a slot for the catapatate) buys and places, then the list
+            folds back. Placement refused: nothing is paid, the choice stays (getPendingOffer for a defense).
+            An empty cell also opens the "Planter" list: the clicked line is planted on that cell.
+            "Planter" list (D14): "Carotte 10 -> 40" (Carrot 10 -> 40), seed price then ripe value (last stage in CropConfig).
+            An empty slot opens the "Défenses" list (D14): the clicked catapatate is bought on that slot;
+            scarecrow and bramble, placed on the field, are grey there.
+            A crop: its panel, "Carotte, graine / en pousse / mûre" (Carrot, seed / growing / ripe) in the Growth color, and "Vendre" (Sell)
+            (shop.sell, second click). A defense: "Améliorer" (Upgrade) (shop.upgrade), and during the day "Retirer", for 0 coins:
+            on the field if onHarvested answers (bramble, scarecrow: shop.sell), and the catapatate opened from
+            its slot (D14: DefenseSlot.remove). At the bottom right, during the day: the urn (session.buyUrn), always with its outline.
+            highlightedZone: the zone whose free places are in white. Can be viewed at night: all grey, no purchase (canAct).
+            shownDefense: the defense of the open panel, by day and by night (GameScreen veils its range).
+            Too expensive (wallet.canAfford): line or "Améliorer" in grey, with no outline, and cannot be chosen;
+            the urn keeps its outline, grey text, and the click buys nothing.
+            showPlantList, showDefenseList (D14, Antonin): unfold a list without choosing anything, and leave it open
+            if called again; the tutorial calls them, and so do the "Planter" and "Défenses" buttons.
+            The words come from Texts; the outlines of "Planter", "Défenses" and "Améliorer" are sized from the words
+            of the language (TextWidth): plantButton, defenseButton, upgradeButton.
+        end note
+        class DefenseRenderer {
+            +DefenseRenderer(layout : BoardLayout, texts : Texts)
+            +render(canvas : Canvas, slots : DefenseSlots, delta : float):void
+            ~{static} slotSpriteArea(slotArea : Bounds):Bounds
+        }
+        note bottom of DefenseRenderer
+            Draws the catapatates on their slot (throwing if isAttacking, D14), and the level and the
+            durability of each defense (D14): on a slot, two stacked labels "N1" ("L1" in English) above "92%",
+            on the side away from the field. Scarecrow and bramble: WorldRenderer already draws their sprite (spriteAt); here,
+            only the "N1 92%" label above the cell, and the sprite drawn again with a tint for 0.2 s: red after a hit, blue after "Améliorer".
+            The catapatate does not flash red (it wears with each shot); it flashes blue after "Améliorer".
+            slotSpriteArea (D14): the place of a catapatate on its slot, centered; static and package-private,
+            the tutorial puts its ghost catapatate there, at the exact place of a real one.
+        end note
+        class Tutorial {
+            ~{static} AREA : Bounds
+            +Tutorial(world : Bounds, layout : BoardLayout, shop : ShopWindow, shown : boolean, texts : Texts)
+            +nextButton():Bounds
+            +startButton():Bounds
+            +isOver():boolean
+            +render(canvas : Canvas):void
+            +handleClick(x : float, y : float):boolean
+        }
+        note bottom of Tutorial
+            The first-day tutorial (D14, Antonin; jury feedback: the player did not know what to do).
+            Five bubbles: plant, defend (the catapatate), garlic, turnip, "Améliorer"; shown = withTitle,
+            never after "Rejouer". Modal: handleClick takes all clicks while a bubble is shown,
+            only its button moves on ("Suivant" (Next), then "Commencer à jouer" on the last one).
+            render: the world darkened except the bubble's target (4 drawShade), the bubble in Melda's frame (drawDialog),
+            an arrow on the target (drawArrow); bubble 5 places a ghost catapatate (Tint.GHOST), only drawn.
+            Each bubble opens the shop list it talks about (showPlantList, showDefenseList) or closes it.
+            The bubbles and the buttons come from Texts; each button ends at x 347, its outline sized from its words.
+        end note
+        Tutorial --> ShopWindow : opens its lists
+        Tutorial ..> BoardLayout : reads at creation
+        Tutorial ..> DefenseRenderer : slotSpriteArea
+        class MeldaRenderer {
+            +MeldaRenderer(layout : BoardLayout, texts : Texts)
+            +nextButton():Bounds
+            +renderMelda(canvas : Canvas, melda : Melda):void
+            +renderDialog(canvas : Canvas, melda : Melda):void
+            +handleClick(melda : Melda, x : float, y : float):boolean
+            ~{static} directionOf(start : Point, end : Point):String
+            ~{static} linesOf(text : String):List<String>
+        }
+        note bottom of MeldaRenderer
+            Melda's visit (D12), with no event: reads session.getMelda() every frame, like the enemies.
+            Her paths are computed once from the farm point of the map: forest, gate, under Garry (seen from behind), dirt path.
+            renderMelda: her place = path x getWalkProgress (0 to 1), her sprite facing the direction of the walk (8 directions),
+            a small bubble on her left while she talks. renderDialog: the dark frame under the bottom fence (drawDialog,
+            34 letters per line, 3 lines at most) and the "Passer à la suite" (Continue) button, grey while the bubble
+            is being written, ending at x 343, its outline sized from its words.
+            handleClick: true while she talks (the click is hers, wherever it lands); on the button, nextBubble.
+            directionOf and linesOf: static and package-private so that MeldaRendererTest checks the 8 directions and the line breaks of her real texts.
+        end note
+        class TextWidth {
+            +{static} of(text : String):int
+        }
+        note bottom of TextWidth
+            The width of a text in the game font (lsans-15, the default font of libGDX), from the advance of each
+            letter and the kerning of each pair, copied from the font: the buttons are sized from their words without
+            libGDX, and TextsLayoutTest checks that the words of both languages fit their place.
+            A character the font does not have -> IllegalArgumentException.
+        end note
+        FarmRenderer --> BoardLayout
+        OutlineRenderer --> BoardLayout
+        GrowthRenderer --> BoardLayout
+        GrowthRenderer ..> Growth
+        ShopWindow ..> Growth
+        BoardLayout *-- Bounds
+        BoardLayout *-- Point
+        DefenseRenderer --> BoardLayout
+        DefenseRenderer *-- "2" HitFlash
+        MeldaRenderer ..> BoardLayout : reads at creation
+    }
+    !endsub
+    !startsub VIEW_WORLD
+    package com.cropa.view.world {
+        class WorldRenderer {
+            +WorldRenderer(layout : BoardLayout)
+            +render(canvas : Canvas, field : FieldView):void
+        }
+        note bottom of WorldRenderer
+            Track A. Draws the map (canvas.drawMap), then the sprite of each occupied cell,
+            at its place (getCellBounds), with the key given by field.spriteAt. Knows neither libGDX nor Crop.
+            The bramble and the scarecrow too, like a crop; DefenseRenderer only adds their durability and their tints.
+        end note
+    }
+    !endsub
+    !startsub VIEW_ENEMY
+    package com.cropa.view.enemy {
+        class EnemyRenderer {
+            +EnemyRenderer(layout : BoardLayout)
+            +render(canvas : Canvas, enemies : List<? extends EnemyView>, delta : float):void
+        }
+        note bottom of EnemyRenderer
+            Track B. Draws each enemy still in play (isOnBoard) with its key (spriteKey), at toScreen(row, cellsToFarm).
+            A hit enemy flashes red for a short moment (HitFlash on getHealth). One cell (16 px) per enemy,
+            28 px for the witch (witch, witch_attack, witch_back), the size of old Garry.
+            Knows neither libGDX nor the type of the enemy. Old Garry and the cat are not enemies: FarmRenderer
+            draws them, with the farm.
+        end note
+    }
+    !endsub
+    ' Relations between packages: kept out of the package blocks,
+    ' so that a package diagram only draws the classes of its package.
+    GameConfig *-- CropConfig
+    GameConfig *-- EnemyConfig
+    GameConfig *-- DefenseConfig
+    GameSession ..> GameConfig : reads
+    GameSession *-- Board
+    GameSession *-- Wallet
+    GameSession *-- Shop
+    Damageable <|.. Enemy
+    Updatable <|.. Enemy
+    Damageable <|-- Walker
+    LaneEnemy --> Farm : deals its damage
+    DeviateStrategy --> CropType
+    GameSession *-- WaveSpawner
+    GameSession *-- Farm
+    GameSession *-- Farmer
+    GameSession *-- Cat
+    GameSession --> "*" Enemy
+    Updatable <|.. Defense
+    Occupant <|.. Scarecrow
+    Occupant <|.. Bramble
+    DefenseLine <|.. DefenseSlots
+    EnemyFactory --> DefenseLine
+    LaneEnemy --> DefenseLine : wears while fleeing
+    Shop o-- "3" DefenseOffer
+    GameSession *-- DefenseSlots
+    GdxGame <|-- CropaGame
+    Canvas <|.. GdxCanvas
+    TiledLayoutReader ..> BoardLayout : creates
+    Screen <|.. GameScreen
+    GameListener <|.. Hud
+    GameListener <|.. EndScene
+    CropaGame ..> GameSession : creates
+    GameScreen --> GameSession
+    GameScreen *-- BoardLayout
+    GameScreen *-- Hud
+    GameScreen *-- ShopWindow
+    GameScreen *-- DefenseRenderer
+    GameScreen *-- FarmRenderer
+    GameScreen *-- OutlineRenderer
+    GameScreen *-- GrowthRenderer
+    ShopWindow --> GameSession
+    ShopWindow ..> CropConfig : reads
+    GameScreen *-- WorldRenderer
+    WorldRenderer --> BoardLayout
+    GameScreen *-- EnemyRenderer
+    EnemyRenderer --> BoardLayout
+    GameScreen *-- NightRenderer
+    GameScreen *-- EndScene
+    GameScreen *-- TitleScene
+    GameScreen *-- "2" Cinematic
+    Cinematic *-- "*" Scene
+    Cat ..> EnemyView : reads
+    EndScene ..> Figure
+    TitleScene ..> Figure
+    GameConfig --> Language
+    CropaGame --> Language
+    Texts ..> GameResult
+    Texts ..> DefenseType
+    Texts ..> CropType
+    GameScreen ..> Texts : creates
+    Hud --> Texts
+    ShopWindow --> Texts
+    Tutorial --> Texts
+    MeldaRenderer --> Texts
+    EndScene --> Texts
+    TitleScene --> Texts
+    Cinematic ..> Texts
+    DefenseRenderer --> Texts
+    Growth ..> Texts
+    ShopWindow ..> TextWidth
+    TitleScene ..> TextWidth
+    EnemyRenderer *-- HitFlash
+    NightState ..> WaveSpawner : starts the wave
+    FarmRenderer ..> Cat : reads
+    FarmRenderer ..> Farmer : reads
+    GameScreen *-- MeldaRenderer
+    GameScreen *-- Tutorial
+    MeldaRenderer ..> Melda : reads
+@enduml

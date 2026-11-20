@@ -15,12 +15,13 @@ The site is in French (default) and in English.
 | My portfolio (projects) | `pages/fr/portfolio.html` | `pages/en/portfolio.html` |
 | Contact me | `pages/fr/contact.html` | `pages/en/contact.html` |
 
-`404.html` is the page GitHub Pages shows for any missing address. `pages/games/snake.html` and `pages/games/pendu.html` are the two games on their own, the pages loaded by the portfolio cards.
+`404.html` is the page GitHub Pages shows for any missing address. `pages/games/snake.html` and `pages/games/pendu.html` are the two games on their own, the pages loaded by the portfolio cards. `pages/games/2d-game/` is the 2D game in Java, built for the web from `02_games/2D_game` of the Axou repository (`sh gradlew teavm:gdx_teavm_web_js_build`, then `app.js`, `assets/` and `scripts/` of `teavm/build/dist/js/webapp/` copied here; `index.html` belongs to the site). Its card adds a full screen button, and "Quitter" (Quit) in the game closes the card.
 
 ## What is in the portfolio
 
-Eight project cards on a wheel, each with a small animated scene. Some can be tried without leaving the page:
+Nine project cards on a wheel, each with a small animated scene. Some can be tried without leaving the page:
 
+- **2D game in Java**: a pixel-art farm and defence game made with Java and libGDX, playable in the card or in full screen (`pages/games/2d-game/`, the Java turned into JavaScript by TeaVM).
 - **Snake** and **Hangman**: both games, playable in the browser (`js/games/`); the original projects are in Python, with Pygame.
 - **Caesar and Vigenère ciphers** and **Language detector**: live demos of the algorithms (`js/tools/`).
 - **Lost**: the cat of the game, in 3D, which can be turned with the mouse or a finger.
@@ -31,8 +32,9 @@ Eight project cards on a wheel, each with a small animated scene. Some can be tr
 
 - HTML, CSS and JavaScript (ES modules). No framework, no build step, no package to install.
 - [three.js](https://threejs.org/) r186, as a reduced bundle in `js/vendor/`, only for the 3D cat of the Lost card.
+- [gdx-teavm](https://github.com/xpenatan/gdx-teavm) 1.6.1, only for the 2D game: its `app.js` is built in the game's repository, the site only hosts it.
 - Manrope and Instrument Serif typefaces, hosted with the site.
-- The contact form is sent through Formspree, after an "Are you human?" check.
+- The contact form (Formspree) and the CV download buttons share the same "Are you human?" check.
 - Animations stop or simplify when the visitor's system asks for reduced motion.
 
 ## Structure
@@ -43,7 +45,7 @@ index.html              French home page
 pages/
 ├── fr/                 My background, My portfolio, Contact me (French)
 ├── en/                 home page and the same three pages (English)
-└── games/              Snake and Hangman on their own
+└── games/              Snake and Hangman on their own, and the 2D game (2d-game/)
 css/
 ├── base/               colours, sizes and other shared values (tokens.css), base rules
 ├── layout/             header and menu, sections, footer, responsive rules
@@ -84,6 +86,7 @@ Missions given to my team of AI agents: for each one, an approved mission brief,
 ## Credits
 
 - Photo, drawings and texts: original work by Axel FOLLET.
+- Sprites of the 2D game in Java: made by the game team with Pixel Lab.
 - 3D cubes, faceted cat, symbols and animated project scenes: built with HTML, CSS, SVG and JavaScript, except the LinkedIn logo.
 - Lost's 3D cat: "Rigged and animated Cat" model by JonasDichelle (BlendSwap), under the [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/) licence, reshaped and posed sitting; displayed with three.js, under the MIT licence.
 - Manrope (The Manrope Project Authors) and Instrument Serif (The Instrument Serif Project Authors) typefaces, under the SIL Open Font License 1.1 (`assets/fonts/OFL-Manrope.txt`, `assets/fonts/OFL-InstrumentSerif.txt`).

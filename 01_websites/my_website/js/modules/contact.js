@@ -218,6 +218,29 @@ function watchNotice(form) {
  * Form missing from the page: the function stops.
  */
 export function initContact() {
+    /*
+     * Resume button: the page holds no address of the PDF, only its language (data-cv-download="FR" or "EN").
+     * The address is built once "Are you human?" is passed, then a temporary link starts the download.
+     */
+    const cv = document.querySelector("[data-cv-download]");
+    let checking = false;
+    cv?.addEventListener("click", async () => {
+        if (checking) return;
+        checking = true;
+        try {
+            if (await requireHuman()) {
+                const name = "CV_Axel_FOLLET_" + cv.dataset.cvDownload + ".pdf";
+                const download = document.createElement("a");
+                download.href = new URL("../../assets/documents/" + name, location.href).href;
+                download.download = name;
+                download.click();
+            }
+        } finally {
+            checking = false;
+            cv.focus();
+        }
+    });
+
     const form = document.getElementById("contact-form");
     const status = document.getElementById("form-status");
     const submitButton = form?.querySelector("[type='submit']");

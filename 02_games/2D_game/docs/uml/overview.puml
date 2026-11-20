@@ -1,0 +1,65 @@
+@startuml
+' Overview: one box per package, one arrow per real dependency.
+' The arrows come from the imports of core/src/main/java: A ..> B means a class of A imports a class of B.
+set separator none
+
+package com.cropa {
+}
+package com.badlogic.gdx {
+}
+package com.cropa.model.world {
+}
+package com.cropa.model.economy {
+}
+package com.cropa.model.game {
+}
+package com.cropa.model.enemy {
+}
+package com.cropa.model.defense {
+}
+package com.cropa.text {
+}
+package com.cropa.view {
+}
+package com.cropa.view.gdx {
+}
+package com.cropa.view.world {
+}
+package com.cropa.view.enemy {
+}
+
+com.cropa ..> com.badlogic.gdx
+com.cropa ..> com.cropa.model.game
+com.cropa ..> com.cropa.view.gdx
+com.cropa ..> com.cropa.text
+
+com.cropa.model.game ..> com.cropa.model.world
+com.cropa.model.game ..> com.cropa.model.enemy
+com.cropa.model.game ..> com.cropa.model.defense
+com.cropa.model.game ..> com.cropa.model.economy
+com.cropa.model.game ..> com.cropa.text
+com.cropa.text ..> com.cropa.model.game
+com.cropa.text ..> com.cropa.model.defense
+com.cropa.text ..> com.cropa.model.world
+com.cropa.model.economy ..> com.cropa.model.world
+com.cropa.model.economy ..> com.cropa.model.game
+com.cropa.model.enemy ..> com.cropa.model.world
+com.cropa.model.defense ..> com.cropa.model.world
+com.cropa.model.defense ..> com.cropa.model.enemy
+
+com.cropa.view ..> com.cropa.model.defense
+com.cropa.view ..> com.cropa.model.game
+com.cropa.view ..> com.cropa.model.world
+com.cropa.view ..> com.cropa.text
+com.cropa.view.world ..> com.cropa.view
+com.cropa.view.world ..> com.cropa.model.world
+com.cropa.view.enemy ..> com.cropa.view
+com.cropa.view.enemy ..> com.cropa.model.enemy
+com.cropa.view.gdx ..> com.cropa.view
+com.cropa.view.gdx ..> com.cropa.view.world
+com.cropa.view.gdx ..> com.cropa.view.enemy
+com.cropa.view.gdx ..> com.cropa.model.game
+com.cropa.view.gdx ..> com.cropa.model.defense
+com.cropa.view.gdx ..> com.cropa.text
+com.cropa.view.gdx ..> com.badlogic.gdx
+@enduml

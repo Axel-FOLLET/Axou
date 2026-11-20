@@ -928,6 +928,15 @@
 }
 
 
+/* "Full screen" above the 2D game, on the right (project-showcase.js creates it with the iframe) */
+.project-card__fullscreen {
+    align-self: flex-end;
+    flex: none;
+
+    margin: 12px 16px;
+}
+
+
 /* Reduced motion: the cards take their place without sliding, the widened area appears without fading */
 @media (prefers-reduced-motion: reduce) {
 
@@ -1186,4 +1195,32 @@
         padding: 20px 18px;
     }
 
+}
+
+.farm-preview, .farm-scene {
+    image-rendering: pixelated;
+}
+
+/* Snake draws a 256 by 160 board in a 290-unit-wide view. */
+.farm-scene {
+    width: min(88.27586%, 256px);
+    height: auto;
+    aspect-ratio: 8 / 5;
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    [data-hover="ghost"]:hover .project-card__media::before {
+        content: "";
+        position: absolute;
+        top: 4px;
+        left: 0;
+        z-index: 2;
+        --sprite-width: 32px;
+        width: var(--sprite-width);
+        height: 32px;
+        pointer-events: none;
+        image-rendering: pixelated;
+        background: url("../../assets/images/2dgame-java/ghost-east.png") center / contain no-repeat;
+        animation: motion-sprite-cross 1.8s steps(32) forwards;
+    }
 }

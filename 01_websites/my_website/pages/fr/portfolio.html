@@ -273,6 +273,35 @@
                 -->
                 <div class="showcase__track" role="region" aria-label="Projets">
 
+                    <article class="project-card" data-hover="ghost" data-slug="2dgame-java" aria-labelledby="project-title-2dgame" data-domain="games">
+                        <div class="project-card__main">
+                            <div class="project-card__media">
+                                <img class="farm-preview" src="../../assets/images/2dgame-java/garry-0.png" alt="" width="96" height="96">
+                            </div>
+                            <div class="project-card__body">
+                                <h3 class="project-card__title" id="project-title-2dgame" tabindex="0">Jeu 2D en Java</h3>
+                                <ul class="project-card__tags" aria-label="Compétences et technologies">
+                                    <li class="tag">Java</li>
+                                    <li class="tag">libGDX</li>
+                                    <li class="tag">Epitech</li>
+                                </ul>
+                                <div class="project-card__story">
+                                    <p class="project-card__text">Un jeu de ferme à trois&nbsp;: le jour, Garry cultive&nbsp;; la nuit, il défend sa ferme.</p>
+                                    <p class="project-card__label">Ce que j'en retiens</p>
+                                    <p class="project-card__text">Le polymorphisme&nbsp;: chaque défense réagit à sa façon. Et le pattern Factory, découvert et appliqué.</p>
+                                </div>
+                                <div class="project-card__actions">
+                                    <a class="button" href="https://github.com/Axel-FOLLET/Axou/tree/main/02_games/2D_game" target="_blank" rel="noopener noreferrer">Code source<span class="visually-hidden"> – Jeu 2D en Java (nouvel onglet)</span></a>
+                                    <button class="button project-card__toggle project-card__toggle--game" type="button" aria-expanded="false" aria-controls="stage-2dgame" data-label-open="Jouer" data-label-close="Fermer le jeu"><span class="project-card__toggle-label">Jouer</span><span class="visually-hidden"> – Jeu 2D en Java</span></button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Game: project-showcase.js loads pages/games/2d-game/ into this area when opened, with a full screen button, and unloads it when closed or when "Quitter" (Quit) is clicked in the game. -->
+                        <div class="project-card__stage project-card__stage--game" id="stage-2dgame" data-game="2d-game" data-game-title="Jeu 2D en Java jouable" data-fullscreen-label="Plein écran" hidden></div>
+
+                    </article>
+
                     <article class="project-card" data-slug="yia-jobs" aria-labelledby="project-title-yia-jobs" data-domain="web" data-hover="cursor">
 
                         <div class="project-card__main">
@@ -314,6 +343,273 @@
 
                     </article>
 
+                    <!-- Lost: in development, source code published, no playable version yet. -->
+                    <article class="project-card" data-slug="cat-game" aria-labelledby="project-title-cat-game" data-domain="games" data-hover="cat">
+
+                        <div class="project-card__main">
+
+                            <div class="project-card__media">
+                                <span class="cat-figure" role="img" aria-label="Chat assis, dessiné en facettes"></span>
+                            </div>
+
+                            <div class="project-card__body">
+
+                                <h3 class="project-card__title" id="project-title-cat-game">Lost</h3>
+
+                                <p class="project-card__badge">En développement</p>
+
+                                <ul class="project-card__tags" aria-label="Compétences et technologies">
+                                    <li class="tag">Three.js</li>
+                                    <li class="tag">Blender</li>
+                                    <li class="tag">Agent IA</li>
+                                </ul>
+
+                                <div class="project-card__story">
+                                    <p class="project-card__text"><strong>Un jeu vidéo 3D dans le navigateur</strong>&nbsp;: un chaton cherche sa mère.</p>
+                                    <p class="project-card__text">Avec un agent IA (Claude), que je dirige&nbsp;: <strong>je décide de ce qu'est le jeu et je valide le résultat en y jouant</strong>.</p>
+                                </div>
+
+                                <div class="project-card__actions">
+                                    <a class="button" href="https://github.com/Axel-FOLLET/Axou/tree/main/02_games/Lost" target="_blank" rel="noopener noreferrer">Code source<span class="visually-hidden"> – Lost (nouvel onglet)</span></a>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </article>
+
+                    <!-- Context engineering guide: guide.md is given to an AI, the PDF is the edition for readers.
+                         The .md is stored as .md.txt: GitHub Pages (Jekyll) would turn a .md file into an HTML page;
+                         the download attribute gives it back its .md name. -->
+                    <article class="project-card" data-slug="guide-contexte" aria-labelledby="project-title-guide-contexte" data-domain="ai" data-hover="type">
+
+                        <div class="project-card__main">
+
+                            <div class="project-card__media">
+                                <!-- Symbol: open book -->
+                                <svg class="project-card__icon" viewBox="0 0 48 48" aria-hidden="true">
+                                    <path d="M24 12c-4-3-10-4-17-3v26c7-1 13 0 17 3 4-3 10-4 17-3V9c-7-1-13 0-17 3z"/>
+                                    <path d="M24 12v26M11 16h8M11 21h8M29 16h8M29 21h8"/>
+                                </svg>
+                            </div>
+
+                            <div class="project-card__body">
+
+                                <h3 class="project-card__title" id="project-title-guide-contexte">Guide d'ingénierie de contexte</h3>
+
+                                <ul class="project-card__tags" aria-label="Compétences et technologies">
+                                    <li class="tag">Gestion de projet IA</li>
+                                    <li class="tag">Claude</li>
+                                    <li class="tag">Codex</li>
+                                </ul>
+
+                                <div class="project-card__story">
+                                    <p class="project-card__text"><strong>Un guide à donner à son IA</strong> pour cadrer son usage et bâtir son propre système.</p>
+                                    <p class="project-card__label">Comment il a été construit</p>
+                                    <p class="project-card__text"><strong>Conçu et dirigé par moi</strong>, rédigé par des agents IA que j'ai pilotés.</p>
+                                    <p class="project-card__text">Le .md est à donner à son agent IA.</p>
+                                </div>
+
+                                <div class="project-card__actions">
+                                    <a class="button" href="../../assets/documents/guide_ingenierie_contexte.pdf" target="_blank" rel="noopener noreferrer">Lire le PDF<span class="visually-hidden"> – Guide d'ingénierie de contexte (nouvel onglet)</span></a>
+                                    <a class="button" href="../../assets/documents/guide_ingenierie_contexte.md.txt" download="guide_ingenierie_contexte.md">Télécharger .md<span class="visually-hidden"> – Guide d'ingénierie de contexte, version à donner à son IA</span></a>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </article>
+
+                    <article class="project-card" data-slug="snake" aria-labelledby="project-title-snake" data-domain="games" data-hover="snake">
+
+                        <div class="project-card__main">
+
+                            <div class="project-card__media">
+                                <!-- Symbol: snake made of squares and its apple -->
+                                <svg class="project-card__icon" viewBox="0 0 48 48" aria-hidden="true">
+                                    <path d="M5 29h24v-16h8v8"/>
+                                    <path d="M5 37h32v-8"/>
+                                    <path d="M5 29v8M13 29v8M21 29v8M29 21h8M29 13v16"/>
+                                    <path d="M33 16.5h.01"/>
+                                    <circle cx="14" cy="15" r="4"/>
+                                    <path d="M14 11c0-2 1-3 3-3.5"/>
+                                </svg>
+                            </div>
+
+                            <div class="project-card__body">
+
+                                <h3 class="project-card__title" id="project-title-snake">Jeu du Snake</h3>
+
+                                <ul class="project-card__tags" aria-label="Compétences et technologies">
+                                    <li class="tag">Python</li>
+                                    <li class="tag">Pygame</li>
+                                    <li class="tag">Événements clavier</li>
+                                    <li class="tag">Collisions</li>
+                                </ul>
+
+                                <div class="project-card__story">
+                                    <p class="project-card__text">Un Snake complet, en projet personnel après le Pendu.</p>
+                                    <p class="project-card__label">Ce que j'en retiens</p>
+                                    <p class="project-card__text">Le temps réel impose de séparer la boucle de jeu, l'affichage et les règles.</p>
+                                </div>
+
+                                <div class="project-card__actions">
+                                    <a class="button" href="https://github.com/Axel-FOLLET/Axou/tree/main/02_games/snake" target="_blank" rel="noopener noreferrer">Code source<span class="visually-hidden"> – Jeu du Snake (nouvel onglet)</span></a>
+                                    <button class="button project-card__toggle project-card__toggle--game" type="button" aria-expanded="false" aria-controls="stage-snake" data-label-open="Jouer" data-label-close="Fermer le jeu"><span class="project-card__toggle-label">Jouer</span><span class="visually-hidden"> – Jeu du Snake</span></button>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Game: project-showcase.js loads pages/games/snake.html into this area when opened and unloads it when closed. -->
+                        <div class="project-card__stage project-card__stage--game" id="stage-snake" data-game="snake" data-game-title="Jeu du Snake jouable" hidden></div>
+
+                    </article>
+
+                    <article class="project-card" data-slug="pendu" aria-labelledby="project-title-pendu" data-domain="games" data-hover="hangman">
+
+                        <div class="project-card__main">
+
+                            <div class="project-card__media">
+                                <!-- Symbol: gallows and hanged man -->
+                                <svg class="project-card__icon" viewBox="0 0 48 48" aria-hidden="true">
+                                    <path d="M6 43h22M13 43V5h20v6"/>
+                                    <circle cx="33" cy="15" r="4"/>
+                                    <path d="M33 19v11M33 22l-5 5M33 22l5 5M33 30l-4 8M33 30l4 8"/>
+                                </svg>
+                            </div>
+
+                            <div class="project-card__body">
+
+                                <h3 class="project-card__title" id="project-title-pendu">Jeu du Pendu</h3>
+
+                                <ul class="project-card__tags" aria-label="Compétences et technologies">
+                                    <li class="tag">Python</li>
+                                    <li class="tag">Pygame</li>
+                                    <li class="tag">Fonctions</li>
+                                    <li class="tag">Lecture de fichiers</li>
+                                </ul>
+
+                                <div class="project-card__story">
+                                    <p class="project-card__text">Mon premier projet personnel et mon premier programme complet.</p>
+                                    <p class="project-card__label">Ce que j'en retiens</p>
+                                    <p class="project-card__text">Lire des mots dans un fichier et anticiper les saisies invalides.</p>
+                                </div>
+
+                                <div class="project-card__actions">
+                                    <a class="button" href="https://github.com/Axel-FOLLET/Axou/tree/main/02_games/hangman" target="_blank" rel="noopener noreferrer">Code source<span class="visually-hidden"> – Jeu du Pendu (nouvel onglet)</span></a>
+                                    <button class="button project-card__toggle project-card__toggle--game" type="button" aria-expanded="false" aria-controls="stage-pendu" data-label-open="Jouer" data-label-close="Fermer le jeu"><span class="project-card__toggle-label">Jouer</span><span class="visually-hidden"> – Jeu du Pendu</span></button>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="project-card__stage project-card__stage--game" id="stage-pendu" data-game="pendu" data-game-title="Jeu du Pendu jouable" hidden></div>
+
+                    </article>
+
+                    <!-- This site: it brings my resume and my portfolio together -->
+                    <article class="project-card" data-slug="parcours-portfolio" aria-labelledby="project-title-parcours-portfolio" data-domain="web" data-hover="cursor">
+
+                        <div class="project-card__main">
+
+                            <div class="project-card__media">
+                                <!-- Symbol: the two door cubes of the home page (fallback without JavaScript) -->
+                                <svg class="project-card__icon" viewBox="0 0 48 48" aria-hidden="true">
+                                    <path d="M6 19l8-5 8 5v10l-8 5-8-5zM6 19l8 5 8-5M14 24v10"/>
+                                    <path d="M26 19l8-5 8 5v10l-8 5-8-5zM26 19l8 5 8-5M34 24v10"/>
+                                </svg>
+                            </div>
+
+                            <div class="project-card__body">
+
+                                <h3 class="project-card__title" id="project-title-parcours-portfolio">Parcours &amp; Portfolio</h3>
+
+                                <ul class="project-card__tags" aria-label="Compétences et technologies">
+                                    <li class="tag">HTML</li>
+                                    <li class="tag">CSS</li>
+                                    <li class="tag">JavaScript</li>
+                                    <li class="tag">Agents IA</li>
+                                </ul>
+
+                                <div class="project-card__story">
+                                    <p class="project-card__text">Mon site de CV et mon portfolio réunis en un seul site, sans framework.</p>
+                                    <p class="project-card__label">Comment il a été construit</p>
+                                    <p class="project-card__text">Des missions confiées à mon équipe d'agents IA&nbsp;: pour chacune, un ordre de mission validé, puis le contrôle de l'agent expert.</p>
+                                </div>
+
+                                <div class="project-card__actions">
+                                    <a class="button" href="https://github.com/Axel-FOLLET/my_website" target="_blank" rel="noopener noreferrer">Code source<span class="visually-hidden"> – Parcours &amp; Portfolio (nouvel onglet)</span></a>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </article>
+
+                    <article class="project-card" data-slug="detecteur-langue" aria-labelledby="project-title-detecteur-langue" data-domain="algorithms" data-hover="language">
+
+                        <div class="project-card__main">
+
+                            <div class="project-card__media">
+                                <!-- Symbol: speech bubble -->
+                                <svg class="project-card__icon" viewBox="0 0 48 48" aria-hidden="true">
+                                    <path d="M9 9h30a4 4 0 0 1 4 4v16a4 4 0 0 1-4 4H22l-8 7v-7H9a4 4 0 0 1-4-4V13a4 4 0 0 1 4-4z"/>
+                                    <path d="M13 19h22M13 25h14"/>
+                                </svg>
+                            </div>
+
+                            <div class="project-card__body">
+
+                                <h3 class="project-card__title" id="project-title-detecteur-langue">Détecteur de <span data-language="language idioma língua lingua Sprache taal språk język dil">langue</span></h3>
+
+                                <ul class="project-card__tags" aria-label="Compétences et technologies">
+                                    <li class="tag">Python</li>
+                                    <li class="tag">Statistiques</li>
+                                    <li class="tag">Unicode</li>
+                                </ul>
+
+                                <div class="project-card__story">
+                                    <p class="project-card__text">Reconnaître la langue d'un texte parmi dix en comparant la fréquence de ses lettres à celle de chaque langue.</p>
+                                    <p class="project-card__label">Ce que j'en retiens</p>
+                                    <p class="project-card__text">Une méthode statistique a besoin de volume&nbsp;: fiable dès deux phrases, elle hésite sur quelques mots.</p>
+                                </div>
+
+                                <div class="project-card__actions">
+                                    <a class="button" href="https://github.com/Axel-FOLLET/Axou/tree/main/03_algorithms/language_detector" target="_blank" rel="noopener noreferrer">Code source<span class="visually-hidden"> – Détecteur de langue (nouvel onglet)</span></a>
+                                    <button class="button project-card__toggle" type="button" aria-expanded="false" aria-controls="demo-language" data-label-open="Tester" data-label-close="Masquer la démo"><span class="project-card__toggle-label">Tester</span><span class="visually-hidden"> – Détecteur de langue</span></button>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Demo: project-demos.js recomputes the ranking on every input -->
+                        <div class="project-card__stage demo demo--language" id="demo-language" hidden>
+
+                            <div class="form__field">
+                                <label class="form__label" for="language-text">Texte à analyser</label>
+                                <textarea class="form__input form__input--area demo__input" id="language-text" rows="4" placeholder="Quelques phrases en français, anglais, espagnol, portugais, italien, allemand, néerlandais, suédois, polonais ou turc."></textarea>
+                                <p class="demo__hint">Au moins 80 lettres pour un résultat fiable&nbsp;: la méthode repose sur des statistiques.</p>
+                            </div>
+
+                            <p class="demo__verdict" aria-live="polite"></p>
+                            <ol class="demo__ranking"></ol>
+                            <p class="demo__note"></p>
+
+                            <div class="demo__actions">
+                                <button class="button demo__example" type="button">Charger un exemple</button>
+                            </div>
+
+                        </div>
+
+                    </article>
+
                     <article class="project-card" data-slug="cesar-vigenere" aria-labelledby="project-title-cesar-vigenere" data-domain="algorithms" data-hover="cipher">
 
                         <div class="project-card__main">
@@ -342,7 +638,7 @@
                                 </div>
 
                                 <div class="project-card__actions">
-                                    <a class="button" href="https://github.com/Axel-FOLLET/Axou/tree/main/03_algorithms/chiffrement" target="_blank" rel="noopener noreferrer">Code source<span class="visually-hidden"> – Chiffrements de César et de Vigenère (nouvel onglet)</span></a>
+                                    <a class="button" href="https://github.com/Axel-FOLLET/Axou/tree/main/03_algorithms/ciphers" target="_blank" rel="noopener noreferrer">Code source<span class="visually-hidden"> – Chiffrements de César et de Vigenère (nouvel onglet)</span></a>
                                     <button class="button project-card__toggle" type="button" aria-expanded="false" aria-controls="demo-cipher" data-label-open="Tester" data-label-close="Masquer la démo"><span class="project-card__toggle-label">Tester</span><span class="visually-hidden"> – Chiffrements de César et de Vigenère</span></button>
                                 </div>
 
@@ -397,273 +693,6 @@
 
                     </article>
 
-                    <article class="project-card" data-slug="snake" aria-labelledby="project-title-snake" data-domain="games" data-hover="snake">
-
-                        <div class="project-card__main">
-
-                            <div class="project-card__media">
-                                <!-- Symbol: snake made of squares and its apple -->
-                                <svg class="project-card__icon" viewBox="0 0 48 48" aria-hidden="true">
-                                    <path d="M5 29h24v-16h8v8"/>
-                                    <path d="M5 37h32v-8"/>
-                                    <path d="M5 29v8M13 29v8M21 29v8M29 21h8M29 13v16"/>
-                                    <path d="M33 16.5h.01"/>
-                                    <circle cx="14" cy="15" r="4"/>
-                                    <path d="M14 11c0-2 1-3 3-3.5"/>
-                                </svg>
-                            </div>
-
-                            <div class="project-card__body">
-
-                                <h3 class="project-card__title" id="project-title-snake">Jeu du Snake</h3>
-
-                                <ul class="project-card__tags" aria-label="Compétences et technologies">
-                                    <li class="tag">Python</li>
-                                    <li class="tag">Pygame</li>
-                                    <li class="tag">Événements clavier</li>
-                                    <li class="tag">Collisions</li>
-                                </ul>
-
-                                <div class="project-card__story">
-                                    <p class="project-card__text">Un Snake complet, en projet personnel après le Pendu.</p>
-                                    <p class="project-card__label">Ce que j'en retiens</p>
-                                    <p class="project-card__text">Le temps réel impose de séparer la boucle de jeu, l'affichage et les règles.</p>
-                                </div>
-
-                                <div class="project-card__actions">
-                                    <a class="button" href="https://github.com/Axel-FOLLET/Axou/tree/main/02_games/jeu_du_snake" target="_blank" rel="noopener noreferrer">Code source<span class="visually-hidden"> – Jeu du Snake (nouvel onglet)</span></a>
-                                    <button class="button project-card__toggle project-card__toggle--game" type="button" aria-expanded="false" aria-controls="stage-snake" data-label-open="Jouer" data-label-close="Fermer le jeu"><span class="project-card__toggle-label">Jouer</span><span class="visually-hidden"> – Jeu du Snake</span></button>
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                        <!-- Game: project-showcase.js loads pages/games/snake.html into this area when opened and unloads it when closed. -->
-                        <div class="project-card__stage project-card__stage--game" id="stage-snake" data-game="snake" data-game-title="Jeu du Snake jouable" hidden></div>
-
-                    </article>
-
-                    <article class="project-card" data-slug="pendu" aria-labelledby="project-title-pendu" data-domain="games" data-hover="hangman">
-
-                        <div class="project-card__main">
-
-                            <div class="project-card__media">
-                                <!-- Symbol: gallows and hanged man -->
-                                <svg class="project-card__icon" viewBox="0 0 48 48" aria-hidden="true">
-                                    <path d="M6 43h22M13 43V5h20v6"/>
-                                    <circle cx="33" cy="15" r="4"/>
-                                    <path d="M33 19v11M33 22l-5 5M33 22l5 5M33 30l-4 8M33 30l4 8"/>
-                                </svg>
-                            </div>
-
-                            <div class="project-card__body">
-
-                                <h3 class="project-card__title" id="project-title-pendu">Jeu du Pendu</h3>
-
-                                <ul class="project-card__tags" aria-label="Compétences et technologies">
-                                    <li class="tag">Python</li>
-                                    <li class="tag">Pygame</li>
-                                    <li class="tag">Fonctions</li>
-                                    <li class="tag">Lecture de fichiers</li>
-                                </ul>
-
-                                <div class="project-card__story">
-                                    <p class="project-card__text">Mon premier projet personnel et mon premier programme complet.</p>
-                                    <p class="project-card__label">Ce que j'en retiens</p>
-                                    <p class="project-card__text">Lire des mots dans un fichier et anticiper les saisies invalides.</p>
-                                </div>
-
-                                <div class="project-card__actions">
-                                    <a class="button" href="https://github.com/Axel-FOLLET/Axou/tree/main/02_games/jeu_du_pendu" target="_blank" rel="noopener noreferrer">Code source<span class="visually-hidden"> – Jeu du Pendu (nouvel onglet)</span></a>
-                                    <button class="button project-card__toggle project-card__toggle--game" type="button" aria-expanded="false" aria-controls="stage-pendu" data-label-open="Jouer" data-label-close="Fermer le jeu"><span class="project-card__toggle-label">Jouer</span><span class="visually-hidden"> – Jeu du Pendu</span></button>
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                        <div class="project-card__stage project-card__stage--game" id="stage-pendu" data-game="pendu" data-game-title="Jeu du Pendu jouable" hidden></div>
-
-                    </article>
-
-                    <!-- Lost: in development, source code published, no playable version yet. -->
-                    <article class="project-card" data-slug="cat-game" aria-labelledby="project-title-cat-game" data-domain="games" data-hover="cat">
-
-                        <div class="project-card__main">
-
-                            <div class="project-card__media">
-                                <span class="cat-figure" role="img" aria-label="Chat assis, dessiné en facettes"></span>
-                            </div>
-
-                            <div class="project-card__body">
-
-                                <h3 class="project-card__title" id="project-title-cat-game">Lost</h3>
-
-                                <p class="project-card__badge">En développement</p>
-
-                                <ul class="project-card__tags" aria-label="Compétences et technologies">
-                                    <li class="tag">Three.js</li>
-                                    <li class="tag">Blender</li>
-                                    <li class="tag">Agent IA</li>
-                                </ul>
-
-                                <div class="project-card__story">
-                                    <p class="project-card__text"><strong>Un jeu vidéo 3D dans le navigateur</strong>&nbsp;: un chaton cherche sa mère.</p>
-                                    <p class="project-card__text">Avec un agent IA (Claude), que je dirige&nbsp;: <strong>je décide de ce qu'est le jeu et je valide le résultat en y jouant</strong>.</p>
-                                </div>
-
-                                <div class="project-card__actions">
-                                    <a class="button" href="https://github.com/Axel-FOLLET/Axou/tree/main/02_games/Lost" target="_blank" rel="noopener noreferrer">Code source<span class="visually-hidden"> – Lost (nouvel onglet)</span></a>
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </article>
-
-                    <!-- This site: it brings my resume and my portfolio together -->
-                    <article class="project-card" data-slug="parcours-portfolio" aria-labelledby="project-title-parcours-portfolio" data-domain="web" data-hover="cursor">
-
-                        <div class="project-card__main">
-
-                            <div class="project-card__media">
-                                <!-- Symbol: the two door cubes of the home page (fallback without JavaScript) -->
-                                <svg class="project-card__icon" viewBox="0 0 48 48" aria-hidden="true">
-                                    <path d="M6 19l8-5 8 5v10l-8 5-8-5zM6 19l8 5 8-5M14 24v10"/>
-                                    <path d="M26 19l8-5 8 5v10l-8 5-8-5zM26 19l8 5 8-5M34 24v10"/>
-                                </svg>
-                            </div>
-
-                            <div class="project-card__body">
-
-                                <h3 class="project-card__title" id="project-title-parcours-portfolio">Parcours &amp; Portfolio</h3>
-
-                                <ul class="project-card__tags" aria-label="Compétences et technologies">
-                                    <li class="tag">HTML</li>
-                                    <li class="tag">CSS</li>
-                                    <li class="tag">JavaScript</li>
-                                    <li class="tag">Agents IA</li>
-                                </ul>
-
-                                <div class="project-card__story">
-                                    <p class="project-card__text">Mon site de CV et mon portfolio réunis en un seul site, sans framework.</p>
-                                    <p class="project-card__label">Comment il a été construit</p>
-                                    <p class="project-card__text">Des missions confiées à mon équipe d'agents IA&nbsp;: pour chacune, un ordre de mission validé, puis le contrôle de l'agent expert.</p>
-                                </div>
-
-                                <div class="project-card__actions">
-                                    <a class="button" href="https://github.com/Axel-FOLLET/my_website" target="_blank" rel="noopener noreferrer">Code source<span class="visually-hidden"> – Parcours &amp; Portfolio (nouvel onglet)</span></a>
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </article>
-
-                    <!-- Context engineering guide: guide.md is given to an AI, the PDF is the edition for readers.
-                         The .md is stored as .md.txt: GitHub Pages (Jekyll) would turn a .md file into an HTML page;
-                         the download attribute gives it back its .md name. -->
-                    <article class="project-card" data-slug="guide-contexte" aria-labelledby="project-title-guide-contexte" data-domain="ai" data-hover="type">
-
-                        <div class="project-card__main">
-
-                            <div class="project-card__media">
-                                <!-- Symbol: open book -->
-                                <svg class="project-card__icon" viewBox="0 0 48 48" aria-hidden="true">
-                                    <path d="M24 12c-4-3-10-4-17-3v26c7-1 13 0 17 3 4-3 10-4 17-3V9c-7-1-13 0-17 3z"/>
-                                    <path d="M24 12v26M11 16h8M11 21h8M29 16h8M29 21h8"/>
-                                </svg>
-                            </div>
-
-                            <div class="project-card__body">
-
-                                <h3 class="project-card__title" id="project-title-guide-contexte">Guide d'ingénierie de contexte</h3>
-
-                                <ul class="project-card__tags" aria-label="Compétences et technologies">
-                                    <li class="tag">Gestion de projet IA</li>
-                                    <li class="tag">Claude</li>
-                                    <li class="tag">Codex</li>
-                                </ul>
-
-                                <div class="project-card__story">
-                                    <p class="project-card__text"><strong>Un guide à donner à son IA</strong> pour cadrer son usage et bâtir son propre système.</p>
-                                    <p class="project-card__label">Comment il a été construit</p>
-                                    <p class="project-card__text"><strong>Conçu et dirigé par moi</strong>, rédigé par des agents IA que j'ai pilotés.</p>
-                                    <p class="project-card__text">Le .md est à donner à son agent IA.</p>
-                                </div>
-
-                                <div class="project-card__actions">
-                                    <a class="button" href="../../assets/documents/guide_ingenierie_contexte.pdf" target="_blank" rel="noopener noreferrer">Lire le PDF<span class="visually-hidden"> – Guide d'ingénierie de contexte (nouvel onglet)</span></a>
-                                    <a class="button" href="../../assets/documents/guide_ingenierie_contexte.md.txt" download="guide_ingenierie_contexte.md">Télécharger .md<span class="visually-hidden"> – Guide d'ingénierie de contexte, version à donner à son IA</span></a>
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </article>
-
-                    <article class="project-card" data-slug="detecteur-langue" aria-labelledby="project-title-detecteur-langue" data-domain="algorithms" data-hover="language">
-
-                        <div class="project-card__main">
-
-                            <div class="project-card__media">
-                                <!-- Symbol: speech bubble -->
-                                <svg class="project-card__icon" viewBox="0 0 48 48" aria-hidden="true">
-                                    <path d="M9 9h30a4 4 0 0 1 4 4v16a4 4 0 0 1-4 4H22l-8 7v-7H9a4 4 0 0 1-4-4V13a4 4 0 0 1 4-4z"/>
-                                    <path d="M13 19h22M13 25h14"/>
-                                </svg>
-                            </div>
-
-                            <div class="project-card__body">
-
-                                <h3 class="project-card__title" id="project-title-detecteur-langue">Détecteur de <span data-language="language idioma língua lingua Sprache taal språk język dil">langue</span></h3>
-
-                                <ul class="project-card__tags" aria-label="Compétences et technologies">
-                                    <li class="tag">Python</li>
-                                    <li class="tag">Statistiques</li>
-                                    <li class="tag">Unicode</li>
-                                </ul>
-
-                                <div class="project-card__story">
-                                    <p class="project-card__text">Reconnaître la langue d'un texte parmi dix en comparant la fréquence de ses lettres à celle de chaque langue.</p>
-                                    <p class="project-card__label">Ce que j'en retiens</p>
-                                    <p class="project-card__text">Une méthode statistique a besoin de volume&nbsp;: fiable dès deux phrases, elle hésite sur quelques mots.</p>
-                                </div>
-
-                                <div class="project-card__actions">
-                                    <a class="button" href="https://github.com/Axel-FOLLET/Axou/tree/main/03_algorithms/detecteur_de_langue" target="_blank" rel="noopener noreferrer">Code source<span class="visually-hidden"> – Détecteur de langue (nouvel onglet)</span></a>
-                                    <button class="button project-card__toggle" type="button" aria-expanded="false" aria-controls="demo-language" data-label-open="Tester" data-label-close="Masquer la démo"><span class="project-card__toggle-label">Tester</span><span class="visually-hidden"> – Détecteur de langue</span></button>
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                        <!-- Demo: project-demos.js recomputes the ranking on every input -->
-                        <div class="project-card__stage demo demo--language" id="demo-language" hidden>
-
-                            <div class="form__field">
-                                <label class="form__label" for="language-text">Texte à analyser</label>
-                                <textarea class="form__input form__input--area demo__input" id="language-text" rows="4" placeholder="Quelques phrases en français, anglais, espagnol, portugais, italien, allemand, néerlandais, suédois, polonais ou turc."></textarea>
-                                <p class="demo__hint">Au moins 80 lettres pour un résultat fiable&nbsp;: la méthode repose sur des statistiques.</p>
-                            </div>
-
-                            <p class="demo__verdict" aria-live="polite"></p>
-                            <ol class="demo__ranking"></ol>
-                            <p class="demo__note"></p>
-
-                            <div class="demo__actions">
-                                <button class="button demo__example" type="button">Charger un exemple</button>
-                            </div>
-
-                        </div>
-
-                    </article>
-
                 </div>
 
             </div>
@@ -700,14 +729,14 @@
             <div>
                 <p class="footer__title">Crédits</p>
                 <p class="footer__credits">
-                    Photo, dessins et textes&nbsp;: créations personnelles d'Axel FOLLET. Cubes 3D, chat en facettes, pictogrammes et scènes animées des projets réalisés en HTML, CSS, SVG et JavaScript, sauf le logo LinkedIn. Chat 3D de Lost&nbsp;: modèle «&nbsp;<span lang="en">Rigged and animated Cat</span>&nbsp;» de JonasDichelle (BlendSwap), sous licence <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noopener noreferrer" hreflang="en">CC BY 3.0<span class="visually-hidden"> (nouvel onglet)</span></a>, retouché et posé assis&nbsp;; affiché avec <a href="https://threejs.org" target="_blank" rel="noopener noreferrer" hreflang="en">three.js<span class="visually-hidden"> (nouvel onglet)</span></a>, sous licence MIT. Polices Manrope (The Manrope Project Authors) et Instrument Serif (The Instrument Serif Project Authors), sous licence SIL Open Font License 1.1 (<a href="../../assets/fonts/OFL-Manrope.txt">licence de Manrope</a>, <a href="../../assets/fonts/OFL-InstrumentSerif.txt">licence d'Instrument Serif</a>), hébergées avec le site. LinkedIn® et le logo [in]® sont des marques de LinkedIn Corporation et de ses sociétés affiliées&nbsp;; ce site personnel n'est ni affilié à LinkedIn ni approuvé par LinkedIn.
+                    Photo, dessins et textes&nbsp;: créations personnelles d'Axel FOLLET. Cubes 3D, chat en facettes, pictogrammes et scènes animées des projets réalisés en HTML, CSS, SVG et JavaScript, sauf le logo LinkedIn. Sprites du jeu 2D en Java réalisés par l'équipe du jeu avec Pixel Lab. Chat 3D de Lost&nbsp;: modèle «&nbsp;<span lang="en">Rigged and animated Cat</span>&nbsp;» de JonasDichelle (BlendSwap), sous licence <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noopener noreferrer" hreflang="en">CC BY 3.0<span class="visually-hidden"> (nouvel onglet)</span></a>, retouché et posé assis&nbsp;; affiché avec <a href="https://threejs.org" target="_blank" rel="noopener noreferrer" hreflang="en">three.js<span class="visually-hidden"> (nouvel onglet)</span></a>, sous licence MIT. Polices Manrope (The Manrope Project Authors) et Instrument Serif (The Instrument Serif Project Authors), sous licence SIL Open Font License 1.1 (<a href="../../assets/fonts/OFL-Manrope.txt">licence de Manrope</a>, <a href="../../assets/fonts/OFL-InstrumentSerif.txt">licence d'Instrument Serif</a>), hébergées avec le site. LinkedIn® et le logo [in]® sont des marques de LinkedIn Corporation et de ses sociétés affiliées&nbsp;; ce site personnel n'est ni affilié à LinkedIn ni approuvé par LinkedIn.
                 </p>
                 <details class="footer__legal">
                     <summary class="footer__legal-toggle">Mentions légales et données</summary>
                     <p><strong>Éditeur et directeur de la publication&nbsp;:</strong> Axel FOLLET, particulier, site personnel non professionnel. Contact&nbsp;: formulaire du site ou LinkedIn.</p>
                     <p><strong>Hébergeur&nbsp;:</strong> GitHub, Inc. (GitHub Pages), 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, États-Unis, <a href="https://support.github.com/" target="_blank" rel="noopener noreferrer" hreflang="en">support.github.com<span class="visually-hidden"> (nouvel onglet)</span></a>. Pour la sécurité, GitHub enregistre l'adresse IP des visiteurs.</p>
                     <p id="donnees-formulaire"><strong>Formulaire de contact&nbsp;:</strong> responsable du traitement, Axel FOLLET. Nom, prénom, e-mail et message sont obligatoires&nbsp;; le sujet est facultatif. Ces données servent uniquement à vous répondre, sur la base de l'intérêt légitime à traiter votre demande. Elles transitent par Formspree, Inc., aux États-Unis, qui les conserve selon sa <a href="https://formspree.io/legal/privacy-policy" target="_blank" rel="noopener noreferrer" hreflang="en">politique de confidentialité<span class="visually-hidden"> (nouvel onglet)</span></a>, et sont supprimées 12 mois après notre dernier échange. Vous pouvez demander l'accès à vos données, leur rectification, leur effacement ou la limitation de leur traitement, ou vous y opposer, par le formulaire ou LinkedIn, et adresser une réclamation à la <a href="https://www.cnil.fr/fr/plaintes" target="_blank" rel="noopener noreferrer">CNIL<span class="visually-hidden"> (nouvel onglet)</span></a>.</p>
-                    <p><strong>Navigateur&nbsp;:</strong> aucun cookie ni mesure d'audience. Le site garde seulement sur votre appareil la réponse à la protection anti-robot du formulaire («&nbsp;<span lang="en">Are you human?</span>&nbsp;», posée à l'envoi), jusqu'à la fermeture de l'onglet, et vos records de Snake et du Pendu, jusqu'à ce que vous effaciez les données du site dans votre navigateur.</p>
+                    <p><strong>Navigateur&nbsp;:</strong> aucun cookie ni mesure d'audience. Le site garde seulement sur votre appareil la réponse à la protection anti-robot («&nbsp;<span lang="en">Are you human?</span>&nbsp;», posée à l'envoi du formulaire ou au téléchargement du CV), jusqu'à la fermeture de l'onglet, et vos records de Snake et du Pendu, jusqu'à ce que vous effaciez les données du site dans votre navigateur.</p>
                     <p><strong>Propriété intellectuelle&nbsp;:</strong> textes, photo, dessins, mise en page et code source © 2026 Axel FOLLET, tous droits réservés. Le code est public sur GitHub pour être lu&nbsp;; toute réutilisation demande mon accord. Les polices Manrope et Instrument Serif, le modèle du chat de Lost, three.js et le logo LinkedIn restent sous leurs propres licences et marques.</p>
                 </details>
             </div>

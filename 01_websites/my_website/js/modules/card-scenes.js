@@ -24,6 +24,7 @@
 const SCENES = {
     "yia-jobs": { path: "./scenes/job-board.js", ready: true },
     "cesar-vigenere": { path: "./scenes/cipher.js", ready: true },
+    "2dgame-java": { path: "./scenes/farm.js", ready: true },
     "snake": { path: "./scenes/snake.js", ready: true },
     "pendu": { path: "./scenes/hangman.js", ready: true },
     "cat-game": { path: "./cat-3d.js", ready: true },

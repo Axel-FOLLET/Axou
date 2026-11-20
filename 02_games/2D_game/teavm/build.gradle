@@ -1,0 +1,19 @@
+// The web version: TeaVM turns the Java of the game into JavaScript, gdx-teavm gives libGDX in the browser.
+plugins {
+  id "com.github.xpenatan.gdx-teavm" version "1.6.1"
+}
+
+eclipse.project.name = appName + '-teavm'
+
+dependencies {
+  implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
+  implementation project(':core')
+}
+
+gdxTeaVM {
+  assets('../assets')
+  js {
+    mainClass = 'com.cropa.teavm.TeaVMLauncher'
+    htmlTitle = 'Cropa'
+  }
+}

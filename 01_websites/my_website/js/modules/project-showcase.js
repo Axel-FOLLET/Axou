@@ -15,9 +15,15 @@ import { initProjectFilter } from "./project-filter.js";
  */
 const DRAG_THRESHOLD = 6;
 /*
- * Only these games can be loaded into a card.
+ * Only these games can be loaded into a card, each with its page in pages/games/.
+ * The 2D game is the web build of 02_games/2D_game (gdx-teavm): its page must be an index.html,
+ * the game finds its images next to it.
  */
-const GAMES = ["pendu", "snake"];
+const GAMES = {
+    "pendu": "pendu.html",
+    "snake": "snake.html",
+    "2d-game": "2d-game/index.html"
+};
 /*
  * Shape of the wheel, in card widths: left-to-right radius (radius), front-to-back radius (depth)
  * and distance of the eye (perspective). The wheel is wider than it is deep: the side cards move apart
@@ -160,7 +166,7 @@ export function initProjectShowcase(language) {
      * ("Play" button on tablets, for example).
      */
     function focusInCard(card, preferred) {
-        const target = [preferred, ...card.querySelectorAll("a[href], button:not(:disabled)")]
+        const target = [preferred, ...card.querySelectorAll("a[href], button:not(:disabled)"), card.querySelector(".project-card__title[tabindex]")]
             .find(element => element && element.offsetParent !== null);
         target?.focus({ preventScroll: true });
     }
@@ -257,7 +263,8 @@ export function initProjectShowcase(language) {
      * like the neighbour of a three-card wheel, and the notch on the left stays empty.
      */
     function notches(count) {
-        return Math.max(count, 3);
+        // Only the centre and its immediate neighbours are visible.
+        return Math.min(8, Math.max(count, 3));
     }
 
     /*
@@ -280,7 +287,15 @@ export function initProjectShowcase(language) {
         const x = unit.x * radius * width;
         const covered = (width + width * unit.scale) / 2 - x;
         const overflow = x + width * unit.scale / 2 - track.clientWidth / 2;
-        if (Math.max(covered, overflow) <= 0) return radius;
+        if (Math.max(covered, overflow) <= 0) {
+            if (count === 4) {
+                // Keep the visible gap of the three-card view when a fourth card sits behind it.
+                const three = ringPlace(1, 3, ring, radius);
+                const gap = three.x - (1 + three.scale) / 2;
+                if (gap > 0) return Math.min(radius, (gap + (1 + unit.scale) / 2) / unit.x);
+            }
+            return radius;
+        }
         return Math.min(radius, (SIDE_BAND / width + (1 - unit.scale) / 2) / unit.x);
     }
 
@@ -352,7 +367,8 @@ export function initProjectShowcase(language) {
          * Tight wheel (neighbours reduced to their edge): the card coming to the centre passes in front from the start
          * and never touches the edge, no word can be cut. Its text comes back without waiting (RISE_WAIT not needed).
          */
-        const tight = radius < ringRoom(ring, width);
+        const neighbour = ringPlace(1, notches(count), ring, radius);
+        const tight = neighbour.x < (1 + neighbour.scale) / 2;
         const half = track.clientWidth / 2;
         const inset = textInset();
         updateRoomAbove(ring, height);
@@ -614,11 +630,11 @@ export function initProjectShowcase(language) {
      */
     function loadGame(stage) {
         const game = stage.dataset.game;
-        if (!GAMES.includes(game)) return;
+        if (!Object.hasOwn(GAMES, game)) return;
         const gameFrame = document.createElement("iframe");
         gameFrame.className = "project-card__frame";
         gameFrame.title = stage.dataset.gameTitle || game;
-        gameFrame.src = new URL("../../pages/games/" + game + ".html?lang=" + language, import.meta.url).href;
+        gameFrame.src = new URL("../../pages/games/" + GAMES[game] + "?lang=" + language, import.meta.url).href;
         /*
          * The keyboard must go to the game as soon as it is loaded. ?. accepts an inaccessible document.
          */
@@ -626,7 +642,23 @@ export function initProjectShowcase(language) {
             gameFrame.focus({ preventScroll: true });
             gameFrame.contentDocument?.querySelector("canvas")?.focus({ preventScroll: true });
         }, { once: true });
-        stage.replaceChildren(gameFrame);
+        stage.replaceChildren(...fullscreenButton(stage, gameFrame), gameFrame);
+    }
+
+    /*
+     * "Full screen" above a game drawn for a large screen (data-fullscreen-label on its area):
+     * the iframe takes the whole screen; Escape gives it back to the card.
+     * Returns the button in a list, empty for the other games or a browser without the Fullscreen API.
+     */
+    function fullscreenButton(stage, gameFrame) {
+        const label = stage.dataset.fullscreenLabel;
+        if (!label || !gameFrame.requestFullscreen) return [];
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "button project-card__fullscreen";
+        button.textContent = label;
+        button.addEventListener("click", () => gameFrame.requestFullscreen().catch(() => {}));
+        return [button];
     }
 
     /*
@@ -665,6 +697,8 @@ export function initProjectShowcase(language) {
             setToggleLabel(button, button.dataset.labelOpen);
         }
         if (stage) {
+            /* A game in full screen leaves it before its iframe is removed */
+            if (document.fullscreenElement && stage.contains(document.fullscreenElement)) document.exitFullscreen().catch(() => {});
             if (stage.dataset.game) stage.replaceChildren();
             stage.hidden = true;
         }
@@ -690,6 +724,16 @@ export function initProjectShowcase(language) {
      */
     document.addEventListener("keydown", event => {
         if (event.key === "Escape" && expanded) collapse(expanded);
+    });
+
+    /*
+     * "Quitter" (Quit) at the end of the 2D game: the game, in its iframe, sends "game-quit";
+     * the card closes as with "Close the game". Only a message from the open game of the site counts.
+     */
+    window.addEventListener("message", event => {
+        if (event.data !== "game-quit" || event.origin !== window.location.origin || !expanded) return;
+        const gameFrame = expanded.querySelector(".project-card__frame");
+        if (gameFrame && event.source === gameFrame.contentWindow) collapse(expanded);
     });
 
     /*
