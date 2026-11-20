@@ -313,9 +313,12 @@ export function initProjectShowcase(language) {
 
     /*
      * Width of a normal card, in pixels; offsetWidth ignores transforms.
+     * Neither the widened card nor a closed card still shrinking back (shrinking, see collapse) is measured:
+     * read during its transition, its width would tighten the wheel around the centre.
      */
+    let shrinking = null;
     function cardWidth() {
-        return visible.find(card => card !== expanded)?.offsetWidth || active.offsetWidth;
+        return visible.find(card => card !== expanded && card !== shrinking)?.offsetWidth || active.offsetWidth;
     }
 
     /*
@@ -704,6 +707,18 @@ export function initProjectShowcase(language) {
         }
         card.classList.remove("project-card--expanded");
         if (expanded === card) expanded = null;
+        /*
+         * The card shrinks back (transition of width, css/pages/portfolio.css): cardWidth ignores it until the end,
+         * then the wheel is placed again with its normal width.
+         */
+        shrinking = card;
+        const settle = event => {
+            if (event.target !== card || event.propertyName !== "width") return;
+            card.removeEventListener("transitionend", settle);
+            if (shrinking === card) shrinking = null;
+            requestRender();
+        };
+        card.addEventListener("transitionend", settle);
         if (restoreFocus) focusInCard(card, button);
         requestRender();
     }
