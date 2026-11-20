@@ -68,6 +68,10 @@ const EXPANDED_MAX = 1040;
  */
 const FIT_GAP = 8;
 /*
+ * Smallest reduction of the wheel on a window too low for the centre card (fitWheel): below it, the page scrolls instead.
+ */
+const FIT_MIN = 0.8;
+/*
  * Momentum on release: the wheel goes on for this time (ms) at the speed of the gesture, then stops on the nearest card.
  */
 const MOMENTUM_MS = 250;
@@ -125,7 +129,7 @@ export function initProjectShowcase(language) {
         const touch = !arrowMode.matches;
         showcase.classList.toggle("showcase--touch", touch);
         hint.textContent = (touch ? showcase.dataset.labelHintTouch : showcase.dataset.labelHint) || "";
-        updateWidth();
+        fitWheel();
         render();
     }
 
@@ -329,21 +333,18 @@ export function initProjectShowcase(language) {
     }
 
     /*
-     * On desktop, if the centre card does not fit under the header (small screen, zoom),
-     * the cards widen (showcase--wide, css/pages/portfolio.css): their text takes fewer lines and they are shorter.
-     * The height is measured at the normal width and without transition: otherwise the widened card,
-     * now short enough, would lose the class at the next measurement.
+     * On desktop, if the centre card does not fit under the header (low window, zoom), the whole wheel is reduced
+     * just enough (fit, from FIT_MIN to 1), like the page zoomed out: the cards keep their size, their text and
+     * their neighbours, only drawn smaller (render). Large windows keep fit at 1.
+     * FIT_GAP stays free under the card, as when the page scrolls to the wheel (wheelTop).
+     * offsetHeight ignores transforms: it is the height of the card before the reduction.
      * All the cards share the grid row, as tall as the tallest one: active.offsetHeight is the height of every card.
      */
-    function updateWidth() {
+    let fit = 1;
+    function fitWheel() {
         if (!active || expanded) return;
-        const instant = showcase.classList.contains("showcase--instant");
-        showcase.classList.add("showcase--instant");
-        showcase.classList.remove("showcase--wide");
-        const tooHigh = active.offsetHeight > window.innerHeight - headerRoom();
-        showcase.classList.toggle("showcase--wide", arrowMode.matches && tooHigh);
-        active.offsetWidth;
-        if (!instant) showcase.classList.remove("showcase--instant");
+        const room = window.innerHeight - headerRoom() - FIT_GAP;
+        fit = arrowMode.matches ? Math.min(1, Math.max(FIT_MIN, room / active.offsetHeight)) : 1;
     }
 
     /*
@@ -411,7 +412,11 @@ export function initProjectShowcase(language) {
                 card.wheelContent = 0;
                 card.offsetWidth;
             }
-            card.style.transform = `translate(${x}px, ${place.y * height}px) scale(${place.scale})`;
+            /*
+             * Reduced wheel (fit, see fitWheel): the whole wheel shrinks towards the top of the cards, so the centre card
+             * keeps its top under the header. Each card shrinks around its own centre, hence the lift of half the height lost.
+             */
+            card.style.transform = `translate(${x * fit}px, ${(place.y * fit - (1 - fit) / 2) * height}px) scale(${place.scale * fit})`;
             card.style.zIndex = String(100 - Math.round(distance * 10));
             /*
              * No cut word at the edge of the wheel (overflow-x: clip, css/pages/portfolio.css): the content (--content, 0 to 1)
@@ -473,6 +478,10 @@ export function initProjectShowcase(language) {
          * A single card: nothing to turn, the arrows are removed (hidden, css/pages/portfolio.css).
          */
         previousButton.hidden = nextButton.hidden = count < 2;
+        /*
+         * The reduced wheel leaves an empty band under the cards (the grid row keeps its height): the page takes it back.
+         */
+        track.style.marginBottom = fit < 1 ? `${-(1 - fit) * height}px` : "";
     }
 
     function requestRender() {
@@ -502,7 +511,7 @@ export function initProjectShowcase(language) {
 
 
     window.addEventListener("resize", () => {
-        updateWidth();
+        fitWheel();
         requestRender();
     });
 
@@ -549,7 +558,7 @@ export function initProjectShowcase(language) {
         const ring = narrow.matches ? RINGS.narrow : RINGS.wide;
         const width = cardWidth();
         const count = visible.length;
-        drag.step = Math.max(ringPlace(1, notches(count), ring, ringRadius(ring, width, count)).x * width, 40);
+        drag.step = Math.max(ringPlace(1, notches(count), ring, ringRadius(ring, width, count)).x * width * fit, 40);
         dragShift = distance / drag.step;
         /*
          * Speed of the gesture in px/ms, smoothed over the last moves: it gives the momentum on release.
@@ -788,7 +797,7 @@ export function initProjectShowcase(language) {
             if (active && location.hash.startsWith("#projects/")) history.replaceState(null, "", "#projects");
             setActive(visible[0]);
         }
-        updateWidth();
+        fitWheel();
         render();
         notifyCentre();
     }
@@ -807,7 +816,7 @@ export function initProjectShowcase(language) {
         const showcaseTop = top - headerRoom();
         if (!active) return showcaseTop;
         const cardTop = top + cardRowOffset();
-        const below = cardTop + active.offsetHeight + FIT_GAP - (showcaseTop + window.innerHeight);
+        const below = cardTop + active.offsetHeight * fit + FIT_GAP - (showcaseTop + window.innerHeight);
         if (below <= 0) return showcaseTop;
         return Math.min(showcaseTop + below, cardTop - headerRoom());
     }
@@ -900,7 +909,7 @@ export function initProjectShowcase(language) {
      * The fonts can change the height of the text once loaded: the width of the cards is checked again.
      */
     document.fonts?.ready.then(() => {
-        updateWidth();
+        fitWheel();
         render();
     });
     requestAnimationFrame(() => requestAnimationFrame(() => showcase.classList.remove("showcase--instant")));

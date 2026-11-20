@@ -126,37 +126,22 @@
 
 
 /*
-    Window too low for the centre card (small screen, zoom): project-showcase.js widens the cards on desktop (updateWidth).
-    Their text takes fewer lines: the card is shorter.
-*/
-.showcase--wide {
-    --card-width: 420px;
-}
-
-
-/*
     Height of the cards on the wheel (--card-height), by window width: the size the cards had before their media
-    became a large animated area (330 × 585 px on desktop, 420 × 509 px once widened). It is a minimum: a card whose text
+    became a large animated area (330 × 585 px on desktop). It is a minimum: a card whose text
     needs more room still grows (long words, text enlarged by the visitor), and the whole row with it.
     Inside that height the media takes what the text leaves, up to 230 px (.project-card__media below):
     the cards keep their size, the text decides the size of the media, never the other way round.
     The English texts wrap differently: a few widths have their own value (:lang(en)).
+    On a desktop window too low for the centre card, project-showcase.js reduces the whole wheel (fitWheel):
+    the cards keep this size.
 */
 .showcase--ready {
     --card-height: 585px;
 }
 
-.showcase--ready.showcase--wide {
-    --card-height: 509px;
-}
-
-.showcase--ready.showcase--wide:lang(en) {
-    --card-height: 495px;
-}
-
 @media (min-width: 1025px) and (max-width: 1249px) {
 
-    .showcase--ready:not(.showcase--wide) {
+    .showcase--ready {
         --card-height: 653px;
     }
 
@@ -634,7 +619,7 @@
     Animated area of the card: that of the former Lost media (330 × 230 px on desktop, the card width when it is narrower).
     The scene of the card (card-scenes.js) is built inside it; without JavaScript or before its scene, it shows
     the symbol of the card (or the drawn cat), which the scene hides.
-    max-width: a widened card (.showcase--wide) keeps a media of the same width, centred.
+    max-width: a wider card keeps a media of the same width, centred.
     The top of the area (about 40 px) stays free for the hover animation (motion.css, data-hover), drawn above the scene.
     position: relative: the scenes can place their layers from the area itself.
 */
