@@ -16,6 +16,7 @@ import java.util.Optional;
  * the "Lancer la nuit" button by day, or the end of the game once it is over, and a red alert on the last night.
  * The day before the last night, the button turns red ("Lancer la dernière nuit") and warns that nothing can be
  * sold after it. Beside the button, the urn gauge: the money against the price of the urn, in words and as a bar.
+ * At the bottom right of the world, the button that cuts the sound or brings it back.
  * It only shows the values it receives.
  */
 public class Hud implements GameListener {
@@ -40,6 +41,12 @@ public class Hud implements GameListener {
     private static final float GAUGE_WIDTH = 136f;
     private static final float GAUGE_HEIGHT = 5f;
     private static final float GAUGE_BAR_DROP = 22f;
+    // The sound button (asked by Axel on 20/11, for the version of the website), in the bottom right corner: its right
+    // edge where the outlines of the shop end (x 541), on the line of the urn (its words at y 24, like ShopWindow's
+    // URN_TOP). The urn button stands just left of it, by day. "Son : non" is 62 px wide like "Sound off", so its
+    // outline starts at x 473 at most (TextsLayoutTest checks both languages against the urn).
+    private static final float SOUND_RIGHT = 541f;
+    private static final float SOUND_TOP = 24f;
 
     //-------------------- FIELDS --------------------
     // The y of the top edge of the world.
@@ -54,6 +61,9 @@ public class Hud implements GameListener {
     // words, then never changed. The last-night button is wider, for its longer text.
     private final Bounds nightButton;
     private final Bounds lastNightButton;
+    // The sound button while the sound plays, and while it is cut: its words change, so its width too.
+    private final Bounds soundOnButton;
+    private final Bounds soundOffButton;
     private int money;
     private int farmHealth;
     // The number of the phase and its kind: day 1 and night 1 share the number 1, so the word is kept apart.
@@ -67,8 +77,10 @@ public class Hud implements GameListener {
     private String gaugeText;
     // The end of the game, in words. Empty while the game goes on.
     private Optional<String> ending = Optional.empty();
-    // true while Melda is on screen (day 12): the night button is greyed and does nothing.
+    // true while the neighbour is on screen (day 12): the night button is greyed and does nothing.
     private boolean nightLocked;
+    // true while the sound is cut: the button then says so. Told by GameScreen, which asks the Jukebox.
+    private boolean muted;
 
     //-------------------- CONSTRUCTOR --------------------
     // Called once by GameScreen.show(). The starting values come from the model: no number of the rules is copied here.
@@ -93,6 +105,8 @@ public class Hud implements GameListener {
         number = START_DAY;
         nightButton = new Bounds(MARGIN - 3, secondRowTop() - 16, TextWidth.of(texts.startNight()) + 6, 19);
         lastNightButton = new Bounds(MARGIN - 3, secondRowTop() - 16, TextWidth.of(texts.startLastNight()) + 6, 19);
+        soundOnButton = soundButton(texts.sound(false));
+        soundOffButton = soundButton(texts.sound(true));
         refreshText();
     }
 
@@ -169,22 +183,32 @@ public class Hud implements GameListener {
         ending = Optional.of(texts.ending(result));
     }
 
-    // Called by GameScreen at each frame, before the click, with Melda.isVisiting() (Axel, day 12): a night launched
+    // Called by GameScreen at each frame, before the click, with Neighbour.isVisiting() (Axel, day 12): a night launched
     // during her walk would send her away before she talks. No event from the model: the HUD is told, like it is told
     // what it shows.
     /**
      * Locks or unlocks the "Lancer la nuit" button: locked, it is greyed and a click on it does nothing.
      *
-     * @param locked {@code true} while Melda is on screen
+     * @param locked {@code true} while the neighbour is on screen
      */
     public void lockNight(boolean locked) {
         nightLocked = locked;
     }
 
+    // Called by GameScreen at each frame, with Jukebox.isMuted(), like lockNight: the HUD only shows what it is told.
+    /**
+     * Shows whether the sound is cut, on the sound button.
+     *
+     * @param muted {@code true} while the sound is cut
+     */
+    public void showMuted(boolean muted) {
+        this.muted = muted;
+    }
+
     //-------------------- CLICKS --------------------
     // Called by GameScreen first, before the shop: true if the click is on the button while it is shown.
     // The HUD does not launch the night itself: it only knows what it shows; GameScreen calls the cycle.
-    // Locked (Melda is here): false, so the click goes on to the shop and the field, which still work.
+    // Locked (the neighbour is here): false, so the click goes on to the shop and the field, which still work.
     /**
      * Tells whether a click, in world pixels, lands on the "Lancer la nuit" button.
      *
@@ -194,6 +218,29 @@ public class Hud implements GameListener {
      */
     public boolean handleClick(float x, float y) {
         return !nightLocked && buttonShown() && button().contains(x, y);
+    }
+
+    // Called by GameScreen before the neighbour and the tutorial, which take every other click: the sound can be cut
+    // while they are shown, by day, by night, and at the end of a game. GameScreen cuts it: the HUD only answers.
+    /**
+     * Tells whether a click, in world pixels, lands on the sound button.
+     *
+     * @param x the x of the click
+     * @param y the y of the click
+     * @return {@code true} if the click is on it
+     */
+    public boolean handleSoundClick(float x, float y) {
+        return soundButton().contains(x, y);
+    }
+
+    // Read by the tests, like getNightButton.
+    /**
+     * Returns the clickable area of the sound button, for its words of now.
+     *
+     * @return its area, in world pixels
+     */
+    public Bounds getSoundButton() {
+        return soundButton();
     }
 
     // Read by the tests, which click in its middle instead of copying numbers.
@@ -237,6 +284,9 @@ public class Hud implements GameListener {
             canvas.drawOutline(button(), OutlineColor.WHITE);
         }
         alert().ifPresent(words -> canvas.drawText(words, MARGIN, alertTop(), TextStyle.ALERT));
+        Bounds sound = soundButton();
+        canvas.drawText(texts.sound(muted), sound.x() + 3, SOUND_TOP);
+        canvas.drawOutline(sound, OutlineColor.WHITE);
     }
 
     // The words, then the bar under them: filled in green (the color of a ripe crop, drawDot) by the share of the
@@ -269,6 +319,17 @@ public class Hud implements GameListener {
     // The day before the last night (day 8): the last day to sell.
     private boolean lastSaleDay() {
         return !night && number == lastNight;
+    }
+
+    // The outline of the sound button for some words: 3 px around them, like the other buttons, ending at SOUND_RIGHT.
+    private Bounds soundButton(String words) {
+        float width = TextWidth.of(words) + 6;
+        return new Bounds(SOUND_RIGHT - width, SOUND_TOP - 16, width, 19);
+    }
+
+    // The sound button of now: its words say whether the sound plays.
+    private Bounds soundButton() {
+        return muted ? soundOffButton : soundOnButton;
     }
 
     // The button of today: wider the day before the last night, for its longer text.

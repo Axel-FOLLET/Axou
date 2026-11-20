@@ -68,14 +68,14 @@ The catapatates of the top slots face down, towards the field (`south-`); those 
 | Cat | sitting | `assets/npc/cat/south-cat.png` | Team |
 | Cat | fleeing | `assets/npc/cat/west-cat.png` | Team |
 | Cat | "miaou" bubble | `assets/talk/Speech-bubble-cat/south-bubble-speech-meow.png` | Team |
-| Melda | walking, one image per direction | `assets/melda/` (8 files) | Team |
-| Melda | speech bubble | `assets/talk/Speech-bubble-characters/south-speech-bubble.png` | Team |
+| Chatty neighbour | walking, one image per direction | `assets/neighbour/` (8 files) | Team |
+| Chatty neighbour | speech bubble | `assets/talk/Speech-bubble-characters/south-speech-bubble.png` | Team |
 | Mr Chmunks | facing the player (title screen) | `assets/npc/ms-chmunks/south-chmunks.png` | Team |
 | Mr Chmunks | walking away (end screen) | `assets/npc/ms-chmunks/east-chmunks.png` | Team |
-| Alexis | facing the player (title screen) | `assets/npc/alexis/south-alexis.png` | Team |
-| Alexis | walking away (end screen) | `assets/npc/alexis/east-alexis.png` | Team |
-| Hugo | facing the player (title screen) | `assets/npc/hugo/south-hugo.png` | Team |
-| Hugo | walking away (end screen) | `assets/npc/hugo/east-hugo.png` | Team |
+| Henchman 2 | facing the player (title screen) | `assets/npc/henchman-2/south-henchman-2.png` | Team |
+| Henchman 2 | walking away (end screen) | `assets/npc/henchman-2/east-henchman-2.png` | Team |
+| Henchman 1 | facing the player (title screen) | `assets/npc/henchman-1/south-henchman-1.png` | Team |
+| Henchman 1 | walking away (end screen) | `assets/npc/henchman-1/east-henchman-1.png` | Team |
 | Garry's wife | ghost (end screen) | `assets/npc/wife/south-ghost.png` | Team |
 
 ## Farm and urn
@@ -98,7 +98,7 @@ The catapatates of the top slots face down, towards the field (`south-`); those 
 
 ## Cinematics
 
-One image per scene, 560 x 320 like the game world.
+One image per scene, made with Pixel Lab, 688 x 384, stretched over the 560 x 320 game world (the images come out about 2% narrower).
 
 | Element | File | Pack |
 | --- | --- | --- |

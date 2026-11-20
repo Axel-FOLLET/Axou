@@ -22,9 +22,12 @@ import com.cropa.model.world.Crop;
 import com.cropa.model.world.CropConfig;
 import com.cropa.model.world.CropType;
 // Language and Texts: the words of the game in French, the language its layout was measured on.
+// Cue: the sounds the panel asks for, written down by the test instead of being played (20/11).
 import com.cropa.text.Language;
 import com.cropa.text.Texts;
+import com.cropa.view.audio.Cue;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import org.junit.jupiter.api.BeforeEach;
@@ -49,6 +52,8 @@ class ShopWindowTest {
     private ShopWindow shop;
     private Catapatate catapatate;
     private RecordingCanvas canvas;
+    // The sounds asked for, in order: the panel receives cues::add as its CuePlayer.
+    private List<Cue> cues;
 
     //-------------------- HELPERS --------------------
     // The game starts on day 1; 45 s later it is still day 1, with 15 s left.
@@ -56,7 +61,8 @@ class ShopWindowTest {
     void startTheDay() {
         session = new GameSession(new GameConfig(), new Random(0));
         session.update(45f);
-        shop = new ShopWindow(session, new GameConfig().getUrnPrice(), new CropConfig(), FRENCH);
+        cues = new ArrayList<>();
+        shop = new ShopWindow(session, new GameConfig().getUrnPrice(), new CropConfig(), FRENCH, cues::add);
         DefenseSlot slot = new DefenseSlot(SlotSide.TOP, 1);
         catapatate = new Catapatate(slot, new DefenseConfig(), new ArrayList<>());
         slot.place(catapatate);
@@ -137,7 +143,7 @@ class ShopWindowTest {
         assertEquals(6, canvas.calls.size());
         assertTrue(drew("text Planter"));
         assertTrue(drew("text Défenses"));
-        assertTrue(drewGreyed("text Urne, 10000 pièces"));
+        assertTrue(drewGreyed("text Acheter l'urne 377.0 24.0"));
         assertTrue(drew("outline WHITE " + ShopWindow.URN_BUTTON));
         assertFalse(clickTheButton());
     }
@@ -1021,7 +1027,7 @@ class ShopWindowTest {
         session.getWallet().add(URN_PRICE - START);
         shop.render(canvas);
 
-        assertTrue(drewWhite("Urne, 10000 pièces"));
+        assertTrue(drewWhite("Acheter l'urne"));
         assertTrue(drew("outline WHITE " + ShopWindow.URN_BUTTON));
     }
 
@@ -1173,5 +1179,111 @@ class ShopWindowTest {
         shop.showDefenseList();
 
         assertTrue(shop.isOpen());
+    }
+
+    //-------------------- SOUNDS --------------------
+    // 20/11: each click asks for its sound. The panel only names it; the Jukebox plays it, or not if the sound is cut.
+
+    // The button opens its list with the sound of the shop, and rolls it up with a plain click.
+    @Test
+    void theButtonOpensWithTheShopSoundAndClosesWithAClick() {
+        clickIn(shop.plantButton());
+        clickIn(shop.plantButton());
+
+        assertEquals(List.of(Cue.UI_SHOP_OPEN, Cue.UI_CLICK), cues);
+    }
+
+    // The tutorial unrolls the list itself: no sound, the player did not click.
+    @Test
+    void theTutorialOpensTheListsWithoutASound() {
+        shop.showPlantList();
+        shop.showDefenseList();
+
+        assertTrue(cues.isEmpty());
+    }
+
+    // From an empty cell: the list opens, then the carrot is planted on that cell.
+    @Test
+    void aSeedPlantedSoundsLikeAPlanting() {
+        shop.handleCellClick(emptyCell());
+        clickPlantLine(0);
+
+        assertEquals(List.of(Cue.UI_SHOP_OPEN, Cue.PLANT), cues);
+        assertFalse(emptyCell().isEmpty());
+    }
+
+    // From the button: the line picked clicks, the planting comes with the click on the cell.
+    @Test
+    void aLinePickedClicksThenTheCellPlants() {
+        clickIn(shop.plantButton());
+        clickPlantLine(0);
+        shop.handleCellClick(emptyCell());
+
+        assertEquals(List.of(Cue.UI_SHOP_OPEN, Cue.UI_CLICK, Cue.PLANT), cues);
+    }
+
+    // A line the player cannot pay is grey: a click on it is refused, and sounds so.
+    @Test
+    void aGreyLineIsRefused() {
+        session.getWallet().spend(START);
+        clickIn(shop.plantButton());
+        clickPlantLine(0);
+
+        assertEquals(List.of(Cue.UI_SHOP_OPEN, Cue.UI_REFUSED), cues);
+    }
+
+    // A line picked, then a taken cell: the shop refuses the planting.
+    @Test
+    void aTakenCellIsRefused() {
+        Cell carrot = carrotOn(1, 1);
+        clickIn(shop.plantButton());
+        clickPlantLine(0);
+        shop.handleCellClick(carrot);
+
+        assertEquals(Cue.UI_REFUSED, cues.get(cues.size() - 1));
+    }
+
+    @Test
+    void anUpgradeSoundsLikeAnUpgrade() {
+        shop.openFor(catapatate);
+        clickTheButton();
+
+        assertEquals(List.of(Cue.DEFENSE_UPGRADE), cues);
+    }
+
+    @Test
+    void anUpgradeWithoutEnoughMoneyIsRefused() {
+        session.getWallet().spend(START - 50);
+        shop.openFor(catapatate);
+        clickTheButton();
+
+        assertEquals(List.of(Cue.UI_REFUSED), cues);
+    }
+
+    // The panel of the carrot opens, then "Vendre" sells it.
+    @Test
+    void aSaleSoundsLikeAHarvest() {
+        shop.handleCellClick(ripeCarrot());
+        clickIn(ShopWindow.SELL_BUTTON);
+
+        assertEquals(List.of(Cue.UI_SHOP_OPEN, Cue.HARVEST), cues);
+    }
+
+    // A defense picked from the button, then placed on a free cell of the field.
+    @Test
+    void aDefensePlacedSoundsLikeAPlacement() {
+        clickIn(shop.defenseButton());
+        clickDefenseLine(2);
+        shop.handleCellClick(emptyCell());
+
+        assertEquals(List.of(Cue.UI_SHOP_OPEN, Cue.UI_CLICK, Cue.DEFENSE_PLACE), cues);
+    }
+
+    // The urn costs 10 000 coins: with the 250 of the start, the shop refuses it.
+    @Test
+    void theUrnTooExpensiveIsRefused() {
+        clickIn(ShopWindow.URN_BUTTON);
+
+        assertEquals(List.of(Cue.UI_REFUSED), cues);
     }
 }

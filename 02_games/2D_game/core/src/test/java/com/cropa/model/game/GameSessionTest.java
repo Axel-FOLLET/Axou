@@ -352,32 +352,32 @@ class GameSessionTest {
     assertTrue(session.getCycle().canAct());
   }
 
-  // -------------------- MELDA --------------------
-  // Melda is created with the game, but never comes on day 1 (rules section 9): the first dawn is the one of day 2.
-  /** A new game has Melda, and she does not talk on day 1. */
+  // -------------------- NEIGHBOUR --------------------
+  // The neighbour is created with the game, but never comes on day 1 (rules section 9): the first dawn is the one of day 2.
+  /** A new game has Neighbour, and she does not talk on day 1. */
   @Test
-  void newGameHasMeldaSilentOnDayOne() {
+  void newGameHasNeighbourSilentOnDayOne() {
     GameSession session = new GameSession(new GameConfig(), new Random(0));
 
-    assertNotNull(session.getMelda());
-    assertFalse(session.getMelda().isTalking());
+    assertNotNull(session.getNeighbour());
+    assertFalse(session.getNeighbour().isTalking());
   }
 
   // Her day is drawn by the seed, so the test reads it instead of writing it: getDay() - 1 quiet nights from day 1
   // lead to the dawn of her day. Quiet nights: the farm is never hit, so the game always reaches her day.
   // At that dawn she comes into the forest first (day 12): she is on screen, she does not talk yet.
-  /** Played up to the dawn of her day, Melda comes; the day before, she does not. */
+  /** Played up to the dawn of her day, Neighbour comes; the day before, she does not. */
   @Test
-  void meldaComesAtTheDawnOfHerDay() {
+  void neighbourComesAtTheDawnOfHerDay() {
     GameSession session = new GameSession(new GameConfig(), new Random(0));
-    int meldaDay = session.getMelda().getDay();
+    int neighbourDay = session.getNeighbour().getDay();
 
-    playQuietNights(session, meldaDay - 2);
-    assertFalse(session.getMelda().isVisiting());
+    playQuietNights(session, neighbourDay - 2);
+    assertFalse(session.getNeighbour().isVisiting());
 
     playQuietNights(session, 1);
-    assertEquals(meldaDay, session.getCycle().getNumber());
-    assertTrue(session.getMelda().isVisiting());
+    assertEquals(neighbourDay, session.getCycle().getNumber());
+    assertTrue(session.getNeighbour().isVisiting());
   }
 
   // DayState.update moves her visit with the frames of the day: 8 s in the forest, then 6 s to Garry (one frame
@@ -386,29 +386,29 @@ class GameSessionTest {
   // space after it, so it is whole. Read from GameConfig: up to the first space of her first text.
   /** On her day, the frames bring her to Garry, then write the next letters of her bubble. */
   @Test
-  void meldaWritesHerBubbleDuringTheDay() {
+  void neighbourWritesHerBubbleDuringTheDay() {
     GameSession session = new GameSession(new GameConfig(), new Random(0));
-    playQuietNights(session, session.getMelda().getDay() - 1);
+    playQuietNights(session, session.getNeighbour().getDay() - 1);
 
     session.update(8f);
     session.update(6f);
-    assertTrue(session.getMelda().isTalking());
+    assertTrue(session.getNeighbour().isTalking());
     session.update(0.5f);
 
-    String firstFact = new GameConfig().getMeldaFacts().get(0);
-    assertEquals(firstFact.substring(0, firstFact.indexOf(' ')), session.getMelda().getCurrentBubble());
+    String firstFact = new GameConfig().getNeighbourFacts().get(0);
+    assertEquals(firstFact.substring(0, firstFact.indexOf(' ')), session.getNeighbour().getCurrentBubble());
   }
 
   // The night falls during her visit: NightState sends her away, wherever she is.
-  /** The night after her day, Melda is no longer on screen. */
+  /** The night after her day, Neighbour is no longer on screen. */
   @Test
-  void meldaLeavesWhenTheNightFalls() {
+  void neighbourLeavesWhenTheNightFalls() {
     GameSession session = new GameSession(new GameConfig(), new Random(0));
-    playQuietNights(session, session.getMelda().getDay() - 1);
+    playQuietNights(session, session.getNeighbour().getDay() - 1);
 
     startQuietNight(session);
 
-    assertFalse(session.getMelda().isVisiting());
+    assertFalse(session.getNeighbour().isVisiting());
   }
 
   // -------------------- DEFENSES --------------------

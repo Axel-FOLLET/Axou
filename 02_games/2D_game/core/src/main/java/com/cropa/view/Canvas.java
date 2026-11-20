@@ -98,9 +98,9 @@ public interface Canvas {
      */
     void drawNote(List<String> lines, float x, float y, TextStyle style);
 
-    // For Melda's dialog (day 12): a dark box of a given size, and lines at the size of the HUD on it, without the
+    // For the neighbour's dialog (day 12): a dark box of a given size, and lines at the size of the HUD on it, without the
     // bubble of each line (drawText gives one to every text). The full-size font keeps the letters regular: the
-    // small one of drawNote, at half size, drew them uneven at Melda's length (Axel's test).
+    // small one of drawNote, at half size, drew them uneven at the neighbour's length (Axel's test).
     /**
      * Fills an area with the dark color of the bubbles, then writes lines of white text in it, at the size of the
      * HUD, from its top left corner.

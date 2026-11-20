@@ -21,16 +21,16 @@ public class NightState implements PhaseState {
   // Called once at the start of each night, by DayNightCycle, after the loops of GameSession.update.
   // The night N keeps the number of the day N (DayNightCycle.startNight does not change it): night 1 after day 1.
   // getWaveSpawner is package-private: NightState is in the same package as GameSession.
-  // Melda leaves first: the night falls, even in the middle of a bubble. Before her day, it changes nothing.
+  // The neighbour leaves first: the night falls, even in the middle of a bubble. Before her day, it changes nothing.
   /**
-   * Starts the night: Melda leaves, and the wave of this night begins, its first enemies come
+   * Starts the night: the neighbour leaves, and the wave of this night begins, its first enemies come
    * after the start delay.
    *
    * @param session the game
    */
   @Override
   public void enter(GameSession session) {
-    session.getMelda().leave();
+    session.getNeighbour().leave();
     session.getWaveSpawner().startNight(session.getCycle().getNumber());
   }
 

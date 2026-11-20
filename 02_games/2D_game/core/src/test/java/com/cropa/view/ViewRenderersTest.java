@@ -70,7 +70,7 @@ class ViewRenderersTest {
     //-------------------- HUD --------------------
     // The starting values come from the caller: other numbers show that nothing is written in the HUD.
     // On the second line, the urn gauge (J10): its words, its green part (150 / 10 000 of the bar) and its outline,
-    // then by day the "Lancer la nuit" button (J9). Both are tested in HudTest.
+    // then by day the "Lancer la nuit" button (J9), and the sound button (20/11). They are tested in HudTest.
     @Test
     void hudShowsTheValuesItReceives() {
         RecordingCanvas canvas = new RecordingCanvas();
@@ -80,7 +80,9 @@ class ViewRenderersTest {
                 "dot " + new Bounds(180, 266, 136f * (150f / 10000), 5) + " RIPE",
                 "outline WHITE " + new Bounds(180, 266, 136, 5),
                 "text Lancer la nuit 8.0 288.0",
-                "outline WHITE Bounds[x=5.0, y=272.0, width=93.0, height=19.0]"), canvas.calls);
+                "outline WHITE Bounds[x=5.0, y=272.0, width=93.0, height=19.0]",
+                "text Son : oui 481.0 24.0",
+                "outline WHITE " + new Bounds(478, 8, 63, 19)), canvas.calls);
     }
 
     // Without this test, an on... method could forget to rebuild the text and the old value would stay on screen.

@@ -60,15 +60,15 @@ class TitleSceneTest {
         assertTrue(drew("centered > Cliquer pour jouer < 280.0 95.0"));
     }
 
-    // Asked by Axel: M. Chmunks with the urn between Hugo and Alexis, all facing the player, their feet on y 150.
+    // Asked by Axel: M. Chmunks with the urn between Henchman 1 and Henchman 2, all facing the player, their feet on y 150.
     // The urn comes after M. Chmunks: it is drawn in front of him.
     @Test
     void chmunksHoldsTheUrnBetweenHisHenchmen() {
         new TitleScene(WORLD, true, FRENCH).render(canvas);
 
-        assertTrue(drew("sprite " + SpriteCatalog.HUGO_FRONT + " " + new Bounds(195, 150f - 42f * 2 / 56, 42, 42)));
+        assertTrue(drew("sprite " + SpriteCatalog.HENCHMAN_1_FRONT + " " + new Bounds(195, 150f - 42f * 2 / 56, 42, 42)));
         assertTrue(drew("sprite " + SpriteCatalog.CHMUNKS_FRONT + " " + new Bounds(258, 150f - 44f * 2 / 32, 44, 44)));
-        assertTrue(drew("sprite " + SpriteCatalog.ALEXIS_FRONT + " " + new Bounds(323, 150f - 42f * 3 / 56, 42, 42)));
+        assertTrue(drew("sprite " + SpriteCatalog.HENCHMAN_2_FRONT + " " + new Bounds(323, 150f - 42f * 3 / 56, 42, 42)));
         assertTrue(indexOf("sprite " + SpriteCatalog.URN) > indexOf("sprite " + SpriteCatalog.CHMUNKS_FRONT));
     }
 

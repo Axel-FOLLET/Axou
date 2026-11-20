@@ -212,13 +212,13 @@ public class EndScene implements GameListener {
         canvas.drawCenteredText(texts.farmFell(night, number), centerX, at(FIRST_LINE_TOP));
     }
 
-    // M. Chmunks goes away to the right with the urn, between Hugo and Alexis.
+    // M. Chmunks goes away to the right with the urn, between Henchman 1 and Henchman 2.
     private void drawUrnSold(Canvas canvas) {
         canvas.drawCenteredText(texts.defeatTitle(), centerX, at(TITLE_TOP));
-        Figure.HUGO.stand(canvas, centerX - SPACING, at(GROUND));
+        Figure.HENCHMAN_1.stand(canvas, centerX - SPACING, at(GROUND));
         Figure.CHMUNKS.stand(canvas, centerX, at(GROUND));
         Figure.URN.stand(canvas, centerX + CARRIED_X, at(GROUND + CARRIED_HEIGHT));
-        Figure.ALEXIS.stand(canvas, centerX + SPACING, at(GROUND));
+        Figure.HENCHMAN_2.stand(canvas, centerX + SPACING, at(GROUND));
         canvas.drawCenteredText(texts.urnSold(), centerX, at(FIRST_LINE_TOP));
     }
 

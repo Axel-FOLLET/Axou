@@ -61,8 +61,8 @@ public class GameSession {
   // The day and night cycle keeps the timer and the current phase; the dawn is DayState.enter, which calls dawn.
   private final DayNightCycle cycle;
 
-  // Melda comes once per game, on her day: DayState starts her at that dawn, NightState sends her away.
-  private final Melda melda;
+  // The neighbour comes once per game, on her day: DayState starts her at that dawn, NightState sends her away.
+  private final Neighbour neighbour;
 
   // The number of nights of a game (8): the dawn after the last one decides the urn. Read once from GameConfig.
   private final int nightCount;
@@ -140,7 +140,7 @@ public class GameSession {
     cycle = new DayNightCycle(config);
     // Her day is the first draw of the game's Random, before any enemy: the same seed always gives the same day.
     // Every later draw (the moles, the witches) comes one step after it.
-    melda = new Melda(config.getMeldaFacts(), config.getMeldaLettersPerSecond(), config.getNightCount(), random);
+    neighbour = new Neighbour(config.getNeighbourFacts(), config.getNeighbourLettersPerSecond(), config.getNightCount(), random);
 
     // config is only a parameter: the number of nights is kept, for the check of the last dawn in update.
     nightCount = config.getNightCount();
@@ -361,12 +361,12 @@ public class GameSession {
 
   // Read by the view at each frame, like the enemies: no event, it draws her bubble while she talks.
   /**
-   * Returns Melda, who comes once per game.
+   * Returns the neighbour, who comes once per game.
    *
-   * @return Melda
+   * @return the neighbour
    */
-  public Melda getMelda() {
-    return melda;
+  public Neighbour getNeighbour() {
+    return neighbour;
   }
 
   // Used by the screen to draw the defenses, and later by the shop to place and upgrade them.

@@ -193,8 +193,8 @@
             +getCropConfig():CropConfig
             +getEnemyConfig():EnemyConfig
             +getDefenseConfig():DefenseConfig
-            +getMeldaFacts():List<String>
-            +getMeldaLettersPerSecond():float
+            +getNeighbourFacts():List<String>
+            +getNeighbourLettersPerSecond():float
         }
         note bottom of GameConfig
             250 coins at the start (200 before D10), urn 10,000, 8 nights, day 60 s maximum, night 45 s maximum.
@@ -202,8 +202,8 @@
             one single config per game. GameConfig() creates the three default ones; the second constructor
             lets a test give its own (balance tried without touching the game values).
             GameConfig(language, firstGame), called by CropaGame: the language of every text (getLanguage, read by
-            GameScreen), and Melda's texts in it (getMeldaFacts, from Texts): true at launch and after a change of
-            language (meldaFirstGame), false after "Rejouer" (Play again) (meldaReplay).
+            GameScreen), and the neighbour's texts in it (getNeighbourFacts, from Texts): true at launch and after a change of
+            language (neighbourFirstGame), false after "Rejouer" (Play again) (neighbourReplay).
             GameConfig() and the test constructor -> French, first game.
         end note
         enum GameResult {
@@ -227,7 +227,7 @@
             Observer pattern: the HUD implements GameListener and subscribes to the game.
             The model notifies its subscribers without knowing that a HUD exists.
             onGameOver: one single call, with the way the game ends.
-            No event for Melda (D11): the view reads session.getMelda() every frame, like the enemies.
+            No event for Neighbour (D11): the view reads session.getNeighbour() every frame, like the enemies.
         end note
         interface PhaseState <<State>> {
             +enter(session : GameSession):void
@@ -243,12 +243,12 @@
         class DayState <<State>>
         note bottom of DayState
             enter: session.dawn() (crops grow one stage, defenses at dawn, remaining enemies flee),
-            then getMelda().startIfToday(day number). update: getMelda().update(delta), her bubble is written.
+            then getNeighbour().startIfToday(day number). update: getNeighbour().update(delta), her bubble is written.
             canAct -> true. End: timer at 0 or the "Lancer la nuit" (Start the night) button.
         end note
         class NightState <<State>>
         note bottom of NightState
-            enter: Melda leaves (getMelda().leave(), even in the middle of a bubble), then the night's wave
+            enter: Neighbour leaves (getNeighbour().leave(), even in the middle of a bubble), then the night's wave
             starts (WaveSpawner.startNight).
             update: adds to the game the enemies that the WaveSpawner spawns (session.addEnemy).
             canAct -> false. End: timer at 0 -> next day, or end of the game after night 8.
@@ -287,7 +287,7 @@
             +getEnemies():List<Enemy>
             ~getWaveSpawner():WaveSpawner
             +getDefenseSlots():DefenseSlots
-            +getMelda():Melda
+            +getNeighbour():Neighbour
             +getResult():Optional<GameResult>
             +isOver():boolean
         }
@@ -303,10 +303,10 @@
             no more carrots or catapatate from the POC). Each night has its wave (WaveSpawner, started by NightState).
             Reads all its configs from GameConfig; random is the only source of randomness, given to each enemy.
             dawn (package, L7): the dawn, called by DayState.enter; DayState no longer imports Crop, Defense or Enemy.
-            Melda's day is the first draw of random; the cat receives new Random(random.nextLong()).
+            The neighbour's day is the first draw of random; the cat receives new Random(random.nextLong()).
         end note
-        class Melda {
-            +Melda(facts : List<String>, lettersPerSecond : float, nightCount : int, random : Random)
+        class Neighbour {
+            +Neighbour(facts : List<String>, lettersPerSecond : float, nightCount : int, random : Random)
             +startIfToday(day : int):void
             +update(delta : float):void
             +nextBubble():void
@@ -319,10 +319,10 @@
             +getWalkProgress():float
             +getDay():int
         }
-        note bottom of Melda
+        note bottom of Neighbour
             Her day is drawn at creation: 2 + random.nextInt(nightCount - 1), so from day 2 to day 8.
-            startIfToday: called at each dawn; she comes only once, on her day. Her texts: GameConfig.getMeldaFacts().
-            update: writes the bubble at 20 letters/s (getMeldaLettersPerSecond); the day timer keeps running.
+            startIfToday: called at each dawn; she comes only once, on her day. Her texts: GameConfig.getNeighbourFacts().
+            update: writes the bubble at 20 letters/s (getNeighbourLettersPerSecond); the day timer keeps running.
             Phases: ABSENT, WANDERING (8 s in the forest), ARRIVING (6 s), TALKING, LEAVING (6 s), GONE.
             nextBubble ("Passer à la suite" (Move on) button): no effect while the bubble is being written; after the last one, she leaves.
             leave: at nightfall, no effect if she has not come (ABSENT).
@@ -337,15 +337,15 @@
             GONE
         }
         note bottom of Phase
-            Public enum declared in Melda (Melda.Phase): how far she is in her visit.
+            Public enum declared in Neighbour (Neighbour.Phase): how far she is in her visit.
             The view reads it (getPhase) to choose the path and the direction of her walk.
         end note
-        Melda +-- Phase
+        Neighbour +-- Phase
         PhaseState <|.. DayState
         PhaseState <|.. NightState
         DayNightCycle --> PhaseState
         GameSession *-- DayNightCycle
-        GameSession *-- Melda
+        GameSession *-- Neighbour
         GameSession o-- "*" GameListener
     }
     !endsub
@@ -376,15 +376,15 @@
             +level(level : int):String
             +ending(result : GameResult):String
             +tutorialBubbles():List<List<String>>
-            +meldaFirstGame():List<String>
-            +meldaReplay():List<String>
+            +neighbourFirstGame():List<String>
+            +neighbourReplay():List<String>
         }
         note bottom of Texts
             Every word the player reads, in French and in English, side by side in each method (pick): the view
             asks Texts instead of writing its own words. One instance per language (of). Only the main methods are
-            listed; the others follow the screens: title, cutscenes, HUD, shop, tutorial, Melda, end screen.
+            listed; the others follow the screens: title, cutscenes, HUD, shop, tutorial, Neighbour, end screen.
             French: the words of the game as the team wrote them. English: the same, with "Catapotato" and
-            Melda's talk without its swear word. "3 450" in French, "3,450" in English (number).
+            The neighbour's talk without its swear word. "3 450" in French, "3,450" in English (number).
             Only characters of the game font: no typographic apostrophe (TextWidth refuses it).
         end note
         Texts --> Language
@@ -873,16 +873,16 @@
             victory = Cinematic.victory(world, texts), drawn only if getResult() is VICTORY, before the end screen.
             Click: title screen shown -> on its language button, onSwitchLanguage at the start of the next frame
             (Gdx.app.postRunnable); anywhere else, it closes, nothing else; cutscene running -> next scene; game over (isOver) -> EndScene only: "Rejouer" -> onReplay at the start of the next frame
-            (Gdx.app.postRunnable), "Quitter" (Quit) -> Gdx.app.exit(); while Melda talks, meldaRenderer.handleClick takes all clicks;
+            (Gdx.app.postRunnable), "Quitter" (Quit) -> Gdx.app.exit(); while Neighbour talks, neighbourRenderer.handleClick takes all clicks;
             during the day, "Lancer la nuit" (hud.handleClick -> launchNight);
             then the shop (shopWindow.handleClick); then BoardLayout: slot -> handleSlotClick,
             cell -> handleCellClick; neither -> close. The shop decides (place, plant, open).
             resize updates the viewport; dispose frees the map, the canvas and the renderers.
             pause, resume and hide (required by Screen) stay empty.
-            Melda (D12): drawn with the enemies, before the front trees that hide her in the forest; her dialog after the shop;
-            every frame, hud.lockNight(session.getMelda().isVisiting()).
+            Neighbour (D12): drawn with the enemies, before the front trees that hide her in the forest; her dialog after the shop;
+            every frame, hud.lockNight(session.getNeighbour().isVisiting()).
             Tutorial (D14, Antonin), in the first game only (withTitle): drawn after the shop; its click
-            comes after Melda's and before the HUD's; while it is shown, session.update(0): the timer
+            comes after the neighbour's and before the HUD's; while it is shown, session.update(0): the timer
             of day 1 stays full until "Commencer à jouer" (Start playing).
             Garry (D14): farmRenderer receives session.getFarmer() and getCycle().isNight().
         end note
@@ -912,7 +912,7 @@
             Tint.HURT: setColor(1, 0.3, 0.3) for the time of one sprite; Tint.UPGRADED: setColor(0.4, 0.6, 1).
             drawNightVeil: the bubble pixel, stretched and tinted night blue. drawDot: the same pixel, in the color
             of the style (red, orange, green). drawRangeVeil: the same pixel, white at 35%.
-            drawDialog: a dark bubble over the whole area, then the lines in white in the HUD font (Melda's dialog).
+            drawDialog: a dark bubble over the whole area, then the lines in white in the HUD font (the neighbour's dialog).
             Tutorial (D14): Tint.GHOST, the image at 60% opacity; drawShade, the bubble pixel in black at 50%;
             drawArrow, a solid yellow arrow (ShapeRenderer in Filled mode).
             Loads each image once (key -> SpriteCatalog -> Texture) and frees them all in the same place.
@@ -1057,7 +1057,7 @@
             The end screen, over the frozen game: a dark veil, then one scene per ending (onGameOver).
             Victory: Garry, the urn and the ghost of his wife, "Rachetée au jour N" (Bought back on day N).
             Farm destroyed: the destroyed barn, "La ferme est tombée la nuit N." (The farm fell on night N.).
-            Urn sold: Mr Chmunks leaving with the urn, between Hugo and Alexis.
+            Urn sold: Mr Chmunks leaving with the urn, between Henchman 1 and Henchman 2.
             handleClick -> REPLAY or QUIT; GameScreen decides what to do with it. Nothing while the game goes on.
         end note
         enum EndChoice {
@@ -1073,7 +1073,7 @@
         }
         note bottom of TitleScene
             The title screen, at launch only: the darkened farm (veil 0.6), the full title
-            on three lines, Mr Chmunks with the urn between Hugo and Alexis, "> Cliquer pour jouer <" (Click to play),
+            on three lines, Mr Chmunks with the urn between Henchman 1 and Henchman 2, "> Cliquer pour jouer <" (Click to play),
             and at the top right the button of the other language ("English", or "Français" in English).
             handleClick: on that button -> SWITCH_LANGUAGE, the screen stays; anywhere else -> PLAY, it closes and
             draws nothing more; empty once closed.
@@ -1130,11 +1130,11 @@
             +{static} URN : String
             +{static} FARM_DESTROYED : String
             +{static} CHMUNKS : String
-            +{static} HUGO : String
-            +{static} ALEXIS : String
+            +{static} HENCHMAN_1 : String
+            +{static} HENCHMAN_2 : String
             +{static} CHMUNKS_FRONT : String
-            +{static} HUGO_FRONT : String
-            +{static} ALEXIS_FRONT : String
+            +{static} HENCHMAN_1_FRONT : String
+            +{static} HENCHMAN_2_FRONT : String
             +{static} pathOf(spriteKey : String):String
         }
         note bottom of SpriteCatalog
@@ -1214,7 +1214,7 @@
             The day before (day lastNight): red "Lancer la dernière nuit" (Start the last night) button, wider, and below it a block
             of two small red lines (drawNote): "Vous ne pourrez plus rien vendre après." (You will not be able to sell anything after.),
             "Seule la défense de votre ferme comptera." (Only the defense of your farm will count.).
-            Melda: her bubbles are drawn by MeldaRenderer, which reads session.getMelda() every frame;
+            Neighbour: her bubbles are drawn by NeighbourRenderer, which reads session.getNeighbour() every frame;
             the HUD greys out "Lancer la nuit" while she is there (lockNight).
         end note
         class ShopWindow {
@@ -1292,7 +1292,7 @@
             Five bubbles: plant, defend (the catapatate), garlic, turnip, "Améliorer"; shown = withTitle,
             never after "Rejouer". Modal: handleClick takes all clicks while a bubble is shown,
             only its button moves on ("Suivant" (Next), then "Commencer à jouer" on the last one).
-            render: the world darkened except the bubble's target (4 drawShade), the bubble in Melda's frame (drawDialog),
+            render: the world darkened except the bubble's target (4 drawShade), the bubble in the neighbour's frame (drawDialog),
             an arrow on the target (drawArrow); bubble 5 places a ghost catapatate (Tint.GHOST), only drawn.
             Each bubble opens the shop list it talks about (showPlantList, showDefenseList) or closes it.
             The bubbles and the buttons come from Texts; each button ends at x 347, its outline sized from its words.
@@ -1300,24 +1300,24 @@
         Tutorial --> ShopWindow : opens its lists
         Tutorial ..> BoardLayout : reads at creation
         Tutorial ..> DefenseRenderer : slotSpriteArea
-        class MeldaRenderer {
-            +MeldaRenderer(layout : BoardLayout, texts : Texts)
+        class NeighbourRenderer {
+            +NeighbourRenderer(layout : BoardLayout, texts : Texts)
             +nextButton():Bounds
-            +renderMelda(canvas : Canvas, melda : Melda):void
-            +renderDialog(canvas : Canvas, melda : Melda):void
-            +handleClick(melda : Melda, x : float, y : float):boolean
+            +renderNeighbour(canvas : Canvas, neighbour : Neighbour):void
+            +renderDialog(canvas : Canvas, neighbour : Neighbour):void
+            +handleClick(neighbour : Neighbour, x : float, y : float):boolean
             ~{static} directionOf(start : Point, end : Point):String
             ~{static} linesOf(text : String):List<String>
         }
-        note bottom of MeldaRenderer
-            Melda's visit (D12), with no event: reads session.getMelda() every frame, like the enemies.
+        note bottom of NeighbourRenderer
+            The neighbour's visit (D12), with no event: reads session.getNeighbour() every frame, like the enemies.
             Her paths are computed once from the farm point of the map: forest, gate, under Garry (seen from behind), dirt path.
-            renderMelda: her place = path x getWalkProgress (0 to 1), her sprite facing the direction of the walk (8 directions),
+            renderNeighbour: her place = path x getWalkProgress (0 to 1), her sprite facing the direction of the walk (8 directions),
             a small bubble on her left while she talks. renderDialog: the dark frame under the bottom fence (drawDialog,
             34 letters per line, 3 lines at most) and the "Passer à la suite" (Continue) button, grey while the bubble
             is being written, ending at x 343, its outline sized from its words.
             handleClick: true while she talks (the click is hers, wherever it lands); on the button, nextBubble.
-            directionOf and linesOf: static and package-private so that MeldaRendererTest checks the 8 directions and the line breaks of her real texts.
+            directionOf and linesOf: static and package-private so that NeighbourRendererTest checks the 8 directions and the line breaks of her real texts.
         end note
         class TextWidth {
             +{static} of(text : String):int
@@ -1337,7 +1337,7 @@
         BoardLayout *-- Point
         DefenseRenderer --> BoardLayout
         DefenseRenderer *-- "2" HitFlash
-        MeldaRenderer ..> BoardLayout : reads at creation
+        NeighbourRenderer ..> BoardLayout : reads at creation
     }
     !endsub
     !startsub VIEW_WORLD
@@ -1433,7 +1433,7 @@
     Hud --> Texts
     ShopWindow --> Texts
     Tutorial --> Texts
-    MeldaRenderer --> Texts
+    NeighbourRenderer --> Texts
     EndScene --> Texts
     TitleScene --> Texts
     Cinematic ..> Texts
@@ -1445,7 +1445,7 @@
     NightState ..> WaveSpawner : starts the wave
     FarmRenderer ..> Cat : reads
     FarmRenderer ..> Farmer : reads
-    GameScreen *-- MeldaRenderer
+    GameScreen *-- NeighbourRenderer
     GameScreen *-- Tutorial
-    MeldaRenderer ..> Melda : reads
+    NeighbourRenderer ..> Neighbour : reads
 @enduml

@@ -8,6 +8,7 @@ package com.cropa.view;
 // OptionalInt for "no line chosen yet" and for what a harvest brings.
 // CropConfig (day 14): the value of each crop once ripe, shown next to its price in the "Planter" list.
 // Texts: the words of the shop and the names of the crops and defenses, in the language of the game.
+// Cue and CuePlayer (20/11): the sounds of the shop, and what plays them (the Jukebox in the game, a list in the tests).
 import com.cropa.model.defense.Defense;
 import com.cropa.model.defense.DefenseOffer;
 import com.cropa.model.defense.DefenseSlot;
@@ -19,6 +20,8 @@ import com.cropa.model.world.CropConfig;
 import com.cropa.model.world.CropType;
 import com.cropa.model.world.Occupant;
 import com.cropa.text.Texts;
+import com.cropa.view.audio.Cue;
+import com.cropa.view.audio.CuePlayer;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
@@ -33,10 +36,13 @@ import java.util.OptionalInt;
 // The "Défenses" list opens two ways too. From the button: an offer picked waits for a click on a slot or a cell.
 // From an empty slot (day 14): the player picks the catapatate, and it is bought on that slot at once; the scarecrow
 // and the bramble, which go on the field, are grey there.
-// Bottom right, by day: the urn, the goal of the game, a button like the others (white outline).
+// Bottom right, by day: the urn, the goal of the game, a button like the others (white outline), left of the sound
+// button of the HUD.
 // It also decides what a click on a cell or a slot does (handleCellClick, handleSlotClick), so this order is tested
 // without a window.
 // Every clickable area has a white outline. No libGDX: it draws through Canvas and receives clicks as world points.
+// Each click makes its sound (20/11): a list or a panel that opens, a button or a line picked, a seed planted, a defense
+// placed or upgraded, a crop sold, and a refusal when the shop says no (not enough money, a taken place, the night).
 /**
  * The shop on screen: the "Planter" button and its list (the four seeds, with their price and their value once ripe),
  * the "Défenses" button and its list (the three defenses, with their price), also opened by an empty slot, the urn by
@@ -58,8 +64,14 @@ public class ShopWindow {
     // Row 0: the outline of each button is 3 px wider than its words on each side ("Planter" is 46 px wide in the
     // default font, "Défenses" 63 px), and 12 px of gap between the two outlines.
     private static final float BUTTON_GAP = 12f;
-    // The urn, alone at the bottom right of the world: far from the lists, which never reach it.
+    // The urn, at the bottom right of the world: far from the lists, which never reach it. Since 20/11 the sound button
+    // of the HUD takes the corner (from x 473 at most), and the urn stands left of it: its outline ends at x 469, 4 px
+    // before. "Acheter l'urne" is 89 px wide ("Buy the urn" 74): the outline holds the French words, so it starts at
+    // x 374, 26 px right of the dialog frame of the tutorial and of the neighbour (it ends at x 348, on the same line).
+    // The price is no longer on the button: the gauge of the HUD shows it.
     private static final float URN_TOP = 24f;
+    private static final float URN_RIGHT = 469f;
+    private static final float URN_WIDTH = 95f;
     // The lines of the "Planter" list: the four crops, in the order of CropType. Rows 1 to 4.
     private static final int PLANT_LINES = CropType.values().length;
     // The lines of the "Défenses" list: one per kind of defense (GameSession creates one offer per DefenseType). Rows 1 to 3.
@@ -76,9 +88,8 @@ public class ShopWindow {
     public static final Bounds REMOVE_BUTTON = rowBounds(REMOVE_ROW, PANEL_WIDTH);
     /** The "Vendre" line of the panel of a crop: sells it, by day only. */
     public static final Bounds SELL_BUTTON = rowBounds(SELL_ROW, PANEL_WIDTH);
-    // "Urne, 10000 pièces" is 126 px wide: the width of the panel holds it.
     /** The urn of the shop: buys it, by day only. */
-    public static final Bounds URN_BUTTON = new Bounds(PANEL_X - 3, URN_TOP - 16, PANEL_WIDTH, 19);
+    public static final Bounds URN_BUTTON = new Bounds(URN_RIGHT - URN_WIDTH, URN_TOP - 16, URN_WIDTH, 19);
     // The whole lists, and the whole panel of a defense, under the buttons. A click inside never goes through to the board.
     private static final Bounds LIST_AREA = rowsBounds(1, PLANT_LINES);
     private static final Bounds DEFENSE_LIST_AREA = rowsBounds(1, DEFENSE_LINES);
@@ -96,8 +107,11 @@ public class ShopWindow {
     private final Bounds upgradeButton;
     // Asked whether it is day, for its shop, for the defenses of the field and for the urn. It never changes: final.
     private final GameSession session;
-    // The price of the urn, shown on its line. Given by GameScreen, read in GameConfig: no number of the rules here.
+    // The price of the urn: its button stays grey below it. Given by GameScreen, read in GameConfig: no number of the
+    // rules here.
     private final int urnPrice;
+    // Plays the sounds of the shop. Given by GameScreen: the shop does not know whether the sound is cut.
+    private final CuePlayer cues;
     // The values of the crops, the same object the session plants with (GameConfig.getCropConfig): read only, for the
     // value of a ripe crop in the "Planter" list.
     private final CropConfig crops;
@@ -127,12 +141,14 @@ public class ShopWindow {
      * Creates the shop of a game, with every panel closed.
      *
      * @param session the game, asked whether actions are allowed (day) or not (night)
-     * @param urnPrice the price of the urn, shown on its line
+     * @param urnPrice the price of the urn: its button stays grey below it
      * @param crops the values of the crops, for the value of a ripe crop shown in the "Planter" list
      * @param texts the words of the shop, in the language of the game
+     * @param cues plays the sounds of the shop
      */
-    public ShopWindow(GameSession session, int urnPrice, CropConfig crops, Texts texts) {
+    public ShopWindow(GameSession session, int urnPrice, CropConfig crops, Texts texts, CuePlayer cues) {
         this.session = session;
+        this.cues = cues;
         this.urnPrice = urnPrice;
         this.crops = crops;
         this.texts = texts;
@@ -349,7 +365,9 @@ public class ShopWindow {
             return true;
         }
         if (session.getCycle().canAct() && URN_BUTTON.contains(x, y)) {
-            session.buyUrn();
+            if (!session.buyUrn()) {
+                cues.play(Cue.UI_REFUSED);
+            }
             return true;
         }
         if (listShown()) {
@@ -367,12 +385,13 @@ public class ShopWindow {
             return false;
         }
         if (showsUpgrade(defense.get()) && upgradeButton.contains(x, y)) {
-            session.getShop().upgrade(defense.get());
+            confirm(session.getShop().upgrade(defense.get()), Cue.DEFENSE_UPGRADE);
             return true;
         }
         if (showsRemove() && REMOVE_BUTTON.contains(x, y)) {
             remove();
             close();
+            cues.play(Cue.UI_CLICK);
             return true;
         }
         if (PANEL.contains(x, y)) {
@@ -394,12 +413,14 @@ public class ShopWindow {
      */
     public void handleSlotClick(DefenseSlot slot) {
         if (pendingOffer.isPresent()) {
-            if (session.getCycle().canAct() && session.getShop().buyDefense(pendingOffer.get(), slot)) {
+            if (confirm(session.getCycle().canAct() && session.getShop().buyDefense(pendingOffer.get(), slot),
+                    Cue.DEFENSE_PLACE)) {
                 close();
             }
             return;
         }
         slot.getDefense().ifPresentOrElse(defense -> openSlotPanel(slot, defense), () -> openDefenseListFor(slot));
+        cues.play(Cue.UI_SHOP_OPEN);
     }
 
     // The panel of the defense, then the slot it stands on is remembered, for "Retirer" (day 14). openFor first: it
@@ -429,25 +450,27 @@ public class ShopWindow {
      */
     public void handleCellClick(Cell cell) {
         if (pendingOffer.isPresent()) {
-            if (session.getCycle().canAct() && session.getShop().buyDefense(pendingOffer.get(), cell)) {
+            if (confirm(session.getCycle().canAct() && session.getShop().buyDefense(pendingOffer.get(), cell),
+                    Cue.DEFENSE_PLACE)) {
                 close();
             }
             return;
         }
         if (hasPendingChoice()) {
-            if (session.getCycle().canAct() && buy(chosenLine.getAsInt(), cell)) {
+            if (confirm(session.getCycle().canAct() && buy(chosenLine.getAsInt(), cell), Cue.PLANT)) {
                 close();
             }
             return;
         }
         openFor(cell);
+        cues.play(Cue.UI_SHOP_OPEN);
     }
 
     // The panel of a crop: "Vendre", by day only, sells it through the shop and closes the panel. Elsewhere in the
     // panel, kept; outside, the panel closes and false lets GameScreen look at the board (a click elsewhere cancels).
     private boolean handleCropClick(float x, float y) {
         if (session.getCycle().canAct() && SELL_BUTTON.contains(x, y)) {
-            clickedCell.ifPresent(cell -> session.getShop().sell(cell));
+            clickedCell.ifPresent(cell -> confirm(session.getShop().sell(cell), Cue.HARVEST));
             close();
             return true;
         }
@@ -459,11 +482,14 @@ public class ShopWindow {
     }
 
     // The button: a shown list rolls up; otherwise the list unrolls, with no line picked, and whatever was open closes.
+    // The sound here, not in showPlantList: the tutorial also unrolls the list, without a click of the player.
     private void toggleList() {
         if (listShown()) {
             close();
+            cues.play(Cue.UI_CLICK);
         } else {
             showPlantList();
+            cues.play(Cue.UI_SHOP_OPEN);
         }
     }
 
@@ -471,8 +497,10 @@ public class ShopWindow {
     private void toggleDefenseList() {
         if (defenseListShown) {
             close();
+            cues.play(Cue.UI_CLICK);
         } else {
             showDefenseList();
+            cues.play(Cue.UI_SHOP_OPEN);
         }
     }
 
@@ -490,8 +518,12 @@ public class ShopWindow {
             return true;
         }
         for (int line = 0; line < PLANT_LINES; line++) {
-            if (plantLine(line).contains(x, y) && canAfford(plantPrice(line))) {
-                pickLine(line);
+            if (plantLine(line).contains(x, y)) {
+                if (canAfford(plantPrice(line))) {
+                    pickLine(line);
+                } else {
+                    cues.play(Cue.UI_REFUSED);
+                }
             }
         }
         return true;
@@ -513,8 +545,12 @@ public class ShopWindow {
         }
         List<DefenseOffer> offers = session.getShop().getDefenseOffers();
         for (int line = 0; line < offers.size(); line++) {
-            if (defenseLine(line).contains(x, y) && canBuyHere(offers.get(line))) {
-                pickOffer(offers.get(line));
+            if (defenseLine(line).contains(x, y)) {
+                if (canBuyHere(offers.get(line))) {
+                    pickOffer(offers.get(line));
+                } else {
+                    cues.play(Cue.UI_REFUSED);
+                }
             }
         }
         return true;
@@ -525,9 +561,10 @@ public class ShopWindow {
     private void pickOffer(DefenseOffer offer) {
         if (clickedSlot.isEmpty()) {
             pendingOffer = Optional.of(offer);
+            cues.play(Cue.UI_CLICK);
             return;
         }
-        if (session.getShop().buyDefense(offer, clickedSlot.get())) {
+        if (confirm(session.getShop().buyDefense(offer, clickedSlot.get()), Cue.DEFENSE_PLACE)) {
             close();
         }
     }
@@ -544,10 +581,11 @@ public class ShopWindow {
     private void pickLine(int line) {
         if (listFromButton) {
             chosenLine = OptionalInt.of(line);
+            cues.play(Cue.UI_CLICK);
             return;
         }
         Optional<Cell> cell = plantCell();
-        if (cell.isPresent() && buy(line, cell.get())) {
+        if (cell.isPresent() && confirm(buy(line, cell.get()), Cue.PLANT)) {
             close();
         }
     }
@@ -555,6 +593,13 @@ public class ShopWindow {
     // The seed of the line, bought by the shop, which checks the money and the cell: a refusal costs nothing.
     private boolean buy(int line, Cell cell) {
         return session.getShop().buySeed(CropType.values()[line], cell);
+    }
+
+    // The sound of an answer of the shop: the sound of what was done, or the refusal. Returns the answer, so the caller
+    // still decides what closes.
+    private boolean confirm(boolean done, Cue sound) {
+        cues.play(done ? sound : Cue.UI_REFUSED);
+        return done;
     }
 
     //-------------------- DRAWING --------------------
@@ -576,7 +621,7 @@ public class ShopWindow {
         canvas.drawOutline(defenseButton, OutlineColor.WHITE);
         if (session.getCycle().canAct()) {
             TextStyle style = canAfford(urnPrice) ? TextStyle.NORMAL : TextStyle.GREYED;
-            canvas.drawText(texts.urnOffer(urnPrice), PANEL_X, URN_TOP, style);
+            canvas.drawText(texts.urnOffer(), URN_BUTTON.x() + 3, URN_TOP, style);
             canvas.drawOutline(URN_BUTTON, OutlineColor.WHITE);
         }
         if (listShown()) {

@@ -4,10 +4,10 @@
 
     actor Player
     participant GameScreen
-    participant MeldaRenderer
+    participant NeighbourRenderer
     participant Hud <<Observer>>
     participant GameSession
-    participant Melda
+    participant Neighbour
     participant DayNightCycle
     participant NightState <<State>>
     participant DayState <<State>>
@@ -29,12 +29,12 @@
     == Start of the night ==
     note over GameScreen
         render, before handleClick: "Lancer la nuit" is greyed out
-        during Melda's whole visit (Hud.lockNight).
+        during the neighbour's whole visit (Hud.lockNight).
     end note
-    GameScreen -> GameSession : getMelda()
-    GameSession --> GameScreen : melda
-    GameScreen -> Melda : isVisiting()
-    Melda --> GameScreen : false
+    GameScreen -> GameSession : getNeighbour()
+    GameSession --> GameScreen : neighbour
+    GameScreen -> Neighbour : isVisiting()
+    Neighbour --> GameScreen : false
     GameScreen -> Hud : lockNight(false)
     Player -> GameScreen : click (x, y)
     activate GameScreen
@@ -47,15 +47,15 @@
     end note
     GameScreen -> GameSession : isOver()
     GameSession --> GameScreen : false
-    GameScreen -> GameSession : getMelda()
-    GameSession --> GameScreen : melda
-    GameScreen -> MeldaRenderer : handleClick(melda, x, y)
-    activate MeldaRenderer
-    MeldaRenderer -> Melda : isTalking()
-    Melda --> MeldaRenderer : false
-    MeldaRenderer --> GameScreen : false (she is not talking: the click goes on)
-    deactivate MeldaRenderer
-    note right of MeldaRenderer
+    GameScreen -> GameSession : getNeighbour()
+    GameSession --> GameScreen : neighbour
+    GameScreen -> NeighbourRenderer : handleClick(neighbour, x, y)
+    activate NeighbourRenderer
+    NeighbourRenderer -> Neighbour : isTalking()
+    Neighbour --> NeighbourRenderer : false
+    NeighbourRenderer --> GameScreen : false (she is not talking: the click goes on)
+    deactivate NeighbourRenderer
+    note right of NeighbourRenderer
         While she talks: true, the click stops there
         (on "Passer à la suite" (Next), nextBubble()).
         During her visit, Hud.handleClick returns false (lockNight).
@@ -71,10 +71,10 @@
     DayNightCycle -> DayNightCycle : startNight(session)
     DayNightCycle -> NightState : enter(session)
     activate NightState
-    NightState -> GameSession : getMelda()
-    GameSession --> NightState : melda
-    NightState -> Melda : leave()
-    note right of Melda
+    NightState -> GameSession : getNeighbour()
+    GameSession --> NightState : neighbour
+    NightState -> Neighbour : leave()
+    note right of Neighbour
         Night falls: if she came that day, she leaves
         at once (GONE), even in the middle of a bubble.
         Before her day (ABSENT), nothing changes.
@@ -336,14 +336,14 @@
             frame, removeIf takes it out of the list, with no reward.
         end note
         deactivate GameSession
-        DayState -> GameSession : getMelda()
-        GameSession --> DayState : melda
+        DayState -> GameSession : getNeighbour()
+        GameSession --> DayState : neighbour
         DayState -> GameSession : getCycle()
         GameSession --> DayState : cycle
         DayState -> DayNightCycle : getNumber()
         DayNightCycle --> DayState : day
-        DayState -> Melda : startIfToday(day)
-        note right of Melda
+        DayState -> Neighbour : startIfToday(day)
+        note right of Neighbour
             On the drawn day (from 2 to 8, once per game),
             she starts her walk in the forest.
         end note

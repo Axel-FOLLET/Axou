@@ -4,12 +4,12 @@
 
     actor Player
     participant GameScreen
-    participant MeldaRenderer
+    participant NeighbourRenderer
     participant Hud <<Observer>>
     participant ShopWindow
     participant BoardLayout
     participant GameSession
-    participant Melda
+    participant Neighbour
     participant DayNightCycle
     participant Shop
     participant Wallet
@@ -27,15 +27,15 @@
     end note
     GameScreen -> GameSession : isOver()
     GameSession --> GameScreen : false
-    GameScreen -> GameSession : getMelda()
-    GameSession --> GameScreen : melda
-    GameScreen -> MeldaRenderer : handleClick(melda, x, y)
-    activate MeldaRenderer
-    MeldaRenderer -> Melda : isTalking()
-    Melda --> MeldaRenderer : false
-    MeldaRenderer --> GameScreen : false (she is not talking: the click goes on)
-    deactivate MeldaRenderer
-    note right of MeldaRenderer
+    GameScreen -> GameSession : getNeighbour()
+    GameSession --> GameScreen : neighbour
+    GameScreen -> NeighbourRenderer : handleClick(neighbour, x, y)
+    activate NeighbourRenderer
+    NeighbourRenderer -> Neighbour : isTalking()
+    Neighbour --> NeighbourRenderer : false
+    NeighbourRenderer --> GameScreen : false (she is not talking: the click goes on)
+    deactivate NeighbourRenderer
+    note right of NeighbourRenderer
         While she talks: true, the click stops there
         (on "Passer à la suite" (Next), nextBubble()).
         The player buys and starts the night outside her visit.
@@ -62,7 +62,7 @@
     activate GameScreen
     note right of GameScreen
         Same first checks as in click 1
-        (isOver, MeldaRenderer.handleClick -> false,
+        (isOver, NeighbourRenderer.handleClick -> false,
         canAct, Hud.handleClick -> false).
     end note
     GameScreen -> ShopWindow : handleClick(x, y)
@@ -103,7 +103,7 @@
     activate GameScreen
     note right of GameScreen
         Same first checks as in click 1
-        (isOver, MeldaRenderer.handleClick -> false,
+        (isOver, NeighbourRenderer.handleClick -> false,
         canAct, Hud.handleClick -> false).
     end note
     GameScreen -> ShopWindow : handleClick(x, y)

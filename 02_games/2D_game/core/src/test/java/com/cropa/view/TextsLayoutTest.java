@@ -25,7 +25,7 @@ class TextsLayoutTest {
 
     //-------------------- CONSTANTS --------------------
     // The world is 560 px wide. The shop panel holds 138 px of words (144 minus 3 px on each side); the dialog frame of
-    // the tutorial and of Melda, 236 px. The first line of the HUD ends before the shop (x 397, from x 8).
+    // the tutorial and of the neighbour, 236 px. The first line of the HUD ends before the shop (x 397, from x 8).
     private static final float WORLD_WIDTH = 560f;
     private static final float PANEL_WORDS = 138f;
     private static final float DIALOG_WORDS = 236f;
@@ -61,7 +61,7 @@ class TextsLayoutTest {
     @ParameterizedTest
     @EnumSource(Language.class)
     void theShopButtonsFitTheWorld(Language language) {
-        ShopWindow shop = new ShopWindow(null, MAX_MONEY, new CropConfig(), Texts.of(language));
+        ShopWindow shop = new ShopWindow(null, MAX_MONEY, new CropConfig(), Texts.of(language), cue -> { });
         Bounds defenses = shop.defenseButton();
 
         assertTrue(defenses.x() > shop.plantButton().x() + shop.plantButton().width());
@@ -86,7 +86,6 @@ class TextsLayoutTest {
             fits(texts.name(type) + " (" + MAX_MONEY + ")", PANEL_WORDS);
             fits(texts.defenseTitle(type, MAX_LEVEL, 100), PANEL_WORDS);
         }
-        fits(texts.urnOffer(MAX_MONEY), PANEL_WORDS);
         fits(texts.upgrade(200), PANEL_WORDS);
         fits(texts.maxLevel(), PANEL_WORDS);
         fits(texts.remove(), PANEL_WORDS);
@@ -109,14 +108,14 @@ class TextsLayoutTest {
         }
     }
 
-    // Melda's texts, cut the way her dialog cuts them: 3 lines at most (no word lost), each one inside the frame.
+    // The neighbour's texts, cut the way her dialog cuts them: 3 lines at most (no word lost), each one inside the frame.
     @ParameterizedTest
     @EnumSource(Language.class)
-    void meldaFitsHerFrame(Language language) {
+    void neighbourFitsHerFrame(Language language) {
         Texts texts = Texts.of(language);
-        for (List<String> facts : List.of(texts.meldaFirstGame(), texts.meldaReplay())) {
+        for (List<String> facts : List.of(texts.neighbourFirstGame(), texts.neighbourReplay())) {
             for (String fact : facts) {
-                List<String> lines = MeldaRenderer.linesOf(fact);
+                List<String> lines = NeighbourRenderer.linesOf(fact);
                 assertEquals(fact, String.join(" ", lines), "more than 3 lines: " + fact);
                 lines.forEach(line -> fits(line, DIALOG_WORDS));
             }
@@ -136,6 +135,25 @@ class TextsLayoutTest {
         fits(texts.urnSold(), WORLD_WIDTH);
         fits(texts.replay(), END_BUTTON_WORDS);
         fits(texts.quit(), END_BUTTON_WORDS);
+    }
+
+    // The bottom line, by day (20/11): the dialog frame of the tutorial and of the neighbour, then the urn button, then
+    // the sound button in the corner, in both of its states. The urn's words fit its outline; nothing touches, and the
+    // sound button stays in the world.
+    @ParameterizedTest
+    @EnumSource(Language.class)
+    void theUrnAndTheSoundButtonShareTheBottomLine(Language language) {
+        Texts texts = Texts.of(language);
+        Hud hud = new Hud(320, MAX_MONEY, 100, 8, MAX_MONEY, texts);
+        Bounds urn = ShopWindow.URN_BUTTON;
+        fits(texts.urnOffer(), urn.width() - 6);
+        assertTrue(urn.x() > Tutorial.AREA.x() + Tutorial.AREA.width(), "the urn touches the dialog frame");
+        for (boolean muted : new boolean[] {false, true}) {
+            hud.showMuted(muted);
+            Bounds button = hud.getSoundButton();
+            assertTrue(button.x() > urn.x() + urn.width(), texts.sound(muted) + " touches the urn");
+            assertTrue(button.x() + button.width() <= WORLD_WIDTH, texts.sound(muted) + " leaves the world");
+        }
     }
 
     //-------------------- HELPERS --------------------

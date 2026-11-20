@@ -23,15 +23,15 @@ record Figure(String key, float size, float feet) {
     static final Figure URN = new Figure(SpriteCatalog.URN, 40f, 40f * 8 / 32);
     // The destroyed farm, at the size of the farm in the game (FarmRenderer): 7 empty rows in a 56 px image.
     static final Figure FARM_DESTROYED = new Figure(SpriteCatalog.FARM_DESTROYED, 100f, 100f * 7 / 56);
-    // M. Chmunks: 29 px tall in a 32 px image, 2 empty rows. Hugo and Alexis: 53 px tall in a 56 px image, 2 empty rows.
+    // M. Chmunks: 29 px tall in a 32 px image, 2 empty rows. Henchman 1 and Henchman 2: 53 px tall in a 56 px image, 2 empty rows.
     // Walking away to the right: the end screen.
     static final Figure CHMUNKS = new Figure(SpriteCatalog.CHMUNKS, 44f, 44f * 2 / 32);
-    static final Figure HUGO = new Figure(SpriteCatalog.HUGO, 42f, 42f * 2 / 56);
-    static final Figure ALEXIS = new Figure(SpriteCatalog.ALEXIS, 42f, 42f * 2 / 56);
-    // The same three facing the player: the title screen. Same sizes, but Alexis has 3 empty rows (51 px tall).
+    static final Figure HENCHMAN_1 = new Figure(SpriteCatalog.HENCHMAN_1, 42f, 42f * 2 / 56);
+    static final Figure HENCHMAN_2 = new Figure(SpriteCatalog.HENCHMAN_2, 42f, 42f * 2 / 56);
+    // The same three facing the player: the title screen. Same sizes, but Henchman 2 has 3 empty rows (51 px tall).
     static final Figure CHMUNKS_FRONT = new Figure(SpriteCatalog.CHMUNKS_FRONT, 44f, 44f * 2 / 32);
-    static final Figure HUGO_FRONT = new Figure(SpriteCatalog.HUGO_FRONT, 42f, 42f * 2 / 56);
-    static final Figure ALEXIS_FRONT = new Figure(SpriteCatalog.ALEXIS_FRONT, 42f, 42f * 3 / 56);
+    static final Figure HENCHMAN_1_FRONT = new Figure(SpriteCatalog.HENCHMAN_1_FRONT, 42f, 42f * 2 / 56);
+    static final Figure HENCHMAN_2_FRONT = new Figure(SpriteCatalog.HENCHMAN_2_FRONT, 42f, 42f * 3 / 56);
 
     //-------------------- DRAWING --------------------
     // Called by the scenes. The square starts feet lower than the ground: its empty rows fall under the line.

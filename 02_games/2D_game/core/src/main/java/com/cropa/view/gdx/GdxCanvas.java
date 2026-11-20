@@ -41,7 +41,7 @@ public class GdxCanvas implements Canvas {
     // The labels: the same font at half size (lsans-15, 18 px high per line, about 9 once scaled), with a thinner bubble.
     private static final float LABEL_SCALE = 0.5f;
     private static final float LABEL_PADDING = 1f;
-    // Melda's dialog: where its first line starts in its box, from the left edge and from the top.
+    // The neighbour's dialog: where its first line starts in its box, from the left edge and from the top.
     private static final float DIALOG_LEFT = 8f;
     private static final float DIALOG_TOP = 4f;
     // A hit sprite: red kept whole, green and blue at 30 %. A beige pixel (230, 200, 160) becomes (230, 60, 48).
@@ -248,7 +248,7 @@ public class GdxCanvas implements Canvas {
         labelFont.setColor(Color.WHITE);
     }
 
-    // Called by MeldaRenderer while she talks. The dark box first, the same black as the bubbles, from its top left
+    // Called by NeighbourRenderer while she talks. The dark box first, the same black as the bubbles, from its top left
     // corner (drawBubble draws downwards from its y) with no padding: the box is the area. Then the lines with the HUD
     // font, at full size: 8 px from the left edge, the first one 4 px under the top, one line height (18 px) apart.
     /**

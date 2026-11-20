@@ -57,15 +57,15 @@ class TextsTest {
     }
 
     // Each list has as many lines in both languages: one line per image of a cinematic, the same bubbles of the
-    // tutorial, the same bubbles of Melda.
+    // tutorial, the same bubbles of Neighbour.
     @Test
     void bothLanguagesTellTheSameNumberOfLines() {
         assertEquals(FRENCH.titleLines().size(), ENGLISH.titleLines().size());
         assertEquals(FRENCH.introLines().size(), ENGLISH.introLines().size());
         assertEquals(FRENCH.victoryLines().size(), ENGLISH.victoryLines().size());
         assertEquals(FRENCH.tutorialBubbles().size(), ENGLISH.tutorialBubbles().size());
-        assertEquals(FRENCH.meldaFirstGame().size(), ENGLISH.meldaFirstGame().size());
-        assertEquals(FRENCH.meldaReplay().size(), ENGLISH.meldaReplay().size());
+        assertEquals(FRENCH.neighbourFirstGame().size(), ENGLISH.neighbourFirstGame().size());
+        assertEquals(FRENCH.neighbourReplay().size(), ENGLISH.neighbourReplay().size());
         assertEquals(FRENCH.lastSaleWarning().size(), ENGLISH.lastSaleWarning().size());
     }
 

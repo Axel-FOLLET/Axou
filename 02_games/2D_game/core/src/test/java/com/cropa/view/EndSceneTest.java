@@ -101,7 +101,7 @@ class EndSceneTest {
         assertFalse(drew("la nuit"));
     }
 
-    // The other defeat: M. Chmunks goes away with the urn, between Hugo and Alexis.
+    // The other defeat: M. Chmunks goes away with the urn, between Henchman 1 and Henchman 2.
     @Test
     void theUrnSoldShowsChmunksAndHisHenchmen() {
         scene.onDayStarted(9);
@@ -109,10 +109,10 @@ class EndSceneTest {
         scene.render(canvas);
 
         assertTrue(drew("centered DÉFAITE"));
-        assertTrue(drew("sprite " + SpriteCatalog.HUGO));
+        assertTrue(drew("sprite " + SpriteCatalog.HENCHMAN_1));
         assertTrue(drew("sprite " + SpriteCatalog.CHMUNKS));
         assertTrue(drew("sprite " + SpriteCatalog.URN));
-        assertTrue(drew("sprite " + SpriteCatalog.ALEXIS));
+        assertTrue(drew("sprite " + SpriteCatalog.HENCHMAN_2));
         assertTrue(drew("M. Chmunks a vendu l'urne. Trop tard."));
         assertFalse(drew("sprite " + SpriteCatalog.FARM_DESTROYED));
     }

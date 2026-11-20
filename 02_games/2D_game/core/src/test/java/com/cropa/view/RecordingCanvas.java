@@ -45,7 +45,7 @@ public class RecordingCanvas implements Canvas {
         calls.add("centered " + text + " " + centerX + " " + y);
     }
 
-    // Melda's dialog: its lines joined by " / ", then its box.
+    // The neighbour's dialog: its lines joined by " / ", then its box.
     @Override
     public void drawDialog(List<String> lines, Bounds area) {
         calls.add("dialog " + String.join(" / ", lines) + " " + area);

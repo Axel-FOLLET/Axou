@@ -11,9 +11,11 @@ package com.cropa.view.gdx;
 // and the labels of all of them. EnemyRenderer: the enemies.
 // NightRenderer: the dark veil of the night. Bounds: the whole world, which the veil covers.
 // GrowthRenderer: the colored dot of each crop. OutlineRenderer also veils the range of the defense shown.
-// MeldaRenderer: Melda while she talks, and the note of her words, which a click passes.
+// NeighbourRenderer: the neighbour while she talks, and the note of her words, which a click passes.
 // TitleChoice: the click on the title screen, which may ask for the other language. Texts: every word of the screen, in
 // the language of the game (GameConfig).
+// The sound (20/11): AudioDirector makes the sounds of this game, Jukebox (given by CropaGame) plays them with the music,
+// Cue names the click of the buttons. Random: the neighbour's syllables.
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
@@ -36,7 +38,7 @@ import com.cropa.view.EndScene;
 import com.cropa.view.FarmRenderer;
 import com.cropa.view.GrowthRenderer;
 import com.cropa.view.Hud;
-import com.cropa.view.MeldaRenderer;
+import com.cropa.view.NeighbourRenderer;
 import com.cropa.view.NightRenderer;
 import com.cropa.view.OutlineRenderer;
 import com.cropa.view.ShopWindow;
@@ -44,10 +46,14 @@ import com.cropa.text.Texts;
 import com.cropa.view.TitleChoice;
 import com.cropa.view.TitleScene;
 import com.cropa.view.Tutorial;
+import com.cropa.view.audio.AudioDirector;
+import com.cropa.view.audio.Cue;
+import com.cropa.view.audio.Jukebox;
 import com.cropa.view.enemy.EnemyRenderer;
 import com.cropa.view.world.WorldRenderer;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 // implements Screen: GameScreen writes the 7 methods of Screen, one per step of a screen's life.
 /**
@@ -56,9 +62,10 @@ import java.util.Optional;
  * until a click, then the intro cinematic until its last scene is clicked; after a victory, the victory cinematic
  * comes before the end screen. F1 shows or hides the outlines of the
  * cells and the defense slots; a click goes to the HUD ("Lancer la nuit"), then to the shop panel, which places a
- * defense, plants, opens a panel or sells; while Melda talks, a click goes to her "Passer à la suite" button only;
+ * defense, plants, opens a panel or sells; while the neighbour talks, a click goes to her "Passer à la suite" button only;
  * once the game is over, a click goes to the end screen only ("Rejouer",
- * "Quitter"). It holds no drawing rule: the renderers decide, {@link GdxCanvas} draws.
+ * "Quitter"). It holds no drawing rule: the renderers decide, {@link GdxCanvas} draws. The first click allows the
+ * sound; the HUD's sound button cuts it or brings it back, at any time of the game.
  */
 public class GameScreen implements Screen {
 
@@ -75,7 +82,7 @@ public class GameScreen implements Screen {
     private DefenseRenderer defenseRenderer;
     private EnemyRenderer enemyRenderer;
     private FarmRenderer farmRenderer;
-    private MeldaRenderer meldaRenderer;
+    private NeighbourRenderer neighbourRenderer;
     // The five bubbles of the first day (day 14), shown only when the game starts with the title screen. Modal: while
     // they are shown, the day is frozen and every click goes to them.
     private Tutorial tutorial;
@@ -90,6 +97,8 @@ public class GameScreen implements Screen {
     // end screen.
     private Cinematic intro;
     private Cinematic victory;
+    // The sounds of this game, created in show() like the HUD and subscribed to the session the same way.
+    private AudioDirector audioDirector;
     // false by default: the outlines stay hidden until the first press on F1.
     private boolean outlinesVisible;
     // The session this screen moves forward and draws, and its numbers. They never change: final.
@@ -97,6 +106,8 @@ public class GameScreen implements Screen {
     private final GameConfig config;
     // true at launch, false after "Rejouer": the title screen is shown once, before the first game.
     private final boolean withTitle;
+    // The music and the sounds of the whole game, kept by CropaGame across the screens.
+    private final Jukebox jukebox;
     // What "Rejouer" does, and what the language button of the title screen does: given by CropaGame, which alone can
     // replace this screen by a new one.
     private final Runnable onReplay;
@@ -112,14 +123,16 @@ public class GameScreen implements Screen {
      * @param config the balancing numbers, for the starting money and the last night shown by the HUD, and the values
      *     of the crops shown by the shop panel
      * @param withTitle true to show the title screen before the game starts
+     * @param jukebox plays the music and the sounds; it outlives this screen
      * @param onReplay what the "Rejouer" button of the end screen does: start a new game
      * @param onSwitchLanguage what the language button of the title screen does: start over in the other language
      */
-    public GameScreen(GameSession session, GameConfig config, boolean withTitle, Runnable onReplay,
+    public GameScreen(GameSession session, GameConfig config, boolean withTitle, Jukebox jukebox, Runnable onReplay,
             Runnable onSwitchLanguage) {
         this.session = session;
         this.config = config;
         this.withTitle = withTitle;
+        this.jukebox = jukebox;
         this.onReplay = onReplay;
         this.onSwitchLanguage = onSwitchLanguage;
     }
@@ -134,7 +147,8 @@ public class GameScreen implements Screen {
     // Day 14: the farm renderer receives the health of the farm before the first update, its full health, to change
     // the image of the farm at half; the shop panel receives the values of the crops, for "Carotte 10 -> 40".
     // The title screen covers that world too; it listens to nothing, only a click closes it.
-    // Every word comes from the Texts of the language of the game (GameConfig): the HUD, the shop, the tutorial, Melda's
+    // The director of the sounds listens like the HUD; it asks for the day music at once (Jukebox.playTrack).
+    // Every word comes from the Texts of the language of the game (GameConfig): the HUD, the shop, the tutorial, the neighbour's
     // button, the end screen, the title screen and the cinematics.
     // The cinematics cover it as well. The intro comes with the title screen only: after "Rejouer", an empty
     // cinematic, over at once, so the new game starts at once. The victory cinematic is created for every game, but
@@ -158,7 +172,7 @@ public class GameScreen implements Screen {
         defenseRenderer = new DefenseRenderer(layout, texts);
         enemyRenderer = new EnemyRenderer(layout);
         farmRenderer = new FarmRenderer(layout, session.getFarmHealth());
-        meldaRenderer = new MeldaRenderer(layout, texts);
+        neighbourRenderer = new NeighbourRenderer(layout, texts);
         outlineRenderer = new OutlineRenderer(layout);
         growthRenderer = new GrowthRenderer(layout);
         Bounds world = new Bounds(0, 0, viewport.getWorldWidth(), viewport.getWorldHeight());
@@ -166,13 +180,15 @@ public class GameScreen implements Screen {
         hud = new Hud(viewport.getWorldHeight(), config.getStartingMoney(), session.getFarmHealth(),
                 config.getNightCount(), config.getUrnPrice(), texts);
         session.addListener(hud);
-        shopWindow = new ShopWindow(session, config.getUrnPrice(), config.getCropConfig(), texts);
+        shopWindow = new ShopWindow(session, config.getUrnPrice(), config.getCropConfig(), texts, jukebox);
         tutorial = new Tutorial(world, layout, shopWindow, withTitle, texts);
         endScene = new EndScene(world, texts);
         session.addListener(endScene);
         titleScene = new TitleScene(world, withTitle, texts);
         intro = withTitle ? Cinematic.intro(world, texts) : new Cinematic(world, List.of(), texts);
         victory = Cinematic.victory(world, texts);
+        audioDirector = new AudioDirector(session, config.getNightCount(), jukebox, new Random());
+        session.addListener(audioDirector);
     }
 
     // Called on every frame by super.render() in CropaGame; delta: seconds since the previous frame.
@@ -181,7 +197,7 @@ public class GameScreen implements Screen {
     // While the title screen or the intro is shown, no update: the game waits for the clicks, the first day does not
     // start. While the tutorial is shown (day 14), update(0): no time passes, the timer of the first day stays full
     // until "Commencer à jouer", but the HUD still hears the timer, the money and the health on the first frame.
-    // Melda (day 12) is drawn with the enemies, before the front trees, which hide her in the forest. Her dialog comes
+    // The neighbour (day 12) is drawn with the enemies, before the front trees, which hide her in the forest. Her dialog comes
     // after the HUD and the shop panel, so nothing covers it while she talks. While she is on screen, the HUD's night
     // button is locked (told before the click); while she talks, the shop panel is closed, since only her button
     // answers. The cat is drawn by the farm renderer, from the session's cat.
@@ -195,6 +211,8 @@ public class GameScreen implements Screen {
     // Then the intro does the same until its last scene is clicked; after a victory, the victory cinematic replaces
     // them until its last scene is clicked, then the end screen comes. A defeat goes to the end screen at once.
     // delta also goes to the renderers that keep a red after a hit.
+    // The sound: the director looks at the game right after it moved, with the same delta; the jukebox moves its fades
+    // on every frame, title screen and cinematics included, and the HUD is told whether the sound is cut.
     /**
      * Switches the outlines when F1 is pressed, gives a click to the shop panel or to what is under it, moves the game
      * forward, then draws the map and the crops, the sprites, the defenses, the enemies, the front trees, the free places
@@ -211,20 +229,24 @@ public class GameScreen implements Screen {
         if (Gdx.input.isKeyJustPressed(Input.Keys.F1)) {
             outlinesVisible = !outlinesVisible;
         }
-        hud.lockNight(session.getMelda().isVisiting());
-        if (session.getMelda().isTalking()) {
+        hud.lockNight(session.getNeighbour().isVisiting());
+        hud.showMuted(jukebox.isMuted());
+        if (session.getNeighbour().isTalking()) {
             shopWindow.close();
         }
         handleClick();
         if (!titleScene.isVisible() && intro.isOver()) {
-            session.update(tutorial.isOver() ? delta : 0f);
+            float gameDelta = tutorial.isOver() ? delta : 0f;
+            session.update(gameDelta);
+            audioDirector.update(gameDelta);
         }
+        jukebox.update(delta);
         worldRenderer.render(canvas, session.getBoard());
         farmRenderer.render(canvas, session.getFarmHealth(), session.getFarmer(), session.getCycle().isNight(),
                 session.getCat(), delta);
         defenseRenderer.render(canvas, session.getDefenseSlots(), delta);
         enemyRenderer.render(canvas, session.getEnemies(), delta);
-        meldaRenderer.renderMelda(canvas, session.getMelda());
+        neighbourRenderer.renderNeighbour(canvas, session.getNeighbour());
         canvas.drawFront();
         shopWindow.highlightedZone()
                 .ifPresent(zone -> outlineRenderer.renderFree(canvas, zone, session.getBoard(), session.getDefenseSlots()));
@@ -241,7 +263,7 @@ public class GameScreen implements Screen {
             hud.render(canvas);
             shopWindow.render(canvas);
             tutorial.render(canvas);
-            meldaRenderer.renderDialog(canvas, session.getMelda());
+            neighbourRenderer.renderDialog(canvas, session.getNeighbour());
             endScene.render(canvas);
         }
         if (outlinesVisible) {
@@ -313,35 +335,50 @@ public class GameScreen implements Screen {
     // A game over gives the click to the end screen only: after a victory by day, canAct stays true, so without the
     // early return the shop would still sell, and launchNight would start a night (it goes through the cycle).
     // The HUD first, by day: "Lancer la nuit". && stops at canAct when it is false: at night, the HUD is not even asked.
-    // While Melda talks, she takes every click (her "Passer à la suite" button, or nothing): no buying, no planting,
+    // While the neighbour talks, she takes every click (her "Passer à la suite" button, or nothing): no buying, no planting,
     // no harvest until her last bubble (Axel, day 12).
     // Then the shop panel: a click on its buttons, its lists or its panels must not also reach the board behind it.
     // Then the slot under the click, then the cell: the shop panel decides (place the defense picked, plant, open);
     // no slot and no cell closes the panel, and forgets a line or a defense picked.
+    // The sound (20/11): every click first allows it (a browser plays nothing before one). The title screen, the
+    // cinematics and the buttons of the end screen click. The sound button comes before the end screen, the neighbour
+    // and the tutorial, which take every other click: it works at any time of the game. Its click is heard when the
+    // sound comes back, not when it is cut.
     private void handleClick() {
         if (!Gdx.input.justTouched()) {
             return;
         }
+        jukebox.unlock();
         Vector2 world = viewport.unproject(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
         Optional<TitleChoice> titleChoice = titleScene.handleClick(world.x, world.y);
         if (titleChoice.isPresent()) {
+            jukebox.play(Cue.UI_CLICK);
             if (titleChoice.get() == TitleChoice.SWITCH_LANGUAGE) {
                 Gdx.app.postRunnable(onSwitchLanguage);
             }
             return;
         }
         if (intro.handleClick()) {
+            jukebox.play(Cue.UI_CLICK);
             return;
         }
         if (isVictoryShown()) {
             victory.handleClick();
+            jukebox.play(Cue.UI_CLICK);
+            return;
+        }
+        if (hud.handleSoundClick(world.x, world.y)) {
+            jukebox.toggleMute();
+            jukebox.play(Cue.UI_CLICK);
             return;
         }
         if (session.isOver()) {
-            endScene.handleClick(world.x, world.y).ifPresent(this::choose);
+            Optional<EndChoice> choice = endScene.handleClick(world.x, world.y);
+            choice.ifPresent(this::choose);
+            choice.ifPresent(chosen -> jukebox.play(Cue.UI_CLICK));
             return;
         }
-        if (meldaRenderer.handleClick(session.getMelda(), world.x, world.y)) {
+        if (neighbourRenderer.handleClick(session.getNeighbour(), world.x, world.y)) {
             return;
         }
         // The tutorial before the HUD: modal, it takes every click while it is shown, so nothing launches the night,

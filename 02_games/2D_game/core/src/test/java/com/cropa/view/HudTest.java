@@ -270,11 +270,11 @@ class HudTest {
         assertFalse(drew("Dernière nuit"));
     }
 
-    //-------------------- MELDA (J12) --------------------
-    // While Melda is on screen, the button is greyed and a click on it is not used; once she left, it works again.
+    //-------------------- NEIGHBOUR (J12) --------------------
+    // While the neighbour is on screen, the button is greyed and a click on it is not used; once she left, it works again.
     // Without this test, a night launched during her walk would send her away before she talks.
     @Test
-    void theButtonIsLockedWhileMeldaIsHere() {
+    void theButtonIsLockedWhileNeighbourIsHere() {
         hud.lockNight(true);
         hud.render(canvas);
 
@@ -287,12 +287,59 @@ class HudTest {
 
     // The red button of the day before the last night is greyed too: grey wins over red while she is here.
     @Test
-    void theLastNightButtonIsGreyedWhileMeldaIsHere() {
+    void theLastNightButtonIsGreyedWhileNeighbourIsHere() {
         hud.onDayStarted(8);
         hud.lockNight(true);
         hud.render(canvas);
 
         assertTrue(drew("text Lancer la dernière nuit 8.0 288.0 GREYED"));
         assertFalse(clickTheButton());
+    }
+
+    //-------------------- SOUND BUTTON (20/11) --------------------
+    // A click in the middle of the sound button, as it is now.
+    private boolean clickTheSoundButton() {
+        Bounds button = hud.getSoundButton();
+        return hud.handleSoundClick(button.x() + button.width() / 2, button.y() + button.height() / 2);
+    }
+
+    // In the bottom right corner, with its white outline ending at x 541: "Son : oui" is 57 px wide, so its words start
+    // at 481, on the line of the urn (y 24).
+    @Test
+    void theSoundButtonSaysTheSoundPlays() {
+        hud.render(canvas);
+
+        assertTrue(drew("text Son : oui 481.0 24.0"));
+        assertTrue(drew("outline WHITE " + new Bounds(478, 8, 63, 19)));
+        assertTrue(clickTheSoundButton());
+    }
+
+    // Cut: the words change, and the button keeps its right edge, so it grows to the left.
+    @Test
+    void theSoundButtonSaysTheSoundIsCut() {
+        hud.showMuted(true);
+        hud.render(canvas);
+
+        assertTrue(drew("text Son : non 476.0 24.0"));
+        assertTrue(clickTheSoundButton());
+    }
+
+    // By night and once the game is over, the button stays: the sound can be cut at any time.
+    @Test
+    void theSoundButtonStaysAtNightAndAtTheEnd() {
+        hud.onNightStarted(1);
+        hud.onGameOver(GameResult.DEFEAT_FARM_DESTROYED);
+        hud.render(canvas);
+
+        assertTrue(drew("text Son : oui"));
+        assertTrue(clickTheSoundButton());
+    }
+
+    // A click on "Lancer la nuit" is not a click on the sound button.
+    @Test
+    void theNightButtonIsNotTheSoundButton() {
+        Bounds night = hud.getNightButton();
+
+        assertFalse(hud.handleSoundClick(night.x() + night.width() / 2, night.y() + night.height() / 2));
     }
 }

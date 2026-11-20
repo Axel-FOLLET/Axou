@@ -22,13 +22,14 @@ import java.util.List;
 public class Tutorial {
 
     //-------------------- CONSTANTS --------------------
-    // The frame of Melda's dialog, under the farm, over the forest (x 104 to 348, y 10 to 88): neither on the HUD (top
-    // left), nor on the shop panel and the urn (right, from x 397), nor on the field (x 240 to 320, y 128 to 208).
-    // Melda never comes on day 1 (her day is drawn from 2), so the two never share it on the first day.
+    // The frame of the neighbour's dialog, under the farm, over the forest (x 104 to 348, y 10 to 88): neither on the HUD (top
+    // left), nor on the shop panel (right, from x 397) and the urn (bottom right, from x 374), nor on the field (x 240
+    // to 320, y 128 to 208).
+    // The neighbour never comes on day 1 (her day is drawn from 2), so the two never share it on the first day.
     // Package-private: the tests find the bubble drawn in it.
     static final Bounds AREA = new Bounds(104, 10, 244, 78);
     // The text of the bubbles comes from Texts (tutorialBubbles), cut by hand: 34 letters at most per line (the measure
-    // of Melda's dialog, HUD font; 236 px inside the frame, TextsTest checks it), and 3 lines at most, above the button.
+    // of the neighbour's dialog, HUD font; 236 px inside the frame, TextsTest checks it), and 3 lines at most, above the button.
     // Bubbles 3 and 4 say nothing more than the hint: the player finds the effect alone (the enemy turns away,
     // rules.md sections 6 and 8).
     // The list of the shop a bubble unrolls, so the player sees what it speaks of.
@@ -47,7 +48,7 @@ public class Tutorial {
     private static final int FIELD_COLUMN = 1;
     // The arrow points to the right, its tip 2 px before the left edge of its target, at mid-height.
     private static final float ARROW_GAP = 2f;
-    // The button at the bottom right of the frame, like "Passer à la suite" in Melda's: its outline 3 px around its
+    // The button at the bottom right of the frame, like "Passer à la suite" in the neighbour's: its outline 3 px around its
     // words, ending at x 347 (inside the frame), 16 px under the top of the text and 3 px above it, like the buttons of
     // the HUD. "Suivant" is 48 px wide (lsans-15, the HUD font): its outline from x 293. The button of the last bubble
     // (asked on day 14), "Commencer à jouer", is 130 px wide: its outline from 347 - 136 = 211.
@@ -146,8 +147,8 @@ public class Tutorial {
     }
 
     //-------------------- CLICKS --------------------
-    // Called by GameScreen on every click, after Melda and before the HUD. Modal: while a bubble is shown, every click
-    // is taken (true), like Melda's while she talks, so none reaches the HUD, the shop or the field; only the one on
+    // Called by GameScreen on every click, after the neighbour and before the HUD. Modal: while a bubble is shown, every click
+    // is taken (true), like the neighbour's while she talks, so none reaches the HUD, the shop or the field; only the one on
     // the button moves the tutorial on. Once it is over, false: the game gets its clicks back.
     /**
      * Takes every click while a bubble is shown: a click on its button shows the next bubble, or closes the tutorial

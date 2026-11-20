@@ -48,17 +48,17 @@ public final class SpriteCatalog {
     public static final String FARM_DESTROYED = "farm_destroyed";
     /** Key of M. Chmunks walking away, on the end screen. */
     public static final String CHMUNKS = "chmunks";
-    /** Key of Hugo, a henchman of M. Chmunks, walking away, on the end screen. */
-    public static final String HUGO = "hugo";
-    /** Key of Alexis, a henchman of M. Chmunks, walking away, on the end screen. */
-    public static final String ALEXIS = "alexis";
+    /** Key of Henchman 1, a henchman of M. Chmunks, walking away, on the end screen. */
+    public static final String HENCHMAN_1 = "henchman_1";
+    /** Key of Henchman 2, a henchman of M. Chmunks, walking away, on the end screen. */
+    public static final String HENCHMAN_2 = "henchman_2";
     // The title screen (TitleScene): the same three, facing the player.
     /** Key of M. Chmunks facing the player, on the title screen. */
     public static final String CHMUNKS_FRONT = "chmunks_front";
-    /** Key of Hugo facing the player, on the title screen. */
-    public static final String HUGO_FRONT = "hugo_front";
-    /** Key of Alexis facing the player, on the title screen. */
-    public static final String ALEXIS_FRONT = "alexis_front";
+    /** Key of Henchman 1 facing the player, on the title screen. */
+    public static final String HENCHMAN_1_FRONT = "henchman_1_front";
+    /** Key of Henchman 2 facing the player, on the title screen. */
+    public static final String HENCHMAN_2_FRONT = "henchman_2_front";
 
     //-------------------- TABLE --------------------
     // Map.ofEntries gives a table nobody can change. A crop, an enemy, a scarecrow or a bramble key is what its
@@ -116,12 +116,13 @@ public final class SpriteCatalog {
             entry(URN, "objects/urn/south-urn.png"),
             entry(FARM_DESTROYED, "farm/east-farm-destroyed.png"),
             entry(CHMUNKS, "npc/ms-chmunks/east-chmunks.png"),
-            entry(HUGO, "npc/hugo/east-hugo.png"),
-            entry(ALEXIS, "npc/alexis/east-alexis.png"),
+            entry(HENCHMAN_1, "npc/henchman-1/east-henchman-1.png"),
+            entry(HENCHMAN_2, "npc/henchman-2/east-henchman-2.png"),
             entry(CHMUNKS_FRONT, "npc/ms-chmunks/south-chmunks.png"),
-            entry(HUGO_FRONT, "npc/hugo/south-hugo.png"),
-            entry(ALEXIS_FRONT, "npc/alexis/south-alexis.png"),
-            // The cinematics (Cinematic): one image per scene, 560 x 320 like the world, so it is not stretched.
+            entry(HENCHMAN_1_FRONT, "npc/henchman-1/south-henchman-1.png"),
+            entry(HENCHMAN_2_FRONT, "npc/henchman-2/south-henchman-2.png"),
+            // The cinematics (Cinematic): one image per scene, 688 x 384, stretched over the 560 x 320 world
+            // (the images come out about 2% narrower).
             entry("intro_1", "cinematics/intro/1.png"),
             entry("intro_2", "cinematics/intro/2.png"),
             entry("intro_3", "cinematics/intro/3.png"),
@@ -130,19 +131,19 @@ public final class SpriteCatalog {
             entry("victory_1", "cinematics/victory/1.png"),
             entry("victory_2", "cinematics/victory/2.png"),
             entry("victory_3", "cinematics/victory/3.png"),
-            // Melda and the cat (day 12), as plain names like the cinematics: no constant, Yohan writes the Javadoc
-            // of the constants above today. Melda walks: one image per direction, "melda_" + the direction chosen by
-            // MeldaRenderer. The cat sits seen from the front and flees west, to the farm. The two bubbles face the
+            // The neighbour and the cat (day 12), as plain names like the cinematics: no constant, Yohan writes the Javadoc
+            // of the constants above today. The neighbour walks: one image per direction, "neighbour_" + the direction chosen by
+            // NeighbourRenderer. The cat sits seen from the front and flees west, to the farm. The two bubbles face the
             // player, their tail pointing down.
-            entry("melda_east", "melda/east-melda.png"),
-            entry("melda_north_east", "melda/north-east-melda.png"),
-            entry("melda_north", "melda/north-melda.png"),
-            entry("melda_north_west", "melda/north-west-melda.png"),
-            entry("melda_west", "melda/west-melda.png"),
-            entry("melda_south_west", "melda/south-west-melda.png"),
-            entry("melda_south", "melda/south-melda.png"),
-            entry("melda_south_east", "melda/south-east-melda.png"),
-            entry("melda_bubble", "talk/Speech-bubble-characters/south-speech-bubble.png"),
+            entry("neighbour_east", "neighbour/east-neighbour.png"),
+            entry("neighbour_north_east", "neighbour/north-east-neighbour.png"),
+            entry("neighbour_north", "neighbour/north-neighbour.png"),
+            entry("neighbour_north_west", "neighbour/north-west-neighbour.png"),
+            entry("neighbour_west", "neighbour/west-neighbour.png"),
+            entry("neighbour_south_west", "neighbour/south-west-neighbour.png"),
+            entry("neighbour_south", "neighbour/south-neighbour.png"),
+            entry("neighbour_south_east", "neighbour/south-east-neighbour.png"),
+            entry("neighbour_bubble", "talk/Speech-bubble-characters/south-speech-bubble.png"),
             entry("cat_fleeing", "npc/cat/west-cat.png"),
             entry("cat_meow", "talk/Speech-bubble-cat/south-bubble-speech-meow.png"));
 

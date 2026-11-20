@@ -1,7 +1,7 @@
 package com.cropa.text;
 
 // The model: the kinds of crop and of defense, and the ways a game ends, each with its name.
-// Java: List for the lines of a bubble or of Melda's talk; Locale for the thousands of a number.
+// Java: List for the lines of a bubble or of the neighbour's talk; Locale for the thousands of a number.
 import com.cropa.model.defense.DefenseType;
 import com.cropa.model.game.GameResult;
 import com.cropa.model.world.CropType;
@@ -106,12 +106,12 @@ public final class Texts {
             List.of("Le vieux Garry vivait seul dans sa ferme délabrée, avec son chat.",
                 "Sur la cheminée trônait une urne : les cendres de sa défunte femme.",
                 "Le riche et avare M. Chmunks trouva ce pot magnifique. Il le voulut.",
-                "Une nuit, ses sbires Alexis et Hugo volèrent l'urne.",
+                "Une nuit, ses deux sbires volèrent l'urne.",
                 "Prix de rachat : 10 000 pièces. Garry n'a que des graines... et une fourche."),
             List.of("Old Garry lived alone on his run-down farm, with his cat.",
                 "On the mantelpiece stood an urn: the ashes of his late wife.",
                 "The rich and greedy Mr Chmunks found this pot gorgeous. He wanted it.",
-                "One night, his henchmen Alexis and Hugo stole the urn.",
+                "One night, his two henchmen stole the urn.",
                 "Ransom: 10,000 coins. Garry only has seeds... and a pitchfork."));
     }
 
@@ -171,6 +171,16 @@ public final class Texts {
         return pick("Lancer la dernière nuit", "Start the last night");
     }
 
+    /**
+     * Returns the words of the sound button.
+     *
+     * @param muted {@code true} while the sound is cut
+     * @return "Son : oui" while it plays, "Son : non" while it is cut
+     */
+    public String sound(boolean muted) {
+        return muted ? pick("Son : non", "Sound off") : pick("Son : oui", "Sound on");
+    }
+
     /** @return the alert of the last night */
     public String lastNight() {
         return pick("Dernière nuit !", "Last night!");
@@ -209,14 +219,14 @@ public final class Texts {
         return pick("Défenses", "Defenses");
     }
 
+    // 20/11: the button left of the sound button has no room for the price; the gauge of the HUD shows it.
     /**
-     * Returns the line of the urn in the shop.
+     * Returns the words of the urn button of the shop.
      *
-     * @param price the price of the urn
-     * @return for example "Urne, 10000 pièces"
+     * @return "Acheter l'urne" or "Buy the urn"
      */
-    public String urnOffer(int price) {
-        return pick("Urne, " + price + " pièces", "Urn, " + price + " coins");
+    public String urnOffer() {
+        return pick("Acheter l'urne", "Buy the urn");
     }
 
     /**
@@ -322,7 +332,7 @@ public final class Texts {
     }
 
     //-------------------- TUTORIAL --------------------
-    // Cut by hand: 34 letters at most per line, 3 lines at most, in the frame of Melda's dialog.
+    // Cut by hand: 34 letters at most per line, 3 lines at most, in the frame of the neighbour's dialog.
     /**
      * Returns the five bubbles of the tutorial, each as its lines.
      *
@@ -354,21 +364,21 @@ public final class Texts {
         return pick("Commencer à jouer", "Start playing");
     }
 
-    //-------------------- MELDA --------------------
-    /** @return the button that shows Melda's next bubble */
-    public String meldaNext() {
+    //-------------------- NEIGHBOUR --------------------
+    /** @return the button that shows the neighbour's next bubble */
+    public String neighbourNext() {
         return pick("Passer à la suite", "Continue");
     }
 
-    // Her talk comes from the team's interview of Melda. Two versions with the same start and the same end: the second
+    // Her talk comes from an interview made by the team. Two versions with the same start and the same end: the second
     // one at the first game, the first one at every "Rejouer" (GameConfig). The English one is close to the French,
     // without its swear word.
     /**
-     * Returns what Melda says at the first game since the launch.
+     * Returns what the neighbour says at the first game since the launch.
      *
      * @return her bubbles, in their order
      */
-    public List<String> meldaFirstGame() {
+    public List<String> neighbourFirstGame() {
         return pick(
             List.of("Qu'est-ce qui se passe ici ? Comment vous allez ? Moi, ça va, je fais un petit tour.",
                 "Je venais prendre des nouvelles. Comment va madame ? Oh, vous faites de la récolte ?",
@@ -387,11 +397,11 @@ public final class Texts {
     }
 
     /**
-     * Returns what Melda says after a "Rejouer".
+     * Returns what the neighbour says after a "Rejouer".
      *
      * @return her bubbles, in their order
      */
-    public List<String> meldaReplay() {
+    public List<String> neighbourReplay() {
         return pick(
             List.of("Qu'est-ce qui se passe ici ? Comment vous allez ? Moi, ça va, je fais un petit tour.",
                 "Je venais prendre des nouvelles. Comment va madame ? Oh, vous faites de la récolte ?",

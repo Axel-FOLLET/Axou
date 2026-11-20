@@ -9,8 +9,8 @@ import java.util.Optional;
 // No interface: the title screen does not listen to the session. It is shown before the game starts, and only a click
 // closes it. No libGDX: it draws through Canvas.
 /**
- * The title screen, over the farm darkened: the full title of the game, M. Chmunks holding the urn between Hugo and
- * Alexis, "Cliquer pour jouer", and at the top right the button of the other language. A click on that button starts
+ * The title screen, over the farm darkened: the full title of the game, M. Chmunks holding the urn between Henchman 1 and
+ * Henchman 2, "Cliquer pour jouer", and at the top right the button of the other language. A click on that button starts
  * the game over in the other language; a click anywhere else closes the title screen, and the game starts.
  */
 public class TitleScene {
@@ -113,8 +113,8 @@ public class TitleScene {
 
     //-------------------- DRAWING --------------------
     // Called on every frame by GameScreen, after the farm and instead of the HUD. The veil darkens the farm, then the
-    // three lines of the title, 22 px apart; Hugo on the left, M. Chmunks in the middle with the urn drawn after him,
-    // so in front of him, Alexis on the right, all facing the player; then the invitation to click, and the language
+    // three lines of the title, 22 px apart; Henchman 1 on the left, M. Chmunks in the middle with the urn drawn after him,
+    // so in front of him, Henchman 2 on the right, all facing the player; then the invitation to click, and the language
     // button with the white outline of what can be clicked.
     /**
      * Draws the title screen if it is shown, nothing otherwise.
@@ -129,10 +129,10 @@ public class TitleScene {
         for (int line = 0; line < titleLines.size(); line++) {
             canvas.drawCenteredText(titleLines.get(line), centerX, at(TITLE_TOP - line * LINE_SPACING));
         }
-        Figure.HUGO_FRONT.stand(canvas, centerX - SPACING, at(GROUND));
+        Figure.HENCHMAN_1_FRONT.stand(canvas, centerX - SPACING, at(GROUND));
         Figure.CHMUNKS_FRONT.stand(canvas, centerX, at(GROUND));
         Figure.URN.stand(canvas, centerX, at(GROUND + HELD_HEIGHT));
-        Figure.ALEXIS_FRONT.stand(canvas, centerX + SPACING, at(GROUND));
+        Figure.HENCHMAN_2_FRONT.stand(canvas, centerX + SPACING, at(GROUND));
         canvas.drawCenteredText(playLabel, centerX, at(PLAY_TOP));
         canvas.drawText(languageLabel, languageButton.x() + 3, at(LANGUAGE_TOP));
         canvas.drawOutline(languageButton, OutlineColor.WHITE);

@@ -103,7 +103,7 @@ The first time, the command shows the download of Gradle (`Downloading https://s
   java -jar lwjgl3/build/libs/Cropa-1.0.0.jar
   ```
 
-The window opens on the title screen: the "English" (or "Français") button at the top right changes the language, a click anywhere else starts the opening cutscene, then each click moves to the next scene, up to the first day. The game has no sound.
+The window opens on the title screen: the "English" (or "Français") button at the top right changes the language, a click anywhere else starts the opening cutscene, then each click moves to the next scene, up to the first day. That first click also starts the music; the "Son : oui" ("Sound on") button, in the bottom right corner, cuts the sound and brings it back.
 
 ### Troubleshooting
 
@@ -130,7 +130,7 @@ The `teavm` module builds the same game for a web browser, with [gdx-teavm](http
 sh gradlew teavm:gdx_teavm_web_js_build
 ```
 
-The page is written in `teavm/build/dist/js/webapp/` (`index.html`, `app.js`, the images in `assets/`, about 4 MB). Any web server can serve this folder. The game takes the whole page and starts in the language given in the address, `index.html?lang=fr` or `index.html?lang=en`; without it, in the language of the browser.
+The page is written in `teavm/build/dist/js/webapp/` (`index.html`, `app.js`, the images and the sounds in `assets/`, about 6 MB). Any web server can serve this folder. The game takes the whole page and starts in the language given in the address, `index.html?lang=fr` or `index.html?lang=en`; without it, in the language of the browser.
 
 On the web, "Quitter" (Quit) at the end of a game closes the card of the portfolio when the game runs in it (the game sends the message `game-quit` to the page of the site). Opened alone, it closes the tab, when the browser allows it: only for a tab opened by a link or a script.
 
@@ -158,6 +158,8 @@ Coverage at v4.17, the final code: 89% of branches, 86% of instructions.
 | [`docs/rules.md`](docs/rules.md) | The game rules: board, controls, plants, defenses, enemies, characters, balance numbers, shop, what the game does not do |
 | [`docs/uml/`](docs/uml/) | PlantUML diagrams: the class diagram (`classes.puml`, split by package in `classes_*.puml`), the sequences of a purchase (`sequence_purchase.puml`) and of a night (`sequence_night.puml`), and an overview of the packages (`overview.puml`) |
 | [`docs/sprites.md`](docs/sprites.md) | The image shown for each element of the game, in each state, and the tile sheets of the map |
+| [`docs/sounds.md`](docs/sounds.md) | The music and the sounds: what plays them, their volumes, how they are made |
+| [`tools/sounds/`](tools/sounds/) | The Python scripts that make the sounds; `python3 -B tools/sounds/render_sounds.py` writes them again in `assets/sounds/` |
 | [`tools/Tiles.java`](tools/Tiles.java) | The program that draws the four tile sheets of the map, pixel by pixel; `java tools/Tiles.java assets/maps/assets` writes them again |
 
 ---
@@ -167,8 +169,10 @@ Coverage at v4.17, the final code: 89% of branches, 86% of instructions.
 All the images were made for the game, with AI tools:
 
 - the sprites marked "Team" in [`docs/sprites.md`](docs/sprites.md), generated with Pixel Lab from the team's descriptions;
-- the images of the opening and victory cutscenes ([`assets/cinematics/`](assets/cinematics/));
+- the images of the opening and victory cutscenes, generated with Pixel Lab ([`assets/cinematics/`](assets/cinematics/));
 - the four tile sheets of the map (grass, soil, fences, decor), drawn pixel by pixel after the project, with Codex, to replace third-party sheets that could not be published ([`docs/sprites.md`](docs/sprites.md#map)).
+
+The day music is a track by Anto, made with Suno; the two night loops are made from it. Every other sound is synthesised by code, with no recording and no third-party sound ([`docs/sounds.md`](docs/sounds.md)).
 
 ---
 
@@ -176,6 +180,6 @@ All the images were made for the game, with AI tools:
 
 | Track | Who | Content |
 | --- | --- | --- |
-| A — World and cycle | Antonin | Gradle project and CI, Tiled map, day and night (State pattern), board, plants, money, shop, Melda, tutorial, architecture document |
+| A — World and cycle | Antonin | Gradle project and CI, Tiled map, day and night (State pattern), board, plants, money, shop, the chatty neighbour, tutorial, architecture document |
 | B — Enemies and waves | Yohan | Sprites and licences, `Enemy` hierarchy, movements (Strategy pattern), mole, witch, bat, waves, old Garry and the cat, sequence diagrams, proof of playability |
 | C — Defenses and HUD | Axel | Class diagram, defenses (`Defense`, catapatate, scarecrow, bramble, "Améliorer" (Upgrade)), libGDX game screen, HUD, shop, cutscenes, project management |

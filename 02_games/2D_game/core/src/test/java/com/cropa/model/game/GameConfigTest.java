@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-// The three configs a GameConfig carries: the crops, the enemies and the defenses. List: Melda's fun facts.
+// The three configs a GameConfig carries: the crops, the enemies and the defenses. List: the neighbour's fun facts.
 import com.cropa.model.defense.DefenseConfig;
 import com.cropa.model.enemy.EnemyConfig;
 import com.cropa.model.world.CropConfig;
@@ -95,21 +95,21 @@ class GameConfigTest {
     assertSame(defenseConfig, config.getDefenseConfig());
   }
 
-  // -------------------- MELDA --------------------
+  // -------------------- NEIGHBOUR --------------------
   // Rules: her bubbles are written slowly, 20 letters per second (GDD).
-  /** Melda writes 20 letters per second. */
+  /** Neighbour writes 20 letters per second. */
   @Test
-  void meldaWritesTwentyLettersPerSecond() {
+  void neighbourWritesTwentyLettersPerSecond() {
     GameConfig config = new GameConfig();
 
-    assertEquals(20f, config.getMeldaLettersPerSecond(), TOLERANCE);
+    assertEquals(20f, config.getNeighbourLettersPerSecond(), TOLERANCE);
   }
 
   // She needs at least one text to talk, and nobody may change her texts during a game: the list is read-only.
-  /** Melda has fun facts, in a read-only list. */
+  /** Neighbour has fun facts, in a read-only list. */
   @Test
-  void meldaFactsAreGivenInAReadOnlyList() {
-    List<String> facts = new GameConfig().getMeldaFacts();
+  void neighbourFactsAreGivenInAReadOnlyList() {
+    List<String> facts = new GameConfig().getNeighbourFacts();
 
     assertFalse(facts.isEmpty());
     assertThrows(UnsupportedOperationException.class, () -> facts.add("one more"));
@@ -120,7 +120,7 @@ class GameConfigTest {
   /** The first game gives the second version: 7 bubbles, the third one about her brushing. */
   @Test
   void firstGameGivesTheSecondVersion() {
-    List<String> facts = new GameConfig(Language.FRENCH, true).getMeldaFacts();
+    List<String> facts = new GameConfig(Language.FRENCH, true).getNeighbourFacts();
 
     assertEquals(7, facts.size());
     assertTrue(facts.get(2).startsWith("Vous aimez mon brushing"));
@@ -130,8 +130,8 @@ class GameConfigTest {
   /** "Rejouer" gives the first version: same start and end as the first game, another middle. */
   @Test
   void replayGivesTheFirstVersion() {
-    List<String> replay = new GameConfig(Language.FRENCH, false).getMeldaFacts();
-    List<String> firstGame = new GameConfig(Language.FRENCH, true).getMeldaFacts();
+    List<String> replay = new GameConfig(Language.FRENCH, false).getNeighbourFacts();
+    List<String> firstGame = new GameConfig(Language.FRENCH, true).getNeighbourFacts();
 
     assertEquals(7, replay.size());
     assertTrue(replay.get(2).startsWith("J'ai de la famille"));

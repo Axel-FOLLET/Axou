@@ -43,7 +43,7 @@ class TutorialTest {
     @BeforeEach
     void startTheFirstDay() {
         session = new GameSession(new GameConfig(), new Random(0));
-        shop = new ShopWindow(session, new GameConfig().getUrnPrice(), new CropConfig(), FRENCH);
+        shop = new ShopWindow(session, new GameConfig().getUrnPrice(), new CropConfig(), FRENCH, cue -> { });
         tutorial = new Tutorial(WORLD, TestLayouts.layout(), shop, true, FRENCH);
         canvas = new RecordingCanvas();
     }
@@ -141,7 +141,7 @@ class TutorialTest {
         }
     }
 
-    // The mask first (four bands), then the box, the "Suivant" button and its white outline, in the frame of Melda's
+    // The mask first (four bands), then the box, the "Suivant" button and its white outline, in the frame of the neighbour's
     // dialog, then the arrow, last: over the list of the shop drawn before it.
     @Test
     void aBubbleIsDrawnWithItsMaskItsNextButtonAndItsArrow() {
@@ -260,7 +260,7 @@ class TutorialTest {
         assertFalse(clickNext());
     }
 
-    // Each line fits the box: 34 letters at most (the measure of Melda's dialog), 3 lines at most above the button.
+    // Each line fits the box: 34 letters at most (the measure of the neighbour's dialog), 3 lines at most above the button.
     @Test
     void everyBubbleFitsTheBox() {
         for (List<String> lines : FRENCH.tutorialBubbles()) {

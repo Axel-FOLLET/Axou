@@ -1,7 +1,7 @@
 package com.cropa.model.game;
 
 // The numbers of the crops, the enemies and the defenses: GameConfig carries them, so a game gets all its numbers
-// from one object. Language and Texts: the language of the game, and Melda's fun facts in it. List: her fun facts.
+// from one object. Language and Texts: the language of the game, and the neighbour's fun facts in it. List: her fun facts.
 import com.cropa.model.defense.DefenseConfig;
 import com.cropa.model.enemy.EnemyConfig;
 import com.cropa.model.world.CropConfig;
@@ -31,13 +31,13 @@ public class GameConfig {
   private final float dayDuration = 60f;
   private final float nightDuration = 45f;
 
-  // Melda (rules section 9): her bubbles are written at 20 letters per second (GDD).
-  // Her texts come from the team's interview of Melda, in Texts, in the language of the game. Two versions with the
+  // The neighbour (rules section 9): her bubbles are written at 20 letters per second (GDD).
+  // Her texts come from an interview made by the team, in Texts, in the language of the game. Two versions with the
   // same start and the same end: the second one at the first game, the first one at every "Rejouer" (Axel's choice).
-  private final float meldaLettersPerSecond = 20f;
-  // The language every text of this game is shown in, and the version of Melda's facts, chosen by the constructor.
+  private final float neighbourLettersPerSecond = 20f;
+  // The language every text of this game is shown in, and the version of the neighbour's facts, chosen by the constructor.
   private final Language language;
-  private final List<String> meldaFacts;
+  private final List<String> neighbourFacts;
 
   // The numbers of the crops, the enemies and the defenses. Final: chosen once, when the game is created.
   // GameSession reads them here instead of creating its own, so a test can give it other numbers.
@@ -55,7 +55,7 @@ public class GameConfig {
   }
 
   // Called by CropaGame.startNewGame: true at launch and after a change of language, false after "Rejouer". Only
-  // Melda's texts change with it.
+  // The neighbour's texts change with it.
   /**
    * Creates the configuration of a real game, with the default numbers.
    *
@@ -88,7 +88,7 @@ public class GameConfig {
     this.defenseConfig = defenseConfig;
     this.language = language;
     Texts texts = Texts.of(language);
-    this.meldaFacts = firstGame ? texts.meldaFirstGame() : texts.meldaReplay();
+    this.neighbourFacts = firstGame ? texts.neighbourFirstGame() : texts.neighbourReplay();
   }
 
   // -------------------- ACCESSORS --------------------
@@ -183,23 +183,23 @@ public class GameConfig {
     return defenseConfig;
   }
 
-  // Called by GameSession when the game starts, to create Melda.
+  // Called by GameSession when the game starts, to create Neighbour.
   /**
-   * Returns Melda's fun facts, one text per bubble.
+   * Returns the neighbour's fun facts, one text per bubble.
    *
    * @return her fun facts, in a read-only list
    */
-  public List<String> getMeldaFacts() {
-    return meldaFacts;
+  public List<String> getNeighbourFacts() {
+    return neighbourFacts;
   }
 
-  // Called by GameSession when the game starts, to create Melda.
+  // Called by GameSession when the game starts, to create Neighbour.
   /**
-   * Returns how fast Melda's bubbles are written.
+   * Returns how fast the neighbour's bubbles are written.
    *
    * @return the letters written per second
    */
-  public float getMeldaLettersPerSecond() {
-    return meldaLettersPerSecond;
+  public float getNeighbourLettersPerSecond() {
+    return neighbourLettersPerSecond;
   }
 }

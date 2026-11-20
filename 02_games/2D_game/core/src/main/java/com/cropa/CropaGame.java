@@ -6,6 +6,7 @@ package com.cropa;
 // GameScreen: our first screen, the one that draws the map.
 // GameConfig: the balancing numbers of the game. GameSession: the model of the game.
 // Language: French or English, every text the player reads.
+// GdxSpeaker: plays the sound files with libGDX. Jukebox: the music and the "sound cut" button of the whole game.
 // Random: the source of randomness given to the session.
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
@@ -13,7 +14,9 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.cropa.model.game.GameConfig;
 import com.cropa.model.game.GameSession;
 import com.cropa.text.Language;
+import com.cropa.view.audio.Jukebox;
 import com.cropa.view.gdx.GameScreen;
+import com.cropa.view.gdx.GdxSpeaker;
 import java.util.Random;
 
 // extends Game: CropaGame inherits setScreen and the screen handling; each launcher creates it with the language to
@@ -27,6 +30,10 @@ public class CropaGame extends Game {
     //-------------------- FIELDS --------------------
     // The language of the games to come: given by the launcher, changed by the button of the title screen.
     private Language language;
+    // Created once in create(), when libGDX's audio is ready, and kept across the games: the files are loaded once,
+    // the music goes on and the sound stays cut after "Rejouer" and the language button.
+    private GdxSpeaker speaker;
+    private Jukebox jukebox;
 
     //-------------------- CONSTRUCTOR --------------------
     /**
@@ -45,14 +52,15 @@ public class CropaGame extends Game {
     // as what "Rejouer" does. setScreen hides the screen before, then calls show() and resize(width, height) on the
     // new one; it does not free the one before, so it is freed here, once it is no longer shown.
     // One GameConfig for the session and the screen: the HUD shows the money the rules really give.
-    // withTitle also tells the first game from a "Rejouer": GameConfig gives Melda's second version at the first game,
+    // withTitle also tells the first game from a "Rejouer": GameConfig gives the neighbour's second version at the first game,
     // her first version after.
     // this::switchLanguage: the same kind of Runnable, for the language button of the title screen.
     private void startNewGame(boolean withTitle) {
         GameConfig config = new GameConfig(language, withTitle);
         Screen previous = getScreen();
         GameSession session = new GameSession(config, new Random());
-        setScreen(new GameScreen(session, config, withTitle, () -> startNewGame(false), this::switchLanguage));
+        setScreen(new GameScreen(session, config, withTitle, jukebox, () -> startNewGame(false),
+            this::switchLanguage));
         if (previous != null) {
             previous.dispose();
         }
@@ -66,12 +74,14 @@ public class CropaGame extends Game {
     }
 
     //-------------------- LIFECYCLE --------------------
-    // Called once at launch: the first game, behind the title screen.
+    // Called once at launch: the sound first, since every screen uses it, then the first game, behind the title screen.
     /**
-     * Opens the first screen of the game, the {@link GameScreen}, with its title screen.
+     * Loads the sounds, then opens the first screen of the game, the {@link GameScreen}, with its title screen.
      */
     @Override
     public void create() {
+        speaker = new GdxSpeaker();
+        jukebox = new Jukebox(speaker);
         startNewGame(true);
     }
 
@@ -89,15 +99,18 @@ public class CropaGame extends Game {
 
     // Called once when the window closes. super.dispose() only calls hide() on the screen,
     // so the screen's own dispose() is called here; without it, the map and its renderer are never freed.
-    // getScreen() is null if no screen was opened.
+    // getScreen() is null if no screen was opened. The sound files last, freed like the map: by hand.
     /**
-     * Hides the current screen, then frees it.
+     * Hides the current screen, then frees it and the sounds.
      */
     @Override
     public void dispose() {
         super.dispose();
         if (getScreen() != null) {
             getScreen().dispose();
+        }
+        if (speaker != null) {
+            speaker.dispose();
         }
     }
 }

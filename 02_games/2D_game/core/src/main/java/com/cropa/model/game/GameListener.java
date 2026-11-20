@@ -4,7 +4,7 @@ package com.cropa.model.game;
 // The HUD and the end screen (EndScene) implement it; GameScreen subscribes them through addListener. A statistics
 // screen would be one more class, the model unchanged.
 // onGameOver is a default method: the HUD and the fake listeners compile without writing it.
-// No event for Melda: the view reads GameSession.getMelda() at each frame, like the enemies, and draws her bubble
+// No event for the neighbour: the view reads GameSession.getNeighbour() at each frame, like the enemies, and draws her bubble
 // while she talks.
 /**
  * Something that wants to know when the game changes: the money, the farm's health,
