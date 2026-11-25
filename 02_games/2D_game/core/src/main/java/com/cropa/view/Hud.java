@@ -297,13 +297,9 @@ public class Hud implements GameListener {
     private void drawStatus(Canvas canvas) {
         float top = worldTop - MARGIN;
         float x = BORDER;
-        int words = parts.stream().mapToInt(TextWidth::of).sum();
-        int inlineGap = BAR_GAP + HEALTH_WIDTH + BAR_GAP;
-        int baseWidth = 2 * BORDER + words + 3 * (ICON + ICON_GAP) + 2 * GROUP_GAP;
-        boolean under = baseWidth + inlineGap > SHOP_LEFT - SHOP_GAP;
-        int healthGap = under ? GROUP_GAP : inlineGap;
-        int width = baseWidth + healthGap;
-        Bounds frame = new Bounds(0, top - (under ? 20 : 16), width, under ? 24 : 20);
+        boolean under = healthUnder();
+        int healthGap = under ? GROUP_GAP : BAR_GAP + HEALTH_WIDTH + BAR_GAP;
+        Bounds frame = new Bounds(0, top - (under ? 20 : 16), statusWidth(), under ? 24 : 20);
         canvas.drawFrame(SpriteCatalog.HUD_FRAME, frame, Tint.NORMAL);
         for (int i = 0; i < parts.size(); i++) {
             if (i < 3) {
@@ -326,15 +322,35 @@ public class Hud implements GameListener {
         }
     }
 
+    // The width of the frame of the first line, from x 0: its words, icons and gaps, and the health bar beside "PV".
+    private int statusWidth() {
+        return baseWidth() + (healthUnder() ? GROUP_GAP : BAR_GAP + HEALTH_WIDTH + BAR_GAP);
+    }
+
+    // True when the health bar beside "PV" would push the first line into the shop: it then goes under "PV".
+    private boolean healthUnder() {
+        return baseWidth() + BAR_GAP + HEALTH_WIDTH + BAR_GAP > SHOP_LEFT - SHOP_GAP;
+    }
+
+    // The first line without the health bar: its borders, words, icons and the gaps between the groups.
+    private int baseWidth() {
+        int words = parts.stream().mapToInt(TextWidth::of).sum();
+        return 2 * BORDER + words + 3 * (ICON + ICON_GAP) + 2 * GROUP_GAP;
+    }
+
+    // The frame of the urn ends where the frame of the first line ends (the user, 25/11: "plus esthétique"), so the
+    // two frames share their right edge; never further left than GAUGE_X, clear of the night button.
     /** Use the atlas index as an explicit one-second animation time. */
     private void drawUrnGauge(Canvas canvas) {
         float top = secondRowTop();
-        Bounds urn = new Bounds(GAUGE_X + TextWidth.of(gaugeText) + BORDER, top - 20, 16, 20);
-        float left = GAUGE_X - BORDER;
-        Bounds frame = new Bounds(left, urn.y() - BORDER, urn.x() + urn.width() + BORDER - left,
-                urn.height() + 2 * BORDER);
+        int textWidth = TextWidth.of(gaugeText);
+        float width = BORDER + textWidth + BORDER + 16 + BORDER;
+        float left = Math.max(GAUGE_X - BORDER, statusWidth() - width);
+        float textX = left + BORDER;
+        Bounds urn = new Bounds(textX + textWidth + BORDER, top - 20, 16, 20);
+        Bounds frame = new Bounds(left, urn.y() - BORDER, width, urn.height() + 2 * BORDER);
         canvas.drawFrame(SpriteCatalog.HUD_FRAME, frame, Tint.NORMAL);
-        canvas.drawPlainText(gaugeText, GAUGE_X, top, TextStyle.NORMAL);
+        canvas.drawPlainText(gaugeText, textX, top, TextStyle.NORMAL);
         float share = Math.max(0f, Math.min(1f, (float) money / urnPrice));
         canvas.drawAnimation("urn_gauge", urn, (int) (share * URN_STEPS), Tint.NORMAL);
     }

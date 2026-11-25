@@ -7,7 +7,6 @@ import com.cropa.model.defense.DefenseSlots;
 import com.cropa.model.defense.SlotSide;
 import com.cropa.model.enemy.Enemy;
 import com.cropa.model.world.Board;
-import com.cropa.text.Texts;
 import com.cropa.view.fx.Effects;
 import com.cropa.view.fx.Particle;
 import java.util.ArrayList;
@@ -26,21 +25,15 @@ public class DefenseRenderer {
     // Drawn size, in world pixels: 24 px from a 32 px image, centred on its 16 px slot, like the farmer in FarmRenderer.
     // 16 looked tiny, 32 covered the field.
     private static final float CATAPATATE_SIZE = 24f;
-    // In world pixels: the space between the sprite and its label, and the height kept for the small text above
-    // a sprite, because the canvas places the top of the text at the y it receives.
-    private static final float LABEL_GAP = 2f;
-    private static final float LABEL_HEIGHT = 6f;
-    // Above a top slot, the label is raised by the bar and its gap: the bar ends 1 px over the sprite.
-    private static final float LABEL_LINE = 11f;
     // A short puff keeps the breaking defense visible through the smoke.
     private static final int DESTRUCTION_SMOKE_COUNT = 6;
-    // The health bar under the level label (the user, 25/11: no number, under "N1", bigger and contrasted). 14 px
-    // wide: two bars of neighbouring slots, 16 px apart, keep 2 px between them. Its top is 12 px under the top of
-    // the label: in a small window the canvas enlarges the label font (GdxCanvas.labelScale, at most 0.8 from the
-    // card of the site up), and its bubble then reaches 11 px down. A 1 px black edge around the coloured part.
+    // The health bar of a defense (the user, 25/11: no number, bigger and contrasted; then no level label any more,
+    // it hid the view; then 35 % thinner, 6 to 4 px high). 14 px wide: two bars of neighbouring slots, 16 px apart, keep 2 px between them. On the side
+    // away from the field, 1 px from the sprite: above a top one, under a bottom one; on the top edge of a field cell.
+    // A 1 px black edge around the coloured part.
     private static final float BAR_WIDTH = 14f;
-    private static final float BAR_HEIGHT = 6f;
-    private static final float BAR_DROP = 12f;
+    private static final float BAR_HEIGHT = 4f;
+    private static final float BAR_SPACE = 1f;
     private static final float BAR_EDGE = 1f;
     // The empty part, dark grey, and the fill, bright on the black edge: green, yellow, orange, then red.
     private static final float[] BAR_EMPTY = {0.22f, 0.22f, 0.22f};
@@ -53,8 +46,6 @@ public class DefenseRenderer {
     //-------------------- FIELDS --------------------
     // The places of the slots and cells, read from the map. It never changes: final.
     private final BoardLayout layout;
-    // The words of the labels, in the language of the game.
-    private final Texts texts;
     private static final float FLIGHT = .35f;
     private static final float ARC_HEIGHT = 18f;
     private static final int FIELD_OFFSET = 3;
@@ -63,10 +54,10 @@ public class DefenseRenderer {
     private final Map<Defense, Pose> poses = new HashMap<>();
     private final List<Shot> shots = new ArrayList<>();
     private final List<Breakage> breaks = new ArrayList<>();
-    // The labels and health bars of this frame, kept for renderLabels when the game draws them after the night
-    // lighting, like the cat's bubble: graded, the green bar turned a dull teal at night (the user, 25/11).
-    private final List<Consumer<Canvas>> labels = new ArrayList<>();
-    private boolean labelsDeferred;
+    // The health bars of this frame, kept for renderHealthBars when the game draws them after the night lighting,
+    // like the cat's bubble: graded, the green bar turned a dull teal at night (the user, 25/11).
+    private final List<Consumer<Canvas>> healthBars = new ArrayList<>();
+    private boolean healthBarsDeferred;
     private double now;
 
     /** A placement owns its clocks and flashes until that object leaves the board. */
@@ -101,14 +92,13 @@ public class DefenseRenderer {
     private record Breakage(String key, Bounds area, double start) {}
 
     /** Creates a standalone renderer for callers without a shared effects service. */
-    public DefenseRenderer(BoardLayout layout, Texts texts) {
-        this(layout, texts, new Effects(new Random()));
+    public DefenseRenderer(BoardLayout layout) {
+        this(layout, new Effects(new Random()));
     }
 
     /** Uses the effects service flushed by the game screen. */
-    public DefenseRenderer(BoardLayout layout, Texts texts, Effects effects) {
+    public DefenseRenderer(BoardLayout layout, Effects effects) {
         this.layout = layout;
-        this.texts = texts;
         this.effects = effects;
     }
 
@@ -120,7 +110,7 @@ public class DefenseRenderer {
     /** Samples each occupied place once, then plays effects that outlive their owner. */
     public void render(Canvas canvas, DefenseSlots slots, List<Enemy> enemies, float delta) {
         now += delta;
-        labels.clear();
+        healthBars.clear();
         var live = slots.getDefenses();
         poses.entrySet().removeIf(entry -> {
             Defense defense = entry.getKey();
@@ -144,8 +134,9 @@ public class DefenseRenderer {
                 slot.getDefense().ifPresent(defense -> {
                     String base = side == SlotSide.TOP ? SpriteCatalog.CATAPATATE_TOP : SpriteCatalog.CATAPATATE_BOTTOM;
                     draw(canvas, defense, base, base, area, Optional.of(slot), enemies, delta);
-                    float y = labelY(side, area) + (side == SlotSide.TOP ? LABEL_LINE : 0);
-                    label(canvas, defense, center(area).x(), y);
+                    float y = side == SlotSide.TOP ? area.y() + area.height() + BAR_SPACE
+                            : area.y() - BAR_SPACE - BAR_HEIGHT;
+                    health(canvas, defense, center(area).x(), y);
                 });
             }
         }
@@ -154,9 +145,8 @@ public class DefenseRenderer {
             String idle = defense instanceof Bramble bramble ? bramble.spriteKey() : "scarecrow";
             draw(canvas, defense, defense instanceof Bramble ? "bramble" : idle, idle, area,
                     Optional.empty(), enemies, delta);
-            // Above the cell, the bar sits on its top edge and the label over the bar.
-            float y = area.y() + area.height() + BAR_DROP + BAR_HEIGHT;
-            label(canvas, defense, center(area).x(), y);
+            // The bar sits on the top edge of the cell.
+            health(canvas, defense, center(area).x(), area.y() + area.height());
         });
         breaks.removeIf(b -> now - b.start >= Animations.duration(b.key, 6));
         for (Breakage b : breaks) canvas.drawAnimation(b.key, b.area, (float) (now - b.start), Tint.NORMAL);
@@ -199,34 +189,30 @@ public class DefenseRenderer {
     }
 
     /**
-     * From now on, render keeps the labels and health bars for {@link #renderLabels}: the game draws them after the
-     * night lighting, so they keep their colours.
+     * From now on, render keeps the health bars for {@link #renderHealthBars}: the game draws them after the night
+     * lighting, so they keep their colours.
      */
-    public void deferLabels() {
-        labelsDeferred = true;
+    public void deferHealthBars() {
+        healthBarsDeferred = true;
     }
 
-    /** Draws the labels and health bars kept by the last render, then forgets them. */
-    public void renderLabels(Canvas canvas) {
-        for (Consumer<Canvas> label : labels) label.accept(canvas);
-        labels.clear();
+    /** Draws the health bars kept by the last render, then forgets them. */
+    public void renderHealthBars(Canvas canvas) {
+        for (Consumer<Canvas> bar : healthBars) bar.accept(canvas);
+        healthBars.clear();
     }
 
-    // The level, then the health bar under it; drawn at once, or kept for renderLabels.
-    private void label(Canvas canvas, Defense defense, float centerX, float y) {
-        String level = levelOf(defense);
+    // The health bar of a defense, its bottom edge at y; drawn at once, or kept for renderHealthBars.
+    private void health(Canvas canvas, Defense defense, float centerX, float y) {
         int durability = defense.getDurability();
-        Consumer<Canvas> draw = target -> {
-            target.drawLabel(level, centerX, y);
-            drawHealth(target, durability, centerX, y);
-        };
-        if (labelsDeferred) labels.add(draw);
+        Consumer<Canvas> draw = target -> drawHealth(target, durability, centerX, y);
+        if (healthBarsDeferred) healthBars.add(draw);
         else draw.accept(canvas);
     }
 
-    /** Draws the health bar under a level label whose top is at labelTop: black edge, grey empty part, bright fill. */
-    private static void drawHealth(Canvas canvas, int percent, float centerX, float labelTop) {
-        Bounds frame = new Bounds(centerX - BAR_WIDTH / 2, labelTop - BAR_DROP - BAR_HEIGHT, BAR_WIDTH, BAR_HEIGHT);
+    /** Draws a health bar from bottom up, centred on centerX: black edge, grey empty part, bright fill. */
+    private static void drawHealth(Canvas canvas, int percent, float centerX, float bottom) {
+        Bounds frame = new Bounds(centerX - BAR_WIDTH / 2, bottom, BAR_WIDTH, BAR_HEIGHT);
         canvas.drawColorLayer(frame, 0f, 0f, 0f, 1f);
         float inner = BAR_WIDTH - 2 * BAR_EDGE;
         float x = frame.x() + BAR_EDGE;
@@ -298,16 +284,4 @@ public class DefenseRenderer {
         return Bounds.centeredOn(center, CATAPATATE_SIZE);
     }
 
-    private String levelOf(Defense defense) {
-        return texts.level(defense.getLevel());
-    }
-
-    // On the side away from the field, so the labels never hide a crop: above a top sprite, under a bottom one.
-    // The top of the label closest to the sprite; drawOnSlot stacks the second one from it.
-    private static float labelY(SlotSide side, Bounds area) {
-        if (side == SlotSide.TOP) {
-            return area.y() + area.height() + LABEL_GAP + LABEL_HEIGHT;
-        }
-        return area.y() - LABEL_GAP;
-    }
 }

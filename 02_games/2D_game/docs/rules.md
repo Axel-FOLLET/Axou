@@ -134,7 +134,7 @@ Each plant has its own stages. It grows one stage per night, and its value depen
 
 All defenses are bought during the day, in the shop.
 
-- **Durability:** each defense has a durability. At 0%, it is destroyed. In the game, a bar under the defense's level (L1, L2, L3; N1, N2, N3 in French) shows what remains: green when new, then yellow, orange and red as it wears.
+- **Durability:** each defense has a durability. At 0%, it is destroyed. In the game, a bar beside the defense, on the side away from the field, shows what remains: green when new, then yellow, orange and red as it wears. The level is not written: the sprite shows it (wood, reinforced, metal).
 - **Only one wear per crossing, never added together:** on a field tile, the defense's wear counts (bramble -20%, scarecrow -10%); on a defense slot, the enemy's wear counts (bat -10%, witch -20%). A witch that crosses a bramble therefore takes 20% off it, not 40%.
 - **Upgrade:** a single action, with 3 levels at most. Each upgrade increases damage and **resets durability to 100%**.
 - **Targeting:** a defense only hits enemies **in range**, **one at a time**.

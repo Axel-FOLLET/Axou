@@ -71,6 +71,7 @@ class ViewRenderersTest {
     // The starting values come from the caller: other numbers show that nothing is written in the HUD.
     // On the second line, the urn gauge (J10): its words, its green part (150 / 10 000 of the bar) and its outline,
     // then by day the "Lancer la nuit" button (J9), and the sound button (20/11). They are tested in HudTest.
+    // The frame of the urn ends at x 372 like the frame of the first line (the user, 25/11).
     @Test
     void hudShowsTheValuesItReceives() {
         RecordingCanvas canvas = new RecordingCanvas();
@@ -81,9 +82,9 @@ class ViewRenderersTest {
                 "sprite lifebar_back " + new Bounds(201, 303, 24, 6),
                 "sprite lifebar_fill " + new Bounds(202, 304, 22, 4),
                 "sprite dial_day " + new Bounds(228, 302, 10, 10), "text Jour : 1 239.0 312.0",
-                "text Temps : 0 s 292.0 312.0", "sprite hud_frame " + new Bounds(176, 264, 151, 28),
-                "text Urne : 150 / 10 000 180.0 288.0",
-                "sprite urn_gauge " + new Bounds(307, 268, 16, 20),
+                "text Temps : 0 s 292.0 312.0", "sprite hud_frame " + new Bounds(221, 264, 151, 28),
+                "text Urne : 150 / 10 000 225.0 288.0",
+                "sprite urn_gauge " + new Bounds(352, 268, 16, 20),
                 "sprite button_frame " + new Bounds(5, 272, 93, 19), "text Lancer la nuit 8.0 288.0",
                 "sprite button_frame " + new Bounds(478, 8, 63, 19), "text Son : oui 481.0 24.0"), canvas.calls);
     }

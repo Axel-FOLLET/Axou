@@ -16,9 +16,6 @@ import com.cropa.model.enemy.EnemyConfig;
 import com.cropa.model.enemy.Witch;
 import com.cropa.model.world.Cell;
 import com.cropa.model.world.Farm;
-// Language and Texts: the words of the game in French, the language its layout was measured on.
-import com.cropa.text.Language;
-import com.cropa.text.Texts;
 import com.cropa.view.fx.Effects;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,9 +34,7 @@ class DefenseRendererTest {
     private final DefenseSlots slots = new DefenseSlots();
     private final RecordingCanvas canvas = new RecordingCanvas();
     private final Effects effects = new Effects(new Random(0));
-    // In French, the language the labels were drawn for: "N1".
-    private final DefenseRenderer renderer =
-        new DefenseRenderer(TestLayouts.layout(), Texts.of(Language.FRENCH), effects);
+    private final DefenseRenderer renderer = new DefenseRenderer(TestLayouts.layout(), effects);
 
     //-------------------- HELPERS --------------------
     // Places a catapatate the way the shop will: created for its slot, then placed on it.
@@ -66,7 +61,7 @@ class DefenseRendererTest {
     }
 
     //-------------------- THE SLOTS --------------------
-    // No defense: nothing is drawn, not even an empty label.
+    // No defense: nothing is drawn, not even an empty bar.
     @Test
     void drawsNothingWithoutDefense() {
         renderer.render(canvas, slots, 0f);
@@ -94,33 +89,21 @@ class DefenseRendererTest {
         assertEquals("sprite catapatate_bottom " + new Bounds(188, 124, 24, 24), canvas.calls.get(0));
     }
 
-    // Asked by Axel on day 14: the level always shown, "N1" read above "92%", centred on the slot, on the side away
-    // from the field. Top slot: above the sprite, the durability at 188 + 24 + 2 + 6 = 220, the level raised over
-    // the health bar, at 220 + 11 = 231.
+    // The user, 25/11: no more "N1", "N2", "N3" on the defenses, they hid the view; the sprite shows the level (wood,
+    // reinforced, metal). An upgraded bottom catapatate: its reinforced sprite, and no text at all.
     @Test
-    void writesLevelAndDurabilityAboveATopSlot() {
+    void writesNoLevelOnADefense() {
+        Catapatate catapatate = placeOn(SlotSide.BOTTOM, 3);
+        catapatate.upgrade();
         placeOn(SlotSide.TOP, 3).wear(8);
 
         renderer.render(canvas, slots, 0f);
 
-        assertEquals("label N1 200.0 231.0", canvas.calls.get(1));
-        assertTrue(canvas.calls.stream().noneMatch(call -> call.contains("%")));
+        assertTrue(canvas.calls.stream().noneMatch(call -> call.startsWith("label ")), canvas.calls.toString());
+        assertTrue(canvas.calls.contains("sprite catapatate_bottom_reinforced " + new Bounds(188, 124, 24, 24)));
     }
 
-    // Bottom slot: below the sprite, the level 2 px under it, at 124 - 2 = 122, the durability one label lower, at
-    // 122 - 9 = 113. An upgrade gives level 2 and back 100 %.
-    @Test
-    void writesLevelAndDurabilityBelowABottomSlot() {
-        Catapatate catapatate = placeOn(SlotSide.BOTTOM, 3);
-        catapatate.upgrade();
-
-        renderer.render(canvas, slots, 0f);
-
-        assertEquals("label N2 200.0 122.0", canvas.calls.get(1));
-        assertEquals("sprite catapatate_bottom_reinforced " + new Bounds(188, 124, 24, 24), canvas.calls.get(0));
-    }
-
-    // Two defenses: one sprite and two labels each, top side first.
+    // Two defenses: one sprite each, top side first.
     @Test
     void drawsEveryPlacedDefense() {
         placeOn(SlotSide.TOP, 1);
@@ -128,45 +111,45 @@ class DefenseRendererTest {
 
         renderer.render(canvas, slots, 0f);
 
-        assertEquals(4, canvas.calls.size());
+        assertEquals(2, canvas.calls.size());
         assertTrue(canvas.calls.get(0).startsWith("sprite catapatate_top"));
-        assertTrue(canvas.calls.get(2).startsWith("sprite catapatate_bottom"));
+        assertTrue(canvas.calls.get(1).startsWith("sprite catapatate_bottom"));
     }
 
-    // The user, 25/11: the health under "N1", as a bar with no number, bigger and contrasted. Top slot: the label at
-    // 231, the bar 12 px lower, 14 x 6 centred on x 200: (193, 213), 1 px over the sprite (212). At 92 %: a black edge, the grey empty part, then
-    // 92 % of the 12 px inside in green.
+    // The user, 25/11: the health as a bar with no number, bigger and contrasted, then 35 % thinner. Top slot: 14 x 4 centred on x 200,
+    // 1 px over the sprite (188 + 24 = 212): (193, 213). At 92 %: a black edge, the grey empty part, then 92 % of the
+    // 12 px inside in green.
     @Test
-    void drawsTheHealthBarUnderTheLevelOfATopSlot() {
+    void drawsTheHealthBarAboveATopSlot() {
         placeOn(SlotSide.TOP, 3).wear(8);
 
         renderer.render(canvas, slots, 0f);
 
         assertEquals(List.of(
-                "color " + new Bounds(193, 213, 14, 6) + " 0.0 0.0 0.0 1.0",
-                "color " + new Bounds(194, 214, 12, 4) + " 0.22 0.22 0.22 1.0",
-                "color " + new Bounds(194, 214, 12 * 92 / 100f, 4) + " 0.3 0.95 0.3 1.0"), colors());
+                "color " + new Bounds(193, 213, 14, 4) + " 0.0 0.0 0.0 1.0",
+                "color " + new Bounds(194, 214, 12, 2) + " 0.22 0.22 0.22 1.0",
+                "color " + new Bounds(194, 214, 12 * 92 / 100f, 2) + " 0.3 0.95 0.3 1.0"), colors());
     }
 
-    // Bottom slot: the label at 122, the bar under it, at 122 - 12 - 6 = 104; nearly broken, it turns red.
+    // Bottom slot: the bar 1 px under the sprite (124), at 124 - 1 - 4 = 119; nearly broken, it turns red.
     // Field: the bar on the top of the cell r2c3, at 176.
     @Test
-    void drawsTheHealthBarUnderTheLevelOfABottomSlotAndAFieldDefense() {
+    void drawsTheHealthBarUnderABottomSlotAndOnAFieldDefense() {
         placeOn(SlotSide.BOTTOM, 3).wear(80);
         brambleOnR2C3();
 
         renderer.render(canvas, slots, 0f);
 
-        assertTrue(colors().contains("color " + new Bounds(193, 104, 14, 6) + " 0.0 0.0 0.0 1.0"));
-        assertTrue(colors().contains("color " + new Bounds(194, 105, 12 * 20 / 100f, 4) + " 1.0 0.18 0.18 1.0"));
-        assertTrue(colors().contains("color " + new Bounds(193, 176, 14, 6) + " 0.0 0.0 0.0 1.0"));
+        assertTrue(colors().contains("color " + new Bounds(193, 119, 14, 4) + " 0.0 0.0 0.0 1.0"));
+        assertTrue(colors().contains("color " + new Bounds(194, 120, 12 * 20 / 100f, 2) + " 1.0 0.18 0.18 1.0"));
+        assertTrue(colors().contains("color " + new Bounds(193, 176, 14, 4) + " 0.0 0.0 0.0 1.0"));
     }
 
-    // In the game, the labels and bars wait for renderLabels, drawn after the night lighting; once drawn, they are
+    // In the game, the bars wait for renderHealthBars, drawn after the night lighting; once drawn, they are
     // forgotten, so a second call draws nothing.
     @Test
-    void deferredLabelsWaitForRenderLabels() {
-        renderer.deferLabels();
+    void deferredHealthBarsWaitForRenderHealthBars() {
+        renderer.deferHealthBars();
         placeOn(SlotSide.TOP, 3);
 
         renderer.render(canvas, slots, 0f);
@@ -174,13 +157,13 @@ class DefenseRendererTest {
         assertTrue(colors().isEmpty());
 
         canvas.calls.clear();
-        renderer.renderLabels(canvas);
-        assertEquals(List.of("label N1 200.0 231.0"), canvas.calls);
+        renderer.renderHealthBars(canvas);
+        assertTrue(canvas.calls.isEmpty());
         assertEquals(3, colors().size());
 
-        canvas.calls.clear();
-        renderer.renderLabels(canvas);
-        assertTrue(canvas.calls.isEmpty());
+        canvas.extras.clear();
+        renderer.renderHealthBars(canvas);
+        assertTrue(colors().isEmpty());
     }
 
     private List<String> colors() {
@@ -198,27 +181,24 @@ class DefenseRendererTest {
     }
 
     //-------------------- THE FIELD --------------------
-    // Expected by the sheet of the day: a bramble on the field, one label, and no sprite (WorldRenderer draws it).
-    // Above the cell r2c3: x = 192 + 8 = 200; the health bar sits on the cell (176), the top of the text at
-    // 176 + 12 + 6 = 194.
+    // A bramble on the field: its sprite on the cell r2c3, and no text.
     @Test
-    void writesOnlyTheLabelOfAFieldDefense() {
+    void drawsAFieldDefenseWithoutText() {
         brambleOnR2C3();
 
-        assertEquals(List.of("sprite bramble_0 " + new Bounds(192, 160, 16, 16), "label N1 200.0 194.0"), frame(0f));
+        assertEquals(List.of("sprite bramble_0 " + new Bounds(192, 160, 16, 16)), frame(0f));
     }
 
     // Expected by the sheet of the day: crossed between two frames (100 then 80), its sprite is drawn once more,
-    // in red, on its cell; 0.2 s later, only the label is left.
+    // in red, on its cell; 0.2 s later, drawn normally again.
     @Test
     void redrawsACrossedFieldDefenseInRed() {
         Bramble bramble = brambleOnR2C3();
         frame(FRAME);
         bramble.wear(20);
 
-        assertEquals(List.of("sprite bramble_strike " + new Bounds(192, 160, 16, 16) + " HURT", "label N1 200.0 194.0"),
-                frame(FRAME));
-        assertEquals(List.of("sprite bramble_strike " + new Bounds(192, 160, 16, 16), "label N1 200.0 194.0"), frame(0.25f));
+        assertEquals(List.of("sprite bramble_strike " + new Bounds(192, 160, 16, 16) + " HURT"), frame(FRAME));
+        assertEquals(List.of("sprite bramble_strike " + new Bounds(192, 160, 16, 16)), frame(0.25f));
     }
 
     //-------------------- THE UPGRADE --------------------

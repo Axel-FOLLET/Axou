@@ -229,8 +229,8 @@ public class GameScreen implements Screen {
         worldRenderer = new WorldRenderer(layout, effects);
         livingDecor = new LivingDecor();
         Texts texts = Texts.of(config.getLanguage());
-        defenseRenderer = new DefenseRenderer(layout, texts, effects);
-        defenseRenderer.deferLabels();
+        defenseRenderer = new DefenseRenderer(layout, effects);
+        defenseRenderer.deferHealthBars();
         enemyRenderer = new EnemyRenderer(layout, effects);
         farmRenderer = new FarmRenderer(layout, session.getFarmHealth(), effects);
         neighbourRenderer = new NeighbourRenderer(layout, texts);
@@ -369,8 +369,8 @@ public class GameScreen implements Screen {
             canvas.drawSprite("neighbour_bubble", neighbourBubble, Tint.NORMAL);
             neighbourBubble = null;
         }
-        // The levels and health bars of the defenses, also above the lighting: they keep their colours at night.
-        defenseRenderer.renderLabels(canvas);
+        // The health bars of the defenses, also above the lighting: they keep their colours at night.
+        defenseRenderer.renderHealthBars(canvas);
         growthRenderer.render(canvas, session.getBoard());
         effects.renderTexts(canvas);
         shopWindow.shownDefense().ifPresent(defense -> outlineRenderer.renderRange(canvas, defense));

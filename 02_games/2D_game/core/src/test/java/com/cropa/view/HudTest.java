@@ -17,6 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -249,19 +251,52 @@ class HudTest {
     }
 
     //-------------------- THE URN GAUGE (J10) --------------------
-    // The words and the animated urn share the second frame, clear of the widest night button.
+    // The frames drawn by the HUD, in order: the first line, then the urn gauge.
+    private List<Bounds> hudFrames() {
+        Pattern frame = Pattern.compile(
+                "sprite hud_frame Bounds\\[x=([-.0-9]+), y=([-.0-9]+), width=([-.0-9]+), height=([-.0-9]+)\\]");
+        List<Bounds> frames = new ArrayList<>();
+        for (String call : canvas.calls) {
+            Matcher m = frame.matcher(call);
+            if (m.matches()) {
+                frames.add(new Bounds(Float.parseFloat(m.group(1)), Float.parseFloat(m.group(2)),
+                        Float.parseFloat(m.group(3)), Float.parseFloat(m.group(4))));
+            }
+        }
+        return frames;
+    }
+
+    // The frame of the urn gauge, after checking that it ends where the frame of the first line ends (the user,
+    // 25/11: both frames share their right edge).
+    private Bounds urnFrameAlignedOnTheStatus() {
+        List<Bounds> frames = hudFrames();
+        assertEquals(2, frames.size(), frames.toString());
+        Bounds status = frames.get(0), urn = frames.get(1);
+        assertEquals(status.x() + status.width(), urn.x() + urn.width(), frames.toString());
+        return urn;
+    }
+
+    // The animated urn, 16 x 20, at the right end of its frame, 4 px inside.
+    private static Bounds urnIn(Bounds frame) {
+        return new Bounds(frame.x() + frame.width() - 4 - 16, 268, 16, 20);
+    }
+
+    // The words and the animated urn share the second frame, clear of the widest night button; its right edge is
+    // the one of the first line, left of the shop.
     @Test
     void theGaugeShowsTheMoneyAgainstTheUrn() {
         hud.onDayStarted(8);
         hud.render(canvas);
 
-        Bounds frame = new Bounds(176, 264, 151, 28);
+        Bounds frame = urnFrameAlignedOnTheStatus();
+        assertEquals(264, frame.y());
+        assertEquals(28, frame.height());
         assertTrue(canvas.extras.contains("frame hud_frame " + frame + " NORMAL"));
         assertGap(hud.getNightButton(), frame, 1);
         assertTrue(frame.x() + frame.width() <= 397);
-        assertTrue(canvas.extras.contains("plain Urne : 200 / 10 000 180.0 288.0 NORMAL"));
-        assertTrue(canvas.extras.contains("animation urn_gauge " + new Bounds(307, 268, 16, 20) + " 0.0 NORMAL"));
-        assertTrue(drew("sprite urn_gauge " + new Bounds(307, 268, 16, 20)));
+        assertTrue(canvas.extras.contains("plain Urne : 200 / 10 000 " + (frame.x() + 4) + " 288.0 NORMAL"));
+        assertTrue(canvas.extras.contains("animation urn_gauge " + urnIn(frame) + " 0.0 NORMAL"));
+        assertTrue(drew("sprite urn_gauge " + urnIn(frame)));
     }
 
     // It follows the money, with the thousands apart; past the price, the bar stays full, never wider.
@@ -270,8 +305,9 @@ class HudTest {
         hud.onMoneyChanged(12345);
         hud.render(canvas);
 
-        assertTrue(drew("text Urne : 12 345 / 10 000 180.0 288.0"));
-        assertTrue(canvas.extras.contains("animation urn_gauge " + new Bounds(327, 268, 16, 20) + " 10.0 NORMAL"));
+        Bounds frame = urnFrameAlignedOnTheStatus();
+        assertTrue(drew("text Urne : 12 345 / 10 000 " + (frame.x() + 4) + " 288.0"));
+        assertTrue(canvas.extras.contains("animation urn_gauge " + urnIn(frame) + " 10.0 NORMAL"));
     }
 
     // At 0 coins: the words and the empty outline, no green part.
@@ -280,9 +316,19 @@ class HudTest {
         hud.onMoneyChanged(0);
         hud.render(canvas);
 
+        Bounds frame = urnFrameAlignedOnTheStatus();
         assertTrue(drew("text Urne : 0 / 10 000"));
-        assertTrue(canvas.extras.contains("animation urn_gauge " + new Bounds(291, 268, 16, 20) + " 0.0 NORMAL"));
-        assertTrue(drew("sprite urn_gauge " + new Bounds(291, 268, 16, 20)));
+        assertTrue(canvas.extras.contains("animation urn_gauge " + urnIn(frame) + " 0.0 NORMAL"));
+        assertTrue(drew("sprite urn_gauge " + urnIn(frame)));
+    }
+
+    // At night the button is gone, but the frame of the urn keeps its place under the end of the first line.
+    @Test
+    void theGaugeStaysAlignedAtNight() {
+        hud.onNightStarted(3);
+        hud.render(canvas);
+
+        urnFrameAlignedOnTheStatus();
     }
 
     // Always there while the game goes on: at night too, where the button is gone.
