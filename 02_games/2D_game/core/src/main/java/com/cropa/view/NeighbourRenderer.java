@@ -111,7 +111,7 @@ public class NeighbourRenderer {
             case ARRIVING -> drawWalking(canvas, toGarry, neighbour.getWalkProgress());
             case LEAVING -> drawWalking(canvas, away, neighbour.getWalkProgress());
             case TALKING -> {
-                drawAt(canvas, talkPlace, "north");
+                drawAt(canvas, talkPlace, "north", 0f);
                 canvas.drawSprite("neighbour_bubble", new Bounds(talkPlace.x() - NEIGHBOUR_SIZE / 2 - BUBBLE_LEFT,
                     talkPlace.y() + BUBBLE_UP, BUBBLE_SIZE, BUBBLE_SIZE));
             }
@@ -133,14 +133,19 @@ public class NeighbourRenderer {
      * @param neighbour the neighbour, read as she is now
      */
     public void renderDialog(Canvas canvas, Neighbour neighbour) {
+        renderDialog(canvas, neighbour, Pointer.AWAY);
+    }
+
+    /** Draws the speaker and the live state of the timed continue button. */
+    public void renderDialog(Canvas canvas, Neighbour neighbour, Pointer pointer) {
         if (!neighbour.isTalking()) {
             return;
         }
         String words = neighbour.getCurrentBubble();
+        DialogFrame.draw(canvas, DIALOG_AREA, "portrait_neighbour");
         canvas.drawDialog(words.isEmpty() ? List.of() : linesOf(words), DIALOG_AREA);
         TextStyle style = neighbour.isBubbleWritten() ? TextStyle.NORMAL : TextStyle.GREYED;
-        canvas.drawText(nextLabel, nextButton.x() + 3, NEXT_TOP, style);
-        canvas.drawOutline(nextButton, OutlineColor.WHITE);
+        pointer.button(canvas, nextButton, nextLabel, style);
     }
 
     //-------------------- CLICKS --------------------
@@ -184,9 +189,15 @@ public class NeighbourRenderer {
     }
 
     // Her sprite with its bottom edge centred on the point, turned to the direction given.
-    private static void drawAt(Canvas canvas, Point feet, String direction) {
-        canvas.drawSprite("neighbour_" + direction,
-            new Bounds(feet.x() - NEIGHBOUR_SIZE / 2, feet.y(), NEIGHBOUR_SIZE, NEIGHBOUR_SIZE));
+    private static void drawAt(Canvas canvas, Point feet, String direction, float time) {
+        float width = NEIGHBOUR_SIZE * 0.6f;
+        float height = width * 12 / 32;
+        // Four empty rows place her shoes above the bottom edge.
+        canvas.drawSprite("shadow", new Bounds(feet.x() - width / 2,
+                feet.y() + NEIGHBOUR_SIZE * 4 / 64 - height / 2, width, height));
+        // The same bounds keep her feet on the path while the frames change.
+        Bounds area = new Bounds(feet.x() - NEIGHBOUR_SIZE / 2, feet.y(), NEIGHBOUR_SIZE, NEIGHBOUR_SIZE);
+        canvas.drawAnimation("neighbour_" + direction, area, time, Tint.NORMAL);
     }
 
     // Her place along a path, at the same speed all along: progress 0.5 is half the length of the path, whatever
@@ -207,7 +218,8 @@ public class NeighbourRenderer {
                 float share = length == 0 ? 0 : Math.min(1f, left / length);
                 Point here = new Point(start.x() + (end.x() - start.x()) * share,
                     start.y() + (end.y() - start.y()) * share);
-                drawAt(canvas, here, directionOf(start, end));
+                // Keep the stride continuous through every turn along this path.
+                drawAt(canvas, here, directionOf(start, end), progress * total / 24f);
                 return;
             }
             left -= length;

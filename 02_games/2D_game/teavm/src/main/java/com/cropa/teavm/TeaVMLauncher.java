@@ -3,6 +3,7 @@ package com.cropa.teavm;
 // WebApplication: libGDX in the browser (gdx-teavm). CropaGame and Language: the game and the language it starts in.
 // JSBody: a line of JavaScript called from Java. Window and Navigator: the address of the page and the language of the
 // browser.
+import com.badlogic.gdx.ApplicationListener;
 import com.cropa.CropaGame;
 import com.cropa.text.Language;
 import com.github.xpenatan.gdx.teavm.backends.web.WebApplication;
@@ -20,7 +21,16 @@ public class TeaVMLauncher {
         // 0 x 0: the game takes the whole page; its FitViewport keeps the ratio of the world and adds bars.
         config.width = 0;
         config.height = 0;
+        // The real pixels of the screen: with CSS pixels, a screen zoomed to 125 or 150 % got a smaller image that the
+        // browser stretched, and the small letters blurred (the user, 25/11). The backend converts the clicks itself.
+        config.usePhysicalPixels = true;
         new WebApplication(new CropaGame(language()), config) {
+            // Show the rocking chair while the browser downloads the game assets.
+            @Override
+            protected ApplicationListener createDefaultPreloadAppListener() {
+                return new LoadingScreen();
+            }
+
             // "Quitter" (Quit) at the end of a game calls Gdx.app.exit(), which does nothing in a browser by default.
             @Override
             public void exit() {

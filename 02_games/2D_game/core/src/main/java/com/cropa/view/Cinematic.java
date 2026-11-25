@@ -37,6 +37,8 @@ public class Cinematic {
     // The position of the scene shown in the list: 0 for the first one. Equal to the size of the list once the last
     // scene has been clicked: no scene left, the cinematic is over.
     private int current;
+    // The letters and camera start together on each image.
+    private float time;
 
     //-------------------- CONSTRUCTOR --------------------
     // Called by GameScreen.show(), with the same world as the title screen. An empty list gives a cinematic that is
@@ -103,6 +105,15 @@ public class Cinematic {
         return current >= scenes.size();
     }
 
+    /**
+     * Identifies the image used for the screen fade.
+     *
+     * @return the zero-based image index
+     */
+    public int imageIndex() {
+        return current;
+    }
+
     //-------------------- CLICKS --------------------
     // Called by GameScreen on every click, first, like the title screen: a click anywhere goes to the next scene, so
     // no position is needed. Once the cinematic is over, the click is not used, and goes to what comes next.
@@ -116,7 +127,18 @@ public class Cinematic {
             return false;
         }
         current++;
+        time = 0f;
         return true;
+    }
+
+    //-------------------- TIME --------------------
+    /**
+     * Advances the current image.
+     *
+     * @param delta elapsed time in seconds
+     */
+    public void update(float delta) {
+        time += delta;
     }
 
     //-------------------- DRAWING --------------------
@@ -135,9 +157,15 @@ public class Cinematic {
         }
         Scene scene = scenes.get(current);
         float centerX = world.x() + world.width() / 2;
+        // The image stays still over the whole world (the user, 25/11: the image must not move); only the letters
+        // of the line appear one by one.
         canvas.drawSprite(scene.imageKey(), world);
         canvas.drawNightVeil(new Bounds(world.x(), world.y(), world.width(), BAND_HEIGHT), BAND_OPACITY);
-        canvas.drawCenteredText(scene.line(), centerX, world.y() + LINE_TOP);
+        // Count whole characters so a partially revealed line never splits a surrogate pair.
+        String line = scene.line();
+        int letters = Math.min(line.codePointCount(0, line.length()), (int) (time * 40f));
+        String visible = line.substring(0, line.offsetByCodePoints(0, letters));
+        canvas.drawCenteredText(visible, centerX, world.y() + LINE_TOP);
         canvas.drawLabel(continueLabel, centerX, world.y() + CONTINUE_TOP);
     }
 }

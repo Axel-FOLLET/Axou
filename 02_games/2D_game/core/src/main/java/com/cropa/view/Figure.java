@@ -40,10 +40,12 @@ record Figure(String key, float size, float feet) {
      *
      * @param canvas where to draw
      * @param x the middle of the figure, in world pixels
+     * @param time animation time including the figure phase, in seconds
      * @param ground the height of its feet, in world pixels
      */
-    void stand(Canvas canvas, float x, float ground) {
+    void stand(Canvas canvas, float x, float ground, float time) {
         float bottom = ground - feet;
-        canvas.drawSprite(key, new Bounds(x - size / 2, bottom, size, size));
+        // Keep the feet fixed while the scene chooses the breathing phase.
+        canvas.drawAnimation(key, new Bounds(x - size / 2, bottom, size, size), time, Tint.NORMAL);
     }
 }

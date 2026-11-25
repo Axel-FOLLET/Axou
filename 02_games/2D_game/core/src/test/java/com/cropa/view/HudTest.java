@@ -2,6 +2,7 @@ package com.cropa.view;
 
 // JUnit: the checks the tests use, and the annotations. The model: a real session, to check that the HUD hears it,
 // its numbers, and the ways a game ends. Random: asked by the session.
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -11,9 +12,15 @@ import com.cropa.model.game.GameSession;
 // Language and Texts: the words of the game in French, the language its layout was measured on.
 import com.cropa.text.Language;
 import com.cropa.text.Texts;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 // No window: the HUD draws on a RecordingCanvas and receives clicks as world points.
 // The values it shows are tested in ViewRenderersTest; here, the lines under them: "Lancer la nuit", the end of the
@@ -64,7 +71,7 @@ class HudTest {
         hud.render(canvas);
 
         assertTrue(drew("text Lancer la nuit 8.0 288.0"));
-        assertTrue(drew("outline WHITE"));
+        assertTrue(drew("sprite button_frame " + hud.getNightButton()));
         assertTrue(clickTheButton());
     }
 
@@ -178,16 +185,83 @@ class HudTest {
         assertFalse(drew("Dernier jour"));
     }
 
-    //-------------------- THE URN GAUGE (J10) --------------------
-    // Asked by Axel on day 10: the urn was not visible enough. On the second line, right of the button: the money
-    // against the price, then the bar under the words, 136 px wide: 200 / 10 000 of it in green, and its outline.
     @Test
-    void theGaugeShowsTheMoneyAgainstTheUrn() {
+    void statusLeavesSpaceBetweenSuccessiveElements() {
+        for (Language language : Language.values()) {
+            Texts texts = Texts.of(language);
+            Hud status = new Hud(320, 250, 150, 8, 10000, texts);
+            status.onTimerChanged(60);
+            Map<String, Bounds> drawn = new HashMap<>();
+            status.render(new RecordingCanvas() {
+                @Override public void drawSprite(String key, Bounds area, Tint tint) {
+                    drawn.put(key, area);
+                }
+                @Override public void drawPlainText(String words, float x, float y, TextStyle style) {
+                    drawn.put(words, new Bounds(x, y - 12, TextWidth.of(words), 12));
+                }
+            });
+            List<String> words = texts.statusParts(250, 150, false, 1, 60);
+            assertGap(drawn.get("icon_coin"), drawn.get(words.get(0)), 1);
+            assertGap(drawn.get(words.get(0)), drawn.get("icon_heart"), 5);
+            assertGap(drawn.get("icon_heart"), drawn.get(words.get(1)), 1);
+            Bounds bar = drawn.get("lifebar_back");
+            assertGap(drawn.get(words.get(1)), bar, 3);
+            assertGap(bar, drawn.get("dial_day"), 3);
+            assertGap(drawn.get("dial_day"), drawn.get(words.get(2)), 1);
+            Bounds day = drawn.get(words.get(2));
+            assertEquals(5f, drawn.get(words.get(3)).x() - (day.x() + day.width()));
+        }
+    }
+
+    private static void assertGap(Bounds left, Bounds right, int minimum) {
+        assertTrue(right.x() - (left.x() + left.width()) >= minimum, left + " to " + right);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"FRENCH,1120,20", "ENGLISH,1120,20", "FRENCH,10000,24", "ENGLISH,10000,20"})
+    void daySixStatusKeepsFourUnitsBeforeTheShop(Language language, int money, int height) {
+        Hud status = new Hud(320, money, 50, 8, 10000, Texts.of(language));
+        status.onDayStarted(6);
+        status.onTimerChanged(57);
+        List<Bounds> frames = new ArrayList<>();
+        status.render(new RecordingCanvas() {
+            @Override public void drawFrame(String key, Bounds area, Tint tint) {
+                if (SpriteCatalog.HUD_FRAME.equals(key)) frames.add(area);
+            }
+        });
+
+        Bounds top = frames.get(0);
+        assertEquals(316f, top.y() + top.height());
+        assertEquals((float) height, top.height());
+        assertTrue(397 - (top.x() + top.width()) >= 4, top.toString());
+    }
+
+    @Test
+    void aLongStatusPlacesTheBarUnderTheHealthText() {
+        hud.onMoneyChanged(10000);
+        hud.onNightStarted(10);
+        hud.onTimerChanged(60);
         hud.render(canvas);
 
-        assertTrue(drew("text Urne : 200 / 10 000 180.0 288.0"));
-        assertTrue(drew("dot " + new Bounds(180, 266, 136f * (200f / 10000), 5) + " RIPE"));
-        assertTrue(drew("outline WHITE " + new Bounds(180, 266, 136, 5)));
+        assertTrue(drew("text PV ferme : 100 125.0 312.0"));
+        assertTrue(drew("sprite lifebar_back " + new Bounds(125, 294, 24, 6)));
+        assertTrue(drew("sprite hud_frame " + new Bounds(0, 292, 384, 24)));
+    }
+
+    //-------------------- THE URN GAUGE (J10) --------------------
+    // The words and the animated urn share the second frame, clear of the widest night button.
+    @Test
+    void theGaugeShowsTheMoneyAgainstTheUrn() {
+        hud.onDayStarted(8);
+        hud.render(canvas);
+
+        Bounds frame = new Bounds(176, 264, 151, 28);
+        assertTrue(canvas.extras.contains("frame hud_frame " + frame + " NORMAL"));
+        assertGap(hud.getNightButton(), frame, 1);
+        assertTrue(frame.x() + frame.width() <= 397);
+        assertTrue(canvas.extras.contains("plain Urne : 200 / 10 000 180.0 288.0 NORMAL"));
+        assertTrue(canvas.extras.contains("animation urn_gauge " + new Bounds(307, 268, 16, 20) + " 0.0 NORMAL"));
+        assertTrue(drew("sprite urn_gauge " + new Bounds(307, 268, 16, 20)));
     }
 
     // It follows the money, with the thousands apart; past the price, the bar stays full, never wider.
@@ -197,7 +271,7 @@ class HudTest {
         hud.render(canvas);
 
         assertTrue(drew("text Urne : 12 345 / 10 000 180.0 288.0"));
-        assertTrue(drew("dot " + new Bounds(180, 266, 136, 5) + " RIPE"));
+        assertTrue(canvas.extras.contains("animation urn_gauge " + new Bounds(327, 268, 16, 20) + " 10.0 NORMAL"));
     }
 
     // At 0 coins: the words and the empty outline, no green part.
@@ -207,8 +281,8 @@ class HudTest {
         hud.render(canvas);
 
         assertTrue(drew("text Urne : 0 / 10 000"));
-        assertFalse(drew("dot "));
-        assertTrue(drew("outline WHITE " + new Bounds(180, 266, 136, 5)));
+        assertTrue(canvas.extras.contains("animation urn_gauge " + new Bounds(291, 268, 16, 20) + " 0.0 NORMAL"));
+        assertTrue(drew("sprite urn_gauge " + new Bounds(291, 268, 16, 20)));
     }
 
     // Always there while the game goes on: at night too, where the button is gone.
@@ -240,7 +314,7 @@ class HudTest {
         hud.render(canvas);
 
         assertTrue(drew("text Lancer la dernière nuit 8.0 288.0 ALERT"));
-        assertTrue(drew("outline WHITE " + new Bounds(5, 272, 150, 19)));
+        assertTrue(drew("sprite button_frame " + new Bounds(5, 272, 150, 19)));
         assertTrue(drew("note Vous ne pourrez plus rien vendre après. / Seule la défense de votre ferme comptera."
                 + " 8.0 264.0 ALERT"));
         assertFalse(drew("Lancer la nuit"));
@@ -310,7 +384,7 @@ class HudTest {
         hud.render(canvas);
 
         assertTrue(drew("text Son : oui 481.0 24.0"));
-        assertTrue(drew("outline WHITE " + new Bounds(478, 8, 63, 19)));
+        assertTrue(drew("sprite button_frame " + new Bounds(478, 8, 63, 19)));
         assertTrue(clickTheSoundButton());
     }
 
@@ -341,5 +415,19 @@ class HudTest {
         Bounds night = hud.getNightButton();
 
         assertFalse(hud.handleSoundClick(night.x() + night.width() / 2, night.y() + night.height() / 2));
+    }
+
+    @Test
+    void theNightButtonUsesItsOwnBoundsForAllFourFrames() {
+        Bounds b = hud.getNightButton();
+        hud.render(canvas, new Pointer(b.x(), b.y(), false));
+        assertTrue(drew("sprite button_hover_frame " + b));
+        canvas.calls.clear();
+        hud.render(canvas, new Pointer(b.x(), b.y(), true));
+        assertTrue(drew("sprite button_pressed_frame " + b));
+        canvas.calls.clear();
+        hud.lockNight(true);
+        hud.render(canvas, new Pointer(b.x(), b.y(), true));
+        assertTrue(drew("sprite button_disabled_frame " + b));
     }
 }

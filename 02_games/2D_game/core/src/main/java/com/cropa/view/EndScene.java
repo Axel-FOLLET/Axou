@@ -19,8 +19,12 @@ import java.util.Optional;
 public class EndScene implements GameListener {
 
     //-------------------- CONSTANTS --------------------
-    // Almost opaque: the game stays faintly visible behind the scene.
-    private static final float VEIL_OPACITY = 0.85f;
+    // Each result has its own light behind the figures.
+    private static final String VICTORY_BACKGROUND = "end_victory";
+    // Both defeats take place under the moon.
+    private static final String DEFEAT_BACKGROUND = "end_defeat";
+    // Leave the illustration visible through the text bands.
+    private static final float BAND_OPACITY = 0.45f;
     // Heights from the bottom of the world: the title, the line the figures stand on, the two sentences, the buttons.
     // The y of a text is its top.
     private static final float TITLE_TOP = 280f;
@@ -52,6 +56,8 @@ public class EndScene implements GameListener {
     private boolean night;
     // How the game ended. Empty while it goes on: nothing is drawn and no click is used.
     private Optional<GameResult> result = Optional.empty();
+    // The figures breathe while the result is visible.
+    private float time;
 
     //-------------------- CONSTRUCTOR --------------------
     // Called once by GameScreen.show(), with the same world as the night veil.
@@ -173,6 +179,16 @@ public class EndScene implements GameListener {
         return quitButton;
     }
 
+    //-------------------- TIME --------------------
+    /**
+     * Advances the end scene.
+     *
+     * @param delta elapsed time in seconds
+     */
+    public void update(float delta) {
+        time += delta;
+    }
+
     //-------------------- DRAWING --------------------
     // Called on every frame by GameScreen, last: the veil covers the game, the HUD and the shop. Then the scene of the
     // result, then the two buttons with their white outline. A switch over the enum: one scene per way of ending.
@@ -182,50 +198,73 @@ public class EndScene implements GameListener {
      * @param canvas where to draw
      */
     public void render(Canvas canvas) {
+        render(canvas, Pointer.AWAY);
+    }
+
+    /**
+     * Draws the end screen with the current button frames.
+     *
+     * @param canvas where to draw
+     * @param pointer the pointer in world coordinates
+     */
+    public void render(Canvas canvas, Pointer pointer) {
         if (result.isEmpty()) {
             return;
         }
-        canvas.drawNightVeil(world, VEIL_OPACITY);
+        // Keep the illustrated ground and the figures clear between the two bands.
+        String background = result.get() == GameResult.VICTORY ? VICTORY_BACKGROUND : DEFEAT_BACKGROUND;
+        canvas.drawSprite(background, world);
+        drawBand(canvas, TITLE_TOP - 22, 30);
+        drawBand(canvas, BUTTON_TOP - 22, FIRST_LINE_TOP - BUTTON_TOP + 30);
         switch (result.get()) {
             case VICTORY -> drawVictory(canvas);
             case DEFEAT_FARM_DESTROYED -> drawFarmDestroyed(canvas);
             case DEFEAT_URN_SOLD -> drawUrnSold(canvas);
         }
-        drawButton(canvas, texts.replay(), replayButton);
-        drawButton(canvas, texts.quit(), quitButton);
+        drawButton(canvas, pointer, texts.replay(), replayButton);
+        drawButton(canvas, pointer, texts.quit(), quitButton);
     }
 
     // Garry, the urn and the ghost of his wife, side by side, facing the player.
     private void drawVictory(Canvas canvas) {
         canvas.drawCenteredText(texts.victoryTitle(), centerX, at(TITLE_TOP));
-        Figure.GARRY.stand(canvas, centerX - SPACING, at(GROUND));
-        Figure.URN.stand(canvas, centerX, at(GROUND));
-        Figure.GHOST.stand(canvas, centerX + SPACING, at(GROUND));
+        Figure.GARRY.stand(canvas, centerX - SPACING, at(GROUND), time);
+        Figure.URN.stand(canvas, centerX, at(GROUND), time);
+        Figure.GHOST.stand(canvas, centerX + SPACING, at(GROUND), time + 0.4f);
         canvas.drawCenteredText(texts.urnBoughtBack(), centerX, at(FIRST_LINE_TOP));
         canvas.drawCenteredText(texts.boughtOnDay(number), centerX, at(SECOND_LINE_TOP));
+    }
+
+    // A lighter edge on either side softens the strip without darkening the figures.
+    private void drawBand(Canvas canvas, float bottom, float height) {
+        float y = at(bottom);
+        canvas.drawColorLayer(new Bounds(world.x(), y, world.width(), 2), 0, 0, 0, BAND_OPACITY / 2);
+        canvas.drawColorLayer(new Bounds(world.x(), y + 2, world.width(), height - 4), 0, 0, 0, BAND_OPACITY);
+        canvas.drawColorLayer(new Bounds(world.x(), y + height - 2, world.width(), 2),
+                0, 0, 0, BAND_OPACITY / 2);
     }
 
     // The destroyed farm, and when it fell: "la nuit 5" (the enemies only come at night), "le jour 5" otherwise.
     private void drawFarmDestroyed(Canvas canvas) {
         canvas.drawCenteredText(texts.defeatTitle(), centerX, at(TITLE_TOP));
-        Figure.FARM_DESTROYED.stand(canvas, centerX, at(GROUND));
+        Figure.FARM_DESTROYED.stand(canvas, centerX, at(GROUND), time);
         canvas.drawCenteredText(texts.farmFell(night, number), centerX, at(FIRST_LINE_TOP));
     }
 
     // M. Chmunks goes away to the right with the urn, between Henchman 1 and Henchman 2.
     private void drawUrnSold(Canvas canvas) {
         canvas.drawCenteredText(texts.defeatTitle(), centerX, at(TITLE_TOP));
-        Figure.HENCHMAN_1.stand(canvas, centerX - SPACING, at(GROUND));
-        Figure.CHMUNKS.stand(canvas, centerX, at(GROUND));
-        Figure.URN.stand(canvas, centerX + CARRIED_X, at(GROUND + CARRIED_HEIGHT));
-        Figure.HENCHMAN_2.stand(canvas, centerX + SPACING, at(GROUND));
+        Figure.HENCHMAN_1.stand(canvas, centerX - SPACING, at(GROUND), time);
+        Figure.CHMUNKS.stand(canvas, centerX, at(GROUND), time + 0.4f);
+        Figure.URN.stand(canvas, centerX + CARRIED_X, at(GROUND + CARRIED_HEIGHT), time);
+        Figure.HENCHMAN_2.stand(canvas, centerX + SPACING, at(GROUND), time + 0.8f);
         canvas.drawCenteredText(texts.urnSold(), centerX, at(FIRST_LINE_TOP));
     }
 
-    // A button: its text centred in its area, and the white outline of what can be clicked.
-    private void drawButton(Canvas canvas, String text, Bounds button) {
-        canvas.drawCenteredText(text, button.x() + button.width() / 2, at(BUTTON_TOP));
-        canvas.drawOutline(button, OutlineColor.WHITE);
+    // Draw the frame first so the centred words stay visible in every state.
+    private void drawButton(Canvas canvas, Pointer pointer, String text, Bounds button) {
+        canvas.drawFrame(pointer.frame("button", button, false), button, Tint.NORMAL);
+        canvas.drawPlainCenteredText(text, button.x() + button.width() / 2, at(BUTTON_TOP), TextStyle.NORMAL);
     }
 
     //-------------------- INTERNALS --------------------

@@ -7,6 +7,8 @@ package com.cropa.view;
 import com.cropa.model.enemy.Cat;
 import com.cropa.model.enemy.Farmer;
 import com.cropa.model.world.Board;
+import com.cropa.view.fx.Effects;
+import com.cropa.view.world.FarmSplinters;
 import java.util.Locale;
 
 // The sprites that never move: the farm, the old farmer, the cat and the pickup. Before, GameScreen placed them
@@ -22,6 +24,9 @@ public class FarmRenderer {
     private static final float FARM_SIZE = 100f;
     private static final float FARMER_SIZE = 32f;
     private static final float CAT_SIZE = 12f;
+    // Centre of the lit panes in the 200 px farm image, measured from its bottom left.
+    private static final float WINDOW_X_FRACTION = 103.5f / 200f;
+    private static final float WINDOW_Y_FRACTION = 65.5f / 200f;
     // In the 56 px farm image, the walls stop 10 rows above the bottom edge: that height, once scaled to FARM_SIZE.
     private static final float FARM_BASE_HEIGHT = FARM_SIZE * 10 / 56;
     // The farmer sits in front of the farm on row 2 (rules.md); his fork reaches rows 1 to 3.
@@ -64,8 +69,25 @@ public class FarmRenderer {
     private final Bounds rightCypressArea;
     // Turns the farm red for a short instant when its health drops.
     private final HitFlash flash = new HitFlash();
-    // The health of the farm at the start of the game (day 14): its image changes at half of it, then at 0.
+    // Each entry covers one fifth of full health, with its upper endpoint included.
+    private static final String[] HEALTH_BANDS = {
+        "farm_flames", "farm_smoke", SpriteCatalog.FARM_HALF_DESTROYED, "farm_broken_windows", SpriteCatalog.FARM
+    };
+    private static final float LIGHT_FADE_SECONDS = 1f;
+    private final FarmSplinters splinters = new FarmSplinters();
+    private final Effects effects;
+    private int lastFarmHealth;
+    private boolean hasLastFarmHealth;
+    private float nightAge;
     private final int fullHealth;
+    // Keep the clocks here so pauses also pause the poses.
+    private Boolean previousNight;
+    private int garryPreviousHealth;
+    private String previousAttack;
+    private float standTime = 1f;
+    private float attackTime;
+    private float hurtTime = 1f;
+    private float catTime;
 
     //-------------------- CONSTRUCTOR --------------------
     // Called once by GameScreen.show(), with the health of the farm at that moment: the game has not started, so it is
@@ -81,6 +103,12 @@ public class FarmRenderer {
      * @param fullHealth the health of the farm at the start of the game
      */
     public FarmRenderer(BoardLayout layout, int fullHealth) {
+        this(layout, fullHealth, null);
+    }
+
+    /** Places the farm and sends hit feedback to the screen's effects service. */
+    public FarmRenderer(BoardLayout layout, int fullHealth, Effects effects) {
+        this.effects = effects;
         this.fullHealth = fullHealth;
         float farmY = layout.getCellBounds(Board.ROWS, 1).y() + FARM_SIZE / 2 - FARM_BASE_HEIGHT;
         farmArea = Bounds.centeredOn(new Point(layout.getSpot("farm").x(), farmY), FARM_SIZE);
@@ -94,6 +122,13 @@ public class FarmRenderer {
         pickupArea = new Bounds(pickupX - PICKUP_SIZE / 2, pickupGround - PICKUP_FEET, PICKUP_SIZE, PICKUP_SIZE);
         leftCypressArea = treeOn(pickupX - PICKUP_SIZE / 2, pickupGround - CYPRESS_UNDER_WHEELS);
         rightCypressArea = treeOn(pickupX + PICKUP_SIZE / 2, pickupGround - CYPRESS_UNDER_WHEELS);
+    }
+
+    // The night renderer places the halo on the same rectangle used to draw the house.
+    /** @return the centre of the farm window in world pixels */
+    public Point windowCenter() {
+        return new Point(farmArea.x() + farmArea.width() * WINDOW_X_FRACTION,
+                farmArea.y() + farmArea.height() * WINDOW_Y_FRACTION);
     }
 
     //-------------------- DRAWING --------------------
@@ -120,42 +155,107 @@ public class FarmRenderer {
      * @param delta the time since the previous frame, in seconds
      */
     public void render(Canvas canvas, int farmHealth, Farmer farmer, boolean night, Cat cat, float delta) {
+        // Age existing debris before recording a new impact at its origin.
+        splinters.advance(delta);
+        if (hasLastFarmHealth && farmHealth < lastFarmHealth) {
+            splinters.hit();
+            if (effects != null) {
+                effects.shake(Effects.SMALL_SHAKE);
+                effects.floatText(Integer.toString(lastFarmHealth - farmHealth),
+                        farmArea.x() + farmArea.width() / 2, farmArea.y() + farmArea.height(), TextStyle.ALERT);
+            }
+        }
+        lastFarmHealth = farmHealth;
+        hasLastFarmHealth = true;
+        nightAge = night ? Math.min(LIGHT_FADE_SECONDS, nightAge + delta) : 0f;
         canvas.drawSprite(farmKeyOf(farmHealth), farmArea, flash.tintOf(this, farmHealth, delta));
-        canvas.drawSprite(farmerKeyOf(farmer, night), farmerArea);
-        canvas.drawSprite(cat.isFleeing() ? "cat_fleeing" : SpriteCatalog.CAT, catArea);
+        drawFarmer(canvas, farmer, night, farmHealth, delta);
+        drawCat(canvas, cat, delta);
         if (cat.isMeowing()) {
             canvas.drawSprite("cat_meow", meowArea);
         }
         canvas.drawSprite(SpriteCatalog.PICKUP, pickupArea);
         canvas.drawSprite(SpriteCatalog.CYPRESS, leftCypressArea);
         canvas.drawSprite(SpriteCatalog.CYPRESS, rightCypressArea);
+        splinters.draw(canvas, farmArea);
     }
 
     //-------------------- INTERNALS --------------------
-    // The image of the farm from its health (asked by Axel on day 14): intact above half (strictly), half destroyed from
-    // half down to 1, destroyed at 0. health * 2 <= fullHealth, and not health <= fullHealth / 2: with an odd full
-    // health, the integer division would round half down and move the threshold by one. The three images share the
-    // same 56 px frame, so they take the same place.
+    /** Draws the lit windows above the night veil while the farm stands. */
+    public void renderWindows(Canvas canvas, int health, boolean night, float timeLeft) {
+        if (night && health > 0) {
+            String key = SpriteCatalog.FARM.equals(farmKeyOf(health)) ? "farm_light" : "farm_light_broken";
+            float alpha = Math.min(nightAge, Math.max(0f, timeLeft)) / LIGHT_FADE_SECONDS;
+            canvas.drawLight(key, farmArea, alpha);
+        }
+    }
+
+    // Subtract one before dividing to keep each exact threshold in the lower band.
     private String farmKeyOf(int health) {
         if (health <= 0) {
             return SpriteCatalog.FARM_DESTROYED;
         }
-        if (health * 2 <= fullHealth) {
-            return SpriteCatalog.FARM_HALF_DESTROYED;
-        }
-        return SpriteCatalog.FARM;
+        long index = ((long) health * HEALTH_BANDS.length - 1) / Math.max(1, fullHealth);
+        return HEALTH_BANDS[(int) Math.min(index, HEALTH_BANDS.length - 1)];
     }
 
-    // The image of Garry (day 14). By day, his rocking chair. At night, where the model says he faces (Farmer chooses
-    // it from the place of his target: an enemy behind him makes him turn round, west), in lower case:
-    // "farmer_north", "farmer_east", "farmer_south" or "farmer_west"; "_attack" while his pose is on. Only the
-    // direction and the pose are read: no test on the type of the enemy he hits, no geometry here.
-    private static String farmerKeyOf(Farmer farmer, boolean night) {
-        if (!night) {
-            return SpriteCatalog.FARMER;
+    // A new pose starts on its first frame even if this update was long.
+    private void drawFarmer(Canvas canvas, Farmer farmer, boolean night, int health, float delta) {
+        String facing = "farmer_" + farmer.getFacing().name().toLowerCase(Locale.ROOT);
+        String attack = night && farmer.isAttacking() ? facing + "_attack" : null;
+        boolean changed = previousNight != null && previousNight != night;
+        standTime = changed ? 0f : standTime + delta;
+        attackTime = attack != null && !attack.equals(previousAttack) ? 0f : attackTime + delta;
+        hurtTime = night && attack == null && health < garryPreviousHealth ? 0f : hurtTime + delta;
+        previousNight = night;
+        garryPreviousHealth = health;
+        previousAttack = attack;
+
+        // The chair stays beneath him until he finishes sitting down.
+        boolean standingUp = standTime < 0.6f;
+        String key = night ? facing : "farmer";
+        float time = -1f;
+        if (attack != null) {
+            key = attack;
+            time = attackTime;
+        } else if (night && hurtTime < 0.3f) {
+            key = facing + "_hurt";
+            time = hurtTime;
+        } else if (standingUp) {
+            key = "farmer_stand_up";
+            time = night ? standTime : Math.max(0f, Math.nextDown(0.6f) - standTime);
         }
-        String key = "farmer_" + farmer.getFacing().name().toLowerCase(Locale.ROOT);
-        return farmer.isAttacking() ? key + "_attack" : key;
+        drawShadow(canvas, farmerArea, key.startsWith("farmer_south") ? 22f / 96 : 20f / 96);
+        // The seated day sprite already includes the chair.
+        if (night || standingUp) {
+            canvas.drawSprite("farmer_chair", farmerArea);
+        }
+        // Idle loops use the canvas clock so timed poses can start at frame zero.
+        if (time < 0) {
+            canvas.drawSprite(key, farmerArea);
+        } else {
+            canvas.drawAnimation(key, farmerArea, time, Tint.NORMAL);
+        }
+    }
+
+    // Fleeing interrupts the bath and starts a fresh sitting interval.
+    private void drawCat(Canvas canvas, Cat cat, float delta) {
+        float bath = Animations.duration("cat_grooming", 4);
+        catTime = cat.isFleeing() ? 0f : (catTime + delta) % (7f + 2 * bath);
+        drawShadow(canvas, catArea, cat.isFleeing() ? 0f : 10f / 64);
+        if (catTime >= 7f) {
+            canvas.drawAnimation("cat_grooming", catArea, (catTime - 7f) % bath, Tint.NORMAL);
+        } else {
+            canvas.drawSprite(cat.isFleeing() ? "cat_fleeing" : SpriteCatalog.CAT, catArea);
+        }
+    }
+
+    // Centre the oval on the ground below the painted feet.
+    private static void drawShadow(Canvas canvas, Bounds area, float padding) {
+        float width = area.width() * 0.6f;
+        float height = width * 12 / 32;
+        canvas.drawSprite("shadow", new Bounds(area.x() + (area.width() - width) / 2,
+                area.y() + area.height() * padding - height / 2, width, height));
     }
 
     // A cypress centred on x, its trunk on the given height: its square starts TREE_FEET lower.

@@ -1,28 +1,25 @@
 package com.cropa.view;
 
-// The model: the defenses of the game (slots and field), the side of a slot, and a defense.
-// Board: the number of columns, one slot per column on each side. Cell: the cell a defense of the field stands on.
-// Occupant: what that cell holds, which gives the sprite key. Texts: the letter of the level, in the language of the
-// game.
+import com.cropa.model.defense.Bramble;
 import com.cropa.model.defense.Defense;
+import com.cropa.model.defense.DefenseSlot;
 import com.cropa.model.defense.DefenseSlots;
 import com.cropa.model.defense.SlotSide;
+import com.cropa.model.enemy.Enemy;
 import com.cropa.model.world.Board;
-import com.cropa.model.world.Cell;
-import com.cropa.model.world.Occupant;
 import com.cropa.text.Texts;
-// Map: the defenses of the field, cell by cell.
+import com.cropa.view.fx.Effects;
+import com.cropa.view.fx.Particle;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Random;
+import java.util.function.Consumer;
 
-// The defenses on the slots above and under the field: each one with its sprite (throwing for 0.3 s after a shot),
-// then its level and its durability.
-// The defenses of the field (scarecrow, bramble): only their level and durability, because WorldRenderer already draws
-// their sprite through Board.spriteAt, like a crop. Their sprite is drawn a second time only to flash it, for 0.2 s.
-// It only talks to Canvas, so the test draws on a RecordingCanvas, without a window.
-/**
- * Draws the defenses placed on the defense slots, the level and durability of every defense, and a short red flash
- * after a hit or blue flash after an upgrade.
- */
+/** Draws placed defenses, their labels and the visual consequences of model transitions. */
 public class DefenseRenderer {
 
     //-------------------- CONSTANTS --------------------
@@ -33,92 +30,265 @@ public class DefenseRenderer {
     // a sprite, because the canvas places the top of the text at the y it receives.
     private static final float LABEL_GAP = 2f;
     private static final float LABEL_HEIGHT = 6f;
-    // Day 14: on a slot, the level is a second label stacked on the durability, one label lower or higher: 6 px of
-    // text, 1 px of bubble above and under it (GdxCanvas), 1 px between the two bubbles. Side by side, "N1 92%" would
-    // be about 27 px wide over 16 px slots: the labels of two catapatates next to each other would cover each other.
-    private static final float LABEL_LINE = 9f;
+    // Above a top slot, the label is raised by the bar and its gap: the bar ends 1 px over the sprite.
+    private static final float LABEL_LINE = 11f;
+    // A short puff keeps the breaking defense visible through the smoke.
+    private static final int DESTRUCTION_SMOKE_COUNT = 6;
+    // The health bar under the level label (the user, 25/11: no number, under "N1", bigger and contrasted). 14 px
+    // wide: two bars of neighbouring slots, 16 px apart, keep 2 px between them. Its top is 12 px under the top of
+    // the label: in a small window the canvas enlarges the label font (GdxCanvas.labelScale, at most 0.8 from the
+    // card of the site up), and its bubble then reaches 11 px down. A 1 px black edge around the coloured part.
+    private static final float BAR_WIDTH = 14f;
+    private static final float BAR_HEIGHT = 6f;
+    private static final float BAR_DROP = 12f;
+    private static final float BAR_EDGE = 1f;
+    // The empty part, dark grey, and the fill, bright on the black edge: green, yellow, orange, then red.
+    private static final float[] BAR_EMPTY = {0.22f, 0.22f, 0.22f};
+    private static final Map<String, float[]> BAR_FILL = Map.of(
+            "new", new float[] {0.3f, 0.95f, 0.3f},
+            "worn", new float[] {1f, 0.85f, 0.15f},
+            "very_worn", new float[] {1f, 0.5f, 0.1f},
+            "almost_broken", new float[] {1f, 0.18f, 0.18f});
 
     //-------------------- FIELDS --------------------
     // The places of the slots and cells, read from the map. It never changes: final.
     private final BoardLayout layout;
     // The words of the labels, in the language of the game.
     private final Texts texts;
-    // Red after a hit, on a drop of the durability. Only for the defenses of the field: they wear only when an enemy
-    // crosses them, so each drop is a real hit. The catapatate wears at each of its own shots: it never turns red.
-    private final HitFlash hurtFlash = new HitFlash();
-    // Blue after an upgrade, on a rise of the level, for every defense. The level never goes down.
-    private final HitFlash upgradeFlash = new HitFlash(Tint.UPGRADED, true);
+    private static final float FLIGHT = .35f;
+    private static final float ARC_HEIGHT = 18f;
+    private static final int FIELD_OFFSET = 3;
+    private static final int NEW_LIMIT = 75, WORN_LIMIT = 50, VERY_WORN_LIMIT = 25;
+    private final Effects effects;
+    private final Map<Defense, Pose> poses = new HashMap<>();
+    private final List<Shot> shots = new ArrayList<>();
+    private final List<Breakage> breaks = new ArrayList<>();
+    // The labels and health bars of this frame, kept for renderLabels when the game draws them after the night
+    // lighting, like the cat's bubble: graded, the green bar turned a dull teal at night (the user, 25/11).
+    private final List<Consumer<Canvas>> labels = new ArrayList<>();
+    private boolean labelsDeferred;
+    private double now;
 
-    //-------------------- CONSTRUCTOR --------------------
-    // Called once by GameScreen.show(), like the other renderers.
-    /**
-     * Creates the renderer of the defenses.
-     *
-     * @param layout the places read from the map
-     * @param texts the words of the labels, in the language of the game
-     */
+    /** A placement owns its clocks and flashes until that object leaves the board. */
+    private static final class Pose {
+        final Bounds area;
+        final String base;
+        final Optional<DefenseSlot> slot;
+        final HitFlash hurt = new HitFlash();
+        boolean attacking;
+        int level, durability;
+        String idle;
+        String action = "";
+        double start, end, sparkle = Double.NEGATIVE_INFINITY;
+
+        Pose(Defense defense, Bounds area, String base, Optional<DefenseSlot> slot, String idle) {
+            this.area = area;
+            this.base = base;
+            this.slot = slot;
+            this.idle = idle;
+            level = defense.getLevel();
+            durability = defense.getDurability();
+        }
+
+        void play(String key, int frames, double now) {
+            action = key;
+            start = now;
+            end = now + Animations.duration(key, frames);
+        }
+    }
+
+    private record Shot(Point from, Point to, double start) {}
+    private record Breakage(String key, Bounds area, double start) {}
+
+    /** Creates a standalone renderer for callers without a shared effects service. */
     public DefenseRenderer(BoardLayout layout, Texts texts) {
+        this(layout, texts, new Effects(new Random()));
+    }
+
+    /** Uses the effects service flushed by the game screen. */
+    public DefenseRenderer(BoardLayout layout, Texts texts, Effects effects) {
         this.layout = layout;
         this.texts = texts;
+        this.effects = effects;
     }
 
-    //-------------------- DRAWING --------------------
-    // Called on every frame by GameScreen, after the world and before the enemies, so an enemy passes in front.
-    // SlotSide.values(): TOP then BOTTOM, in the order of the enum; one slot per column of the field (Board.COLUMNS).
-    // An empty slot draws nothing.
-    // Then the defenses of the field, in the order they were placed. delta: the time the flashes count down.
-    /**
-     * Draws every defense placed on a slot with its level and durability, then the level and durability of every
-     * defense of the field, with a short red flash after a hit or blue flash after an upgrade.
-     *
-     * @param canvas where to draw
-     * @param slots the defenses of the game, on the slots and on the field
-     * @param delta the time since the previous frame, in seconds
-     */
+    /** Draws a board with no visible targets. */
     public void render(Canvas canvas, DefenseSlots slots, float delta) {
+        render(canvas, slots, List.of(), delta);
+    }
+
+    /** Samples each occupied place once, then plays effects that outlive their owner. */
+    public void render(Canvas canvas, DefenseSlots slots, List<Enemy> enemies, float delta) {
+        now += delta;
+        labels.clear();
+        var live = slots.getDefenses();
+        poses.entrySet().removeIf(entry -> {
+            Defense defense = entry.getKey();
+            if (live.contains(defense)) return false;
+            Pose pose = entry.getValue();
+            if (defense.isDestroyed()) {
+                if (defense.isAttacking() && !pose.attacking) {
+                    pose.slot.ifPresent(slot -> shoot(defense, pose.area, slot, enemies));
+                }
+                breaks.add(new Breakage(pose.base + "_destroyed" + material(defense.getLevel()), pose.area, now));
+                effects.shake(Effects.SMALL_SHAKE);
+                Point origin = center(pose.area);
+                effects.burst(Particle.SMOKE, origin.x(), origin.y(), DESTRUCTION_SMOKE_COUNT);
+            }
+            return true;
+        });
         for (SlotSide side : SlotSide.values()) {
             for (int column = 1; column <= Board.COLUMNS; column++) {
-                Bounds area = layout.getSlotBounds(side, column);
-                slots.getSlot(side, column).getDefense()
-                        .ifPresent(defense -> drawOnSlot(canvas, defense, side, area, delta));
+                DefenseSlot slot = slots.getSlot(side, column);
+                Bounds area = slotSpriteArea(layout.getSlotBounds(side, column));
+                slot.getDefense().ifPresent(defense -> {
+                    String base = side == SlotSide.TOP ? SpriteCatalog.CATAPATATE_TOP : SpriteCatalog.CATAPATATE_BOTTOM;
+                    draw(canvas, defense, base, base, area, Optional.of(slot), enemies, delta);
+                    float y = labelY(side, area) + (side == SlotSide.TOP ? LABEL_LINE : 0);
+                    label(canvas, defense, center(area).x(), y);
+                });
             }
         }
-        for (Map.Entry<Cell, Defense> entry : slots.getFieldDefenses().entrySet()) {
-            drawOnField(canvas, entry.getKey(), entry.getValue(), delta);
+        slots.getFieldDefenses().forEach((cell, defense) -> {
+            Bounds area = layout.getCellBounds(cell.getRow(), cell.getColumn());
+            String idle = defense instanceof Bramble bramble ? bramble.spriteKey() : "scarecrow";
+            draw(canvas, defense, defense instanceof Bramble ? "bramble" : idle, idle, area,
+                    Optional.empty(), enemies, delta);
+            // Above the cell, the bar sits on its top edge and the label over the bar.
+            float y = area.y() + area.height() + BAR_DROP + BAR_HEIGHT;
+            label(canvas, defense, center(area).x(), y);
+        });
+        breaks.removeIf(b -> now - b.start >= Animations.duration(b.key, 6));
+        for (Breakage b : breaks) canvas.drawAnimation(b.key, b.area, (float) (now - b.start), Tint.NORMAL);
+        shots.removeIf(shot -> now - shot.start >= FLIGHT + Animations.duration("potato_splash", 5));
+        for (Shot shot : shots) drawShot(canvas, shot);
+    }
+
+    /** Chooses the active pose from edges, independently of the model's shorter attack flag. */
+    private void draw(Canvas canvas, Defense defense, String base, String idle, Bounds area,
+            Optional<DefenseSlot> slot, List<Enemy> enemies, float delta) {
+        Pose p = poses.computeIfAbsent(defense, d -> new Pose(d, area, base, slot, idle));
+        String level = material(defense.getLevel());
+        if (defense.isAttacking() && !p.attacking) {
+            if (slot.isPresent()) {
+                p.play(base + "_throwing" + level, 5, now);
+                shoot(defense, area, slot.get(), enemies);
+            } else {
+                p.play(base + "_attack" + level, 6, now);
+            }
+        } else if (defense instanceof Bramble) {
+            if (defense.getDurability() < p.durability) p.play("bramble_strike" + level, 5, now);
+            else if (!idle.equals(p.idle)) p.play("bramble_grow" + level, 6, now);
+        }
+        if (defense.getLevel() > p.level) {
+            p.sparkle = now;
+            p.end = now;
+        }
+        p.level = defense.getLevel();
+        p.durability = defense.getDurability();
+        p.attacking = defense.isAttacking();
+        p.idle = idle;
+        Tint tint = slot.isPresent() ? Tint.NORMAL : p.hurt.tintOf(defense, p.durability, delta);
+        if (now < p.end) canvas.drawAnimation(p.action, area, (float) (now - p.start), tint);
+        else canvas.drawSprite(idle + level, area, tint);
+        String wear = wear(p.durability);
+        if (!wear.equals("new")) canvas.drawSprite(base + "_wear" + level + "_" + wear, area, tint);
+        if (now - p.sparkle < Animations.duration("upgrade_sparkle", 6)) {
+            canvas.drawAnimation("upgrade_sparkle", area, (float) (now - p.sparkle), Tint.NORMAL);
         }
     }
 
-    // The sprite first, blue for 0.2 s after an upgrade, then the two labels: "N1" read above "92%" on both sides.
-    // All are centred on the middle of the slot. labelY is the top of the label closest to the sprite: above a top
-    // slot, the level goes one line higher; under a bottom slot, the durability goes one line lower.
-    private void drawOnSlot(Canvas canvas, Defense defense, SlotSide side, Bounds slotArea, float delta) {
-        Bounds spriteArea = slotSpriteArea(slotArea);
-        Point center = new Point(spriteArea.x() + spriteArea.width() / 2, spriteArea.y() + spriteArea.height() / 2);
-        canvas.drawSprite(spriteKeyOf(side, defense), spriteArea,
-                upgradeFlash.tintOf(defense, defense.getLevel(), delta));
-        float levelTop = side == SlotSide.TOP ? labelY(side, spriteArea) + LABEL_LINE : labelY(side, spriteArea);
-        canvas.drawLabel(levelOf(defense), center.x(), levelTop);
-        canvas.drawLabel(durabilityOf(defense), center.x(), levelTop - LABEL_LINE);
+    /**
+     * From now on, render keeps the labels and health bars for {@link #renderLabels}: the game draws them after the
+     * night lighting, so they keep their colours.
+     */
+    public void deferLabels() {
+        labelsDeferred = true;
     }
 
-    // WorldRenderer has already drawn the sprite on the cell. Both flashes are asked on every frame, so each one keeps
-    // the value of the previous frame. If one is on, the same sprite is drawn again over it, tinted; blue wins over red
-    // (an upgrade puts the durability back to 100 %, a rise, so both at once only after a hit just before the upgrade).
-    // The sprite key comes from the cell's occupant, which is this very defense: no cast, no instanceof.
-    // Then one label above the cell, "N1 92%" on one line: two stacked labels would cover the whole cell above, often a
-    // crop. One line covers its bottom only, as before day 14; it is wider than the cell, but two defenses of the field
-    // side by side are rare, while a crop above one is common.
-    private void drawOnField(Canvas canvas, Cell cell, Defense defense, float delta) {
-        Bounds cellArea = layout.getCellBounds(cell.getRow(), cell.getColumn());
-        Tint hurt = hurtFlash.tintOf(defense, defense.getDurability(), delta);
-        Tint upgraded = upgradeFlash.tintOf(defense, defense.getLevel(), delta);
-        Tint tint = upgraded != Tint.NORMAL ? upgraded : hurt;
-        if (tint != Tint.NORMAL) {
-            cell.getOccupant().map(Occupant::spriteKey).ifPresent(key -> canvas.drawSprite(key, cellArea, tint));
+    /** Draws the labels and health bars kept by the last render, then forgets them. */
+    public void renderLabels(Canvas canvas) {
+        for (Consumer<Canvas> label : labels) label.accept(canvas);
+        labels.clear();
+    }
+
+    // The level, then the health bar under it; drawn at once, or kept for renderLabels.
+    private void label(Canvas canvas, Defense defense, float centerX, float y) {
+        String level = levelOf(defense);
+        int durability = defense.getDurability();
+        Consumer<Canvas> draw = target -> {
+            target.drawLabel(level, centerX, y);
+            drawHealth(target, durability, centerX, y);
+        };
+        if (labelsDeferred) labels.add(draw);
+        else draw.accept(canvas);
+    }
+
+    /** Draws the health bar under a level label whose top is at labelTop: black edge, grey empty part, bright fill. */
+    private static void drawHealth(Canvas canvas, int percent, float centerX, float labelTop) {
+        Bounds frame = new Bounds(centerX - BAR_WIDTH / 2, labelTop - BAR_DROP - BAR_HEIGHT, BAR_WIDTH, BAR_HEIGHT);
+        canvas.drawColorLayer(frame, 0f, 0f, 0f, 1f);
+        float inner = BAR_WIDTH - 2 * BAR_EDGE;
+        float x = frame.x() + BAR_EDGE;
+        float y = frame.y() + BAR_EDGE;
+        float height = BAR_HEIGHT - 2 * BAR_EDGE;
+        canvas.drawColorLayer(new Bounds(x, y, inner, height), BAR_EMPTY[0], BAR_EMPTY[1], BAR_EMPTY[2], 1f);
+        if (percent <= 0) return;
+        float[] fill = BAR_FILL.get(wear(percent));
+        canvas.drawColorLayer(new Bounds(x, y, inner * Math.min(percent, 100) / 100f, height),
+                fill[0], fill[1], fill[2], 1f);
+    }
+
+    /** Chooses a target in the same row and distance order as Catapatate.findTarget. */
+    private void shoot(Defense defense, Bounds area, DefenseSlot slot, List<Enemy> enemies) {
+        boolean top = slot.getSide() == SlotSide.TOP;
+        int front = top ? 1 : Board.ROWS;
+        Optional<Enemy> target = enemies.stream().filter(e -> !e.hasFled() && e.isTargetable())
+                .filter(e -> defense.reaches(e.getRow(), (int) Math.ceil(e.getCellsToFarm()) - FIELD_OFFSET))
+                .min(Comparator.comparingInt((Enemy e) -> Math.abs(e.getRow() - front))
+                        .thenComparingDouble(Enemy::getCellsToFarm));
+        int row = target.map(Enemy::getRow).orElse(front);
+        Point to = target.filter(Enemy::isOnBoard).map(e -> layout.toScreen(e.getRow(), e.getCellsToFarm()))
+                .orElseGet(() -> center(layout.getCellBounds(row, slot.getColumn())));
+        Point from = new Point(center(area).x(), area.y() + area.height() * (top ? .85f : .15f));
+        shots.add(new Shot(from, to, now));
+    }
+
+    /** The shadow interpolates on the ground while the potato rises above it. */
+    private void drawShot(Canvas canvas, Shot shot) {
+        float age = (float) (now - shot.start);
+        if (age >= FLIGHT) {
+            canvas.drawAnimation("potato_splash", Bounds.centeredOn(shot.to, 24), age - FLIGHT, Tint.NORMAL);
+            return;
         }
-        float labelTop = cellArea.y() + cellArea.height() + LABEL_GAP + LABEL_HEIGHT;
-        String label = levelOf(defense) + " " + durabilityOf(defense);
-        canvas.drawLabel(label, cellArea.x() + cellArea.width() / 2, labelTop);
+        float t = age / FLIGHT;
+        float x = shot.from.x() + (shot.to.x() - shot.from.x()) * t;
+        float y = shot.from.y() + (shot.to.y() - shot.from.y()) * t;
+        canvas.drawSprite("potato_shadow", new Bounds(x - 3, y - 1.5f, 6, 3));
+        Point flying = new Point(x, y + 4 * ARC_HEIGHT * t * (1 - t));
+        canvas.drawAnimation("potato", Bounds.centeredOn(flying, 8), age, Tint.NORMAL);
+    }
+
+    /** Shared by portraits of the next level and by placed defenses. */
+    static String material(int level) {
+        return switch (level) {
+            case 1 -> "";
+            case 2 -> "_reinforced";
+            case 3 -> "_metal";
+            default -> throw new IllegalArgumentException("Defense level " + level);
+        };
+    }
+
+    /** Atlas suffix for both the wear overlay and the shop gauge. */
+    static String wear(int percent) {
+        if (percent > NEW_LIMIT) return "new";
+        if (percent > WORN_LIMIT) return "worn";
+        if (percent > VERY_WORN_LIMIT) return "very_worn";
+        return "almost_broken";
+    }
+
+    private static Point center(Bounds area) {
+        return new Point(area.x() + area.width() / 2, area.y() + area.height() / 2);
     }
 
     // Package-private and static: the tutorial draws its ghost catapatate (day 14) at the very place of a real one,
@@ -128,25 +298,8 @@ public class DefenseRenderer {
         return Bounds.centeredOn(center, CATAPATATE_SIZE);
     }
 
-    // Only the catapatate stands on a slot: its image depends on the side it faces the field from, and on whether it
-    // has just shot (Defense.isAttacking, 0.3 s after each shot): then it is throwing its potato.
-    private static String spriteKeyOf(SlotSide side, Defense defense) {
-        if (defense.isAttacking()) {
-            return side == SlotSide.TOP
-                    ? SpriteCatalog.CATAPATATE_TOP_THROWING
-                    : SpriteCatalog.CATAPATATE_BOTTOM_THROWING;
-        }
-        return side == SlotSide.TOP ? SpriteCatalog.CATAPATATE_TOP : SpriteCatalog.CATAPATATE_BOTTOM;
-    }
-
-    // "N1" ("L1" in English): the level, from 1 to 3, the same letter as in the panel of the shop ("Catapatate N1 92%").
     private String levelOf(Defense defense) {
         return texts.level(defense.getLevel());
-    }
-
-    // "92%": the durability left.
-    private static String durabilityOf(Defense defense) {
-        return defense.getDurability() + "%";
     }
 
     // On the side away from the field, so the labels never hide a crop: above a top sprite, under a bottom one.

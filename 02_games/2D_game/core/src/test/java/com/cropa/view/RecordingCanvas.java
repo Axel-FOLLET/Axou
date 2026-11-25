@@ -15,6 +15,9 @@ public class RecordingCanvas implements Canvas {
     // One line per call, in the order of the calls.
     public final List<String> calls = new ArrayList<>();
 
+    // One line per extended call: the operation, then its arguments in declaration order.
+    public final List<String> extras = new ArrayList<>();
+
     //-------------------- CANVAS --------------------
     @Override
     public void drawMap() {
@@ -86,5 +89,70 @@ public class RecordingCanvas implements Canvas {
     @Override
     public void drawShade(Bounds area) {
         calls.add("shade " + area);
+    }
+    @Override
+    public void drawAnimation(String spriteKey, Bounds area, float time, Tint tint) {
+        extras.add("animation " + spriteKey + " " + area + " " + time + " " + tint);
+        Canvas.super.drawAnimation(spriteKey, area, time, tint);
+    }
+
+    @Override
+    public void drawSprite(String spriteKey, Bounds area, float time, SpriteStyle style) {
+        extras.add("styled " + spriteKey + " " + area + " " + time + " " + style);
+        Canvas.super.drawSprite(spriteKey, area, time, style);
+    }
+
+    @Override
+    public void drawFrame(String spriteKey, Bounds area, Tint tint) {
+        extras.add("frame " + spriteKey + " " + area + " " + tint);
+        Canvas.super.drawFrame(spriteKey, area, tint);
+    }
+
+    @Override
+    public void drawPlainText(String text, float x, float y, TextStyle style) {
+        extras.add("plain " + text + " " + x + " " + y + " " + style);
+        Canvas.super.drawPlainText(text, x, y, style);
+    }
+
+    @Override
+    public void drawPlainCenteredText(String text, float centerX, float y, TextStyle style) {
+        extras.add("plainCentered " + text + " " + centerX + " " + y + " " + style);
+        Canvas.super.drawPlainCenteredText(text, centerX, y, style);
+    }
+
+    @Override
+    public void drawLight(String spriteKey, Bounds area, float alpha, float red, float green, float blue) {
+        String line = "light " + spriteKey + " " + area + " " + alpha;
+        extras.add(red == 1f && green == 1f && blue == 1f ? line : line + " " + red + " " + green + " " + blue);
+    }
+
+    @Override
+    public void drawColorLayer(Bounds area, float red, float green, float blue, float alpha) {
+        extras.add("color " + area + " " + red + " " + green + " " + blue + " " + alpha);
+        Canvas.super.drawColorLayer(area, red, green, blue, alpha);
+    }
+
+    @Override
+    public void drawMultiplyLayer(Bounds area, float red, float green, float blue) {
+        extras.add("multiply " + area + " " + red + " " + green + " " + blue);
+        Canvas.super.drawMultiplyLayer(area, red, green, blue);
+    }
+
+    @Override
+    public void shake(float strength) {
+        extras.add("shake " + strength);
+        Canvas.super.shake(strength);
+    }
+
+    @Override
+    public void drawParticle(String spriteKey, float centerX, float centerY, float size, float rotation, float alpha) {
+        extras.add("particle " + spriteKey + " " + centerX + " " + centerY + " " + size + " " + rotation + " " + alpha);
+        Canvas.super.drawParticle(spriteKey, centerX, centerY, size, rotation, alpha);
+    }
+
+    @Override
+    public void drawFloatingText(String text, float centerX, float y, float alpha, TextStyle style) {
+        extras.add("float " + text + " " + centerX + " " + y + " " + alpha + " " + style);
+        Canvas.super.drawFloatingText(text, centerX, y, alpha, style);
     }
 }

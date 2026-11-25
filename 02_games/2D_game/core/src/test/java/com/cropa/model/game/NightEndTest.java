@@ -7,6 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.cropa.model.enemy.Enemy;
+import com.cropa.model.enemy.EnemyConfig;
+import com.cropa.model.enemy.Mole;
 import java.util.Random;
 import org.junit.jupiter.api.Test;
 
@@ -35,6 +37,23 @@ class NightEndTest {
         for (Enemy bat : session.getEnemies()) {
             bat.takeDamage(bat.getHealth());
         }
+        session.update(0.1f);
+
+        assertFalse(session.getCycle().isNight());
+        assertEquals(2, session.getCycle().getNumber());
+    }
+
+    @Test
+    void dawnComesWhenTheLastMoleHasNothingToEat() {
+        GameSession session = nightOne();
+        session.update(10.1f);
+        assertTrue(session.getWaveSpawner().isFinished());
+        for (Enemy bat : session.getEnemies()) {
+            bat.takeDamage(bat.getHealth());
+        }
+        Mole mole = new Mole(session.getBoard(), new EnemyConfig(), new Random(1));
+        session.addEnemy(mole);
+
         session.update(0.1f);
 
         assertFalse(session.getCycle().isNight());

@@ -120,8 +120,8 @@ Each plant has its own stages. It grows one stage per night, and its value depen
 
 | Plant       | No. of stages | Stages                              | Effect                                                                  |
 | ----------- | ------------- | ----------------------------------- | ----------------------------------------------------------------------- |
-| **Carrot**  | 2             | sprout → ripe                       | None. Grows fast.                                                       |
-| **Pumpkin** | 4             | seed → sprout → large sprout → ripe | None. Worth the most.                                                   |
+| **Carrot**  | 2             | sprout → ripe                       | Grows fast.                                                             |
+| **Pumpkin** | 4             | seed → sprout → large sprout → ripe | Worth the most.                                                         |
 | **Turnip**  | 3             | seed → sprout → ripe                | Blocks the witch (see §8).                                              |
 | **Garlic**  | 3             | seed → sprout → ripe                | Blocks the bat (see §8).                                                |
 | **Bramble** | 2             | seed → ripe                         | Defense (see §7). Cannot be sold, but can be harvested to free the tile. |
@@ -134,7 +134,7 @@ Each plant has its own stages. It grows one stage per night, and its value depen
 
 All defenses are bought during the day, in the shop.
 
-- **Durability:** each defense has a durability. At 0%, it is destroyed.
+- **Durability:** each defense has a durability. At 0%, it is destroyed. In the game, a bar under the defense's level (L1, L2, L3; N1, N2, N3 in French) shows what remains: green when new, then yellow, orange and red as it wears.
 - **Only one wear per crossing, never added together:** on a field tile, the defense's wear counts (bramble -20%, scarecrow -10%); on a defense slot, the enemy's wear counts (bat -10%, witch -20%). A witch that crosses a bramble therefore takes 20% off it, not 40%.
 - **Upgrade:** a single action, with 3 levels at most. Each upgrade increases damage and **resets durability to 100%**.
 - **Targeting:** a defense only hits enemies **in range**, **one at a time**.
@@ -159,6 +159,7 @@ Killing an enemy earns coins. An enemy that reaches the farm stops in front of i
 - Attacks a **random plant** in the field, then waits **11 s** before the next one. It attacks **2 times at most** (3 before D10), then it leaves.
 - Moves underground. It comes out on the plant it eats: during its **3 s meal**, it is visible and the defenses and the farmer can attack it. Then it goes back underground, where nothing can hit it.
 - Can eat turnips and garlic: defense by plants is therefore not perfect. Does not eat brambles.
+- Once underground, it leaves immediately if nothing is left to eat, so the night can end as soon as the other enemies are gone.
 
 ### Witch
 

@@ -130,7 +130,7 @@ The `teavm` module builds the same game for a web browser, with [gdx-teavm](http
 sh gradlew teavm:gdx_teavm_web_js_build
 ```
 
-The page is written in `teavm/build/dist/js/webapp/` (`index.html`, `app.js`, the images and the sounds in `assets/`, about 6 MB). Any web server can serve this folder. The game takes the whole page and starts in the language given in the address, `index.html?lang=fr` or `index.html?lang=en`; without it, in the language of the browser.
+The page is written in `teavm/build/dist/js/webapp/` (`index.html`, `app.js`, the images and the sounds in `assets/`, about 6 MB). The build adds files to this folder without removing old ones: delete `teavm/build/dist/` before building a version to publish. Any web server can serve this folder. The game takes the whole page and starts in the language given in the address, `index.html?lang=fr` or `index.html?lang=en`; without it, in the language of the browser.
 
 On the web, "Quitter" (Quit) at the end of a game closes the card of the portfolio when the game runs in it (the game sends the message `game-quit` to the page of the site). Opened alone, it closes the tab, when the browser allows it: only for a tab opened by a link or a script.
 
@@ -166,11 +166,14 @@ Coverage at v4.17, the final code: 89% of branches, 86% of instructions.
 
 ## Credits
 
-All the images were made for the game, with AI tools:
+In 2026, Python programs written with Codex redrew the team's world sprites at twice their original size and drew the new images pixel by pixel.
 
-- the sprites marked "Team" in [`docs/sprites.md`](docs/sprites.md), generated with Pixel Lab from the team's descriptions;
-- the images of the opening and victory cutscenes, generated with Pixel Lab ([`assets/cinematics/`](assets/cinematics/));
-- the four tile sheets of the map (grass, soil, fences, decor), drawn pixel by pixel after the project, with Codex, to replace third-party sheets that could not be published ([`docs/sprites.md`](docs/sprites.md#map)).
+- The team made the original character and world sprites with Pixel Lab. The opening and victory cutscenes use the team's Pixel Lab images; Codex redrew the two henchmen as knights in one image of each. [Cinematics](docs/sprites.md#cinematics)
+- The crops, farm, urn, pickup and trees were redrawn from the team's images. New frames show leaves swaying, crops being eaten and the farm taking damage. New scenery includes butterflies, fireflies and cloud shadows. [Plants](docs/sprites.md#plants) · [Farm and urn](docs/sprites.md#farm-and-urn) · [Scenery](docs/sprites.md#scenery)
+- The four map tile sheets were drawn with Codex for the public release to replace third-party sheets whose licences forbid redistribution. The larger sheets keep the original tile positions. The website's map scene uses 14 game images scaled back to their original size, including an animated PNG of the farmer. [Map](docs/sprites.md#map)
+- The characters and enemies were redrawn and given new animation frames. The victory and defeat screens use new backgrounds. [Characters](docs/sprites.md#characters) · [Enemies](docs/sprites.md#enemies) · [End screens](docs/sprites.md#end-screens)
+- The defenses, bramble and neighbour's speech bubble were redrawn from the team's images; the cat's meow keeps the team's bubble. Programs written with Codex drew the upgrades, wear and attack effects, interface frames, buttons, icons, portraits and urn gauge. [Defenses](docs/sprites.md#defenses) · [Interface](docs/sprites.md#interface)
+- Programs written with Codex drew the particles, halos and pixel-font glyphs. The fonts use spacing metrics from libGDX's `lsans-15`. The web loading screen reuses the farmer's four rocking-chair frames. [Effects and light](docs/sprites.md#effects-and-light)
 
 The day music is a track by Anto, made with Suno; the two night loops are made from it. Every other sound is synthesised by code, with no recording and no third-party sound ([`docs/sounds.md`](docs/sounds.md)).
 

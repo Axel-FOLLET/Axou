@@ -5,16 +5,29 @@ package com.cropa.view.gdx;
 // loaded, and the lines of a note.
 // The view: the interface written here, the places (an area, the tip of an arrow), the colors and the files of the
 // sprites, their tints, and the styles of the texts.
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Texture.TextureFilter;
+import com.badlogic.gdx.graphics.g2d.NinePatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Matrix4;
+import com.cropa.view.Animations;
+import com.cropa.view.SpriteStyle;
+import java.util.ArrayList;
+import java.util.Random;
 import com.cropa.view.Bounds;
 import com.cropa.view.Canvas;
 import com.cropa.view.OutlineColor;
@@ -38,8 +51,20 @@ public class GdxCanvas implements Canvas {
     private static final float BUBBLE_OPACITY = 0.75f;
     // Gap between a text and the edges of its bubble, in world pixels.
     private static final float BUBBLE_PADDING = 3f;
-    // The labels: the same font at half size (lsans-15, 18 px high per line, about 9 once scaled), with a thinner bubble.
+    // Bitmap font used for the HUD.
+    private static final String FONT_PATH = "fonts/pixel-15.fnt";
+    // Bitmap font drawn for small labels.
+    private static final String LABEL_FONT_PATH = "fonts/pixel-8.fnt";
+    // Two texture pixels cover one world unit at HUD size.
+    private static final float FONT_SCALE = 0.5f;
+    // Labels are half the size of HUD text when the screen is big enough: one pixel of a letter then covers at least
+    // one pixel of the screen. In a small window (the card of the site: 1.26 screen pixels per world pixel), half
+    // size gave 0.63 screen pixel per letter pixel and the letters melted (the user, 25/11). labelScale() rounds a
+    // letter pixel up to whole screen pixels instead, at least one: crisp and regular at every size.
     private static final float LABEL_SCALE = 0.5f;
+    // Never bigger than the HUD text, even in a window smaller than the world.
+    private static final float LABEL_SCALE_MAX = 1f;
+    // Gap between a label and the edges of its bubble, in world units.
     private static final float LABEL_PADDING = 1f;
     // The neighbour's dialog: where its first line starts in its box, from the left edge and from the top.
     private static final float DIALOG_LEFT = 8f;
@@ -84,11 +109,10 @@ public class GdxCanvas implements Canvas {
     //-------------------- FIELDS --------------------
     private final SpriteBatch batch;
     private final OrthographicCamera camera;
-    private final TiledMap map;
     private final ShapeRenderer shapes = new ShapeRenderer();
-    // new BitmapFont(): no file to load, the font is inside the libGDX jar.
-    private final BitmapFont font = new BitmapFont();
-    // A second font object: setScale changes the whole font, so the HUD keeps its own at full size.
+    // The HUD font has a line height of 18 world units.
+    private final BitmapFont font = createFont(FONT_PATH, FONT_SCALE);
+    // The small label font has a line height of 9 world units.
     private final BitmapFont labelFont = createLabelFont();
     // Measures a text to size its bubble. One object, reused: drawText runs on every frame.
     private final GlyphLayout textSize = new GlyphLayout();
@@ -96,8 +120,13 @@ public class GdxCanvas implements Canvas {
     private final Texture bubblePixel = createWhitePixel();
     // Each image is loaded once, the first time it is drawn, and freed in dispose(): one place for both.
     private final Map<String, Texture> textures = new HashMap<>();
-    // Created once, at the first drawMap, then reused on every frame.
-    private OrthogonalTiledMapRenderer mapRenderer;
+    private final TextureAtlas atlas;
+    private final Map<String, List<TextureRegion>> frames = new HashMap<>();
+    private final Map<String, NinePatch> patches = new HashMap<>();
+    private final Matrix4 projection = new Matrix4();
+    private final Random jitter = new Random();
+    private float clock, shakeLeft, shakePeak;
+    private final ScaledTileMapRenderer mapRenderer;
     // The indexes of the map layers, split in two: under the sprites, and over them.
     private final int[] backLayers;
     private final int[] frontLayers;
@@ -114,24 +143,48 @@ public class GdxCanvas implements Canvas {
     public GdxCanvas(SpriteBatch batch, OrthographicCamera camera, TiledMap map) {
         this.batch = batch;
         this.camera = camera;
-        this.map = map;
+        FileHandle file = Gdx.files.internal("atlas/sprites.atlas");
+        atlas = file.exists() ? new TextureAtlas(file) : null;
+        if (atlas != null) {
+            for (Texture page : atlas.getTextures()) page.setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
+        }
+        projection.set(camera.combined);
+        mapRenderer = new ScaledTileMapRenderer(map, batch, this);
         int front = map.getLayers().getIndex(FRONT_LAYER);
         backLayers = IntStream.range(0, map.getLayers().getCount()).filter(index -> index != front).toArray();
         frontLayers = new int[] {front};
     }
 
+    // GameScreen advances both the animation time and the projection used for this frame.
+    public void advance(float delta) {
+        clock += delta;
+        projection.set(camera.combined);
+        shakeLeft = Math.max(0, shakeLeft - delta);
+        if (shakeLeft > 0) {
+            float angle = jitter.nextFloat() * MathUtils.PI2;
+            float radius = jitter.nextFloat() * shakePeak * shakeLeft / 0.3f;
+            projection.translate(radius * MathUtils.cos(angle), radius * MathUtils.sin(angle), 0);
+        }
+    }
+
+    @Override
+    public void shake(float strength) {
+        if (strength > shakePeak * shakeLeft / 0.3f) {
+            shakePeak = strength;
+            shakeLeft = 0.3f;
+        }
+    }
+
     //-------------------- CANVAS --------------------
-    // Called first on every frame, by WorldRenderer. The map renderer has its own batch: everything must be closed before it draws.
+    // Called first on every frame by WorldRenderer. The map renderer opens the shared batch itself.
     /**
      * Draws the tile layers of the map.
      */
     @Override
     public void drawMap() {
         switchTo(Mode.NOTHING);
-        if (mapRenderer == null) {
-            mapRenderer = new OrthogonalTiledMapRenderer(map);
-        }
         mapRenderer.setView(camera);
+        batch.setProjectionMatrix(projection);
         mapRenderer.render(backLayers);
     }
 
@@ -150,16 +203,122 @@ public class GdxCanvas implements Canvas {
      */
     @Override
     public void drawSprite(String spriteKey, Bounds area, Tint tint) {
+        drawAnimation(spriteKey, area, clock, tint);
+    }
+
+    @Override
+    public void drawAnimation(String spriteKey, Bounds area, float time, Tint tint) {
         switchTo(Mode.SPRITES);
-        if (tint == Tint.HURT) {
-            batch.setColor(HURT_COLOR);
-        } else if (tint == Tint.UPGRADED) {
-            batch.setColor(UPGRADED_COLOR);
-        } else if (tint == Tint.GHOST) {
-            batch.setColor(1f, 1f, 1f, GHOST_OPACITY);
-        }
-        batch.draw(textureOf(spriteKey), area.x(), area.y(), area.width(), area.height());
+        tint(tint, 1);
+        batch.draw(region(spriteKey, time), area.x(), area.y(), area.width(), area.height());
         batch.setColor(Color.WHITE);
+    }
+
+    private void tint(Tint tint, float alpha) {
+        Color color = tint == Tint.HURT ? HURT_COLOR : tint == Tint.UPGRADED ? UPGRADED_COLOR : Color.WHITE;
+        batch.setColor(color.r, color.g, color.b, tint == Tint.GHOST ? alpha * GHOST_OPACITY : alpha);
+    }
+
+    @Override
+    public void drawSprite(String key, Bounds area, float time, SpriteStyle style) {
+        switchTo(Mode.SPRITES);
+        tint(style.tint(), style.alpha());
+        float w = area.width() * style.scaleX();
+        float h = area.height() * style.scaleY();
+        float x = area.x() + (area.width() - w) / 2 + style.offsetX();
+        float y = area.y() + style.offsetY();
+        batch.draw(region(key, time), x, y, w / 2, h / 2, w, h, style.flipX() ? -1 : 1, 1, style.rotation());
+        batch.setColor(Color.WHITE);
+    }
+
+    @Override
+    public void drawFrame(String key, Bounds area, Tint tint) {
+        if (!patches.containsKey(key)) {
+            TextureRegion first = region(key, 0);
+            int[] split = first instanceof AtlasRegion packed ? packed.findValue("split") : null;
+            NinePatch patch = null;
+            if (split != null) {
+                patch = new NinePatch(first, split[0], split[1], split[2], split[3]);
+                patch.scale(0.5f, 0.5f);
+            }
+            patches.put(key, patch);
+        }
+        NinePatch patch = patches.get(key);
+        if (patch == null) {
+            drawSprite(key, area, tint);
+            return;
+        }
+        switchTo(Mode.SPRITES);
+        tint(tint, 1);
+        patch.draw(batch, area.x(), area.y(), area.width(), area.height());
+        batch.setColor(Color.WHITE);
+    }
+
+    @Override
+    public void drawPlainText(String text, float x, float y, TextStyle style) {
+        switchTo(Mode.SPRITES);
+        font.setColor(colorOf(style));
+        font.draw(batch, text, x, y);
+        font.setColor(Color.WHITE);
+    }
+
+    @Override
+    public void drawPlainCenteredText(String text, float centerX, float y, TextStyle style) {
+        textSize.setText(font, text);
+        drawPlainText(text, centerX - textSize.width / 2, y, style);
+    }
+
+    @Override
+    public void drawFloatingText(String text, float centerX, float y, float alpha, TextStyle style) {
+        switchTo(Mode.SPRITES);
+        textSize.setText(font, text);
+        float x = centerX - textSize.width / 2;
+        font.setColor(0, 0, 0, alpha);
+        for (int dy = -1; dy <= 1; dy++) {
+            for (int dx = -1; dx <= 1; dx++) {
+                if (dx != 0 || dy != 0) font.draw(batch, text, x + dx, y + dy);
+            }
+        }
+        Color color = colorOf(style);
+        font.setColor(color.r, color.g, color.b, alpha);
+        font.draw(batch, text, x, y);
+        font.setColor(Color.WHITE);
+    }
+
+    @Override
+    public void drawParticle(String key, float centerX, float centerY, float size, float rotation, float alpha) {
+        switchTo(Mode.SPRITES);
+        batch.setColor(1, 1, 1, alpha);
+        float half = size / 2;
+        batch.draw(region(key, clock), centerX - half, centerY - half, half, half, size, size, 1, 1, rotation);
+        batch.setColor(Color.WHITE);
+    }
+
+    @Override
+    public void drawLight(String key, Bounds area, float alpha, float red, float green, float blue) {
+        TextureRegion image = region(key, clock);
+        switchTo(Mode.SPRITES);
+        batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE);
+        batch.setColor(red, green, blue, alpha);
+        batch.draw(image, area.x(), area.y(), area.width(), area.height());
+        batch.setColor(Color.WHITE);
+        batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+    }
+
+    @Override
+    public void drawColorLayer(Bounds area, float red, float green, float blue, float alpha) {
+        switchTo(Mode.SPRITES);
+        batch.setColor(red, green, blue, alpha);
+        batch.draw(bubblePixel, area.x(), area.y(), area.width(), area.height());
+        batch.setColor(Color.WHITE);
+    }
+
+    @Override
+    public void drawMultiplyLayer(Bounds area, float red, float green, float blue) {
+        switchTo(Mode.SPRITES);
+        batch.setBlendFunction(GL20.GL_DST_COLOR, GL20.GL_ZERO);
+        drawColorLayer(area, red, green, blue, 1);
+        batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
     }
 
     // Called by the HUD. The bubble is drawn first, so the text sits on it. Every text gets one, without the HUD knowing.
@@ -197,6 +356,7 @@ public class GdxCanvas implements Canvas {
     @Override
     public void drawLabel(String text, float centerX, float y) {
         switchTo(Mode.SPRITES);
+        labelFont.getData().setScale(labelScale());
         textSize.setText(labelFont, text);
         float x = centerX - textSize.width / 2;
         drawBubble(x, y, LABEL_PADDING);
@@ -219,7 +379,7 @@ public class GdxCanvas implements Canvas {
 
     // Called by the HUD the day before the last night. Each line is measured with the small font of the labels:
     // the bubble is as wide as the longest one, and as tall as one line (capHeight) plus one line height per next
-    // line. setScale(0.5) also scales lineHeight and capHeight (BitmapFontData.setScale): 9 px per line, not 18.
+    // line. The label font supplies both measurements in world units.
     // Then the lines, one line height apart, in the colour of the style, and back to white like drawText.
     /**
      * Draws lines of small text, one under the other, on a single slightly transparent black bubble.
@@ -233,6 +393,7 @@ public class GdxCanvas implements Canvas {
     @Override
     public void drawNote(List<String> lines, float x, float y, TextStyle style) {
         switchTo(Mode.SPRITES);
+        labelFont.getData().setScale(labelScale());
         float width = 0;
         for (String line : lines) {
             textSize.setText(labelFont, line);
@@ -399,9 +560,8 @@ public class GdxCanvas implements Canvas {
         for (Texture texture : textures.values()) {
             texture.dispose();
         }
-        if (mapRenderer != null) {
-            mapRenderer.dispose();
-        }
+        if (atlas != null) atlas.dispose();
+        mapRenderer.dispose();
     }
 
     //-------------------- INTERNALS --------------------
@@ -417,13 +577,13 @@ public class GdxCanvas implements Canvas {
             shapes.end();
         }
         if (next == Mode.SPRITES) {
-            batch.setProjectionMatrix(camera.combined);
+            batch.setProjectionMatrix(projection);
             batch.begin();
         } else if (next == Mode.OUTLINES) {
-            shapes.setProjectionMatrix(camera.combined);
+            shapes.setProjectionMatrix(projection);
             shapes.begin(ShapeRenderer.ShapeType.Line);
         } else if (next == Mode.FILLED) {
-            shapes.setProjectionMatrix(camera.combined);
+            shapes.setProjectionMatrix(projection);
             shapes.begin(ShapeRenderer.ShapeType.Filled);
         }
         mode = next;
@@ -454,11 +614,32 @@ public class GdxCanvas implements Canvas {
         };
     }
 
-    // getData().setScale: every glyph of this font object is drawn at that size.
+    // The scale of the label font: one pixel of its texture is one pixel of a letter. Screen pixels per world pixel,
+    // as the FitViewport shows the world; a letter pixel rounded up to whole screen pixels (at least one, LABEL_SCALE
+    // at most when it already lands on whole pixels); then back to world units. The 0.01 keeps an exact 2.0 from
+    // rounding up to 3.
+    private float labelScale() {
+        float perWorld = Math.min(Gdx.graphics.getBackBufferWidth() / camera.viewportWidth,
+                Gdx.graphics.getBackBufferHeight() / camera.viewportHeight);
+        if (perWorld <= 0) return LABEL_SCALE;
+        float letterPixel = Math.max(1, (float) Math.ceil(LABEL_SCALE * perWorld - 0.01f));
+        return Math.min(LABEL_SCALE_MAX, letterPixel / perWorld);
+    }
+
+    // Keep fractional world positions and smooth the glyphs when the view shrinks them.
+    private static BitmapFont createFont(String path, float scale) {
+        BitmapFont font = new BitmapFont(Gdx.files.internal(path));
+        font.getData().setScale(scale);
+        font.setUseIntegerPositions(false);
+        font.getRegion().getTexture().setFilter(TextureFilter.Linear, TextureFilter.Nearest);
+        return font;
+    }
+
+    // labelScale() always gives whole screen pixels per letter pixel: Nearest both ways keeps every letter pixel sharp.
     private static BitmapFont createLabelFont() {
-        BitmapFont labelFont = new BitmapFont();
-        labelFont.getData().setScale(LABEL_SCALE);
-        return labelFont;
+        BitmapFont font = createFont(LABEL_FONT_PATH, LABEL_SCALE);
+        font.getRegion().getTexture().setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
+        return font;
     }
 
     // Pixmap: an image in memory. Texture copies it to the graphics card, so the pixmap is freed right away.
@@ -471,8 +652,35 @@ public class GdxCanvas implements Canvas {
         return texture;
     }
 
-    // computeIfAbsent: loads the image only if the table does not hold it yet.
-    private Texture textureOf(String spriteKey) {
-        return textures.computeIfAbsent(spriteKey, key -> new Texture(SpriteCatalog.pathOf(key)));
+    TextureRegion tileFrame(String key, float phase) {
+        return region(key, clock + phase);
+    }
+
+    private TextureRegion region(String key, float time) {
+        List<TextureRegion> images = frames.computeIfAbsent(key, this::loadFrames);
+        return images.get(Animations.frameAt(key, images.size(), time));
+    }
+
+    private List<TextureRegion> loadFrames(String key) {
+        List<TextureRegion> images = new ArrayList<>();
+        if (atlas != null) {
+            // TextureAtlas sorts indexed regions as it reads the atlas.
+            for (AtlasRegion frame : atlas.findRegions(key)) images.add(frame);
+        }
+        if (images.isEmpty()) {
+            String path = SpriteCatalog.pathOf(key);
+            String stem = path.substring(0, path.length() - 4);
+            String next = path;
+            do {
+                Texture texture = textures.computeIfAbsent(next, file -> {
+                    Texture loaded = new Texture(Gdx.files.internal(file));
+                    loaded.setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
+                    return loaded;
+                });
+                images.add(new TextureRegion(texture));
+                next = stem + "-" + images.size() + ".png";
+            } while (Gdx.files.internal(next).exists());
+        }
+        return images;
     }
 }

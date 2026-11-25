@@ -943,8 +943,13 @@ class GameSessionTest {
   @Test
   void aMoleUndergroundStaysInTheGame() {
     GameSession session = newDaySession();
+    Board board = session.getBoard();
+    board.getCell(1, 1).place(new Crop(CropType.CARROT, new CropConfig()));
+    board.getCell(1, 2).place(new Crop(CropType.CARROT, new CropConfig()));
     Mole mole = new Mole(session.getBoard(), enemyConfig, new Random(0));
     session.addEnemy(mole);
+    session.update(0.1f);
+    session.update(enemyConfig.getMoleMealDuration());
     assertFalse(mole.isOnBoard());
 
     session.update(0.1f);

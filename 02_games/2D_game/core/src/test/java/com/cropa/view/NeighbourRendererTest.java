@@ -83,7 +83,9 @@ class NeighbourRendererTest {
 
         renderer().renderNeighbour(canvas, neighbourWandering());
 
-        assertEquals(List.of("sprite neighbour_east " + new Bounds(-72, 104, 24, 24)), canvas.calls);
+        assertEquals(2, canvas.calls.size());
+        assertTrue(canvas.calls.get(0).startsWith("sprite shadow "));
+        assertEquals("sprite neighbour_east " + new Bounds(-72, 104, 24, 24), canvas.calls.get(1));
     }
 
     // The end of her way to Garry: the last part goes from (120, 122) to (136, 128), up and right, so east still.
@@ -96,7 +98,9 @@ class NeighbourRendererTest {
 
         renderer().renderNeighbour(canvas, neighbour);
 
-        assertTrue(canvas.calls.get(0).startsWith("sprite neighbour_east "));
+        assertTrue(canvas.calls.get(1).startsWith("sprite neighbour_east "));
+        assertTrue(canvas.extras.stream().anyMatch(c -> c.startsWith("animation neighbour_east ")
+                && !c.endsWith(" 0.0 NORMAL")));
     }
 
     // In front of Garry: her back to the player, and the small bubble on her left (136 - 12 - 24 = 100), 6 px up.
@@ -106,7 +110,11 @@ class NeighbourRendererTest {
 
         renderer().renderNeighbour(canvas, neighbourTalking());
 
+        assertTrue(canvas.extras.contains("animation neighbour_north " + new Bounds(124, 128, 24, 24) + " 0.0 NORMAL"));
+        float width = 24f * 0.6f;
+        float height = width * 12 / 32;
         assertEquals(List.of(
+                "sprite shadow " + new Bounds(136 - width / 2, 129.5f - height / 2, width, height),
                 "sprite neighbour_north " + new Bounds(124, 128, 24, 24),
                 "sprite neighbour_bubble " + new Bounds(100, 134, 24, 24)), canvas.calls);
     }
@@ -125,7 +133,9 @@ class NeighbourRendererTest {
         RecordingCanvas leaving = new RecordingCanvas();
 
         renderer.renderNeighbour(leaving, neighbour);
-        assertEquals(List.of("sprite neighbour_west " + new Bounds(124, 128, 24, 24)), leaving.calls);
+        assertEquals(2, leaving.calls.size());
+        assertTrue(leaving.calls.get(0).startsWith("sprite shadow "));
+        assertEquals("sprite neighbour_west " + new Bounds(124, 128, 24, 24), leaving.calls.get(1));
 
         neighbour.update(6f);
         RecordingCanvas gone = new RecordingCanvas();
@@ -151,9 +161,13 @@ class NeighbourRendererTest {
         renderer().renderDialog(canvas, neighbour);
 
         assertEquals(List.of(
+                "sprite bubble_frame " + new Bounds(100, 6, 252, 86),
+                "sprite portrait_frame " + new Bounds(60, 60, 32, 32),
+                "sprite portrait_neighbour " + new Bounds(64, 64, 24, 24),
+                "sprite bubble_tail_left " + new Bounds(92, 76, 8, 8),
                 "dialog Bon " + DIALOG,
-                "text Passer à la suite 231.0 27.0 GREYED",
-                "outline WHITE " + NEXT_BUTTON), canvas.calls);
+                "sprite button_disabled_frame " + NEXT_BUTTON,
+                "text Passer à la suite 231.0 27.0 GREYED"), canvas.calls);
     }
 
     // The bubble whole: the button is white (NORMAL adds no word to the line).
@@ -165,8 +179,8 @@ class NeighbourRendererTest {
 
         renderer().renderDialog(canvas, neighbour);
 
-        assertEquals("dialog Bon matin " + DIALOG, canvas.calls.get(0));
-        assertEquals("text Passer à la suite 231.0 27.0", canvas.calls.get(1));
+        assertEquals("dialog Bon matin " + DIALOG, canvas.calls.get(4));
+        assertEquals("text Passer à la suite 231.0 27.0", canvas.calls.get(6));
     }
 
     // At the start of a bubble, no word is whole: the box stays, empty, so it does not blink between two bubbles.
@@ -176,7 +190,7 @@ class NeighbourRendererTest {
 
         renderer().renderDialog(canvas, neighbourTalking());
 
-        assertEquals("dialog  " + DIALOG, canvas.calls.get(0));
+        assertEquals("dialog  " + DIALOG, canvas.calls.get(4));
     }
 
     // Her walks have no dialog.

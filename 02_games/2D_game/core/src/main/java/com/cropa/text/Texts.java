@@ -1,12 +1,11 @@
 package com.cropa.text;
 
 // The model: the kinds of crop and of defense, and the ways a game ends, each with its name.
-// Java: List for the lines of a bubble or of the neighbour's talk; Locale for the thousands of a number.
+// Java: List for the lines of a bubble or of the neighbour's talk.
 import com.cropa.model.defense.DefenseType;
 import com.cropa.model.game.GameResult;
 import com.cropa.model.world.CropType;
 import java.util.List;
-import java.util.Locale;
 
 // Every word the player reads, in French and in English, in one place: the view asks this object instead of writing
 // its own words, so a language is chosen once, when a game starts. Each method gives the French text, then the
@@ -50,8 +49,8 @@ public final class Texts {
     }
 
     //-------------------- NUMBERS --------------------
-    // 3450 -> "3 450" in French, "3,450" in English. Locale.ROOT puts a comma between the thousands; in French it is
-    // replaced by a plain space, since the narrow no-break space of Locale.FRANCE is not in the game font.
+    // Group digits from the right, leaving the minus sign in front of the first group.
+    // The game font uses a plain space for French thousands and a comma for English thousands.
     /**
      * Writes an amount with its thousands apart, as a player of this language reads them.
      *
@@ -59,8 +58,13 @@ public final class Texts {
      * @return "3 450" in French, "3,450" in English
      */
     public String number(int amount) {
-        String withCommas = String.format(Locale.ROOT, "%,d", amount);
-        return pick(withCommas.replace(',', ' '), withCommas);
+        StringBuilder grouped = new StringBuilder(Integer.toString(amount));
+        int firstDigit = amount < 0 ? 1 : 0;
+        char separator = language == Language.FRENCH ? ' ' : ',';
+        for (int i = grouped.length() - 3; i > firstDigit; i -= 3) {
+            grouped.insert(i, separator);
+        }
+        return grouped.toString();
     }
 
     //-------------------- TITLE SCREEN --------------------
@@ -103,12 +107,12 @@ public final class Texts {
      */
     public List<String> introLines() {
         return pick(
-            List.of("Le vieux Garry vivait seul dans sa ferme délabrée, avec son chat.",
+            List.of("Le vieux Garry vivait seul dans sa ferme, avec son chat.",
                 "Sur la cheminée trônait une urne : les cendres de sa défunte femme.",
                 "Le riche et avare M. Chmunks trouva ce pot magnifique. Il le voulut.",
                 "Une nuit, ses deux sbires volèrent l'urne.",
                 "Prix de rachat : 10 000 pièces. Garry n'a que des graines... et une fourche."),
-            List.of("Old Garry lived alone on his run-down farm, with his cat.",
+            List.of("Old Garry lived alone on his farm, with his cat.",
                 "On the mantelpiece stood an urn: the ashes of his late wife.",
                 "The rich and greedy Mr Chmunks found this pot gorgeous. He wanted it.",
                 "One night, his two henchmen stole the urn.",
@@ -179,6 +183,16 @@ public final class Texts {
      */
     public String sound(boolean muted) {
         return muted ? pick("Son : non", "Sound off") : pick("Son : oui", "Sound on");
+    }
+
+    /**
+     * Builds the heading shown at nightfall.
+     *
+     * @param number the night starting at one
+     * @return the localized heading with its number
+     */
+    public String nightTitle(int number) {
+        return pick("Nuit ", "Night ") + number;
     }
 
     /** @return the alert of the last night */
@@ -472,6 +486,67 @@ public final class Texts {
     /** @return the button that closes the game */
     public String quit() {
         return pick("Quitter", "Quit");
+    }
+
+    /** Pieces of the existing HUD sentence in their display order. */
+    public List<String> statusParts(int money, int hp, boolean night, int number, int seconds) {
+        return List.of(status(money, hp, night, number, seconds).split("   "));
+    }
+
+    /** Offer descriptions wrapped at word boundaries for the detail card. */
+    public List<String> effect(CropType type) {
+        return switch (type) {
+            case CARROT -> pick(List.of("Pousse vite."),
+                    List.of("Grows fast."));
+            case TURNIP -> pick(List.of("Bloque la sorcière."),
+                    List.of("Blocks the witch."));
+            case GARLIC -> pick(List.of("Bloque la chauve-souris."),
+                    List.of("Blocks the bat."));
+            case PUMPKIN -> pick(List.of("Vaut le plus cher."),
+                    List.of("Worth the most."));
+        };
+    }
+
+    /** The effect of a defense offered by the market. */
+    public List<String> effect(DefenseType type) {
+        return switch (type) {
+            case CATAPATATE -> pick(List.of("Portée de 2 cases (en", "ligne et en diagonale).", "Tire sur le premier", "ennemi à portée."),
+                    List.of("Range of 2 tiles (in a", "straight line and", "diagonally). Fires at the", "first enemy in range."));
+            case SCARECROW -> pick(List.of("Frappe au corps à corps", "les ennemis de sa case", "et des cases voisines", "en croix."),
+                    List.of("Punches, in melee, the", "enemies on its tile and", "on the neighbouring tiles", "in a cross."));
+            case BRAMBLE -> pick(List.of("Pique après 1 nuit de", "pousse. Blesse chaque", "ennemi qui la traverse."),
+                    List.of("Stings after 1 night of", "growth. Hurts every", "enemy that crosses it."));
+        };
+    }
+
+    public enum Action { PLANT, HARVEST, BUY, UPGRADE }
+
+    /** The action on a field cell or defense slot. */
+    public String title(Action action) {
+        return switch (action) {
+            case PLANT -> plant();
+            case HARVEST -> pick("Récolter", "Harvest");
+            case BUY -> pick("Acheter une défense", "Buy a defense");
+            case UPGRADE -> upgradeWord();
+        };
+    }
+
+    /** Mouse instructions in the language of the game. */
+    public List<String> hint(Action action) {
+        return switch (action) {
+            case PLANT -> pick(List.of("Clic sur une case vide,", "puis choix de la graine :", "payée et plantée tout de", "suite."),
+                    List.of("Click an empty tile, then", "choose the seed: it is", "paid for and planted at", "once."));
+            case HARVEST -> pick(List.of("Clic sur une plante,", "puis Vendre : vendue",
+                            "tout de suite à la valeur", "de son stade."),
+                    List.of("Click a plant, then Sell:", "it is sold immediately,", "at the value of its stage."));
+            case BUY -> pick(List.of("Clic dans la liste", "Défenses, puis sur", "un emplacement de",
+                            "défense (ou sur une", "case du champ pour", "l'épouvantail et",
+                            "la ronce) : payée et", "posée tout de suite."),
+                    List.of("Click the defense in the", "shop, then click a", "defense slot (or a field",
+                            "tile for the scarecrow", "and the bramble): it is", "paid for and placed", "at once."));
+            case UPGRADE -> pick(List.of("Clic sur une défense,", "puis Améliorer."),
+                    List.of("Click a defense, then", "Upgrade."));
+        };
     }
 
     //-------------------- INTERNALS --------------------

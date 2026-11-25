@@ -163,4 +163,68 @@ public interface Canvas {
      * @param area the area to darken
      */
     void drawShade(Bounds area);
+    // Renderers supply the time since a pose began.
+    /** Draws the animation at the given time in seconds. */
+    default void drawAnimation(String spriteKey, Bounds area, float time, Tint tint) {
+        drawSprite(spriteKey, area, tint);
+    }
+
+    // Actors use a style to move or turn an image inside its world area.
+    /** Draws the current frame with the given transform. */
+    default void drawSprite(String spriteKey, Bounds area, float time, SpriteStyle style) {
+        drawSprite(spriteKey, area, style.tint());
+    }
+
+    // Panels call this to keep their corners at a fixed size.
+    /** Draws a nine-patch frame. */
+    default void drawFrame(String spriteKey, Bounds area, Tint tint) {
+        drawSprite(spriteKey, area, tint);
+    }
+
+    // Panels supply their own background.
+    /** Draws a line at the usual text baseline. */
+    default void drawPlainText(String text, float x, float y, TextStyle style) {
+        drawText(text, x, y, style);
+    }
+
+    // Panels use this for centred captions.
+    /** Centres a line on the given x. */
+    default void drawPlainCenteredText(String text, float centerX, float y, TextStyle style) {
+        drawCenteredText(text, centerX, y);
+    }
+
+    // The night renderer adds the light of a window.
+    /** Adds a halo over the scene. */
+    default void drawLight(String spriteKey, Bounds area, float alpha) {
+        drawLight(spriteKey, area, alpha, 1f, 1f, 1f);
+    }
+
+    /** Adds a light with the given RGB tint, each component between zero and one. */
+    default void drawLight(String spriteKey, Bounds area, float alpha, float red, float green, float blue) {
+    }
+
+    // The night renderer overlays a colour as the light changes.
+    /** Blends a translucent rectangle over the scene. */
+    default void drawColorLayer(Bounds area, float red, float green, float blue, float alpha) {
+    }
+
+    // The night renderer tints the scenery already drawn.
+    /** Multiplies the underlying colour by the given RGB values. */
+    default void drawMultiplyLayer(Bounds area, float red, float green, float blue) {
+    }
+
+    // Effects requests a shake after an impact.
+    /** Starts a damped shake in world units. */
+    default void shake(float strength) {
+    }
+
+    // Effects places each particle around its centre.
+    /** Draws a rotating square with the given side length. */
+    default void drawParticle(String spriteKey, float centerX, float centerY, float size, float rotation, float alpha) {
+    }
+
+    // Effects draws rising numbers above the scenery.
+    /** Draws centred text with a dark outline. */
+    default void drawFloatingText(String text, float centerX, float y, float alpha, TextStyle style) {
+    }
 }

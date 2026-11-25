@@ -3,6 +3,13 @@ package com.cropa.view;
 // SlotSide: the side of a defense slot, from the model. DefenseSlots and Board: asked which slots and cells are free;
 // Board also gives the size of the field (ROWS, COLUMNS).
 // Defense: asked which cells it reaches.
+import com.cropa.model.defense.Bramble;
+import com.cropa.model.defense.Catapatate;
+import com.cropa.model.defense.DefenseConfig;
+import com.cropa.model.defense.DefenseOffer;
+import com.cropa.model.defense.DefenseType;
+import com.cropa.model.defense.Scarecrow;
+import java.util.List;
 import com.cropa.model.defense.Defense;
 import com.cropa.model.defense.DefenseSlots;
 import com.cropa.model.defense.SlotSide;
@@ -79,7 +86,7 @@ public class OutlineRenderer {
         for (int row = 1; row <= Board.ROWS; row++) {
             for (int column = 1; column <= Board.COLUMNS; column++) {
                 if (defense.reaches(row, column)) {
-                    canvas.drawRangeVeil(layout.getCellBounds(row, column));
+                    canvas.drawSprite(SpriteCatalog.RANGE_CELL, layout.getCellBounds(row, column));
                 }
             }
         }
@@ -90,7 +97,7 @@ public class OutlineRenderer {
         for (int row = 1; row <= Board.ROWS; row++) {
             for (int column = 1; column <= Board.COLUMNS; column++) {
                 if (board.getCell(row, column).isEmpty()) {
-                    canvas.drawOutline(layout.getCellBounds(row, column), OutlineColor.WHITE);
+                    canvas.drawFrame(SpriteCatalog.CELL_FRAME, layout.getCellBounds(row, column), Tint.NORMAL);
                 }
             }
         }
@@ -101,9 +108,34 @@ public class OutlineRenderer {
         for (SlotSide side : SlotSide.values()) {
             for (int column = 1; column <= Board.COLUMNS; column++) {
                 if (slots.getSlot(side, column).isEmpty()) {
-                    canvas.drawOutline(layout.getSlotBounds(side, column), OutlineColor.WHITE);
+                    canvas.drawFrame(SpriteCatalog.CELL_FRAME, layout.getSlotBounds(side, column), Tint.NORMAL);
                 }
             }
         }
+    }
+
+    /** Builds a detached defense so its real reaches method decides which cells to draw. */
+    public void preview(Canvas canvas, Pointer pointer, DefenseOffer offer, DefenseConfig config,
+            Board board, DefenseSlots slots) {
+        if (offer.isPlacedOnField()) {
+            layout.findCell(pointer.x(), pointer.y(), board).filter(cell -> cell.isEmpty()).ifPresent(cell -> {
+                boolean thorn = offer.getType() == DefenseType.BRAMBLE;
+                Defense model = thorn ? new Bramble(cell, config) : new Scarecrow(cell, config, List.of());
+                Bounds area = layout.getCellBounds(cell.getRow(), cell.getColumn());
+                ghost(canvas, model, thorn ? "bramble_0" : "scarecrow", area, area);
+            });
+        } else {
+            layout.findSlot(pointer.x(), pointer.y(), slots).filter(slot -> slot.isEmpty()).ifPresent(slot -> {
+                Bounds area = layout.getSlotBounds(slot.getSide(), slot.getColumn());
+                String key = slot.getSide() == SlotSide.TOP ? SpriteCatalog.CATAPATATE_TOP : SpriteCatalog.CATAPATATE_BOTTOM;
+                ghost(canvas, new Catapatate(slot, config, List.of()), key, area, DefenseRenderer.slotSpriteArea(area));
+            });
+        }
+    }
+
+    private void ghost(Canvas canvas, Defense model, String key, Bounds area, Bounds sprite) {
+        renderRange(canvas, model);
+        canvas.drawSprite(SpriteCatalog.CELL_HOVER, area);
+        canvas.drawSprite(key, sprite, Tint.GHOST);
     }
 }

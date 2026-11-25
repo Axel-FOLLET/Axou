@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 // Language and Texts: the words of the game in French, the language its layout was measured on.
 import com.cropa.text.Language;
 import com.cropa.text.Texts;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -57,7 +58,43 @@ class TitleSceneTest {
         assertTrue(drew("centered Un vieil homme riche a volé l'urne de ma défunte femme, 280.0 290.0"));
         assertTrue(drew("centered je compte la racheter en vendant mes récoltes 280.0 268.0"));
         assertTrue(drew("centered mais des monstres attaquent ma plantation. 1 280.0 246.0"));
-        assertTrue(drew("centered > Cliquer pour jouer < 280.0 95.0"));
+        assertTrue(canvas.extras.contains("float > Cliquer pour jouer < 280.0 95.0 1.0 NORMAL"));
+    }
+
+    // Half a pulse later the three figures still have separate breathing phases.
+    @Test
+    void invitationDimsWhileTheThreeFiguresBreathe() {
+        TitleScene scene = new TitleScene(WORLD, true, FRENCH);
+        scene.update(0.8f);
+        scene.render(canvas);
+        String pulse = canvas.extras.stream().filter(s -> s.startsWith("float ")).findFirst().orElseThrow();
+        String[] words = pulse.split(" ");
+        assertEquals(0.55f, Float.parseFloat(words[words.length - 2]), 0.0001f);
+        List<Float> times = canvas.extras.stream().filter(s -> s.startsWith("animation "))
+                .filter(s -> !s.startsWith("animation urn ")).map(s -> s.split(" "))
+                .map(parts -> Float.valueOf(parts[parts.length - 2])).toList();
+        assertEquals(List.of(0.8f, 0.8f + 0.4f, 0.8f + 0.8f), times);
+    }
+
+    // Both languages keep their own centred bubble at the peak and trough of the pulse.
+    @Test
+    void playBubbleFollowsTheInvitation() {
+        for (Texts texts : List.of(FRENCH, Texts.of(Language.ENGLISH))) {
+            TitleScene scene = new TitleScene(WORLD, true, texts);
+            float width = TextWidth.of(texts.clickToPlay()) + 6;
+            Bounds area = new Bounds(280 - width / 2, 79, width, 19);
+            for (float expected : new float[]{1f, 0.55f}) {
+                RecordingCanvas frame = new RecordingCanvas();
+                scene.render(frame);
+                String label = "float " + texts.clickToPlay() + " 280.0 95.0 ";
+                String pulse = frame.extras.stream().filter(s -> s.startsWith(label)).findFirst().orElseThrow();
+                float alpha = Float.parseFloat(pulse.substring(label.length(), pulse.lastIndexOf(' ')));
+                assertEquals(expected, alpha, 1e-5f);
+                assertEquals("color " + area + " 0.0 0.0 0.0 " + (0.75f * alpha),
+                        frame.extras.get(frame.extras.indexOf(pulse) - 1));
+                scene.update(0.8f);
+            }
+        }
     }
 
     // Asked by Axel: M. Chmunks with the urn between Henchman 1 and Henchman 2, all facing the player, their feet on y 150.
@@ -95,8 +132,19 @@ class TitleSceneTest {
         scene.render(canvas);
 
         assertEquals(new Bounds(498, 296, 54, 19), scene.getLanguageButton());
-        assertTrue(drew("text English 501.0 312.0"));
-        assertTrue(drew("outline WHITE " + scene.getLanguageButton()));
+        assertLanguageFrame(canvas, SpriteCatalog.BUTTON_FRAME, scene.getLanguageButton());
+        for (boolean pressed : new boolean[]{false, true}) {
+            RecordingCanvas frame = new RecordingCanvas();
+            scene.render(frame, new Pointer(525, 305, pressed));
+            String key = pressed ? SpriteCatalog.BUTTON_PRESSED_FRAME : SpriteCatalog.BUTTON_HOVER_FRAME;
+            assertLanguageFrame(frame, key, scene.getLanguageButton());
+        }
+    }
+
+    private void assertLanguageFrame(RecordingCanvas frame, String key, Bounds area) {
+        int index = frame.extras.indexOf("frame " + key + " " + area + " NORMAL");
+        assertTrue(index >= 0);
+        assertEquals("plain English 501.0 312.0 NORMAL", frame.extras.get(index + 1));
     }
 
     // A click on the button asks for the other language and leaves the screen shown: the game starts over in it.
@@ -116,7 +164,7 @@ class TitleSceneTest {
         new TitleScene(WORLD, true, Texts.of(Language.ENGLISH)).render(canvas);
 
         assertTrue(drew("centered A rich old man stole my late wife's urn, 280.0 290.0"));
-        assertTrue(drew("centered > Click to play < 280.0 95.0"));
+        assertTrue(canvas.extras.contains("float > Click to play < 280.0 95.0 1.0 NORMAL"));
         assertTrue(drew("text Français "));
     }
 

@@ -146,18 +146,57 @@ class MoleTest {
 
   // -------------------- SPECIAL CASES --------------------
 
-  // Nothing to eat: no meal, it stays underground and tries again at the next frame.
   @Test
-  void moleWaitsUndergroundWhileThereIsNothingToEat() {
+  void moleLeavesOnItsFirstUpdateWithoutFood() {
     Mole mole = newMole();
 
     mole.update(0.1f);
-    assertFalse(mole.isTargetable());
 
-    board.getCell(3, 4).place(carrot());
+    assertTrue(mole.hasFled());
+  }
+
+  @Test
+  void moleLeavesAsSoonAsItFinishesTheLastCrop() {
+    board.getCell(1, 1).place(carrot());
+    Mole mole = newMole();
     mole.update(0.1f);
 
+    mole.update(3f);
+
+    assertTrue(board.getCrops().isEmpty());
+    assertTrue(mole.hasFled());
+  }
+
+  @Test
+  void moleLeavesWhenFoodDisappearsDuringItsWait() {
+    board.getCell(1, 1).place(carrot());
+    board.getCell(1, 2).place(carrot());
+    Mole mole = newMole();
+    mole.update(0.1f);
+    mole.update(3f);
+    assertFalse(mole.hasFled());
+
+    board.getCells().stream().filter(cell -> !cell.isEmpty()).forEach(Cell::remove);
+    mole.update(0.1f);
+
+    assertTrue(mole.hasFled());
+  }
+
+  @Test
+  void moleWaitsElevenSecondsBeforeEatingTheRemainingCrop() {
+    board.getCell(1, 1).place(carrot());
+    board.getCell(1, 2).place(carrot());
+    Mole mole = newMole();
+    mole.update(0.1f);
+    mole.update(3f);
+
+    mole.update(10.5f);
+    assertFalse(mole.hasFled());
+    assertFalse(mole.isTargetable());
+    mole.update(0.5f);
     assertTrue(mole.isTargetable());
+    mole.update(3f);
+    assertTrue(board.getCrops().isEmpty());
   }
 
   @Test

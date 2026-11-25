@@ -81,8 +81,33 @@ class CinematicTest {
         assertEquals(List.of(
                 "sprite second " + WORLD,
                 "veil " + new Bounds(0, 0, 560, 44) + " 0.7",
-                "centered Line 2 280.0 36.0",
+                "centered  280.0 36.0",
                 "label Cliquer pour continuer 280.0 13.0"), canvas.calls);
+        cinematic.update(0.15f);
+        canvas.calls.clear();
+        cinematic.render(canvas);
+        assertEquals("centered Line 2 280.0 36.0", canvas.calls.get(2));
+    }
+
+    // A click during typing starts a fresh line; the image never moves.
+    @Test
+    void imageStaysStillAndLettersRestartOnEveryClick() {
+        Cinematic film = new Cinematic(WORLD, THREE_SCENES, FRENCH);
+        RecordingCanvas canvas = new RecordingCanvas();
+        film.update(0.05f);
+        film.render(canvas);
+        assertEquals("centered Li 280.0 36.0", canvas.calls.get(2));
+        assertTrue(film.handleClick());
+        canvas.calls.clear();
+        film.render(canvas);
+        assertEquals("sprite second " + WORLD, canvas.calls.get(0));
+        assertEquals("centered  280.0 36.0", canvas.calls.get(2));
+
+        // Long after the click, the image has not moved: it still covers exactly the world.
+        canvas.calls.clear();
+        film.update(8f);
+        film.render(canvas);
+        assertEquals("sprite second " + WORLD, canvas.calls.get(0));
     }
 
     // Once it is over, nothing is drawn: the game shows through.
@@ -124,9 +149,11 @@ class CinematicTest {
     void theIntroStartsWithGarryAndHisCat() {
         RecordingCanvas canvas = new RecordingCanvas();
 
-        Cinematic.intro(WORLD, FRENCH).render(canvas);
+        Cinematic intro = Cinematic.intro(WORLD, FRENCH);
+        intro.update(7f);
+        intro.render(canvas);
 
-        assertEquals("centered Le vieux Garry vivait seul dans sa ferme délabrée, avec son chat. 280.0 36.0",
+        assertEquals("centered Le vieux Garry vivait seul dans sa ferme, avec son chat. 280.0 36.0",
                 canvas.calls.get(2));
     }
 

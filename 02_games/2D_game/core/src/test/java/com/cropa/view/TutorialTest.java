@@ -117,12 +117,12 @@ class TutorialTest {
 
     // The arrow drawn on the last frame, as RecordingCanvas writes it: "arrow <tip>".
     private String shownArrow() {
-        return canvas.calls.stream().filter(call -> call.startsWith("arrow ")).findFirst().orElse("");
+        return canvas.calls.stream().filter(call -> call.startsWith("sprite tutorial_arrow ")).findFirst().orElse("");
     }
 
     // The arrow expected on a target: it points to the right, its tip 2 px before the middle of the left edge.
     private static String arrowOn(Bounds target) {
-        return "arrow " + new Point(target.x() - 2, target.y() + target.height() / 2);
+        return "sprite tutorial_arrow " + new Bounds(target.x() - 18, target.y() + target.height() / 2 - 5, 16, 10);
     }
 
     // The words of a bubble of the tutorial, from 0, its lines joined by a space.
@@ -147,14 +147,14 @@ class TutorialTest {
     void aBubbleIsDrawnWithItsMaskItsNextButtonAndItsArrow() {
         frame();
 
-        assertEquals(8, canvas.calls.size());
+        assertEquals(12, canvas.calls.size());
         for (int band = 0; band < 4; band++) {
             assertTrue(canvas.calls.get(band).startsWith("shade "));
         }
-        assertTrue(canvas.calls.get(4).startsWith("dialog "));
-        assertTrue(canvas.calls.get(5).startsWith("text Suivant "));
-        assertEquals("outline WHITE " + tutorial.nextButton(), canvas.calls.get(6));
-        assertTrue(canvas.calls.get(7).startsWith("arrow "));
+        assertTrue(canvas.calls.get(8).startsWith("dialog "));
+        assertTrue(canvas.calls.get(10).startsWith("text Suivant "));
+        assertEquals("sprite button_frame " + tutorial.nextButton(), canvas.calls.get(9));
+        assertTrue(canvas.calls.get(11).startsWith("sprite tutorial_arrow "));
     }
 
     // Modal (asked on day 14): bubble 1 no longer passes by itself, only "Suivant" moves the tutorial on. The
@@ -185,8 +185,8 @@ class TutorialTest {
         frame();
 
         List<String> drawn = drawnOverTheMask();
-        assertTrue(drawn.get(1).startsWith("text Commencer à jouer "));
-        assertEquals("outline WHITE " + tutorial.startButton(), drawn.get(2));
+        assertTrue(drawn.get(6).startsWith("text Commencer à jouer "));
+        assertEquals("sprite button_frame " + tutorial.startButton(), drawn.get(5));
         assertTrue(canvas.calls.stream().noneMatch(call -> call.startsWith("text Suivant ")));
     }
 
@@ -363,8 +363,8 @@ class TutorialTest {
         frame();
 
         List<String> drawn = drawnOverTheMask();
-        assertEquals("sprite " + SpriteCatalog.CATAPATATE_TOP + " " + ghostArea() + " GHOST", drawn.get(3));
-        assertTrue(drawn.get(4).startsWith("arrow "));
+        assertEquals("sprite " + SpriteCatalog.CATAPATATE_TOP + " " + ghostArea() + " GHOST", drawn.get(7));
+        assertTrue(drawn.get(8).startsWith("sprite tutorial_arrow "));
     }
 
     // The other bubbles show no sprite: the ghost belongs to bubble 5 only, and leaves with it.
@@ -372,7 +372,7 @@ class TutorialTest {
     void noGhostOnTheOtherBubbles() {
         for (int bubble = 0; bubble < FRENCH.tutorialBubbles().size() - 1; bubble++) {
             frame();
-            assertTrue(canvas.calls.stream().noneMatch(call -> call.startsWith("sprite ")), "bubble " + (bubble + 1));
+            assertTrue(canvas.calls.stream().noneMatch(call -> call.endsWith(" GHOST")), "bubble " + (bubble + 1));
             clickNext();
         }
     }

@@ -41,10 +41,14 @@ public class TitleScene {
     // The words of the screen, in the language of the game, and where a click on the language button acts.
     private final List<String> titleLines;
     private final String playLabel;
+    // The invitation keeps the same bubble throughout its pulse.
+    private final Bounds playBubble;
     private final String languageLabel;
     private final Bounds languageButton;
     // true until the first click: then nothing is drawn and the clicks go to the game.
     private boolean visible;
+    // The figures and the invitation share the time spent on the title.
+    private float time;
 
     //-------------------- CONSTRUCTOR --------------------
     // Called once by GameScreen.show(), with the same world as the night veil. visible: true at launch, false after
@@ -62,6 +66,9 @@ public class TitleScene {
         centerX = world.x() + world.width() / 2;
         titleLines = texts.titleLines();
         playLabel = texts.clickToPlay();
+        // Match the HUD bubble: a 13-unit line with 3 units of padding on each side.
+        float bubbleWidth = TextWidth.of(playLabel) + 6;
+        playBubble = new Bounds(centerX - bubbleWidth / 2, at(PLAY_TOP) - 16, bubbleWidth, 19);
         languageLabel = texts.otherLanguage();
         float width = TextWidth.of(languageLabel) + 6;
         languageButton = new Bounds(world.x() + world.width() - LANGUAGE_RIGHT_MARGIN - width,
@@ -111,6 +118,16 @@ public class TitleScene {
         return Optional.of(TitleChoice.PLAY);
     }
 
+    //-------------------- TIME --------------------
+    /**
+     * Advances the title.
+     *
+     * @param delta elapsed time in seconds
+     */
+    public void update(float delta) {
+        time += delta;
+    }
+
     //-------------------- DRAWING --------------------
     // Called on every frame by GameScreen, after the farm and instead of the HUD. The veil darkens the farm, then the
     // three lines of the title, 22 px apart; Henchman 1 on the left, M. Chmunks in the middle with the urn drawn after him,
@@ -122,6 +139,16 @@ public class TitleScene {
      * @param canvas where to draw
      */
     public void render(Canvas canvas) {
+        render(canvas, Pointer.AWAY);
+    }
+
+    /**
+     * Draws the title screen with the current button frames.
+     *
+     * @param canvas where to draw
+     * @param pointer the pointer in world coordinates
+     */
+    public void render(Canvas canvas, Pointer pointer) {
         if (!visible) {
             return;
         }
@@ -129,13 +156,15 @@ public class TitleScene {
         for (int line = 0; line < titleLines.size(); line++) {
             canvas.drawCenteredText(titleLines.get(line), centerX, at(TITLE_TOP - line * LINE_SPACING));
         }
-        Figure.HENCHMAN_1_FRONT.stand(canvas, centerX - SPACING, at(GROUND));
-        Figure.CHMUNKS_FRONT.stand(canvas, centerX, at(GROUND));
-        Figure.URN.stand(canvas, centerX, at(GROUND + HELD_HEIGHT));
-        Figure.HENCHMAN_2_FRONT.stand(canvas, centerX + SPACING, at(GROUND));
-        canvas.drawCenteredText(playLabel, centerX, at(PLAY_TOP));
-        canvas.drawText(languageLabel, languageButton.x() + 3, at(LANGUAGE_TOP));
-        canvas.drawOutline(languageButton, OutlineColor.WHITE);
+        // Spread three breaths over the 1.2-second loop.
+        Figure.HENCHMAN_1_FRONT.stand(canvas, centerX - SPACING, at(GROUND), time);
+        Figure.CHMUNKS_FRONT.stand(canvas, centerX, at(GROUND), time + 0.4f);
+        Figure.URN.stand(canvas, centerX, at(GROUND + HELD_HEIGHT), time);
+        Figure.HENCHMAN_2_FRONT.stand(canvas, centerX + SPACING, at(GROUND), time + 0.8f);
+        float alpha = 0.775f + 0.225f * (float) Math.cos(time * (2 * Math.PI / 1.6));
+        canvas.drawColorLayer(playBubble, 0f, 0f, 0f, 0.75f * alpha);
+        canvas.drawFloatingText(playLabel, centerX, at(PLAY_TOP), alpha, TextStyle.NORMAL);
+        pointer.button(canvas, languageButton, languageLabel, TextStyle.NORMAL);
     }
 
     //-------------------- INTERNALS --------------------

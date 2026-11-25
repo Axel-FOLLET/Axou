@@ -7,7 +7,10 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import com.cropa.model.defense.DefenseType;
 import com.cropa.model.game.GameResult;
+import java.util.Locale;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 // The width of the texts on screen is checked by TextsLayoutTest, in the view.
 /** Tests for {@link Texts} and {@link Language}. */
@@ -46,6 +49,15 @@ class TextsTest {
         assertEquals("Urn: 3,450 / 10,000", ENGLISH.urnGauge(3450, 10000));
     }
 
+    @ParameterizedTest
+    @ValueSource(ints = {0, 1, 9, 10, 99, 100, 999, 1_000, 10_000, 999_999, 1_000_000,
+            Integer.MAX_VALUE, -1, -999, -1_000, -1_234_567, Integer.MIN_VALUE})
+    void numberMatchesRootGroupingInBothLanguages(int amount) {
+        String expected = String.format(Locale.ROOT, "%,d", amount);
+        assertEquals(expected, ENGLISH.number(amount));
+        assertEquals(expected.replace(',', ' '), FRENCH.number(amount));
+    }
+
     // The French words are the ones of the game before the translation: nothing changed for a French player.
     @Test
     void theFrenchWordsAreTheOnesOfTheGame() {
@@ -54,6 +66,32 @@ class TextsTest {
         assertEquals("Épouvantail N1 100%", FRENCH.defenseTitle(
             DefenseType.SCARECROW, 1, 100));
         assertEquals("La ferme est tombée la nuit 5.", FRENCH.farmFell(true, 5));
+    }
+
+    @Test
+    void buyingADefenseExplainsPlacementAndImmediatePayment() {
+        assertEquals("Clic dans la liste Défenses, puis sur un emplacement de défense "
+                        + "(ou sur une case du champ pour l'épouvantail et la ronce) : payée et posée tout de suite.",
+                String.join(" ", FRENCH.hint(Texts.Action.BUY)));
+        assertEquals("Click the defense in the shop, then click a defense slot "
+                        + "(or a field tile for the scarecrow and the bramble): it is paid for and placed at once.",
+                String.join(" ", ENGLISH.hint(Texts.Action.BUY)));
+    }
+
+    @Test
+    void harvestingExplainsTheSellButtonAndStageValue() {
+        assertEquals("Clic sur une plante, puis Vendre : vendue tout de suite à la valeur de son stade.",
+                String.join(" ", FRENCH.hint(Texts.Action.HARVEST)));
+        assertEquals("Click a plant, then Sell: it is sold immediately, at the value of its stage.",
+                String.join(" ", ENGLISH.hint(Texts.Action.HARVEST)));
+    }
+
+    @Test
+    void brambleDescribesGrowthThenDamage() {
+        assertEquals("Pique après 1 nuit de pousse. Blesse chaque ennemi qui la traverse.",
+                String.join(" ", FRENCH.effect(DefenseType.BRAMBLE)));
+        assertEquals("Stings after 1 night of growth. Hurts every enemy that crosses it.",
+                String.join(" ", ENGLISH.effect(DefenseType.BRAMBLE)));
     }
 
     // Each list has as many lines in both languages: one line per image of a cinematic, the same bubbles of the

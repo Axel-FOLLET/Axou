@@ -47,6 +47,7 @@ public class Tutorial {
     private static final int FIELD_ROW = 2;
     private static final int FIELD_COLUMN = 1;
     // The arrow points to the right, its tip 2 px before the left edge of its target, at mid-height.
+    private static final float ARROW_WIDTH = 16f, ARROW_HEIGHT = 10f;
     private static final float ARROW_GAP = 2f;
     // The button at the bottom right of the frame, like "Passer à la suite" in the neighbour's: its outline 3 px around its
     // words, ending at x 347 (inside the frame), 16 px under the top of the text and 3 px above it, like the buttons of
@@ -131,19 +132,25 @@ public class Tutorial {
      * @param canvas where to draw
      */
     public void render(Canvas canvas) {
+        render(canvas, Pointer.AWAY);
+    }
+
+    /** Draws the modal controls at the current pointer. */
+    public void render(Canvas canvas, Pointer pointer) {
         if (isOver()) {
             return;
         }
         Bounds target = steps.get(bubble).target();
         shadeAround(canvas, target);
+        DialogFrame.draw(canvas, AREA, "portrait_garry");
         canvas.drawDialog(bubbles.get(bubble), AREA);
         Bounds button = button();
-        canvas.drawText(isLastBubble() ? startLabel : nextLabel, button.x() + 3, NEXT_TOP);
-        canvas.drawOutline(button, OutlineColor.WHITE);
+        pointer.button(canvas, button, isLastBubble() ? startLabel : nextLabel, TextStyle.NORMAL);
         if (steps.get(bubble).ghost()) {
             canvas.drawSprite(SpriteCatalog.CATAPATATE_TOP, target, Tint.GHOST);
         }
-        canvas.drawArrow(new Point(target.x() - ARROW_GAP, target.y() + target.height() / 2));
+        canvas.drawSprite("tutorial_arrow", new Bounds(target.x() - ARROW_GAP - ARROW_WIDTH,
+                target.y() + (target.height() - ARROW_HEIGHT) / 2, ARROW_WIDTH, ARROW_HEIGHT));
     }
 
     //-------------------- CLICKS --------------------

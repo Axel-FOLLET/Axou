@@ -9,6 +9,8 @@ package com.cropa.view;
 // CropConfig (day 14): the value of each crop once ripe, shown next to its price in the "Planter" list.
 // Texts: the words of the shop and the names of the crops and defenses, in the language of the game.
 // Cue and CuePlayer (20/11): the sounds of the shop, and what plays them (the Jukebox in the game, a list in the tests).
+import com.cropa.model.defense.Bramble;
+import com.cropa.model.defense.SlotSide;
 import com.cropa.model.defense.Defense;
 import com.cropa.model.defense.DefenseOffer;
 import com.cropa.model.defense.DefenseSlot;
@@ -94,12 +96,15 @@ public class ShopWindow {
     private static final Bounds LIST_AREA = rowsBounds(1, PLANT_LINES);
     private static final Bounds DEFENSE_LIST_AREA = rowsBounds(1, DEFENSE_LINES);
     private static final Bounds PANEL = rowsBounds(TITLE_ROW, REMOVE_ROW);
+    private static final Bounds CROP_PANEL = rowsBounds(TITLE_ROW, SELL_ROW);
     // The price written in the upgrade button when its width is measured: the upgrades cost 100 or 200 (DefenseConfig),
     // three digits, so "Améliorer (100)" is as wide as "Améliorer (200)", 100 px.
     private static final int UPGRADE_PRICE_SAMPLE = 100;
 
     //-------------------- FIELDS --------------------
     // The words of the shop and the names of the crops and the defenses, in the language of the game.
+    private static final int DETAIL_WIDTH = 172, LINE_HEIGHT = 18;
+    private static final int STARS = 3, STAR_SIZE = 8, WEAR_WIDTH = 60;
     private final Texts texts;
     // The two buttons of row 0 and the upgrade line, sized once by the constructor from their words.
     private final Bounds plantButton;
@@ -474,7 +479,7 @@ public class ShopWindow {
             close();
             return true;
         }
-        if (PANEL.contains(x, y)) {
+        if (CROP_PANEL.contains(x, y)) {
             return true;
         }
         close();
@@ -615,35 +620,53 @@ public class ShopWindow {
      * @param canvas where to draw
      */
     public void render(Canvas canvas) {
-        canvas.drawText(texts.plant(), PANEL_X, rowTop(0));
-        canvas.drawOutline(plantButton, OutlineColor.WHITE);
-        canvas.drawText(texts.defenses(), defenseButton.x() + 3, rowTop(0));
-        canvas.drawOutline(defenseButton, OutlineColor.WHITE);
+        render(canvas, Pointer.AWAY);
+    }
+
+    /** Draws the stall first so the awning never obscures the menu buttons. */
+    public void render(Canvas canvas, Pointer pointer) {
+        if (isOpen()) {
+            Bounds area = PANEL;
+            if (listShown()) area = LIST_AREA;
+            else if (defenseListShown) area = DEFENSE_LIST_AREA;
+            else if (currentCrop().isPresent()) area = CROP_PANEL;
+            Bounds stall = DialogFrame.around(area);
+            if (area == CROP_PANEL) {
+                // Keep the awning and side borders in place, with the base flush with the sell row.
+                stall = new Bounds(stall.x(), area.y(), stall.width(), stall.height() - DialogFrame.BORDER);
+            }
+            canvas.drawFrame(SpriteCatalog.STALL_FRAME, stall, Tint.NORMAL);
+            canvas.drawSprite("stall_awning", new Bounds(stall.x(), area.y() + area.height(), stall.width(), 16));
+            if (area == PANEL || area == CROP_PANEL) canvas.drawFrame(SpriteCatalog.PANEL_FRAME, area, Tint.NORMAL);
+        }
+        pointer.button(canvas, plantButton, texts.plant(), TextStyle.NORMAL);
+        pointer.button(canvas, defenseButton, texts.defenses(), TextStyle.NORMAL);
         if (session.getCycle().canAct()) {
             TextStyle style = canAfford(urnPrice) ? TextStyle.NORMAL : TextStyle.GREYED;
-            canvas.drawText(texts.urnOffer(), URN_BUTTON.x() + 3, URN_TOP, style);
-            canvas.drawOutline(URN_BUTTON, OutlineColor.WHITE);
+            pointer.button(canvas, URN_BUTTON, texts.urnOffer(), style);
         }
         if (listShown()) {
-            drawList(canvas);
+            drawList(canvas, pointer);
         }
         if (defenseListShown) {
-            drawDefenseList(canvas);
+            drawDefenseList(canvas, pointer);
         }
-        currentCrop().ifPresent(crop -> drawCrop(canvas, crop));
-        current().ifPresent(defense -> drawDefense(canvas, defense));
+        currentCrop().ifPresent(crop -> drawCrop(canvas, crop, pointer));
+        current().ifPresent(defense -> drawDefense(canvas, defense, pointer));
     }
 
     // One line per crop, in the order of CropType: the order of the rules (section 5).
     // By day, a white outline marks each line the player can pay as clickable; at night, no outline and every line
     // grey. A line too expensive is grey too, without outline (asked by Axel on day 9).
-    private void drawList(Canvas canvas) {
+    private void drawList(Canvas canvas, Pointer pointer) {
         boolean canBuy = session.getCycle().canAct();
         for (int line = 0; line < PLANT_LINES; line++) {
             boolean affordable = canAfford(plantPrice(line));
-            canvas.drawText(plantLabel(line), PANEL_X, rowTop(line + 1), styleOf(line, canBuy && affordable));
-            if (canBuy && affordable) {
-                canvas.drawOutline(plantLine(line), OutlineColor.WHITE);
+            CropType type = CropType.values()[line];
+            card(canvas, pointer, plantLine(line), plantLabel(line), styleOf(line, canBuy && affordable));
+            if (pointer.over(plantLine(line))) {
+                detail(canvas, type.name(), texts.name(type), plantPrice(line), texts.effect(type),
+                        styleOf(line, canBuy && affordable));
             }
         }
     }
@@ -652,7 +675,7 @@ public class ShopWindow {
     // Grey at night, grey when too expensive or, from an empty slot, when it goes on the field (canBuyHere), and grey
     // for every offer but the picked one: != compares the objects, the shop has one per kind. The outline only on the
     // offers the player can buy now.
-    private void drawDefenseList(Canvas canvas) {
+    private void drawDefenseList(Canvas canvas, Pointer pointer) {
         List<DefenseOffer> offers = session.getShop().getDefenseOffers();
         for (int line = 0; line < offers.size(); line++) {
             DefenseOffer offer = offers.get(line);
@@ -660,10 +683,34 @@ public class ShopWindow {
             boolean notThePickedOne = pendingOffer.isPresent() && pendingOffer.get() != offer;
             TextStyle style = !canBuy || notThePickedOne ? TextStyle.GREYED : TextStyle.NORMAL;
             String label = texts.name(offer.getType()) + " (" + offer.getPrice() + ")";
-            canvas.drawText(label, PANEL_X, rowTop(line + 1), style);
-            if (canBuy) {
-                canvas.drawOutline(defenseLine(line), OutlineColor.WHITE);
+            String type = offer.getType().name();
+            Bounds area = defenseLine(line);
+            card(canvas, pointer, area, label, style);
+            if (pointer.over(area)) {
+                detail(canvas, type, texts.name(offer.getType()), offer.getPrice(), texts.effect(offer.getType()), style);
             }
+        }
+    }
+
+    private static void card(Canvas canvas, Pointer pointer, Bounds area, String label, TextStyle style) {
+        canvas.drawFrame(pointer.frame("card", area, style == TextStyle.GREYED), area, Tint.NORMAL);
+        canvas.drawPlainText(label, area.x() + 3, area.y() + 16, style);
+    }
+
+    private static String icon(String type) {
+        return "icon_" + type.toLowerCase(java.util.Locale.ROOT);
+    }
+
+    /** Keep the detail panel clear of the stall. */
+    private static void detail(Canvas canvas, String type, String name, int price, List<String> effect, TextStyle style) {
+        float top = rowTop(UPGRADE_ROW);
+        float height = 32 + LINE_HEIGHT * effect.size();
+        float x = LIST_AREA.x() - 16 - DETAIL_WIDTH;
+        canvas.drawFrame(SpriteCatalog.PANEL_FRAME, new Bounds(x, top - height, DETAIL_WIDTH, height), Tint.NORMAL);
+        canvas.drawSprite(icon(type), new Bounds(x + 6, top - 25, 20, 20));
+        canvas.drawPlainText(name + " (" + price + ")", x + 30, top - 7, style);
+        for (int i = 0; i < effect.size(); i++) {
+            canvas.drawPlainText(effect.get(i), x + 6, top - 28 - LINE_HEIGHT * i, style);
         }
     }
 
@@ -672,13 +719,12 @@ public class ShopWindow {
     // the word starts, only GdxCanvas knows the font.
     // Then by day "Vendre (40)": the price is what the shop will pay, the value of its current stage. At night, no
     // button: the panel can still be read.
-    private void drawCrop(Canvas canvas, Crop crop) {
+    private void drawCrop(Canvas canvas, Crop crop, Pointer pointer) {
         Growth growth = Growth.of(crop);
         String title = texts.name(crop.getType()) + ", " + growth.label(texts);
-        canvas.drawText(title, PANEL_X, rowTop(TITLE_ROW), growth.getStyle());
+        canvas.drawPlainText(title, PANEL_X, rowTop(TITLE_ROW), growth.getStyle());
         if (session.getCycle().canAct()) {
-            canvas.drawText(texts.sell(crop.getValue()), PANEL_X, rowTop(SELL_ROW));
-            canvas.drawOutline(SELL_BUTTON, OutlineColor.WHITE);
+            pointer.button(canvas, SELL_BUTTON, texts.sell(crop.getValue()), TextStyle.NORMAL);
         }
     }
 
@@ -710,22 +756,39 @@ public class ShopWindow {
     // Third row, "Retirer", by day (showsRemove): the bramble (asked by Axel on day 10: it is not harvested, it is
     // removed, for nothing), the scarecrow and the catapatate opened from its slot (day 14, for nothing too).
     // The white outlines mark the clickable areas.
-    private void drawDefense(Canvas canvas, Defense defense) {
-        String title = texts.defenseTitle(defense.getType(), defense.getLevel(), defense.getDurability());
-        canvas.drawText(title, PANEL_X, rowTop(TITLE_ROW));
+    private void drawDefense(Canvas canvas, Defense defense, Pointer pointer) {
+        int level = defense.getLevel();
+        String title = texts.name(defense.getType()) + " " + texts.level(level);
+        float top = rowTop(TITLE_ROW);
+        canvas.drawPlainText(title, PANEL_X, top, TextStyle.NORMAL);
+        for (int i = 0; i < STARS; i++) {
+            float x = PANEL.x() + PANEL.width() - 3 - (STARS - i) * STAR_SIZE;
+            canvas.drawSprite(i < level ? "star_full" : "star_empty", new Bounds(x, top - STAR_SIZE, STAR_SIZE, STAR_SIZE));
+        }
+        float y = top - 19;
+        int wear = defense.getDurability();
+        canvas.drawSprite("wearbar_back", new Bounds(PANEL_X, y, WEAR_WIDTH, 5));
+        if (wear > 0) canvas.drawSprite("wearbar_fill_" + DefenseRenderer.wear(wear),
+                new Bounds(PANEL_X, y + 1, WEAR_WIDTH * wear / 100f, 3));
         if (!defense.canUpgrade()) {
-            canvas.drawText(texts.maxLevel(), PANEL_X, rowTop(UPGRADE_ROW));
+            canvas.drawPlainText(texts.maxLevel(), PANEL_X, rowTop(UPGRADE_ROW), TextStyle.NORMAL);
         } else if (showsUpgrade(defense)) {
             boolean affordable = canAfford(defense.getUpgradePrice());
             TextStyle style = affordable ? TextStyle.NORMAL : TextStyle.GREYED;
-            canvas.drawText(texts.upgrade(defense.getUpgradePrice()), PANEL_X, rowTop(UPGRADE_ROW), style);
-            if (affordable) {
-                canvas.drawOutline(upgradeButton, OutlineColor.WHITE);
-            }
+            pointer.button(canvas, upgradeButton, texts.upgrade(defense.getUpgradePrice()), style);
+            String base = switch (defense.getType()) {
+                case CATAPATATE -> selectedSlot.map(slot -> slot.getSide() == SlotSide.BOTTOM)
+                        .orElse(false) ? SpriteCatalog.CATAPATATE_BOTTOM : SpriteCatalog.CATAPATATE_TOP;
+                case SCARECROW -> "scarecrow";
+                case BRAMBLE -> ((Bramble) defense).spriteKey();
+            };
+            float x = PANEL.x() + PANEL.width() - 25;
+            float yPreview = rowTop(UPGRADE_ROW) - 12;
+            canvas.drawSprite("upgrade_arrow", new Bounds(x, yPreview + 2, 8, 8));
+            canvas.drawSprite(base + DefenseRenderer.material(level + 1), new Bounds(x + 9, yPreview, 12, 12));
         }
         if (showsRemove()) {
-            canvas.drawText(texts.remove(), PANEL_X, rowTop(REMOVE_ROW));
-            canvas.drawOutline(REMOVE_BUTTON, OutlineColor.WHITE);
+            pointer.button(canvas, REMOVE_BUTTON, texts.remove(), TextStyle.NORMAL);
         }
     }
 

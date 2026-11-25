@@ -32,6 +32,8 @@ import java.util.Optional;
 import java.util.Random;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 // No window: the panel draws on a RecordingCanvas and receives clicks as world points.
 // The catapatate is the test's own, on a slot outside the game: with no enemy to shoot, its durability only changes
@@ -144,7 +146,7 @@ class ShopWindowTest {
         assertTrue(drew("text Planter"));
         assertTrue(drew("text Défenses"));
         assertTrue(drewGreyed("text Acheter l'urne 377.0 24.0"));
-        assertTrue(drew("outline WHITE " + ShopWindow.URN_BUTTON));
+        assertTrue(drew("sprite button_disabled_frame " + ShopWindow.URN_BUTTON));
         assertFalse(clickTheButton());
     }
 
@@ -157,7 +159,13 @@ class ShopWindowTest {
         shop.render(canvas);
 
         assertTrue(shop.isOpen());
-        assertTrue(drew("Catapatate N1 92%"));
+        Bounds panel = new Bounds(397, ShopWindow.REMOVE_BUTTON.y(), 144, 67);
+        assertTrue(canvas.extras.contains("frame panel_frame " + panel + " NORMAL"));
+        assertTrue(canvas.extras.contains("frame stall_frame " + DialogFrame.around(panel) + " NORMAL"));
+        assertTrue(drew("text Catapatate N1 400.0 288.0"));
+        assertTrue(drew("sprite wearbar_fill_new " + new Bounds(400, 270, 60 * 92 / 100f, 3)));
+        assertTrue(drew("sprite catapatate_top_reinforced "));
+        assertEquals(1, canvas.calls.stream().filter(c -> c.startsWith("sprite star_full ")).count());
     }
 
     // By day, below level 3: the button, with the price of level 2 (100 coins).
@@ -230,7 +238,7 @@ class ShopWindowTest {
         shop.openFor(cell);
         shop.render(canvas);
 
-        assertTrue(drew("Ronce N1 100%"));
+        assertTrue(drew("text Ronce N1 400.0 288.0"));
         assertTrue(drew("Améliorer (60)"));
     }
 
@@ -314,7 +322,7 @@ class ShopWindowTest {
 
         assertTrue(drew("Citrouille 50 -> 1000"));
         assertFalse(drew("Ronce"));
-        assertFalse(drew("outline WHITE " + ShopWindow.plantLine(4)));
+        assertFalse(drew("frame " + ShopWindow.plantLine(4)));
 
         canvas.calls.clear();
         clickIn(shop.defenseButton());
@@ -561,6 +569,26 @@ class ShopWindowTest {
         assertFalse(cell.isEmpty());
         assertTrue(drew("Carotte, mûre"));
         assertTrue(drew("Vendre (40)"));
+    }
+
+    @Test
+    void cropPanelAndStallEndAtTheSellRow() {
+        Bounds sell = ShopWindow.SELL_BUTTON;
+        RecordingCanvas cropCanvas = new RecordingCanvas() {
+            @Override public void drawFrame(String key, Bounds area, Tint tint) {
+                super.drawFrame(key, area, tint);
+                if (!area.equals(ShopWindow.URN_BUTTON)) assertTrue(area.y() >= sell.y(), key + " " + area);
+            }
+        };
+        shop.handleCellClick(ripeCarrot());
+        shop.render(cropCanvas);
+
+        Bounds panel = new Bounds(sell.x(), sell.y(), sell.width(), 43);
+        assertTrue(cropCanvas.extras.contains("frame panel_frame " + panel + " NORMAL"));
+        assertTrue(cropCanvas.extras.contains("frame stall_frame " + new Bounds(393, sell.y(), 152, 47) + " NORMAL"));
+        assertTrue(cropCanvas.calls.contains("sprite stall_awning " + new Bounds(393, 291, 152, 16)));
+        assertFalse(clickIn(ShopWindow.REMOVE_BUTTON));
+        assertFalse(shop.isOpen());
     }
 
     // The panel of a crop counts as open, like the panel of a defense: GameScreen asks isOpen to know whether a click
@@ -1018,7 +1046,7 @@ class ShopWindowTest {
         shop.render(canvas);
 
         assertTrue(drewGreyed("Améliorer (100)"));
-        assertFalse(drew("outline WHITE " + shop.upgradeButton()));
+        assertTrue(drew("sprite button_disabled_frame " + shop.upgradeButton()));
     }
 
     // With the 10 000 coins, the urn turns white, with its outline.
@@ -1028,7 +1056,7 @@ class ShopWindowTest {
         shop.render(canvas);
 
         assertTrue(drewWhite("Acheter l'urne"));
-        assertTrue(drew("outline WHITE " + ShopWindow.URN_BUTTON));
+        assertTrue(drew("sprite button_frame " + ShopWindow.URN_BUTTON));
     }
 
     //-------------------- THE URN (J9, Task 8) --------------------
@@ -1285,5 +1313,101 @@ class ShopWindowTest {
         clickIn(ShopWindow.URN_BUTTON);
 
         assertEquals(List.of(Cue.UI_REFUSED), cues);
+    }
+
+    @Test
+    void hoveringAnOfferShowsItsCardAndDescription() {
+        shop.showPlantList();
+        Bounds carrot = ShopWindow.plantLine(CropType.CARROT.ordinal());
+        shop.render(canvas, new Pointer(carrot.x() + 1, carrot.y() + 1, false));
+        assertTrue(drew("sprite card_hover_frame " + carrot));
+        assertTrue(drew("sprite panel_frame "));
+        assertTrue(drew("text Pousse vite."));
+    }
+
+    @Test
+    void previewUsesTheModelRangeWithoutPlacingOrCharging() {
+        BoardLayout layout = TestLayouts.layout();
+        Bounds cell = layout.getCellBounds(2, 2);
+        Pointer pointer = new Pointer(cell.x() + 1, cell.y() + 1, false);
+        OutlineRenderer renderer = new OutlineRenderer(layout);
+        renderer.preview(canvas, pointer, offerOf(DefenseType.SCARECROW), new DefenseConfig(),
+                session.getBoard(), session.getDefenseSlots());
+        assertTrue(drew("sprite scarecrow " + cell + " GHOST"));
+        assertTrue(drew("sprite cell_hover " + cell));
+        assertEquals(5, canvas.calls.stream().filter(c -> c.startsWith("sprite range_cell ")).count());
+        assertTrue(emptyCell().isEmpty());
+        assertEquals(START, session.getWallet().getBalance());
+        carrotOn(2, 2);
+        canvas.calls.clear();
+        renderer.preview(canvas, pointer, offerOf(DefenseType.SCARECROW), new DefenseConfig(),
+                session.getBoard(), session.getDefenseSlots());
+        assertTrue(canvas.calls.isEmpty());
+    }
+
+    @ParameterizedTest
+    @EnumSource(Language.class)
+    void eachTooltipFitsBelowTheHudAtTheTopOfTheWorld(Language language) {
+        var cells = TestLayouts.cells();
+        var slots = TestLayouts.slots();
+        cells.put("r2c2", new Bounds(160, 304, 16, 16));
+        slots.put("bottom2", new Bounds(192, 304, 16, 16));
+        BoardLayout layout = new BoardLayout(cells, slots, TestLayouts.spots());
+        Pointer cell = new Pointer(168, 319, false);
+        Pointer slot = new Pointer(200, 319, false);
+        Texts texts = Texts.of(language);
+
+        tooltipFrame(layout, texts, cell, Texts.Action.PLANT);
+        tooltipFrame(layout, texts, slot, Texts.Action.BUY);
+        carrotOn(2, 2);
+        assertTrue(session.getShop().buyDefense(offerOf(DefenseType.CATAPATATE), freeSlot()));
+        tooltipFrame(layout, texts, cell, Texts.Action.HARVEST);
+        tooltipFrame(layout, texts, slot, Texts.Action.UPGRADE);
+    }
+
+    @ParameterizedTest
+    @EnumSource(Language.class)
+    void buyTooltipClearsTheBottomSlotPointer(Language language) {
+        BoardLayout layout = TestLayouts.layout();
+        Bounds slot = layout.getSlotBounds(SlotSide.BOTTOM, 2);
+        Pointer pointer = new Pointer(slot.x() + slot.width() / 2, slot.y() + slot.height() - .5f, false);
+        Bounds frame = tooltipFrame(layout, Texts.of(language), pointer, Texts.Action.BUY);
+        assertTrue(frame.y() > pointer.y(), frame.toString());
+    }
+
+    private Bounds tooltipFrame(BoardLayout layout, Texts texts, Pointer pointer, Texts.Action action) {
+        List<Bounds> frames = new ArrayList<>();
+        RecordingCanvas hovered = new RecordingCanvas() {
+            @Override public void drawFrame(String key, Bounds area, Tint tint) {
+                if (SpriteCatalog.TOOLTIP_FRAME.equals(key)) frames.add(area);
+            }
+        };
+        Tooltip tips = new Tooltip(layout, new Bounds(0, 0, 560, 320), texts);
+        tips.render(hovered, pointer, session, true, 0f);
+        tips.render(hovered, pointer, session, true, .5f);
+        assertTrue(hovered.calls.stream().anyMatch(call -> call.startsWith("text " + texts.title(action) + " ")));
+        assertEquals(1, frames.size());
+        Bounds frame = frames.get(0);
+        assertTrue(frame.y() >= 0 && frame.y() + frame.height() <= 292, frame.toString());
+        return frame;
+    }
+
+    @Test
+    void tooltipsWaitForAStationaryPointerAndResetAcrossModals() {
+        BoardLayout layout = TestLayouts.layout();
+        Tooltip tips = new Tooltip(layout, new Bounds(0, 0, 560, 320), FRENCH);
+        Bounds cell = layout.getCellBounds(2, 2);
+        Pointer p = new Pointer(cell.x(), cell.y(), false);
+        tips.render(canvas, p, session, true, 1);
+        tips.render(canvas, p, session, true, .49f);
+        assertTrue(canvas.calls.isEmpty());
+        tips.render(canvas, p, session, true, .02f);
+        assertTrue(drew("sprite tooltip_frame "));
+        assertTrue(drew("text Planter "));
+        canvas.calls.clear();
+        tips.render(canvas, new Pointer(p.x() + 1, p.y(), false), session, true, 1);
+        tips.render(canvas, p, session, false, 1);
+        tips.render(canvas, p, session, true, 1);
+        assertTrue(canvas.calls.isEmpty());
     }
 }

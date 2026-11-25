@@ -67,7 +67,8 @@ class EndSceneTest {
         scene.onGameOver(GameResult.VICTORY);
         scene.render(canvas);
 
-        assertTrue(canvas.calls.get(0).startsWith("veil "));
+        assertEquals("sprite end_victory " + new Bounds(0, 0, 560, 320), canvas.calls.get(0));
+        assertEquals(2L, canvas.extras.stream().filter(s -> s.startsWith("color ") && s.endsWith(" 0.45")).count());
         assertTrue(drew("centered VICTOIRE ! 280.0 280.0"));
         assertTrue(drew("sprite " + SpriteCatalog.FARMER_STANDING));
         assertTrue(drew("sprite " + SpriteCatalog.URN));
@@ -84,6 +85,7 @@ class EndSceneTest {
         scene.render(canvas);
 
         assertTrue(drew("centered DÉFAITE"));
+        assertEquals("sprite end_defeat " + new Bounds(0, 0, 560, 320), canvas.calls.get(0));
         assertTrue(drew("sprite " + SpriteCatalog.FARM_DESTROYED));
         assertTrue(drew("La ferme est tombée la nuit 5."));
         assertFalse(drew("sprite " + SpriteCatalog.CHMUNKS));
@@ -109,6 +111,7 @@ class EndSceneTest {
         scene.render(canvas);
 
         assertTrue(drew("centered DÉFAITE"));
+        assertEquals("sprite end_defeat " + new Bounds(0, 0, 560, 320), canvas.calls.get(0));
         assertTrue(drew("sprite " + SpriteCatalog.HENCHMAN_1));
         assertTrue(drew("sprite " + SpriteCatalog.CHMUNKS));
         assertTrue(drew("sprite " + SpriteCatalog.URN));
@@ -129,16 +132,45 @@ class EndSceneTest {
     }
 
     //-------------------- THE BUTTONS --------------------
-    // Asked by Axel: "Rejouer" and "Quitter", with their white outline.
+    // Only the button under the pointer changes its frame.
     @Test
     void theTwoButtonsAreShown() {
         scene.onGameOver(GameResult.DEFEAT_URN_SOLD);
-        scene.render(canvas);
+        RecordingCanvas rest = new ButtonCanvas();
+        scene.render(rest);
+        assertEndButtons(rest, SpriteCatalog.BUTTON_FRAME, SpriteCatalog.BUTTON_FRAME);
 
-        assertTrue(drew("centered Rejouer 220.0 60.0"));
-        assertTrue(drew("centered Quitter 340.0 60.0"));
-        assertTrue(drew("outline WHITE " + scene.getReplayButton()));
-        assertTrue(drew("outline WHITE " + scene.getQuitButton()));
+        for (boolean pressed : new boolean[]{false, true}) {
+            String active = pressed ? SpriteCatalog.BUTTON_PRESSED_FRAME : SpriteCatalog.BUTTON_HOVER_FRAME;
+            RecordingCanvas replay = new ButtonCanvas();
+            scene.render(replay, new Pointer(220, 54, pressed));
+            assertEndButtons(replay, active, SpriteCatalog.BUTTON_FRAME);
+
+            RecordingCanvas quit = new ButtonCanvas();
+            scene.render(quit, new Pointer(340, 54, pressed));
+            assertEndButtons(quit, SpriteCatalog.BUTTON_FRAME, active);
+        }
+    }
+
+    private void assertEndButtons(RecordingCanvas frame, String replayKey, String quitKey) {
+        assertButton(frame, replayKey, new Bounds(180, 44, 80, 19), "plainCentered Rejouer 220.0 60.0 NORMAL");
+        assertButton(frame, quitKey, new Bounds(300, 44, 80, 19), "plainCentered Quitter 340.0 60.0 NORMAL");
+        assertFalse(frame.calls.stream().anyMatch(call ->
+                call.startsWith("centered Rejouer ") || call.startsWith("centered Quitter ")));
+    }
+
+    private void assertButton(RecordingCanvas frame, String key, Bounds area, String label) {
+        int index = frame.extras.indexOf("frame " + key + " " + area + " NORMAL");
+        assertTrue(index >= 0);
+        assertEquals(label, frame.extras.get(index + 1));
+    }
+
+    // The shared recorder forwards plain text to drawCenteredText; keep the two calls distinct here.
+    private static final class ButtonCanvas extends RecordingCanvas {
+        @Override
+        public void drawPlainCenteredText(String text, float centerX, float y, TextStyle style) {
+            extras.add("plainCentered " + text + " " + centerX + " " + y + " " + style);
+        }
     }
 
     // Once the game is over, each button answers its choice, and a click elsewhere answers nothing.

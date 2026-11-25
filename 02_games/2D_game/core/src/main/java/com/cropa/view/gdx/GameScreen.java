@@ -21,6 +21,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Vector2;
@@ -39,17 +40,25 @@ import com.cropa.view.FarmRenderer;
 import com.cropa.view.GrowthRenderer;
 import com.cropa.view.Hud;
 import com.cropa.view.NeighbourRenderer;
+import com.cropa.view.NightCard;
 import com.cropa.view.NightRenderer;
 import com.cropa.view.OutlineRenderer;
+import com.cropa.view.Pointer;
+import com.cropa.view.Tooltip;
 import com.cropa.view.ShopWindow;
+import com.cropa.view.SpriteStyle;
 import com.cropa.text.Texts;
+import com.cropa.view.Tint;
 import com.cropa.view.TitleChoice;
 import com.cropa.view.TitleScene;
+import com.cropa.view.Transition;
 import com.cropa.view.Tutorial;
 import com.cropa.view.audio.AudioDirector;
 import com.cropa.view.audio.Cue;
 import com.cropa.view.audio.Jukebox;
 import com.cropa.view.enemy.EnemyRenderer;
+import com.cropa.view.fx.Effects;
+import com.cropa.view.world.LivingDecor;
 import com.cropa.view.world.WorldRenderer;
 import java.util.List;
 import java.util.Optional;
@@ -75,10 +84,21 @@ public class GameScreen implements Screen {
     private OrthographicCamera camera;
     private FitViewport viewport;
     private SpriteBatch batch;
+    // These programs share the batch vertex shader so geometry and animation stay in the original passes.
+    private ShaderProgram sceneryShader;
+    private ShaderProgram characterShader;
+    private boolean gradingWorld;
     private GdxCanvas canvas;
+    // The world renderers supply these bubble positions before the night pass.
+    private Bounds catBubble;
+    private Bounds neighbourBubble;
+    private Effects effects;
+    private Tooltip tooltip;
+    private final Vector2 mouse = new Vector2();
     // Kept after show(): render looks for the slot under each click in it.
     private BoardLayout layout;
     private WorldRenderer worldRenderer;
+    private LivingDecor livingDecor;
     private DefenseRenderer defenseRenderer;
     private EnemyRenderer enemyRenderer;
     private FarmRenderer farmRenderer;
@@ -92,6 +112,8 @@ public class GameScreen implements Screen {
     private Hud hud;
     private ShopWindow shopWindow;
     private EndScene endScene;
+    private NightCard nightCard;
+    private Transition transition;
     private TitleScene titleScene;
     // The story before the first day, shown after the title screen, and the one shown after a victory, before the
     // end screen.
@@ -166,17 +188,57 @@ public class GameScreen implements Screen {
         viewport = new FitViewport(560, 320, camera);
         layout = TiledLayoutReader.read(map);
         batch = new SpriteBatch();
-        canvas = new GdxCanvas(batch, camera, map);
-        worldRenderer = new WorldRenderer(layout);
+        sceneryShader = createGradeShader();
+        characterShader = createGradeShader();
+        // Defer only speech sprites so the farm and both speakers still receive the night colours.
+        canvas = new GdxCanvas(batch, camera, map) {
+            @Override
+            public void drawSprite(String key, Bounds area) {
+                switch (key) {
+                    case "cat_meow" -> catBubble = area;
+                    case "neighbour_bubble" -> neighbourBubble = area;
+                    default -> super.drawSprite(key, area);
+                }
+            }
+
+            @Override
+            public void drawAnimation(String key, Bounds area, float time, Tint tint) {
+                boolean actor = gradingWorld && isCharacter(key);
+                if (actor) {
+                    GameScreen.this.batch.setShader(characterShader);
+                }
+                super.drawAnimation(key, area, time, tint);
+                if (actor) {
+                    GameScreen.this.batch.setShader(sceneryShader);
+                }
+            }
+
+            @Override
+            public void drawSprite(String key, Bounds area, float time, SpriteStyle style) {
+                boolean actor = gradingWorld && isCharacter(key);
+                if (actor) {
+                    GameScreen.this.batch.setShader(characterShader);
+                }
+                super.drawSprite(key, area, time, style);
+                if (actor) {
+                    GameScreen.this.batch.setShader(sceneryShader);
+                }
+            }
+        };
+        effects = new Effects(new Random());
+        worldRenderer = new WorldRenderer(layout, effects);
+        livingDecor = new LivingDecor();
         Texts texts = Texts.of(config.getLanguage());
-        defenseRenderer = new DefenseRenderer(layout, texts);
-        enemyRenderer = new EnemyRenderer(layout);
-        farmRenderer = new FarmRenderer(layout, session.getFarmHealth());
+        defenseRenderer = new DefenseRenderer(layout, texts, effects);
+        defenseRenderer.deferLabels();
+        enemyRenderer = new EnemyRenderer(layout, effects);
+        farmRenderer = new FarmRenderer(layout, session.getFarmHealth(), effects);
         neighbourRenderer = new NeighbourRenderer(layout, texts);
         outlineRenderer = new OutlineRenderer(layout);
         growthRenderer = new GrowthRenderer(layout);
         Bounds world = new Bounds(0, 0, viewport.getWorldWidth(), viewport.getWorldHeight());
-        nightRenderer = new NightRenderer(world);
+        tooltip = new Tooltip(layout, world, texts);
+        nightRenderer = new NightRenderer(world, farmRenderer.windowCenter());
         hud = new Hud(viewport.getWorldHeight(), config.getStartingMoney(), session.getFarmHealth(),
                 config.getNightCount(), config.getUrnPrice(), texts);
         session.addListener(hud);
@@ -184,11 +246,19 @@ public class GameScreen implements Screen {
         tutorial = new Tutorial(world, layout, shopWindow, withTitle, texts);
         endScene = new EndScene(world, texts);
         session.addListener(endScene);
+        nightCard = new NightCard(world, layout, config.getNightCount(), texts);
+        session.addListener(nightCard);
+        transition = new Transition(world);
         titleScene = new TitleScene(world, withTitle, texts);
         intro = withTitle ? Cinematic.intro(world, texts) : new Cinematic(world, List.of(), texts);
         victory = Cinematic.victory(world, texts);
         audioDirector = new AudioDirector(session, config.getNightCount(), jukebox, new Random());
         session.addListener(audioDirector);
+    }
+
+    /** Gives renderers the effects belonging to this screen. */
+    public Effects getEffects() {
+        return effects;
     }
 
     // Called on every frame by super.render() in CropaGame; delta: seconds since the previous frame.
@@ -226,6 +296,7 @@ public class GameScreen implements Screen {
      */
     @Override
     public void render(float delta) {
+        canvas.advance(delta);
         if (Gdx.input.isKeyJustPressed(Input.Keys.F1)) {
             outlinesVisible = !outlinesVisible;
         }
@@ -234,44 +305,165 @@ public class GameScreen implements Screen {
         if (session.getNeighbour().isTalking()) {
             shopWindow.close();
         }
-        handleClick();
+        // Advance the outgoing image before a click can replace it with a fresh one.
+        if (titleScene.isVisible()) {
+            titleScene.update(delta);
+        } else if (!intro.isOver()) {
+            intro.update(delta);
+        } else if (isVictoryShown()) {
+            victory.update(delta);
+        } else if (session.isOver()) {
+            endScene.update(delta);
+        }
+        nightCard.update(delta);
+        // Remember the initial display even if the first frame consumes a click.
+        updateTransition(0f);
+        Vector2 position = viewport.unproject(mouse.set(Gdx.input.getX(), Gdx.input.getY()));
+        Pointer pointer = new Pointer(position.x, position.y, Gdx.input.isTouched());
+        handleClick(position);
+        // Keep targets that a lethal shot may remove during this update.
+        var targets = List.copyOf(session.getEnemies());
         if (!titleScene.isVisible() && intro.isOver()) {
             float gameDelta = tutorial.isOver() ? delta : 0f;
             session.update(gameDelta);
+            effects.update(gameDelta);
             audioDirector.update(gameDelta);
         }
         jukebox.update(delta);
-        worldRenderer.render(canvas, session.getBoard());
+        boolean night = session.getCycle().isNight();
+        float timeLeft = session.getCycle().getTimeLeft();
+        worldRenderer.render(canvas, session.getBoard(), night, session.getEnemies(), delta);
+        // Grade the background once, then grade incoming pixels before their normal alpha blend.
+        NightRenderer.Grade scenery = nightRenderer.renderBase(canvas, night, timeLeft, delta);
+        gradingWorld = scenery != null;
+        if (gradingWorld) {
+            canvas.endFrame();
+            configure(characterShader, nightRenderer.characterGrade());
+            configure(sceneryShader, scenery);
+            batch.setShader(sceneryShader);
+        }
         farmRenderer.render(canvas, session.getFarmHealth(), session.getFarmer(), session.getCycle().isNight(),
                 session.getCat(), delta);
-        defenseRenderer.render(canvas, session.getDefenseSlots(), delta);
+        defenseRenderer.render(canvas, session.getDefenseSlots(), targets, delta);
         enemyRenderer.render(canvas, session.getEnemies(), delta);
         neighbourRenderer.renderNeighbour(canvas, session.getNeighbour());
         canvas.drawFront();
+        livingDecor.renderDay(canvas, night, timeLeft, delta);
+        effects.renderParticles(canvas);
         shopWindow.highlightedZone()
                 .ifPresent(zone -> outlineRenderer.renderFree(canvas, zone, session.getBoard(), session.getDefenseSlots()));
-        nightRenderer.render(canvas, session.getCycle().isNight(), session.getCycle().getTimeLeft());
+        // Restore normal drawing before additive lights, speech and interface elements.
+        if (gradingWorld) {
+            batch.setShader(null);
+            gradingWorld = false;
+        }
+        nightRenderer.renderLights(canvas);
+        farmRenderer.renderWindows(canvas, session.getFarmHealth(), night, timeLeft);
+        livingDecor.renderLights(canvas, night, timeLeft);
+        // Draw this frame's speech above the world lighting and below the interface.
+        if (catBubble != null) {
+            canvas.drawSprite("cat_meow", catBubble, Tint.NORMAL);
+            catBubble = null;
+        }
+        if (neighbourBubble != null) {
+            canvas.drawSprite("neighbour_bubble", neighbourBubble, Tint.NORMAL);
+            neighbourBubble = null;
+        }
+        // The levels and health bars of the defenses, also above the lighting: they keep their colours at night.
+        defenseRenderer.renderLabels(canvas);
         growthRenderer.render(canvas, session.getBoard());
+        effects.renderTexts(canvas);
         shopWindow.shownDefense().ifPresent(defense -> outlineRenderer.renderRange(canvas, defense));
+        boolean playing = !titleScene.isVisible() && intro.isOver() && !session.isOver()
+                && tutorial.isOver() && !session.getNeighbour().isTalking();
+        if (playing && session.getCycle().canAct()) {
+            shopWindow.getPendingOffer().ifPresent(offer -> outlineRenderer.preview(canvas, pointer, offer,
+                    config.getDefenseConfig(), session.getBoard(), session.getDefenseSlots()));
+        }
         if (titleScene.isVisible()) {
-            titleScene.render(canvas);
+            titleScene.render(canvas, pointer);
         } else if (!intro.isOver()) {
             intro.render(canvas);
         } else if (isVictoryShown()) {
             victory.render(canvas);
         } else {
-            hud.render(canvas);
-            shopWindow.render(canvas);
-            tutorial.render(canvas);
-            neighbourRenderer.renderDialog(canvas, session.getNeighbour());
-            endScene.render(canvas);
+            hud.render(canvas, pointer);
+            if (!session.isOver()) {
+                nightCard.render(canvas);
+            }
+            shopWindow.render(canvas, playing ? pointer : Pointer.AWAY);
+            tutorial.render(canvas, pointer);
+            neighbourRenderer.renderDialog(canvas, session.getNeighbour(), pointer);
+            endScene.render(canvas, pointer);
         }
         if (outlinesVisible) {
             outlineRenderer.render(canvas);
         }
+        tooltip.render(canvas, pointer, session, playing && !shopWindow.isOpen(), delta);
+        // Fade the complete frame, including any debug outlines.
+        updateTransition(delta);
+        transition.render(canvas);
         canvas.endFrame();
     }
 
+    // Props, shadows and speech have their own lighting even when drawn by an actor renderer.
+    private static boolean isCharacter(String key) {
+        return key.equals("farmer") || (key.startsWith("farmer_") && !key.equals("farmer_chair"))
+                || key.equals("cat") || key.equals("cat_grooming") || key.equals("cat_fleeing")
+                || (key.startsWith("neighbour_") && !key.equals("neighbour_bubble"))
+                || key.equals("bat") || key.startsWith("bat_") || key.equals("witch") || key.startsWith("witch_")
+                || key.equals("mole") || key.startsWith("mole_");
+    }
+
+    // The affine transform commutes with alpha blending, so foreground foliage keeps its original coverage.
+    private ShaderProgram createGradeShader() {
+        String fragment = String.join(String.valueOf((char) 10),
+                "#ifdef GL_ES",
+                "precision mediump float;",
+                "#endif",
+                "varying vec4 v_color;",
+                "varying vec2 v_texCoords;",
+                "uniform sampler2D u_texture;",
+                "uniform vec3 u_scale;",
+                "uniform vec3 u_offset;",
+                "void main() {",
+                "    vec4 pixel = v_color * texture2D(u_texture, v_texCoords);",
+                "    gl_FragColor = vec4(pixel.rgb * u_scale + u_offset, pixel.a);",
+                "}",
+                "");
+        ShaderProgram shader = new ShaderProgram(batch.getShader().getVertexShaderSource(), fragment);
+        if (!shader.isCompiled()) {
+            String log = shader.getLog();
+            shader.dispose();
+            throw new IllegalStateException(log);
+        }
+        return shader;
+    }
+
+    // Upload once per program per frame while the batch is closed.
+    private static void configure(ShaderProgram shader, NightRenderer.Grade grade) {
+        shader.bind();
+        shader.setUniformf("u_scale", grade.r(), grade.g(), grade.b());
+        shader.setUniformf("u_offset", grade.addR(), grade.addG(), grade.addB());
+    }
+
+    // Use the same priority as the drawing branch, including each cinematic image.
+    private void updateTransition(float delta) {
+        Object phase;
+        int image = 0;
+        if (titleScene.isVisible()) {
+            phase = titleScene;
+        } else if (!intro.isOver()) {
+            phase = intro;
+            image = intro.imageIndex();
+        } else if (isVictoryShown()) {
+            phase = victory;
+            image = victory.imageIndex();
+        } else {
+            phase = session.isOver() ? endScene : session;
+        }
+        transition.update(phase, image, delta);
+    }
     // Called when the window size changes, and once right after show().
     // true: centres the camera on the world (280, 160); without it, the map's bottom-left corner sits in the middle.
     /**
@@ -317,6 +509,8 @@ public class GameScreen implements Screen {
     @Override
     public void dispose() {
         canvas.dispose();
+        sceneryShader.dispose();
+        characterShader.dispose();
         batch.dispose();
         map.dispose();
     }
@@ -344,12 +538,11 @@ public class GameScreen implements Screen {
     // cinematics and the buttons of the end screen click. The sound button comes before the end screen, the neighbour
     // and the tutorial, which take every other click: it works at any time of the game. Its click is heard when the
     // sound comes back, not when it is cut.
-    private void handleClick() {
+    private void handleClick(Vector2 world) {
         if (!Gdx.input.justTouched()) {
             return;
         }
         jukebox.unlock();
-        Vector2 world = viewport.unproject(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
         Optional<TitleChoice> titleChoice = titleScene.handleClick(world.x, world.y);
         if (titleChoice.isPresent()) {
             jukebox.play(Cue.UI_CLICK);

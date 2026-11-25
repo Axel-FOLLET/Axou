@@ -7,12 +7,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.cropa.model.defense.DefenseOffer;
 import com.cropa.model.defense.DefenseType;
+import com.cropa.model.game.GameConfig;
+import com.cropa.model.game.GameSession;
 import com.cropa.model.world.CropConfig;
 import com.cropa.model.world.CropType;
 import com.cropa.text.Language;
 import com.cropa.text.Texts;
 import java.util.List;
+import java.util.Locale;
+import java.util.Random;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -95,7 +100,18 @@ class TextsLayoutTest {
     @ParameterizedTest
     @EnumSource(Language.class)
     void theHudLineFitsLeftOfTheShop(Language language) {
-        fits(Texts.of(language).status(MAX_MONEY, 200, true, 10, 60), HUD_LINE);
+        Texts words = Texts.of(language);
+        String status = words.status(MAX_MONEY, 200, true, 10, 60);
+        fits(status, HUD_LINE);
+        assertEquals(status, String.join("   ", words.statusParts(MAX_MONEY, 200, true, 10, 60)));
+        Hud hud = new Hud(320, MAX_MONEY, 200, 10, MAX_MONEY, words);
+        hud.onNightStarted(10);
+        hud.onTimerChanged(60);
+        hud.render(new RecordingCanvas() {
+            @Override public void drawFrame(String key, Bounds area, Tint tint) {
+                if (key.equals("hud_frame")) assertTrue(area.x() + area.width() <= 397);
+            }
+        });
     }
 
     // The bubbles of the tutorial: 3 lines at most, each one inside the frame.
@@ -160,5 +176,56 @@ class TextsLayoutTest {
     // TextWidth also refuses a character out of the font: every text checked here can be drawn.
     private static void fits(String text, float width) {
         assertTrue(TextWidth.of(text) <= width, text + " is " + TextWidth.of(text) + " px wide, more than " + width);
+    }
+
+    @ParameterizedTest
+    @EnumSource(Language.class)
+    void descriptionsAndHintsFitAtNormalSize(Language language) {
+        Texts texts = Texts.of(language);
+        for (CropType crop : CropType.values()) texts.effect(crop).forEach(line -> fits(line, 160));
+        for (DefenseType defense : DefenseType.values()) texts.effect(defense).forEach(line -> fits(line, 160));
+        for (Texts.Action action : Texts.Action.values()) {
+            fits(texts.title(action), 160);
+            texts.hint(action).forEach(line -> fits(line, Tooltip.WORDS));
+        }
+    }
+
+    @ParameterizedTest
+    @EnumSource(Language.class)
+    void offersShowTheirLabelInTheRowAndTheirIconInTheDetailCard(Language language) {
+        Texts texts = Texts.of(language);
+        GameConfig config = new GameConfig();
+        GameSession session = new GameSession(config, new Random(0));
+        CropConfig crops = config.getCropConfig();
+        ShopWindow shop = new ShopWindow(session, config.getUrnPrice(), crops, texts, cue -> { });
+        RecordingCanvas canvas = new RecordingCanvas();
+        shop.handleClick(shop.plantButton().x() + 1, shop.plantButton().y() + 1);
+        shop.render(canvas);
+        for (CropType crop : CropType.values()) {
+            String label = texts.name(crop) + " " + crops.getSeedPrice(crop) + " -> "
+                    + crops.getValue(crop, crops.getStageCount(crop) - 1);
+            assertOffer(shop, canvas, ShopWindow.plantLine(crop.ordinal()), crop.name(), label);
+        }
+        shop.handleClick(shop.defenseButton().x() + 1, shop.defenseButton().y() + 1);
+        shop.render(canvas);
+        List<DefenseOffer> offers = session.getShop().getDefenseOffers();
+        for (int i = 0; i < offers.size(); i++) {
+            DefenseOffer offer = offers.get(i);
+            String label = texts.name(offer.getType()) + " (" + offer.getPrice() + ")";
+            assertOffer(shop, canvas, ShopWindow.defenseLine(i), offer.getType().name(), label);
+        }
+    }
+
+    private static void assertOffer(ShopWindow shop, RecordingCanvas canvas, Bounds row, String type, String label) {
+        String call = "plain " + label + " " + (row.x() + 3) + " " + (row.y() + 16) + " ";
+        assertTrue(canvas.extras.stream().anyMatch(line -> line.startsWith(call)), label);
+        assertTrue(canvas.calls.stream().noneMatch(line -> line.startsWith("sprite icon_")));
+        fits(label, PANEL_WORDS);
+
+        RecordingCanvas hovered = new RecordingCanvas();
+        shop.render(hovered, new Pointer(row.x() + 1, row.y() + 1, false));
+        Bounds detailIcon = new Bounds(215, 239, 20, 20);
+        assertEquals(List.of("sprite icon_" + type.toLowerCase(Locale.ROOT) + " " + detailIcon),
+                hovered.calls.stream().filter(line -> line.startsWith("sprite icon_")).toList());
     }
 }

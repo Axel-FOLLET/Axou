@@ -34,13 +34,13 @@ public class Hud implements GameListener {
     // shown; Axel's choice (14/11): keep the dawn and remove the alert.
     // The warning (asked by Axel): two lines in one block, at half the size of the HUD text. The game is settled at
     // the next dawn: nothing can be sold after it.
-    // The urn gauge (asked by Axel on day 10: the urn was not visible enough). On the second line, right of the
-    // buttons (the red one ends at x 155), left of the shop (x 397): "Urne : 10 000 / 10 000" is about 136 px wide.
-    // The bar is under its text, as wide as it, between the second and the third line.
+    // The gauge shares the second row with the night button, whose right edge is at most x 155.
     private static final float GAUGE_X = 180f;
-    private static final float GAUGE_WIDTH = 136f;
-    private static final float GAUGE_HEIGHT = 5f;
-    private static final float GAUGE_BAR_DROP = 22f;
+    private static final int ICON = 10, HEALTH_WIDTH = 24, BAR_HEIGHT = 6;
+    private static final int ICON_GAP = 1, GROUP_GAP = 5, BAR_GAP = 3;
+    private static final int SHOP_GAP = 4;
+    private static final int BORDER = 4, SHOP_LEFT = 397, URN_STEPS = 10;
+    private final int fullHealth;
     // The sound button (asked by Axel on 20/11, for the version of the website), in the bottom right corner: its right
     // edge where the outlines of the shop end (x 541), on the line of the urn (its words at y 24, like ShopWindow's
     // URN_TOP). The urn button stands just left of it, by day. "Son : non" is 62 px wide like "Sound off", so its
@@ -73,7 +73,7 @@ public class Hud implements GameListener {
     private int secondsLeft;
     // Rebuilt only when a value changes: render runs on every frame and would otherwise build a new String each time.
     // The same for the words of the urn gauge.
-    private String text;
+    private java.util.List<String> parts;
     private String gaugeText;
     // The end of the game, in words. Empty while the game goes on.
     private Optional<String> ending = Optional.empty();
@@ -102,6 +102,7 @@ public class Hud implements GameListener {
         this.urnPrice = urnPrice;
         this.money = money;
         this.farmHealth = farmHealth;
+        this.fullHealth = Math.max(1, farmHealth);
         number = START_DAY;
         nightButton = new Bounds(MARGIN - 3, secondRowTop() - 16, TextWidth.of(texts.startNight()) + 6, 19);
         lastNightButton = new Bounds(MARGIN - 3, secondRowTop() - 16, TextWidth.of(texts.startLastNight()) + 6, 19);
@@ -266,7 +267,12 @@ public class Hud implements GameListener {
      * @param canvas where to draw
      */
     public void render(Canvas canvas) {
-        canvas.drawText(text, MARGIN, worldTop - MARGIN);
+        render(canvas, Pointer.AWAY);
+    }
+
+    /** Draws the controls at the current world-space pointer. */
+    public void render(Canvas canvas, Pointer pointer) {
+        drawStatus(canvas);
         if (ending.isPresent()) {
             canvas.drawText(ending.get(), MARGIN, secondRowTop());
         } else {
@@ -275,31 +281,62 @@ public class Hud implements GameListener {
         if (buttonShown()) {
             if (lastSaleDay()) {
                 TextStyle style = nightLocked ? TextStyle.GREYED : TextStyle.ALERT;
-                canvas.drawText(texts.startLastNight(), MARGIN, secondRowTop(), style);
+                pointer.button(canvas, button(), texts.startLastNight(), style);
                 canvas.drawNote(texts.lastSaleWarning(), MARGIN, alertTop(), TextStyle.ALERT);
             } else {
-                canvas.drawText(texts.startNight(), MARGIN, secondRowTop(),
+                pointer.button(canvas, button(), texts.startNight(),
                         nightLocked ? TextStyle.GREYED : TextStyle.NORMAL);
             }
-            canvas.drawOutline(button(), OutlineColor.WHITE);
         }
         alert().ifPresent(words -> canvas.drawText(words, MARGIN, alertTop(), TextStyle.ALERT));
         Bounds sound = soundButton();
-        canvas.drawText(texts.sound(muted), sound.x() + 3, SOUND_TOP);
-        canvas.drawOutline(sound, OutlineColor.WHITE);
+        pointer.button(canvas, sound, texts.sound(muted), TextStyle.NORMAL);
     }
 
-    // The words, then the bar under them: filled in green (the color of a ripe crop, drawDot) by the share of the
-    // price already earned, then its white outline over it. Full, and no more, once the money reaches the price.
-    // Nothing filled at 0 coins: a rectangle 0 px wide would draw nothing anyway.
-    private void drawUrnGauge(Canvas canvas) {
-        canvas.drawText(gaugeText, GAUGE_X, secondRowTop());
-        Bounds bar = new Bounds(GAUGE_X, secondRowTop() - GAUGE_BAR_DROP, GAUGE_WIDTH, GAUGE_HEIGHT);
-        float share = Math.min(1f, (float) money / urnPrice);
-        if (share > 0) {
-            canvas.drawDot(new Bounds(bar.x(), bar.y(), bar.width() * share, bar.height()), TextStyle.RIPE);
+    /** Keep even the longest normal status left of the shop. For a larger balance the bar sits under HP. */
+    private void drawStatus(Canvas canvas) {
+        float top = worldTop - MARGIN;
+        float x = BORDER;
+        int words = parts.stream().mapToInt(TextWidth::of).sum();
+        int inlineGap = BAR_GAP + HEALTH_WIDTH + BAR_GAP;
+        int baseWidth = 2 * BORDER + words + 3 * (ICON + ICON_GAP) + 2 * GROUP_GAP;
+        boolean under = baseWidth + inlineGap > SHOP_LEFT - SHOP_GAP;
+        int healthGap = under ? GROUP_GAP : inlineGap;
+        int width = baseWidth + healthGap;
+        Bounds frame = new Bounds(0, top - (under ? 20 : 16), width, under ? 24 : 20);
+        canvas.drawFrame(SpriteCatalog.HUD_FRAME, frame, Tint.NORMAL);
+        for (int i = 0; i < parts.size(); i++) {
+            if (i < 3) {
+                String icon = i == 0 ? "icon_coin" : i == 1 ? "icon_heart" : night ? "dial_night" : "dial_day";
+                canvas.drawSprite(icon, new Bounds(x, top - ICON, ICON, ICON));
+                x += ICON + ICON_GAP;
+            }
+            float start = x;
+            canvas.drawPlainText(parts.get(i), x, top, TextStyle.NORMAL);
+            x += TextWidth.of(parts.get(i));
+            if (i == 0 || i == 2) x += GROUP_GAP;
+            if (i == 1) {
+                float barX = under ? start : x + BAR_GAP;
+                float barY = top - (under ? 18 : 9);
+                canvas.drawSprite("lifebar_back", new Bounds(barX, barY, HEALTH_WIDTH, BAR_HEIGHT));
+                float fill = (HEALTH_WIDTH - 2) * Math.min(1f, (float) farmHealth / fullHealth);
+                if (fill > 0) canvas.drawSprite("lifebar_fill", new Bounds(barX + 1, barY + 1, fill, BAR_HEIGHT - 2));
+                x += healthGap;
+            }
         }
-        canvas.drawOutline(bar, OutlineColor.WHITE);
+    }
+
+    /** Use the atlas index as an explicit one-second animation time. */
+    private void drawUrnGauge(Canvas canvas) {
+        float top = secondRowTop();
+        Bounds urn = new Bounds(GAUGE_X + TextWidth.of(gaugeText) + BORDER, top - 20, 16, 20);
+        float left = GAUGE_X - BORDER;
+        Bounds frame = new Bounds(left, urn.y() - BORDER, urn.x() + urn.width() + BORDER - left,
+                urn.height() + 2 * BORDER);
+        canvas.drawFrame(SpriteCatalog.HUD_FRAME, frame, Tint.NORMAL);
+        canvas.drawPlainText(gaugeText, GAUGE_X, top, TextStyle.NORMAL);
+        float share = Math.max(0f, Math.min(1f, (float) money / urnPrice));
+        canvas.drawAnimation("urn_gauge", urn, (int) (share * URN_STEPS), Tint.NORMAL);
     }
 
     //-------------------- TEXT --------------------
@@ -307,7 +344,7 @@ public class Hud implements GameListener {
     // thousands of the gauge are apart as its players read them ("3 450" in French, "3,450" in English).
     // The timer changes about once per second: the text is rebuilt once per second, not on every frame.
     private void refreshText() {
-        text = texts.status(money, farmHealth, night, number, secondsLeft);
+        parts = texts.statusParts(money, farmHealth, night, number, secondsLeft);
         gaugeText = texts.urnGauge(money, urnPrice);
     }
 

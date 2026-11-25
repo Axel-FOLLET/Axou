@@ -10,10 +10,93 @@ dependencies {
   implementation project(':core')
 }
 
+def assetsRoot = rootProject.file('assets')
+def webAssets = layout.buildDirectory.dir('webassets')
+def catalogFile = rootProject.file('core/src/main/java/com/cropa/view/SpriteCatalog.java')
+def looseSprites = rootProject.file('tools/atlas/loose.txt')
+def pack = tasks.register('packSpriteAtlas', Exec) {
+  workingDir rootProject.projectDir
+  commandLine 'python3', 'tools/atlas/build_atlas.py'
+  inputs.files catalogFile, rootProject.file('tools/atlas/build_atlas.py'), rootProject.file('tools/art/pngio.py')
+  inputs.file looseSprites
+  inputs.files rootProject.fileTree('assets') { include '**/*.png'; exclude 'atlas/**' }
+  outputs.dir rootProject.file('assets/atlas')
+}
+
+// A collection tileset can refer to an image anywhere under assets, relative to the TSX.
+def tileImages = [] as Set
+def parser = javax.xml.parsers.DocumentBuilderFactory.newInstance().newDocumentBuilder()
+rootProject.fileTree('assets/maps') { include '**/*.tsx' }.each { tsx ->
+  def images = parser.parse(tsx).getElementsByTagName('image')
+  for (int i = 0; i < images.length; i++) {
+    def image = new File(tsx.parentFile, images.item(i).getAttribute('source')).canonicalFile
+    tileImages.add(assetsRoot.toPath().relativize(image.toPath()).toString().replace(File.separator, '/'))
+  }
+}
+
+// These catalogue frames are loaded through GdxCanvas. Keep every Tiled image by path.
+def atlasMapImages = [
+  'field_furrows', 'gate_open', 'decor/cloud_shadow', 'decor/firefly'
+] as Set
+['decor/butterfly', 'decor/butterfly_blue', 'tileset_grass_spring_33'].each { stem ->
+  atlasMapImages.addAll([stem, "${stem}-1", "${stem}-2", "${stem}-3"]*.toString())
+}
+atlasMapImages.addAll(['decor/farm_splinter', 'decor/farm_splinter-1', 'decor/farm_splinter-2'])
+def atlasMapPaths = atlasMapImages.collect { "maps/assets/${it}.png".toString() } as Set
+
+def stagedAssets = layout.buildDirectory.dir('stagedWebAssets')
+def stage = tasks.register('stageWebAssets', Sync) {
+  dependsOn pack
+  from(assetsRoot) {
+    include 'atlas/**', 'maps/**', 'sounds/**', 'cinematics/**', 'fonts/**'
+    include 'farmer/east-farmer-rocking-chair*.png'
+    include looseSprites.readLines('UTF-8').collect { it.tokenize()[1] }
+    include tileImages
+    exclude { file -> file.path in atlasMapPaths && !(file.path in tileImages) }
+  }
+  into stagedAssets
+  includeEmptyDirs = false
+}
+
+// Separate Sync destinations let Gradle track the source copy and the optimized copy independently.
+def optimize = tasks.register('optimizeWebPngs', Sync) {
+  dependsOn stage
+  from stagedAssets
+  into webAssets
+  includeEmptyDirs = false
+  inputs.files rootProject.file('tools/art/optimize_web_pngs.py'), rootProject.file('tools/art/pngio.py')
+  inputs.file rootProject.file('tools/art/subset_fonts.py')
+  inputs.dir rootProject.file('core/src/main/java')
+  doLast {
+    providers.exec {
+      workingDir rootProject.projectDir
+      commandLine 'python3', 'tools/art/optimize_web_pngs.py', webAssets.get().asFile.absolutePath
+    }.result.get()
+    providers.exec {
+      workingDir rootProject.projectDir
+      commandLine 'python3', 'tools/art/subset_fonts.py',
+          rootProject.file('assets/fonts').absolutePath,
+          rootProject.file('core/src/main/java').absolutePath,
+          webAssets.get().dir('fonts').asFile.absolutePath
+    }.result.get()
+  }
+}
+
+// The plugin's web build depends on generateJavaScript, where it creates the embedded manifest.
+tasks.matching { it.name == 'generateJavaScript' }.configureEach {
+  dependsOn optimize
+  inputs.dir webAssets
+}
+
 gdxTeaVM {
-  assets('../assets')
+  // The game and its web preloader load assets directly and need no default reflection metadata.
+  reflectionDefaults = false
+  assets(webAssets)
   js {
     mainClass = 'com.cropa.teavm.TeaVMLauncher'
     htmlTitle = 'Cropa'
+    // stageWebAssets supplies the rocking chair, including its first frame.
+    logoPath = 'farmer/east-farmer-rocking-chair.png'
+    copyLoadingAsset = false
   }
 }

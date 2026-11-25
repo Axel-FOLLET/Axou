@@ -10,6 +10,7 @@ import java.util.Random;
 
 // The mole (rules §8, §10): it eats a crop at random, 3 s, visible and attackable, then waits 11 s underground,
 // where nothing can touch it. 2 meals at most (3 before day 10), then it leaves.
+// Once underground, it leaves at once if there is nothing left to eat.
 // It ignores the farm and does not eat the bramble.
 // extends Enemy, not LaneEnemy: it follows no row and never hits the farm, so it walks nowhere.
 // The Random is given by whoever creates the mole: a test gives new Random(1), so the draws are always the same.
@@ -65,7 +66,7 @@ public class Mole extends Enemy {
     //-------------------- ACTIONS --------------------
     // Nothing once dead, fled, or for a delta that is not positive: a mole killed during its meal stops here,
     // so the crop stays.
-    // The timer goes down; while it is above 0, nothing else happens. At 0, one step: start or end a meal.
+    // A meal lasts until its timer runs out. Underground, the wait ends early if the food is gone.
     // One step per frame, the time beyond 0 is not carried over: at about 60 frames per second, the difference
     // is invisible, and it is the rhythm the landmarks of the day sheet rely on.
     /**
@@ -80,6 +81,9 @@ public class Mole extends Enemy {
         }
         timer -= delta;
         if (timer > 0) {
+            if (!eating && edibleCells().isEmpty()) {
+                flee();
+            }
             return;
         }
         if (eating) {
@@ -90,12 +94,13 @@ public class Mole extends Enemy {
     }
 
     // Looks for the cells whose occupant a mole eats, and picks one at random.
-    // Nothing to eat: no meal, the timer stays at 0 or below, so it tries again at the next frame.
+    // If none is edible, the mole leaves at once.
     // On its cell, the mole stands in the middle of the column: column + 3 - 0.5 cells left. Catapatate finds the
     // column with ceil(cellsToFarm) - 3, so it aims at the right cell.
     private void startMeal() {
         List<Cell> edibleCells = edibleCells();
         if (edibleCells.isEmpty()) {
+            flee();
             return;
         }
         mealCell = edibleCells.get(random.nextInt(edibleCells.size()));
@@ -126,7 +131,7 @@ public class Mole extends Enemy {
         meal = null;
         eating = false;
         meals++;
-        if (meals >= maxMeals) {
+        if (meals >= maxMeals || edibleCells().isEmpty()) {
             flee();
         } else {
             timer = waitDuration;

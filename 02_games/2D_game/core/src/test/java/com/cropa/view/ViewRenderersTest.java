@@ -75,14 +75,17 @@ class ViewRenderersTest {
     void hudShowsTheValuesItReceives() {
         RecordingCanvas canvas = new RecordingCanvas();
         new Hud(320, 150, 70, 8, 10000, FRENCH).render(canvas);
-        assertEquals(List.of("text Argent : 150   PV ferme : 70   Jour : 1   Temps : 0 s 8.0 312.0",
+        assertEquals(List.of("sprite hud_frame " + new Bounds(0, 296, 372, 20),
+                "sprite icon_coin " + new Bounds(4, 302, 10, 10), "text Argent : 150 15.0 312.0",
+                "sprite icon_heart " + new Bounds(98, 302, 10, 10), "text PV ferme : 70 109.0 312.0",
+                "sprite lifebar_back " + new Bounds(201, 303, 24, 6),
+                "sprite lifebar_fill " + new Bounds(202, 304, 22, 4),
+                "sprite dial_day " + new Bounds(228, 302, 10, 10), "text Jour : 1 239.0 312.0",
+                "text Temps : 0 s 292.0 312.0", "sprite hud_frame " + new Bounds(176, 264, 151, 28),
                 "text Urne : 150 / 10 000 180.0 288.0",
-                "dot " + new Bounds(180, 266, 136f * (150f / 10000), 5) + " RIPE",
-                "outline WHITE " + new Bounds(180, 266, 136, 5),
-                "text Lancer la nuit 8.0 288.0",
-                "outline WHITE Bounds[x=5.0, y=272.0, width=93.0, height=19.0]",
-                "text Son : oui 481.0 24.0",
-                "outline WHITE " + new Bounds(478, 8, 63, 19)), canvas.calls);
+                "sprite urn_gauge " + new Bounds(307, 268, 16, 20),
+                "sprite button_frame " + new Bounds(5, 272, 93, 19), "text Lancer la nuit 8.0 288.0",
+                "sprite button_frame " + new Bounds(478, 8, 63, 19), "text Son : oui 481.0 24.0"), canvas.calls);
     }
 
     // Without this test, an on... method could forget to rebuild the text and the old value would stay on screen.
@@ -95,7 +98,9 @@ class ViewRenderersTest {
         hud.onDayStarted(2);
         hud.onTimerChanged(30);
         hud.render(canvas);
-        assertTrue(canvas.calls.get(0).contains("Argent : 90   PV ferme : 85   Jour : 2   Temps : 30 s"));
+        for (String part : List.of("Argent : 90", "PV ferme : 85", "Jour : 2", "Temps : 30 s")) {
+            assertTrue(canvas.calls.stream().anyMatch(c -> c.startsWith("text " + part + " ")));
+        }
     }
 
     // Day 3 and night 3 share the number 3: without this test, a night could be shown as "Jour : 3".
@@ -105,7 +110,7 @@ class ViewRenderersTest {
         Hud hud = new Hud(320, 200, 100, 8, 10000, FRENCH);
         hud.onNightStarted(3);
         hud.render(canvas);
-        assertTrue(canvas.calls.get(0).contains("Nuit : 3"));
+        assertTrue(canvas.calls.stream().anyMatch(c -> c.startsWith("text Nuit : 3 ")));
     }
 
     // The reference point of the sheet: the first frame sends everything. The HUD starts with 0 health on purpose:
@@ -118,8 +123,9 @@ class ViewRenderersTest {
         session.addListener(hud);
         session.update(0f);
         hud.render(canvas);
-        String expected = "PV ferme : " + session.getFarmHealth() + "   Jour : 1   Temps : 60 s";
-        assertTrue(canvas.calls.get(0).contains(expected));
+        for (String part : List.of("PV ferme : " + session.getFarmHealth(), "Jour : 1", "Temps : 60 s")) {
+            assertTrue(canvas.calls.stream().anyMatch(c -> c.startsWith("text " + part + " ")));
+        }
     }
 
     //-------------------- FARM --------------------
@@ -132,13 +138,15 @@ class ViewRenderersTest {
     void farmRendererPlacesTheSixSprites() {
         RecordingCanvas canvas = new RecordingCanvas();
         new FarmRenderer(TestLayouts.layout(), 100).render(canvas, 100, dayFarmer(), false, sittingCat(), 0f);
-        assertEquals(6, canvas.calls.size());
+        assertEquals(8, canvas.calls.size());
         assertTrue(canvas.calls.get(0).startsWith("sprite farm Bounds[x=30.0"));
-        assertEquals("sprite farmer " + new Bounds(120, 152, 32, 32), canvas.calls.get(1));
-        assertEquals("sprite cat " + new Bounds(114, 186, 12, 12), canvas.calls.get(2));
-        assertEquals("sprite pickup " + new Bounds(-54, 132 - 48f * 11 / 64, 48, 48), canvas.calls.get(3));
-        assertEquals("sprite cypress " + new Bounds(-82, 114, 56, 56), canvas.calls.get(4));
-        assertEquals("sprite cypress " + new Bounds(-34, 114, 56, 56), canvas.calls.get(5));
+        assertTrue(canvas.calls.get(1).startsWith("sprite shadow "));
+        assertEquals("sprite farmer " + new Bounds(120, 152, 32, 32), canvas.calls.get(2));
+        assertTrue(canvas.calls.get(3).startsWith("sprite shadow "));
+        assertEquals("sprite cat " + new Bounds(114, 186, 12, 12), canvas.calls.get(4));
+        assertEquals("sprite pickup " + new Bounds(-54, 132 - 48f * 11 / 64, 48, 48), canvas.calls.get(5));
+        assertEquals("sprite cypress " + new Bounds(-82, 114, 56, 56), canvas.calls.get(6));
+        assertEquals("sprite cypress " + new Bounds(-34, 114, 56, 56), canvas.calls.get(7));
     }
 
     // 100 then 95 PV: the farm turns red, the farmer and the cat do not.
@@ -150,28 +158,85 @@ class ViewRenderersTest {
         RecordingCanvas canvas = new RecordingCanvas();
         renderer.render(canvas, 95, dayFarmer(), false, sittingCat(), 0.016f);
         assertTrue(canvas.calls.get(0).endsWith(" HURT"));
-        assertTrue(canvas.calls.get(1).startsWith("sprite farmer") && !canvas.calls.get(1).endsWith(" HURT"));
+        assertTrue(canvas.calls.get(2).startsWith("sprite farmer") && !canvas.calls.get(2).endsWith(" HURT"));
     }
 
-    // Asked by Axel on day 14: the image of the farm follows its health, out of 100 at the start. Intact above half
-    // (51), half destroyed at half (50) and down to 1, destroyed at 0. Same place for the three images.
-    // Without this test, the threshold could move by one point, or the destroyed farm never show.
+    // Both sides of every fifth, including the last surviving hit point.
     @Test
     void farmImageFollowsItsHealth() {
         FarmRenderer renderer = new FarmRenderer(TestLayouts.layout(), 100);
-        assertTrue(firstCallAt(renderer, 51).startsWith("sprite farm Bounds[x=30.0"));
-        assertTrue(firstCallAt(renderer, 50).startsWith("sprite farm_half_destroyed Bounds[x=30.0"));
-        assertTrue(firstCallAt(renderer, 1).startsWith("sprite farm_half_destroyed "));
-        assertTrue(firstCallAt(renderer, 0).startsWith("sprite farm_destroyed Bounds[x=30.0"));
+        checkBands(renderer, new int[] {0, 1, 20, 21, 40, 41, 60, 61, 80, 81});
     }
 
-    // An odd full health: half of 151 is 75.5, so 76 is still intact and 75 is half destroyed.
-    // Without this test, an integer division (151 / 2 = 75) would put 75 on the wrong side.
+    // Fractional boundaries stay between adjacent integer health values.
     @Test
     void farmHalfThresholdWithAnOddFullHealth() {
         FarmRenderer renderer = new FarmRenderer(TestLayouts.layout(), 151);
-        assertTrue(firstCallAt(renderer, 76).startsWith("sprite farm "));
-        assertTrue(firstCallAt(renderer, 75).startsWith("sprite farm_half_destroyed "));
+        checkBands(renderer, new int[] {0, 1, 30, 31, 60, 61, 90, 91, 120, 121});
+    }
+
+    private void checkBands(FarmRenderer renderer, int[] health) {
+        String[] keys = {"farm_destroyed", "farm_flames", "farm_flames", "farm_smoke", "farm_smoke",
+                "farm_half_destroyed", "farm_half_destroyed", "farm_broken_windows", "farm_broken_windows", "farm"};
+        for (int i = 0; i < keys.length; i++) {
+            assertTrue(firstCallAt(renderer, health[i]).startsWith("sprite " + keys[i] + " Bounds[x=30.0"));
+        }
+    }
+
+    @Test
+    void windowsFollowNightAndSurvivingWalls() {
+        FarmRenderer renderer = new FarmRenderer(TestLayouts.layout(), 100);
+        RecordingCanvas canvas = new RecordingCanvas();
+        renderer.render(canvas, 100, dayFarmer(), true, sittingCat(), 1f);
+        renderer.renderWindows(canvas, 100, false, 5f);
+        renderer.renderWindows(canvas, 0, true, 5f);
+        assertTrue(canvas.extras.isEmpty());
+        renderer.renderWindows(canvas, 81, true, 5f);
+        renderer.renderWindows(canvas, 80, true, .5f);
+        assertTrue(canvas.extras.get(0).startsWith("light farm_light "));
+        assertTrue(canvas.extras.get(1).startsWith("light farm_light_broken "));
+        assertTrue(canvas.extras.get(1).endsWith(" 0.5"));
+    }
+
+    @Test
+    void onlyAHealthDropStartsDebrisAndShake() {
+        var effects = new com.cropa.view.fx.Effects(new java.util.Random(1));
+        FarmRenderer renderer = new FarmRenderer(TestLayouts.layout(), 100, effects);
+        RecordingCanvas canvas = new RecordingCanvas();
+        int previous = 80;
+        for (int hp : new int[] {80, 80, 90, 70, 70}) {
+            canvas.extras.clear();
+            renderer.render(canvas, hp, dayFarmer(), false, sittingCat(), 1f);
+            // The text pass delivers the pending shake to the canvas and consumes it.
+            effects.renderTexts(canvas);
+            String smallShake = "shake " + com.cropa.view.fx.Effects.SMALL_SHAKE;
+            assertEquals(hp < previous ? List.of(smallShake) : List.of(),
+                    canvas.extras.stream().filter(call -> call.startsWith("shake ")).toList());
+            assertEquals(hp < previous ? 5 : 0,
+                    canvas.extras.stream().filter(call -> call.startsWith("particle farm_splinter ")).count());
+            previous = hp;
+        }
+    }
+
+    @Test
+    void damageTextShowsOnlyTheHealthLost() {
+        var effects = new com.cropa.view.fx.Effects(new java.util.Random(1));
+        FarmRenderer renderer = new FarmRenderer(TestLayouts.layout(), 100, effects);
+        RecordingCanvas canvas = new RecordingCanvas();
+        int previous = 100;
+        for (int health : new int[] {100, 90, 90, 100}) {
+            effects.update(1f);
+            canvas.extras.clear();
+            renderer.render(canvas, health, dayFarmer(), false, sittingCat(), 1f);
+            effects.renderTexts(canvas);
+            var texts = canvas.extras.stream().filter(call -> call.startsWith("float ")).toList();
+            assertEquals(health < previous ? 1 : 0, texts.size());
+            if (health < previous) {
+                assertTrue(texts.get(0).startsWith("float 10 "));
+                assertTrue(texts.get(0).endsWith(" ALERT"));
+            }
+            previous = health;
+        }
     }
 
     // One frame drawn with the given health, after 1 s without change: the red of a hit is over, only the image is left.
@@ -193,8 +258,8 @@ class ViewRenderersTest {
 
         new FarmRenderer(TestLayouts.layout(), 100).render(canvas, 100, dayFarmer(), false, cat, 0f);
 
-        assertEquals(6, canvas.calls.size());
-        assertEquals("sprite cat_fleeing " + new Bounds(114, 186, 12, 12), canvas.calls.get(2));
+        assertEquals(8, canvas.calls.size());
+        assertEquals("sprite cat_fleeing " + new Bounds(114, 186, 12, 12), canvas.calls.get(4));
     }
 
     // Meowing: the sitting cat, then its MEOW bubble right after it, 30 px wide, centred on the cat's x (120), its
@@ -214,9 +279,9 @@ class ViewRenderersTest {
 
         new FarmRenderer(TestLayouts.layout(), 100).render(canvas, 100, dayFarmer(), false, cat, 0f);
 
-        assertEquals(7, canvas.calls.size());
-        assertEquals("sprite cat " + new Bounds(114, 186, 12, 12), canvas.calls.get(2));
-        assertEquals("sprite cat_meow " + new Bounds(105, 187, 30, 30), canvas.calls.get(3));
+        assertEquals(9, canvas.calls.size());
+        assertEquals("sprite cat " + new Bounds(114, 186, 12, 12), canvas.calls.get(4));
+        assertEquals("sprite cat_meow " + new Bounds(105, 187, 30, 30), canvas.calls.get(5));
     }
 
     // Old Garry (day 14, feedback of the mid-term jury): by day in his rocking chair ("farmer"); at night, standing,
@@ -233,7 +298,7 @@ class ViewRenderersTest {
 
         new FarmRenderer(TestLayouts.layout(), 100).render(canvas, 100, farmer, false, sittingCat(), 0f);
 
-        assertEquals("sprite farmer " + GARRY, canvas.calls.get(1));
+        assertEquals("sprite farmer " + GARRY, canvas.calls.get(2));
     }
 
     @Test
@@ -242,7 +307,8 @@ class ViewRenderersTest {
 
         new FarmRenderer(TestLayouts.layout(), 100).render(canvas, 100, dayFarmer(), true, sittingCat(), 0f);
 
-        assertEquals("sprite farmer_east " + GARRY, canvas.calls.get(1));
+        assertEquals("sprite farmer_chair " + GARRY, canvas.calls.get(2));
+        assertEquals("sprite farmer_east " + GARRY, canvas.calls.get(3));
     }
 
     // In front of the farm, behind him: west. Ahead of him on his row: east. In his column, on row 1 then row 3:
@@ -269,7 +335,35 @@ class ViewRenderersTest {
     private static String farmerAtNight(Farmer farmer) {
         RecordingCanvas canvas = new RecordingCanvas();
         new FarmRenderer(TestLayouts.layout(), 100).render(canvas, 100, farmer, true, sittingCat(), 0f);
-        return canvas.calls.get(1);
+        return canvas.calls.get(3);
+    }
+
+    // Sample both day transitions, a night hit and both passes of the cat's bath.
+    @Test
+    void transitionsHurtAndGroomingUseLocalTime() {
+        FarmRenderer renderer = new FarmRenderer(TestLayouts.layout(), 100);
+        Farmer farmer = dayFarmer();
+        Cat cat = sittingCat();
+        RecordingCanvas canvas = new RecordingCanvas();
+        renderer.render(canvas, 100, farmer, false, cat, 7f);
+        assertTrue(canvas.extras.stream().anyMatch(c -> c.contains("cat_grooming") && c.endsWith("0.0 NORMAL")));
+        canvas.extras.clear();
+        renderer.render(canvas, 100, farmer, true, cat, 0.72f);
+        assertTrue(canvas.extras.contains("animation farmer_stand_up " + GARRY + " 0.0 NORMAL"));
+        assertTrue(canvas.extras.stream().anyMatch(c -> c.contains("cat_grooming")));
+        canvas.extras.clear();
+        renderer.render(canvas, 99, farmer, true, cat, 0.73f);
+        assertTrue(canvas.extras.contains("animation farmer_east_hurt " + GARRY + " 0.0 NORMAL"));
+        assertTrue(canvas.extras.stream().noneMatch(c -> c.contains("cat_grooming")));
+        canvas.calls.clear();
+        renderer.render(canvas, 99, farmer, true, cat, 0.31f);
+        assertEquals("sprite farmer_east " + GARRY, canvas.calls.get(3));
+        canvas.extras.clear();
+        renderer.render(canvas, 99, farmer, false, cat, 0f);
+        assertTrue(canvas.extras.contains("animation farmer_stand_up " + GARRY + " " + Math.nextDown(0.6f) + " NORMAL"));
+        canvas.calls.clear();
+        renderer.render(canvas, 99, farmer, false, cat, 0.61f);
+        assertEquals("sprite farmer " + GARRY, canvas.calls.get(2));
     }
 
     // A farmer who has hit nobody yet: what the day shows, and the start of a night.
@@ -350,7 +444,7 @@ class ViewRenderersTest {
         board.getCell(3, 3).place(new Crop(CropType.CARROT, new CropConfig()));
         new OutlineRenderer(TestLayouts.layout()).renderFree(canvas, Zone.FIELD, board, new DefenseSlots());
         assertEquals(13, canvas.calls.size());
-        assertTrue(canvas.calls.stream().allMatch(call -> call.contains("WHITE")));
+        assertTrue(canvas.calls.stream().allMatch(call -> call.startsWith("sprite cell_frame ")));
     }
 
     // A catapatate placed by the test on TOP 3, on slots of its own: 9 free slots in white.
@@ -362,7 +456,7 @@ class ViewRenderersTest {
         top3.place(new Catapatate(top3, new DefenseConfig(), new ArrayList<>()));
         new OutlineRenderer(TestLayouts.layout()).renderFree(canvas, Zone.SLOTS, new Board(), slots);
         assertEquals(9, canvas.calls.size());
-        assertTrue(canvas.calls.stream().allMatch(call -> call.contains("WHITE")));
+        assertTrue(canvas.calls.stream().allMatch(call -> call.startsWith("sprite cell_frame ")));
     }
 
     //-------------------- THE RANGE (J10) --------------------
@@ -377,8 +471,8 @@ class ViewRenderersTest {
 
         new OutlineRenderer(layout).renderRange(canvas, catapatate);
 
-        assertEquals(List.of("range " + layout.getCellBounds(1, 2), "range " + layout.getCellBounds(1, 3),
-                "range " + layout.getCellBounds(1, 4), "range " + layout.getCellBounds(2, 3)), canvas.calls);
+        assertEquals(List.of("sprite range_cell " + layout.getCellBounds(1, 2), "sprite range_cell " + layout.getCellBounds(1, 3),
+                "sprite range_cell " + layout.getCellBounds(1, 4), "sprite range_cell " + layout.getCellBounds(2, 3)), canvas.calls);
     }
 
     //-------------------- THE GROWTH DOTS (J10) --------------------

@@ -1,0 +1,14 @@
+bramble_0 vegetables/brambles/south-brambles-seeds.png
+bramble_1 vegetables/brambles/south-brambles-final.png
+carrot_0 vegetables/carrots/south-carrots-seeds.png
+cat_meow talk/Speech-bubble-cat/south-bubble-speech-meow.png
+catapatate_bottom defenses/shooting_potatoes/north-shooting-potatoes.png
+catapatate_top defenses/shooting_potatoes/south-shooting-potatoes.png
+farm_destroyed farm/east-farm-destroyed.png
+garlic_0 vegetables/garlic/south-garlic-seeds.png
+garlic_2 vegetables/garlic/south-garlic-final.png
+neighbour_bubble talk/Speech-bubble-characters/south-speech-bubble.png
+pickup objects/pickup/west-pickup.png
+pumpkin_0 vegetables/pumpkin/south-pumpkin-seeds.png
+turnip_0 vegetables/turnip/south-turnip-seeds.png
+urn objects/urn/south-urn.png
