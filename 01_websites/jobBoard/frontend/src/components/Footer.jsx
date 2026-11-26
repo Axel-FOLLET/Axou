@@ -37,7 +37,7 @@ export default function Footer() {
 
           <h3>{t('Éditeur', 'Publisher')}</h3>
           <p>{t('Y.I.A Jobs est un projet pédagogique non professionnel réalisé à Epitech par Axel FOLLET, Yohan AVRONSART et Ismail BASSIT.', 'Y.I.A Jobs is a non-professional educational project carried out at Epitech by Axel FOLLET, Yohan AVRONSART and Ismail BASSIT.')}</p>
-          <p>{t('Directeur de la publication : Axel FOLLET. Contact : ', 'Publication director: Axel FOLLET. Contact: ')}<a href="https://github.com/Axel-FOLLET/jobBoard" target="_blank" rel="noopener noreferrer">{t('dépôt GitHub du projet', 'project GitHub repository')}</a>.</p>
+          <p>{t('Directeur de la publication : Axel FOLLET. Contact : ', 'Publication director: Axel FOLLET. Contact: ')}<a href="https://github.com/Axel-FOLLET/Axou/tree/main/01_websites/jobBoard" target="_blank" rel="noopener noreferrer">{t('dépôt GitHub du projet', 'project GitHub repository')}</a>.</p>
 
           <h3>{t('Hébergement', 'Hosting')}</h3>
           <p>{t('Démonstration hébergée sur Render (render.com) ; les données de démonstration sont fictives et remises à zéro à chaque redémarrage du service.', 'Demo hosted on Render (render.com); the demo data is fictitious and reset each time the service restarts.')}</p>

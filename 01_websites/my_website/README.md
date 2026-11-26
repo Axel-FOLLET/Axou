@@ -25,7 +25,7 @@ Nine project cards on a wheel, each with a small animated scene. Some can be tri
 - **Snake** and **Hangman**: both games, playable in the browser (`js/games/`); the original projects are in Python, with Pygame.
 - **Caesar and Vigenère ciphers** and **Language detector**: live demos of the algorithms (`js/tools/`).
 - **Lost**: the cat of the game, in 3D, which can be turned with the mouse or a finger.
-- **Job Board**: links to the candidate, recruiter and admin demos of the deployed project.
+- **Job Board**: link to its source code in the Axou repository.
 - **Context engineering guide**: the guide in PDF to read, and its Markdown version to give to an AI, in French and in English (`assets/documents/`). The Markdown file is stored as `.md.txt`, because GitHub Pages would turn a `.md` file into an HTML page; the download link gives it back its `.md` name.
 
 ## Built with

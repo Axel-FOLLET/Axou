@@ -12,8 +12,8 @@
 const SVG_NS = "http://www.w3.org/2000/svg";
 
 /*
- * Every word comes from the Job Board itself: tab names from the card's demo buttons
- * ("Démo candidat", "Candidate demo"…), contract types from backend/data/ads.json
+ * Every word comes from the Job Board itself: tab names from its three roles
+ * (candidat, recruteur, admin), contract types from backend/data/ads.json
  * and their English labels from frontend/src/lang.js, "Postuler" / "Apply" from AddJobOffer.jsx.
  */
 const TEXTS = {
