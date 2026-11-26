@@ -1186,11 +1186,16 @@
     image-rendering: pixelated;
 }
 
-/* Snake draws a 256 by 160 board in a 290-unit-wide view. */
+/*
+    The farm draws a 144 by 100 view (js/modules/scenes/farm.js): two CSS pixels per sprite pixel in a full-size media.
+    In a media lower than the drawing, the drawing shrinks to its height and keeps its shape (object-fit).
+*/
 .farm-scene {
-    width: min(88.27586%, 256px);
+    width: min(100%, 288px);
     height: auto;
-    aspect-ratio: 8 / 5;
+    max-height: 100%;
+    aspect-ratio: 36 / 25;
+    object-fit: contain;
 }
 
 @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
