@@ -1,9 +1,9 @@
 """Demo mode (DEMO_MODE=1): three demonstration accounts and a route that opens
 their session.
 
-The portfolio points to GET /api/demo/login?role=candidat|recruteur|admin: the
+GET /api/demo/login?role=candidat|recruteur|admin: the
 session is opened, then the browser is redirected to the matching area.
-With &lang=fr or &lang=en (portfolio links), the interface opens in that language.
+With &lang=fr or &lang=en, the interface opens in that language.
 The passwords are drawn at random at every start: these accounts can only be
 logged into through this route. Outside demo mode, nothing is created.
 """
